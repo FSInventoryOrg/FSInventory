@@ -1,0 +1,117 @@
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { HardwareType } from "@/types/asset"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as imsService from '@/ims-service'
+import { useAppContext } from '@/hooks/useAppContext'
+import { Spinner } from '../Spinner'
+import Retrieve from "../graphics/Retrieve";
+import { ArrowFatLinesDown } from "@phosphor-icons/react";
+import { useState } from "react";
+import { EmployeeType } from "@/types/employee";
+
+interface DeployAssetProps {
+  assetData: HardwareType;
+}
+const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
+  const queryClient = useQueryClient()
+  const [open, setOpen] = useState(false);
+  const { showToast } = useAppContext();
+  
+  const { data: employees } = useQuery<EmployeeType[]>({ 
+    queryKey: ['fetchAllEmployees'], 
+    queryFn: () => imsService.fetchAllEmployees(),
+  });
+
+  const { mutate: updateEmployee, isPending: updatingEmployee } = useMutation({
+    mutationFn: imsService.updateEmployeeAssetHistory,
+    onSuccess: async () => {
+      showToast({ message: "Asset retrieved successfully!", type: "SUCCESS" });
+      queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
+      setTimeout(() => {
+        setOpen(false);
+      }, 500)
+    },
+    onError: (error: Error) => {
+      showToast({ message: error.message, type: "ERROR" });
+    }
+  });
+
+  const { mutate: retrieveAsset, isPending: retrievalPending } = useMutation({
+    mutationFn: imsService.retrieveAsset,
+    onSuccess: async () => {
+      if (employees) {
+        const employeeList = employees.map((employee: EmployeeType) => `${employee.code}`);
+        if (employeeList.includes(assetData.assignee)) {
+          const assetHistory = {
+            deploymentDate: assetData.deploymentDate,
+            recoveryDate: assetData.recoveryDate,
+            assetCode: assetData.code
+          }
+          updateEmployee({ code: assetData.assignee, assetHistory: assetHistory })
+        } else {
+          showToast({ message: "Asset retrieved successfully!", type: "SUCCESS" });
+          setTimeout(() => {
+            window.location.reload()
+          }, 500)
+        }
+      }
+    },
+    onError: (error: Error) => {
+      showToast({ message: error.message, type: "ERROR" });
+    }
+  });
+
+  const onSubmit = () => {
+    const retrievedAsset = {
+      _id: assetData._id,
+      code: assetData.code,
+      recoveryDate: new Date,
+      recoveredFrom: assetData.assignee,
+    }
+    retrieveAsset({ code: assetData.code, retrievedAsset: retrievedAsset });
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="w-[90px] justify-between h-8 px-2 gap-2 text-xs font-semibold" variant='secondary'>
+          Retrieve
+          <ArrowFatLinesDown weight="fill" size={16} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold">Retrieve asset {assetData.code}?</DialogTitle>
+          <DialogDescription className="">
+            Retrieving this asset from {assetData.assignee} will remove it from their deployed assets list and set the status of this asset to 'IT Storage'.
+          </DialogDescription>
+          <Retrieve />
+        </DialogHeader>
+        <DialogFooter>
+          <Button 
+            type="button" 
+            disabled={(retrievalPending || updatingEmployee)} 
+            className="gap-2 font-semibold"
+            onClick={() => {
+              onSubmit();
+            }}
+          >
+            {(retrievalPending || updatingEmployee) ? <Spinner size={18}/> : null }
+            Yes, I want to retrieve it
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+export default RetrieveAsset;

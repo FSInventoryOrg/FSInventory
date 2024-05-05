@@ -1,0 +1,252 @@
+import { useEffect, useState } from "react"
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Form,
+} from "@/components/ui/form"
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import * as imsService from '@/ims-service'
+import { useAppContext } from '@/hooks/useAppContext'
+import { Spinner } from '../Spinner'
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
+import { ArrowRightIcon, PlusIcon, CalendarIcon } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { EmployeeFormData, EmployeeSchema } from "@/schemas/AddEmployeeSchema";
+import { FullScaleIcon } from "../icons/FullScaleIcon";
+import { Separator } from "../ui/separator";
+import { UserIcon } from "../icons/UserIcon";
+import { Checkbox } from "../ui/checkbox";
+
+const AddEmployee = () => {
+  const queryClient = useQueryClient()
+  const [open, setOpen] = useState(false); 
+  const [openCalendar, setOpenCalendar] = useState(false);
+  const { showToast } = useAppContext();
+
+  const form = useForm<z.infer<typeof EmployeeSchema>>({
+    resolver: zodResolver(EmployeeSchema),
+    defaultValues: {
+      code: '',
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      position: '',
+      startDate: undefined,
+      isActive: true,
+    }
+  });
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: imsService.addEmployee,
+    onSuccess: async () => {
+      showToast({ message: "New employee added successfully!", type: "SUCCESS" });
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
+      setTimeout(() => {
+        setOpen(false);
+      }, 500)
+    },
+    onError: (error: Error) => {
+      showToast({ message: error.message, type: "ERROR" });
+    }
+  });
+
+  const onSubmit = (data: z.infer<typeof EmployeeSchema>) => {
+    const employeeData: EmployeeFormData = {
+      ...data,
+    }
+    mutate(employeeData)
+  }
+
+  useEffect(() => {
+    if (open) {
+      form.reset();
+    }
+  }, [open, form])
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className='h-8 px-2 gap-1 font-semibold border border-primary'>
+          <span className="hidden md:inline-block text-sm">New</span>
+          <PlusIcon className="h-4 w-4"/>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[800px] bg-card p-0">
+        <div className="">
+          <Form {...form}>
+            <form className="flex w-full" onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="flex flex-col justify-center items-start gap-4 bg-accent rounded-md px-4">
+                <div className="h-56 w-56 bg-muted border-border border rounded-full justify-center items-center flex">
+                  <UserIcon size={220} className="fill-current text-darker" />
+                </div>
+                <div className="flex gap-1 justify-center items-center bg-border pl-2 rounded-md">
+                  <FormLabel className='text-sm text-secondary-foreground text-nowrap'>ID No.</FormLabel>
+                  <FormField
+                    control={form.control}
+                    name="code"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormControl>
+                          <Input className="h-8 w-full text-sm border-border" placeholder="FS-XXXX" autoComplete="off" type="input" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />  
+                </div>
+              </div>          
+              <div className="w-full flex flex-col justify-between items-center gap-4 p-4">
+                <FullScaleIcon size={80} className="fill-current text-primary"/>
+                <div className="flex w-full flex-col gap-2 items-start">
+                  <div className="flex w-full gap-2 justify-center items-center">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input className="text-sm" placeholder="First name" autoComplete="off" type="input" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />  
+                    <FormField
+                      control={form.control}
+                      name="middleName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input className="text-sm" placeholder="Middle name" autoComplete="off" type="input" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />  
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input className="text-sm" placeholder="Last name" autoComplete="off" type="input" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />  
+                  </div>
+                  <div className="flex w-full justify-center items-center">
+                    <FormField
+                      control={form.control}
+                      name="position"
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FormControl>
+                            <Input className="text-sm" placeholder="Position" autoComplete="off" type="input" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />  
+                  </div>
+                  <Separator className="my-4" />
+                  <div className="flex w-full gap-2 justify-center items-center bg-border rounded-md pl-2">
+                    <FormLabel className='text-sm text-accent-foreground text-nowrap'>Start Date</FormLabel>
+                    <FormField
+                      control={form.control}
+                      name="startDate"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col w-full">
+                          <Popover open={openCalendar} onOpenChange={setOpenCalendar}>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "w-full pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "PPP")
+                                  ) : (
+                                    <span>MM / DD / YEAR</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0 h-[350px] z-10" align="end">
+                              <Calendar
+                                mode="single"
+                                onSelect={field.onChange}
+                                onDayClick={() => {setOpenCalendar(false)}}
+                                disabled={(date) =>
+                                  date > new Date() || date < new Date("1900-01-01")
+                                }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />  
+                  </div>
+                </div>
+                <div className="self-end flex flex-row justify-center items-center gap-2">
+                  <FormField
+                    control={form.control}
+                    name="isActive"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none text-accent-foreground">
+                          <FormLabel>
+                            Is employee active?
+                          </FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" disabled={isPending} className="gap-2">
+                    {isPending ? <Spinner size={18}/> : null }
+                    Create Employee
+                    <ArrowRightIcon />
+                  </Button>
+                </div>
+              </div>
+            </form>
+          </Form>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+export default AddEmployee;

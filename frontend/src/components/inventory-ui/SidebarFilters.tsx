@@ -1,0 +1,178 @@
+'use client'
+
+import React from 'react'
+import { CodeIcon, FilterIcon, MonitorSmartphoneIcon, RefreshCcwIcon } from 'lucide-react'
+import { Button } from '../ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import CountUp from 'react-countup';
+import * as imsService from '@/ims-service';
+import { useQuery } from '@tanstack/react-query';
+import { HardwareType } from '@/types/asset';
+import { Skeleton } from '../ui/skeleton';
+
+interface SidebarFiltersProps {
+  onFilterChange: (status: string) => void;
+  onCategoryChange: (status: string) => void;
+  selectedStatus: string;
+  selectedCategory: string;
+  totalAssets: number;
+}
+
+const SidebarFilters = ({ onFilterChange, onCategoryChange, selectedStatus, selectedCategory, totalAssets }: SidebarFiltersProps) => {
+
+  const { data, isLoading } = useQuery({ queryKey: ['fetchAllAssets', 'Hardware'], queryFn: () => imsService.fetchAllAssets('Hardware') })
+  const statusCounts: Record<string, number> = {};
+  const categoriesCounts: Record<string, number> = {};
+  const categories = new Set<string>();
+
+  const [prevTotalAssets, setPrevTotalAssets] = React.useState<number>(0)
+
+  if (data) {
+    data.forEach((asset: HardwareType) => {
+      statusCounts[asset.status] = (statusCounts[asset.status] || 0) + 1;
+    });
+    data.forEach((asset: HardwareType) => {
+      categories.add(asset.category);
+      categoriesCounts[asset.category] = (categoriesCounts[asset.category] || 0) + 1;
+    });
+  }
+
+  const handleStatusClick = (status: string) => {
+    onFilterChange(status); 
+    setPrevTotalAssets(totalAssets)
+  };
+
+  return (
+    <section className='w-full flex flex-col'>
+      <div className='flex items-end justify-between mr-8 pb-4'>
+        <h1 className='text-xl font-semibold tracking-wide'>Assets</h1>
+        {isLoading ? 
+        <Skeleton className='bg-muted w-[120px] rounded-xl h-8 border-border border-2' /> 
+        :
+        <div className='text-sm font-semibold border-2 rounded-xl px-3 text-muted-foreground h-8 justify-center items-center flex gap-1'>
+          <span className='text-base text-secondary-foreground'>
+            <CountUp start={prevTotalAssets} end={totalAssets} delay={0} duration={1}>
+              {({ countUpRef }) => (
+                <div>
+                  <span ref={countUpRef} />
+                </div>
+              )}
+            </CountUp>
+          </span> 
+          total assets
+        </div>    
+        }
+      </div>
+      <div className='flex xl:flex-col drop-shadow'>
+        <div className='w-full bg-accent xl:rounded-b-none rounded-l-md xl:rounded-t-md p-4 pb-8 flex flex-col gap-4 '>
+          <h2 className='font-semibold flex gap-2 items-center'><FilterIcon size={16}/>Filter Settings</h2>
+          <div className='flex flex-col gap-2'>
+            <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Type</span>
+            <div className='flex gap-2 w-full md:w-fit xl:w-full'>
+              <Button variant='outline' className='bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2'>
+                Hardware
+                <MonitorSmartphoneIcon size={18} />
+              </Button>
+              <Button variant='outline' className='bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2'>
+                Software
+                <CodeIcon size={18} />
+              </Button>
+            </div>
+          </div>
+          <div className='flex flex-col gap-2'>
+            <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Status</span>
+            <div className='grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-2 gap-2'>
+              {isLoading ? 
+                <>
+                  {Array.from({ length: 10 }, (_, index) => (
+                    <Button 
+                      key={index} 
+                      disabled
+                      variant='outline' 
+                      className="bg-muted rounded-xl border-2 flex w-full justify-end px-2 h-9"
+                    >
+                      <Skeleton className="rounded-lg h-5 w-[30px] bg-secondary" />
+                    </Button>
+                  ))}
+                </> 
+                :
+                <>
+                  <Button 
+                    variant='outline' 
+                    className={`bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 ${selectedStatus === '' ? 'border-primary' : ''}`}
+                    onClick={() => handleStatusClick('all')}
+                  >
+                    <span className='w-[100px] text-start overflow-hidden text-ellipsis text-xs'>All</span>
+                    <div className={`rounded-lg px-2 py-0.5 text-xs ${selectedStatus === '' ? 'bg-primary/30 text-primary' : 'bg-secondary text-secondary-foreground'}`}>{data.length}</div>
+                  </Button>
+                  {Object.entries(statusCounts).map(([status, count]) => (
+                    <Button 
+                      key={status} 
+                      variant='outline' 
+                      className={`bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 ${selectedStatus === status ? 'border-primary' : ''}`}
+                      onClick={() => handleStatusClick(status)}
+                    >
+                      <span className='w-[100px] text-start overflow-hidden text-ellipsis text-xs'>{status}</span>
+                      <div className={`ml-1 rounded-lg px-2 py-0.5 text-xs ${selectedStatus === status ? 'bg-primary/30 text-primary' : 'bg-secondary text-secondary-foreground'}`}>{count}</div>
+                    </Button>
+                  ))}
+                </>
+              }
+            </div>
+          </div>
+          <div className='flex flex-col gap-2'>
+            <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Category</span>
+            <div className='flex gap-2'>
+              {isLoading ? 
+                <Select disabled>
+                  <SelectTrigger className="w-full rounded-xl border-2 font-semibold">
+                    <SelectValue placeholder="All assets" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Hardware</SelectLabel>
+                      <SelectItem value='all'>All</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>            
+                :
+                <Select onValueChange={onCategoryChange} value={selectedCategory}>
+                  <SelectTrigger className="w-full rounded-xl border-2 font-semibold">
+                    <SelectValue placeholder="All assets" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Hardware</SelectLabel>
+                      <SelectItem value='all'>All</SelectItem>
+                      {[...categories].map((category: string) => (
+                        <SelectItem key={category} value={category} className='w-full'>
+                            {category}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              }
+            </div>
+          </div>
+        </div>
+        <Button 
+          className='h-full gap-2 rounded-l-none rounded-r-md xl:rounded-t-none xl:rounded-b-md w-28 xl:w-full text-lg xl:gap-2 xl:py-8' 
+          onClick={() => window.location.reload()}
+        >
+          <RefreshCcwIcon size={20} /> Reset
+        </Button>
+      </div>
+    </section>
+  )
+}
+
+export default SidebarFilters

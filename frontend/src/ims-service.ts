@@ -1,0 +1,396 @@
+import { AssetFormData } from "./schemas/AddAssetSchema";
+import { AssetFormData as DeployAssetFormData } from "./schemas/DeployAssetSchema";
+import { AssetFormData as RetrieveAssetFormData } from "./schemas/RetrieveAssetSchema";
+import { EmployeeFormData } from "./schemas/AddEmployeeSchema";
+import { AssetsHistory } from "./types/employee";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
+
+/* ASSETS */
+
+export const addAsset = async (asset: AssetFormData) => {
+  const response = await fetch(`${API_BASE_URL}/api/assets`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(asset)
+  });
+
+  const responseBody = await response.json();
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+
+  return responseBody;
+}
+
+export const updateAsset = async ({ code, updatedAsset }: { code: string, updatedAsset: AssetFormData }) => {
+  const response = await fetch(`${API_BASE_URL}/api/assets/${code}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(updatedAsset)
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to update asset');
+  }
+
+  return true;
+};
+
+export const deployAsset = async ({ code, deployedAsset }: { code: string, deployedAsset: DeployAssetFormData }) => {
+  console.log(deployedAsset)
+  const response = await fetch(`${API_BASE_URL}/api/assets/deploy/${code}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(deployedAsset)
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to update asset');
+  }
+
+  return true;
+};
+
+export const retrieveAsset = async ({ code, retrievedAsset }: { code: string, retrievedAsset: RetrieveAssetFormData }) => {
+  console.log(retrievedAsset)
+  const response = await fetch(`${API_BASE_URL}/api/assets/retrieve/${code}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(retrievedAsset)
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to update asset');
+  }
+
+  return true;
+};
+
+
+export const updateAssetProperty = async ({ property, value, newValue }: { property: string, value: string, newValue: string }) => {
+  const response = await fetch(`${API_BASE_URL}/api/assets/${property}/${value}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ [property]: newValue })
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to update asset');
+  }
+
+  return true;
+};
+
+export const fetchAllAssets = async (type?: string) => {
+  let url = `${API_BASE_URL}/api/assets`;
+  if (type) {
+    url += `?type=${type}`;
+  }
+
+  const response = await fetch(url, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error("Error fetching assets");
+  }
+
+  return response.json();
+}
+
+export const fetchAllAssetsByStatusAndCategory = async (type: string, status: string, category: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/assets?type=${type}&status=${status}&category=${category}`, {
+    credentials: 'include',
+  });
+
+  if(!response.ok) {
+    throw new Error("Error fetching assets");
+  }
+
+  return response.json();
+}
+
+export const fetchAssetByCode = async (code: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/assets/${code}`, {
+    credentials: 'include',
+  });
+
+  if(!response.ok) {
+    throw new Error("Error fetching asset by code");
+  }
+
+  return response.json();
+}
+
+export const fetchAssetCount = async (property: string, value: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/assets/count/${property}/${value}`, {
+    credentials: 'include',
+  });
+
+  if(!response.ok) {
+    throw new Error("Error fetching assets");
+  }
+
+  return response.json();
+}
+
+export const fetchAssetsByProperty = async (property: string, value: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/assets/${property}/${value}`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error("Error fetching assets");
+  }
+
+  return response.json();
+}
+
+export const fetchAssetUniqueValuesByProperty = async (property: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/assets/uniqueValues/${property}`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error("Error fetching unique values");
+  }
+
+  return response.json();
+}
+
+export const deleteAssetsByProperty = async (property: string, value: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/assets/${property}/${value}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to delete assets')
+  }
+
+  return true;
+}
+
+export const deleteAssetByCode = async (code: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/assets/${code}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to delete asset');
+  }
+
+  return true;
+};
+
+/* OPTIONS */
+
+export const addOptionValue = async ({property, value}: { property: string, value: string | object }) => {
+  const response = await fetch(`${API_BASE_URL}/api/options/${property}`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ value })
+  });
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.error);
+  }
+
+  return response.json();
+};
+
+export const updateOptionValue = async ({ property, value, index }: { property: string, value: string | object, index?: number }) => {
+  const url = `${API_BASE_URL}/api/options/${property}`;
+  const queryString = index !== undefined ? `?index=${index}` : ''; 
+
+  const response = await fetch(url + queryString, {
+    method: 'PUT',
+    credentials: 'include', 
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ value })
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.error || 'Failed to update option');
+  }
+
+  return true;
+};
+
+export const deleteOption = async (property: string, value: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/options/${property}`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ value })
+    });
+
+    const responseBody = await response.json();
+    if (!response.ok) {
+      throw new Error(responseBody.message || `Failed to delete ${property}`);
+    }
+
+    return responseBody;
+  } catch (error) {
+    console.error('Error deleting option:', error);
+    throw error;
+  }
+};
+
+export const fetchOptionValues = async (property: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/options/${property}`, {
+      credentials: 'include',
+    });
+
+    const responseBody = await response.json();
+    if (!response.ok) {
+      throw new Error(responseBody.message || `Failed to fetch ${property}`);
+    }
+
+    return responseBody.value;
+  } catch (error) {
+    console.error('Error fetching option value:', error);
+    throw error;
+  }
+};
+
+
+/* EMPLOYEES */
+
+export const addEmployee = async (asset: EmployeeFormData) => {
+  const response = await fetch(`${API_BASE_URL}/api/employees`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(asset)
+  });
+
+  const responseBody = await response.json();
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+
+  return responseBody;
+}
+
+export const updateEmployeeAssetHistory = async ({ code, assetHistory }: { code: string, assetHistory: AssetsHistory }) => {
+  const response = await fetch(`${API_BASE_URL}/api/employees/history/${code}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(assetHistory)
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to update employee asset history');
+  }
+
+  return true;
+};
+
+export const updateEmployee = async ({ code, updatedEmployee }: { code: string, updatedEmployee: EmployeeFormData }) => {
+  const response = await fetch(`${API_BASE_URL}/api/employees/${code}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(updatedEmployee)
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to update employee');
+  }
+
+  return true;
+};
+
+export const fetchAllEmployees = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/employees`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error("Error fetching employees");
+  }
+
+  return response.json();
+}
+
+export const fetchEmployeeByCode = async (code: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/employees/${code}`, {
+    credentials: 'include',
+  });
+
+  if(!response.ok) {
+    throw new Error("Error fetching employee by code");
+  }
+
+  return response.json();
+}
+
+export const fetchEmployeeUniqueValuesByProperty = async (property: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/employees/uniqueValues/${property}`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error("Error fetching unique values");
+  }
+
+  return response.json();
+}
+
+export const deleteEmployeeByCode = async (code: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/employees/${code}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to delete employee by code');
+  }
+
+  return true;
+};
