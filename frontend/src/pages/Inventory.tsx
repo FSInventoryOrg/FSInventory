@@ -38,13 +38,33 @@ const Inventory = () => {
     queryFn: () => imsService.fetchAllAssetsByStatusAndCategory('Hardware', selectedStatus, selectedCategory) 
   })
 
+  const [height, setHeight] = React.useState('calc(100vh - 91px)');
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1280) {
+        setHeight('calc(100vh - 91px)');
+      } else {
+        setHeight('');
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <section id="inventory" className="flex flex-col xl:flex-row gap-6 w-full px-6 pb-6 pt-3" style={{ height: 'calc(100vh - 91px)' }}>
+    <section 
+      id="inventory" 
+      className="flex flex-col xl:flex-row gap-6 w-full px-6 pb-6 pt-3" 
+      style={{ height }}
+    >
       {isFiltersVisible && (
         <aside className="order-first flex xl:w-80 z-50">
           <SidebarFilters
             onFilterChange={handleFilterChange}
             onCategoryChange={handleCategoryChange}
+            onToggleFilters={handleToggleFilters} 
+            isFiltersVisible={isFiltersVisible} 
             selectedStatus={selectedStatus}
             selectedCategory={selectedCategory}
             totalAssets={data?.length ?? 0}
@@ -61,7 +81,10 @@ const Inventory = () => {
             selectedCategory={selectedCategory} 
           /> 
         ) : ( 
-          <InventoryTableSuspense />
+          <InventoryTableSuspense 
+            onToggleFilters={handleToggleFilters} 
+            isFiltersVisible={isFiltersVisible} 
+          />
         )}
       </main>
     </section>

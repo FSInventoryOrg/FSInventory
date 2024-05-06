@@ -42,12 +42,12 @@ const Layout = ({ children }: Props) => {
   }, []);
 
   return (
-    <div className="w-full flex flex-col border-[0px] items-center relative">
+    <div className="w-full flex flex-col items-center relative">
       <LoadingBar color="lime" className="text-muted" progress={progress} onLoaderFinished={() => setProgress(0)} />
-      <header className={`w-full flex fixed top-0 bg-background border-b-[0px] z-50 ${scrolled ? "drop-shadow-lg" : "drop-shadow-none"}`}>
+      <header className={`w-full justify-center flex fixed top-0 bg-background z-50 ${scrolled ? "drop-shadow-lg" : "drop-shadow-none"}`}>
         <NavigationBar />
       </header>
-      <div className="flex flex-col sm:flex-row mt-[89px] border-[0px] border-green-500 w-full absolute z-40" style={{ minHeight: 'calc(100vh - 89px)' }}>
+      <div className="flex flex-col sm:flex-row mt-[89px] w-full overflow-auto relative z-40" style={{ minHeight: 'calc(100vh - 89px)' }}>
         <main className="flex-1">{children}</main>
       </div>
       <Toaster />

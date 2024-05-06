@@ -1,8 +1,6 @@
 'use client'
 
 import React from 'react';
-import CountUp from 'react-countup';
-import { motion } from "framer-motion"
 import * as imsService from '@/ims-service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetsHistory, EmployeeType } from '@/types/employee';
@@ -42,6 +40,9 @@ import { Spinner } from '../Spinner';
 import { AssetsHistoryTable } from './AssetsHistoryTable';
 import { AssetsHistoryColumns } from './AssetsHistoryColumns';
 import { Info } from '@phosphor-icons/react';
+import AssetsCount from './AssetCounts';
+import { Skeleton } from '../ui/skeleton';
+// import { Skeleton } from '../ui/skeleton';
 
 interface DeploymentInfoProps {
   employee: EmployeeType;
@@ -50,10 +51,9 @@ interface DeploymentInfoProps {
 
 const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
   const [selectedFilter, setSelectedFilter] = React.useState('current');
-  const [expanded, setExpanded] = React.useState(true);
   const [assetsCurrent, setAssetsCurrent] = React.useState<HardwareType[] | null>(null);
   const [assetsHistory, setAssetsHistory] = React.useState<HardwareType[] | null>(null);
-  const [assetCounts, setAssetCounts] = React.useState<{ [category: string]: number } | []>([]);
+  const [assetCounts, setAssetCounts] = React.useState<{ [category: string]: number }>();
 
   const { data: allAssets } = useQuery({ 
     queryKey: ['fetchAllAssets'], 
@@ -100,18 +100,14 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
   }, [currentAssets])
 
   React.useEffect(() => {
-    console.log(selectedFilter)
-    if (selectedFilter === 'current') {
-      const counts = assetsCurrent ? countAssetsByCategory(assetsCurrent) : {};
-      console.log(counts)
-      setAssetCounts(counts)
-    } else {
-      const counts = assetsHistory ? countAssetsByCategory(assetsHistory) : {};
-      setAssetCounts(counts)
+    if (selectedFilter === 'current' && assetsCurrent) {
+      const counts = countAssetsByCategory(assetsCurrent);
+      setAssetCounts(counts);
+    } else if (selectedFilter === 'history' && assetsHistory) {
+      const counts = countAssetsByCategory(assetsHistory);
+      setAssetCounts(counts);
     }
-  }, [selectedFilter, assetsCurrent, assetsHistory]);  
-
-  console.log(assetsCurrent)
+  }, [selectedFilter, assetsCurrent, assetsHistory]);
 
   return (
     <>
@@ -164,46 +160,11 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
             </div>
           </div>
           <div id='statistics' className='relative'>
-            <div 
-              className='flex flex-row gap-2 cursor-pointer w-fit'
-              onClick={() => {
-                setExpanded(!expanded);
-              }}
-            >
-              <div className='flex flex-col bg-secondary rounded-lg border px-4 py-2 w-[125px]'>
-                <span className='text-xs font-bold text-accent-foreground self-end overflow-ellipsis whitespace-nowrap'>TOTAL ASSETS</span>
-                <span className='text-3xl font-bold text-accent-foreground self-end'>
-                  <CountUp start={0} end={Object.values(assetCounts).reduce((acc, count) => acc + count, 0)} delay={0} duration={1}>
-                    {({ countUpRef }) => (
-                      <div>
-                        <span ref={countUpRef} />
-                      </div>
-                    )}
-                  </CountUp>
-                </span>
+            {assetCounts ? <AssetsCount assetCounts={assetCounts} /> : (
+              <div className='flex flex-row gap-2 cursor-pointer w-fit h-[70px]'>
+                <Skeleton className='flex flex-col bg-secondary rounded-lg px-4 py-2 w-[125px]' />
               </div>
-              {Object.entries(assetCounts).map(([category, count], index) => (
-                <motion.div
-                  initial={{ x: 0 }} // Ensure lower index has higher zIndex
-                  animate={{ x: expanded ? (100 * (index+1)) : (15 * (index+1)) }}
-                  transition={{ type: 'spring', ease: "easeInOut", duration: 0.2, delay: index * 0.05 }} // Adjust delay for staggered animation
-                  key={category}
-                  className='w-[125px] flex flex-col bg-accent rounded-lg border px-4 py-2 absolute top-0 left-0'
-                  style={{ zIndex: -(index+1) }} // Ensure zIndex transitions properly
-                >
-                  <span className='text-xs font-bold text-muted-foreground text-end text-ellipsis overflow-hidden whitespace-nowrap w-full'>{category.toUpperCase()}</span>
-                  <span className='text-3xl font-bold text-accent-foreground self-end'>
-                    <CountUp start={0} end={count} delay={0.05} duration={1}>
-                      {({ countUpRef }) => (
-                        <div>
-                          <span ref={countUpRef} />
-                        </div>
-                      )}
-                    </CountUp>
-                  </span>
-                </motion.div>
-              ))}
-            </div>
+            )}
           </div>
         </div>
         <div className='flex items-center gap-2 pb-2'>

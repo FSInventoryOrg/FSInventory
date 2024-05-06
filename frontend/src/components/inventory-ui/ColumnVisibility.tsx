@@ -32,7 +32,7 @@ export function ColumnVisibility<TData>({
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="h-8 w-8 p-0 ml-auto"
+              className="h-8 w-8 p-0"
             >
               <span className="sr-only">Toggle visible columns</span>
               <Columns3Icon className='h-4 w-4'/>

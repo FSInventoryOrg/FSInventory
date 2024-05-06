@@ -16,7 +16,7 @@ const OptionSettings = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant='outline' size='icon' className="h-8 w-8">
-        <span className="sr-only">Toggle visible columns</span>
+        <span className="sr-only">Toggle option settings</span>
           <SlidersHorizontalIcon className='h-4 w-4'/>
           </Button>
       </DialogTrigger>

@@ -35,6 +35,7 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
     mutationFn: imsService.updateEmployeeAssetHistory,
     onSuccess: async () => {
       showToast({ message: "Asset retrieved successfully!", type: "SUCCESS" });
+      queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
       setTimeout(() => {
         setOpen(false);

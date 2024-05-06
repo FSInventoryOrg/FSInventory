@@ -23,7 +23,7 @@ const UserAvatar = () => {
       <DropdownMenuTrigger className="w-full flex rounded-full font-medium focus:outline outline-primary">
         <Avatar className="bg-secondary h-10 w-10 hover:opacity-80" >
           <AvatarImage alt="@user" />
-          <AvatarFallback className="bg-accent"><UserIcon size={100} className="fill-current text-accent-foreground" /></AvatarFallback>
+          <AvatarFallback className="bg-muted"><UserIcon size={100} className="fill-current text-secondary" /></AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-72">

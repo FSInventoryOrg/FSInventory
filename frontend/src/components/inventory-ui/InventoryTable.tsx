@@ -23,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ScrollArea } from "../ui/scroll-area"
+import { ScrollArea, ScrollBar } from "../ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { InventoryPagination } from "./InventoryPagination"
 import AddAsset from "./AddAsset"
@@ -207,29 +207,33 @@ export function InventoryTable<TData, TValue>({
   
   return (
     <div className="w-full flex flex-col h-full" >
-      <div className="flex items-center pb-4 justify-between">
-        <div className="flex items-center -translate-x-4">
-          <SearchIcon className="translate-x-8 h-4 w-4"/>
-          <Input
-            placeholder="Search asset..."
-            value={globalFilter ?? ''}
-            onChange={(event) => table.setGlobalFilter(event.target.value)}
-            className="max-w-sm pl-10 h-8 font-light rounded-md text-sm w-fit md:w-[700px]"
-          />
+      <div className="w-full flex items-center justify-between pb-4 gap-2">
+        <div className="flex gap-2 w-full">
+          {!isFiltersVisible && (
+            <Button
+              className='h-8 w-8 min-w-8 p-0'
+              variant='outline'
+              size='icon'
+              onClick={() => {
+                onToggleFilters(!isFiltersVisible);
+              }}
+            >
+              <span className="sr-only">Toggle sidebar filters</span>
+              <FilterIcon className='h-4 w-4' />
+            </Button>
+          )}
+          <div className="flex items-center w-full">
+            <SearchIcon className="absolute translate-x-3 h-4 w-4"/>
+            <Input
+              placeholder="Search asset..."
+              value={globalFilter ?? ''}
+              onChange={(event) => table.setGlobalFilter(event.target.value)}
+              className="w-full pl-10 h-8 font-light rounded-md text-sm md:w-[700px]"
+            />
+          </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-fit">
           <OptionSettings />
-          <Button
-            className='h-8 w-8 p-0'
-            variant='outline'
-            size='icon'
-            onClick={() => {
-              onToggleFilters(!isFiltersVisible);
-            }}
-          >
-            <span className="sr-only">Toggle visible columns</span>
-            <FilterIcon className='h-4 w-4' />
-          </Button>
           <ColumnVisibility table={table} />
           <AddAsset />
         </div>
@@ -280,6 +284,7 @@ export function InventoryTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
+        <ScrollBar orientation="horizontal" />
       </ScrollArea>
       <InventoryPagination table={table}/>
     </div>

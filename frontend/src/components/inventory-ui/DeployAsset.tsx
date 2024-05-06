@@ -63,6 +63,7 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
     mutationFn: imsService.deployAsset,
     onSuccess: async () => {
       showToast({ message: "Asset deployed successfully!", type: "SUCCESS" });
+      queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
       setTimeout(() => {
         setOpen(false);

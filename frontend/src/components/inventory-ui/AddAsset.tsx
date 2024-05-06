@@ -88,6 +88,7 @@ const AddAsset = () => {
     mutationFn: imsService.addAsset,
     onSuccess: async () => {
       showToast({ message: "New asset added successfully!", type: "SUCCESS" });
+      queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
       setTimeout(() => {
         setOpen(false);

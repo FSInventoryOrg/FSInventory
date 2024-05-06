@@ -47,6 +47,15 @@ app.use("/api/assets", assetRoutes)
 app.use("/api/options", optionRoutes)
 app.use("/api/employees", employeeRoutes)
 
+// Catch-all route for unmatched URLs (place it here)
+app.get('/*', function(req, res) {
+  res.sendFile(path.join(__dirname, '../../../frontend/dist/index.html'), function(err) {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
+});
+
 app.listen(port, () => {
   logger.info(`Server running on http://localhost:${port}`)
   swaggerDocs(app, port);
