@@ -50,7 +50,7 @@ const EmployeeFilter: React.FC<EmployeeFilterProps> = ({ onFilter }) => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant='outline' size='icon' className='p-0 h-8 w-8'>
+        <Button variant='outline' size='icon' className='p-0 h-8 min-w-8 w-8'>
           <span className="sr-only">Filter employees</span>
           <FilterIcon className='h-4 w-4' />
         </Button>

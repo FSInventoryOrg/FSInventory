@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import React from "react"
 
 interface InventoryPaginationProps<TData> {
   table: Table<TData>
@@ -17,15 +18,28 @@ interface InventoryPaginationProps<TData> {
 export function InventoryPagination<TData>({
   table,
 }: InventoryPaginationProps<TData>) {
+  const [isMD, setIsMD] = React.useState(false);
+  React.useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMD(window.innerWidth >= 768); 
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
   return (
-    <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 items-center justify-between pt-4">
+    <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 items-center justify-between pt-4">
       <div className="flex-1 text-sm text-muted-foreground">
         {table.getFilteredSelectedRowModel().rows.length} of{" "}
         {table.getFilteredRowModel().rows.length} row(s) selected.
       </div>
-      <div className="flex items-center space-x-6 lg:space-x-8">
+      <div className="flex w-full sm:w-fit items-center justify-between sm:justify-normal space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Rows per page</p>
+          {isMD && <p className="text-sm font-medium">Rows per page</p>}
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {

@@ -87,19 +87,38 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
       form.reset();
     }
   }, [open, form])
+
+  const [isMD, setIsMD] = useState(false);
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMD(window.innerWidth >= 768); 
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
   
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="flex justify-center items-center rounded-full h-10 w-10 bg-transparent hover:bg-muted-foreground/20 border-0">
-        <PencilIcon size={20} />
+      <DialogTrigger asChild>
+        <Button 
+          size="icon"
+          className="text-white flex justify-center items-center rounded-full h-10 w-10 bg-transparent hover:bg-muted-foreground/20 border-0">
+          <PencilIcon size={20} />
+        </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] bg-card p-0">
+      <DialogContent className="sm:max-w-[800px] bg-card p-0 rounded-md">
         <div className="">
           <Form {...form}>
-            <form className="flex w-full" onSubmit={form.handleSubmit(onSubmit)}>
-              <div className="flex flex-col justify-center items-start gap-4 bg-accent rounded-md px-4">
+            <form className="flex flex-col md:flex-row w-full" onSubmit={form.handleSubmit(onSubmit)}>
+              <div id='side' className="flex flex-col justify-center items-center md:items-start gap-4 bg-accent rounded-md py-4 md:px-4">
+                {!isMD && <FullScaleIcon size={80} className="fill-current text-primary"/>}  
                 <div className="h-56 w-56 bg-muted border-border border rounded-full justify-center items-center flex">
-                  <UserIcon size={1000} className="fill-current text-darker" />
+                  <UserIcon size={220} className="fill-current text-secondary" />
                 </div>
                 <div className="flex gap-1 justify-center items-center bg-border pl-2 rounded-md">
                   <FormLabel className='text-sm text-secondary-foreground text-nowrap'>ID No.</FormLabel>
@@ -117,15 +136,15 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
                   />  
                 </div>
               </div>          
-              <div className="w-full flex flex-col justify-between items-center gap-4 p-4">
-                <FullScaleIcon size={80} className="fill-current text-primary"/>
+              <div id='main' className="w-full flex flex-col justify-between items-center gap-4 p-4">
+                {isMD && <FullScaleIcon size={80} className="fill-current text-primary"/>}  
                 <div className="flex w-full flex-col gap-2 items-start">
                   <div className="flex w-full gap-2 justify-center items-center">
                     <FormField
                       control={form.control}
                       name="firstName"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="w-full">
                           <FormControl>
                             <Input className="text-sm" placeholder="First name" autoComplete="off" type="input" {...field} />
                           </FormControl>
@@ -137,7 +156,7 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
                       control={form.control}
                       name="middleName"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="w-full">
                           <FormControl>
                             <Input className="text-sm" placeholder="Middle name" autoComplete="off" type="input" {...field} />
                           </FormControl>
@@ -149,7 +168,7 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
                       control={form.control}
                       name="lastName"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="w-full">
                           <FormControl>
                             <Input className="text-sm" placeholder="Last name" autoComplete="off" type="input" {...field} />
                           </FormControl>
