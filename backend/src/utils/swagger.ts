@@ -28,7 +28,7 @@ const options: swaggerJsdoc.Options = {
       { name: 'User', description: 'Operations related to users' },
       { name: 'Auth', description: 'Operations related to authentication and authorization' },
       { name: 'Options', description: 'Operations related to options and settings' },
-      { name: 'Employees', description: 'Operations related to employees' },
+      { name: 'Employee', description: 'Operations related to employees' },
     ],
   },
   apis: [
