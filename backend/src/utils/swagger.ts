@@ -27,15 +27,17 @@ const options: swaggerJsdoc.Options = {
       { name: 'Asset', description: 'Operations related to inventory assets' },
       { name: 'User', description: 'Operations related to users' },
       { name: 'Auth', description: 'Operations related to authentication and authorization' },
+      { name: 'Options', description: 'Operations related to options and settings' },
+      { name: 'Employees', description: 'Operations related to employees' },
     ],
   },
   apis: [
-    path.resolve(__dirname, '../routes/*.ts'),
-    path.resolve(__dirname, '../models/*.schema.ts')
+    path.resolve(__dirname, '../routes/*.js'),
+    path.resolve(__dirname, '../models/*.schema.js')
   ],
 }
 
-const swaggerSpec = swaggerJsdoc(options)
+export const swaggerSpec = swaggerJsdoc(options)
 
 function swaggerDocs(app: Express, port: number) {
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
