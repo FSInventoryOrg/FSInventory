@@ -36,6 +36,7 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
     onSuccess: async () => {
       showToast({ message: "Asset retrieved successfully!", type: "SUCCESS" });
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchAssetsByProperty"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
       setTimeout(() => {
         setOpen(false);

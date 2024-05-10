@@ -10,12 +10,12 @@ export const startChangeStream = async () => {
     changeStream.on('change', async (change) => {
       if (change.operationType === 'insert' || change.operationType === 'update') {
         const newAsset = change.fullDocument;
-        console.log('New Asset Added:', newAsset);
+        // console.log('New Asset Added:', newAsset);
         await updateOptions(newAsset)
       }
     });
 
-    console.log('Listening for changes to Assets collection...');
+    // console.log('Listening for changes to Assets collection...');
   } catch (error) {
     console.error('Error starting change stream:', error);
   }
@@ -55,7 +55,7 @@ async function updateOptions(asset: AssetType | HardwareType | SoftwareType) {
     
     // Save the unique values
     await option.save();
-    console.log("Options updated successfully")
+    // console.log("Options updated successfully")
   } catch (error) {
     console.error('Error updating Options document:', error);
   }

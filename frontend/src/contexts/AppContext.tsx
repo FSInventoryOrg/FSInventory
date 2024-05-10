@@ -24,7 +24,6 @@ export const AppContextProvider = ({ children } : { children: React.ReactNode })
   return (
     <AppContext.Provider value={{
       showToast: (toastMessage) => {
-        console.log(toastMessage)
         toast({
           title: toastMessage.type,
           description: toastMessage.message,

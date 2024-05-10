@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { SearchIcon, ChevronLeftIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon, PlusIcon, Columns3Icon, FilterIcon, SlidersHorizontalIcon } from "lucide-react"
 import { TableSuspense } from "../tracker-ui/TableSuspense"
 import React from "react"
+import { Link } from "react-router-dom"
 
 interface InventoryTableSuspenseProps {
   onToggleFilters: (visible: boolean) => void;
@@ -43,7 +44,7 @@ export function InventoryTableSuspense ({ onToggleFilters, isFiltersVisible}: In
                 onToggleFilters(!isFiltersVisible);
               }}
             >
-              <span className="sr-only">Toggle sidebar filters</span>
+              <span className="sr-only">Toggle filter settings</span>
               <FilterIcon className='h-4 w-4' />
             </Button>
           )}
@@ -58,13 +59,15 @@ export function InventoryTableSuspense ({ onToggleFilters, isFiltersVisible}: In
         </div>
         <div className="flex gap-2 w-fit">
           <Button
-            variant="outline"
-            size="icon"
-            disabled
-            className="h-8 w-8 min-w-8 p-0"
+            asChild
+            className='h-8 w-8 min-w-8 p-0'
+            variant='outline'
+            size='icon'
           >
-            <span className="sr-only">Toggle option settings</span>
-            <SlidersHorizontalIcon className='h-4 w-4'/>
+            <Link to="/inventory/settings">
+              <span className="sr-only">Link to inventory settings</span>
+              <SlidersHorizontalIcon className='h-4 w-4'/>
+            </Link>
           </Button>
           <Button
             variant="outline"

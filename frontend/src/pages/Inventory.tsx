@@ -7,6 +7,8 @@ import { InventoryColumns } from '@/components/inventory-ui/InventoryColumns';
 import * as imsService from '@/ims-service';
 import { useQuery } from '@tanstack/react-query';
 import { InventoryTableSuspense } from '@/components/inventory-ui/InventoryTableSuspense';
+import { Defaults } from '@/types/options';
+import { PROPERTIES } from '@/lib/data';
 
 const Inventory = () => {
   const [selectedStatus, setSelectedStatus] = React.useState<string>('');
@@ -37,6 +39,16 @@ const Inventory = () => {
     queryKey: ['fetchAllAssetsByStatusAndCategory', 'Hardware', selectedStatus, selectedCategory], 
     queryFn: () => imsService.fetchAllAssetsByStatusAndCategory('Hardware', selectedStatus, selectedCategory) 
   })
+
+  const { data: defaultOptions } = useQuery<Defaults>({ 
+    queryKey: ['fetchOptionValues', 'defaults'], 
+    queryFn: () => imsService.fetchOptionValues('defaults'),
+  })
+
+  const DEFAULT_HIDDEN_COLUMNS = defaultOptions?.inventoryColumns
+  ? PROPERTIES.filter(property => !defaultOptions.inventoryColumns?.includes(property.id))
+  .map(property => property.id)
+  : [];
 
   const [height, setHeight] = React.useState('calc(100vh - 91px)');
   React.useEffect(() => {
@@ -74,10 +86,12 @@ const Inventory = () => {
       <main className="flex-1 flex gap-4 w-full">
         {data ? (
           <InventoryTable
-            onToggleFilters={handleToggleFilters} 
-            isFiltersVisible={isFiltersVisible} 
             columns={InventoryColumns} 
             data={data} 
+            defaultOptions={defaultOptions || {}}
+            DEFAULT_HIDDEN_COLUMNS={DEFAULT_HIDDEN_COLUMNS}
+            onToggleFilters={handleToggleFilters} 
+            isFiltersVisible={isFiltersVisible} 
             selectedCategory={selectedCategory} 
           /> 
         ) : ( 

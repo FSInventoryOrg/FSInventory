@@ -30,6 +30,7 @@ import { Textarea } from '../ui/textarea';
 import SuggestiveInput from './SuggestiveInput';
 import Options from './Options';
 import { useState } from 'react';
+import { EmployeeSuggestiveInput } from './DeployAsset';
 
 const MiscellaneousForm = () => {
   const { control } = useFormContext<AssetFormData>();
@@ -115,7 +116,7 @@ const MiscellaneousForm = () => {
           render={({ field }) => (
             <FormItem className='w-full'>
               <FormControl>
-                <SuggestiveInput property='assignee' placeholder="Assignee" autoComplete='off' type='input' field={field} />
+                <EmployeeSuggestiveInput property='assignee' placeholder="Assignee" autoComplete='off' type='input' field={field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -161,9 +162,9 @@ const MiscellaneousForm = () => {
                 <FormMessage />
               </FormItem>
               <Button 
-                className='rounded-l-none border-l-0'
+                className='rounded-l-none border-l-0 text-accent-foreground'
                 type='button'
-                variant='secondary'
+                variant='outline'
                 size='icon'
                 onClick={() => {
                   field.onChange(null)
@@ -227,9 +228,9 @@ const MiscellaneousForm = () => {
                 </Popover>
               </FormItem>
               <Button 
-                className='rounded-l-none border-l-0'
+                className='rounded-l-none border-l-0 text-accent-foreground'
                 type='button'
-                variant='secondary'
+                variant='outline'
                 size='icon'
                 onClick={() => {
                   field.onChange(null)

@@ -110,6 +110,99 @@ router.post('/:property', [
 
 /**
  * @openapi
+ * /api/options/defaults:
+ *  put:
+ *    tags:
+ *      - Options
+ *    summary: Update default options
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/Defaults'
+ *    responses:
+ *      200:
+ *        description: Defaults updated successfully
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/Options'
+ *      400:
+ *        description: Bad request, invalid data provided
+ *      401:
+ *        description: Unauthorized, user not authenticated
+ *      403:
+ *        description: Forbidden, user does not have admin privileges
+ *      500:
+ *        description: Internal server error
+ *    security:
+ *      - bearerAuth: []
+ */
+router.put('/defaults', [
+    check("status").optional().isString(),
+    check("category").optional().isString(),
+    check("equipmentType").optional().isString(),
+    check("deployableStatus").optional().isString(),
+    check("retrievableStatus").optional().isString(),
+    check("inventoryColumns").optional().isArray(),
+  ],
+  verifyToken, 
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+      const token = req.cookies.auth_token;
+      const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+
+      if (decodedToken.role !== "ADMIN") {
+        return res.status(403).json({ message: "Only users with admin role can perform this action" });
+      }
+      
+      let option = await Option.findOne();
+      if (!option) {
+        option = new Option({});
+      }
+
+      if (!option.defaults) {
+        option.defaults = {};
+      }
+
+      const { status, category, equipmentType, deployableStatus, retrievableStatus, inventoryColumns } = req.body
+
+      if (status !== undefined) {
+        option.defaults.status = status;
+      }
+      if (category !== undefined) {
+        option.defaults.category = category;
+      }
+      if (equipmentType !== undefined) {
+        option.defaults.equipmentType = equipmentType;
+      }
+      if (deployableStatus !== undefined) {
+        option.defaults.deployableStatus = deployableStatus;
+      }
+      if (retrievableStatus !== undefined) {
+        option.defaults.retrievableStatus = retrievableStatus;
+      }
+      if (inventoryColumns !== undefined) {
+        option.defaults.inventoryColumns = inventoryColumns;
+      }
+
+      await option.save();
+
+      res.status(200).json(option);
+    } catch (error) {
+      console.error('Error updating defaults:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+);
+
+/**
+ * @openapi
  * /api/options/{property}:
  *  put:
  *    tags:

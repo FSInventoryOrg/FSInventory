@@ -433,8 +433,6 @@ router.put('/:code', [
       const code: string = req.params.code;
       const data: any = req.body;
 
-      console.log(data)
-
       const existingAssetCode = await Asset.findOne({ code: data.code });
       if (existingAssetCode && existingAssetCode._id.toString() !== data._id) {
         return res.status(400).json({ message: "Asset code already exists" });
