@@ -99,7 +99,7 @@ const AddEmployee = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className='h-8 px-2 gap-1 font-semibold'>
+        <Button className='h-8 px-2 gap-1 font-semibold rounded-md border-0'>
           <span className="hidden md:inline-block text-sm">New</span>
           <PlusIcon className="h-4 w-4"/>
         </Button>

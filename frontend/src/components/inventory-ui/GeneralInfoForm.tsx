@@ -168,9 +168,9 @@ const GeneralInfoForm = () => {
                 <FormMessage />
               </FormItem>
               <Button 
-                className='rounded-l-none border-l-0'
+                className='rounded-l-none border-l-0 text-accent-foreground'
                 type='button'
-                variant='secondary'
+                variant='outline'
                 size='icon'
                 onClick={() => {
                   field.onChange(null)

@@ -23,6 +23,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { ScrollArea } from "../ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { SearchIcon } from "lucide-react"

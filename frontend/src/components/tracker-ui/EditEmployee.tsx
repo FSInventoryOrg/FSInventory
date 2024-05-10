@@ -78,7 +78,6 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
       ...data,
       _id: employeeData._id,
     }
-    console.log(updatedEmployee)
     mutate({ code: employeeData.code, updatedEmployee: updatedEmployee });
   }
 
