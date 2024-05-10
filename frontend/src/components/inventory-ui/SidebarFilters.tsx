@@ -12,6 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import CountUp from 'react-countup';
 import * as imsService from '@/ims-service';
 import { useQuery } from '@tanstack/react-query';
@@ -83,17 +89,26 @@ const SidebarFilters = ({
       <div className='flex flex-col sm:flex-row xl:flex-col drop-shadow'>
         <div className='w-full bg-accent rounded-b-none rounded-t-md sm:rounded-l-md xl:rounded-b-none xl:rounded-t-md p-4 pb-8 flex flex-col gap-4 '>
           <h2 className='font-semibold flex gap-2 items-center'>
-            <Button
-              className='h-8 w-8 min-w-8 p-0 bg-inherit'
-              variant='outline'
-              size='icon'
-              onClick={() => {
-                onToggleFilters(!isFiltersVisible);
-              }}
-            >
-              <span className="sr-only">Toggle visible columns</span>
-              <FilterIcon className='h-4 w-4' />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    className='h-8 w-8 min-w-8 p-0 bg-inherit'
+                    variant='outline'
+                    size='icon'
+                    onClick={() => {
+                      onToggleFilters(!isFiltersVisible);
+                    }}
+                  >
+                    <span className="sr-only">Toggle filter settings</span>
+                    <FilterIcon className='h-4 w-4' />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className='text-xs'>Hide filter settings</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             Filter Settings
           </h2>
           <div className='flex flex-col gap-2'>

@@ -64,6 +64,7 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
     onSuccess: async () => {
       showToast({ message: "Asset deployed successfully!", type: "SUCCESS" });
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchAssetsByProperty"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
       setTimeout(() => {
         setOpen(false);
@@ -117,7 +118,7 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
                 render={({ field }) => (
                   <FormItem className='w-full'>
                     <FormControl>
-                      <SuggestiveInput 
+                      <EmployeeSuggestiveInput 
                         placeholder='e.g. Juan De La Cruz, Joe Smith' 
                         autoComplete='off' 
                         type='input' 
@@ -196,7 +197,7 @@ interface SuggestiveInputProps extends InputProps {
   field?: any;
 }
 
-const SuggestiveInput = React.forwardRef<HTMLInputElement, SuggestiveInputProps>(
+export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, SuggestiveInputProps>(
   ({ placeholder, field, className, autoComplete, type }, ref) => {
     const { data: employees } = useQuery<EmployeeType[]>({ 
       queryKey: ['fetchAllEmployees'], 

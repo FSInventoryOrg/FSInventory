@@ -36,8 +36,9 @@ import { z } from "zod";
 import GeneralInfoForm from "./GeneralInfoForm";
 import SystemSpecsForm from "./SystemSpecsForm";
 import MiscellaneousForm from "./MiscellaneousForm";
+import { Defaults } from "@/types/options";
 
-const AddAsset = () => {
+const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false); 
   const { showToast } = useAppContext();
@@ -48,24 +49,24 @@ const AddAsset = () => {
     defaultValues: {
       code: '',
       type: 'Hardware',
-      category: '',
       brand: '',
       modelName: '',
       modelNo: '',
       serialNo: '',
       /* Hardware */
       ...((tabValue === 'Hardware') && {
+        category: defaultValues.category,
         processor: '',
         memory: '',
         storage: '',
-        status: 'IT Storage',
+        status: defaultValues.status,
         assignee: '',
         purchaseDate: undefined,
         supplierVendor: '',
         pezaForm8105: '',
         pezaForm8106: '',
         isRGE: false,
-        equipmentType: 'DEV',
+        equipmentType: defaultValues.equipmentType,
         remarks: '',
         deploymentDate: undefined,
         recoveredFrom: '',

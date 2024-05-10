@@ -10,17 +10,21 @@ export type CategoryOptions = {
   properties?: string[];
 }
 
+export type Defaults = {
+  status?: string;
+  category?: string;
+  equipmentType?: string;
+  deployableStatus?: string;
+  retrievableStatus?: string;
+  inventoryColumns?: string[];
+}
+
 export interface OptionsType extends Document {
   _id: string;
   status: StatusOptions[];
   category: CategoryOptions[];
-  brand: string[];
-  processor: string[];
-  memory: string[];
-  storage: string[];
-  supplierVendor: string[];
   equipmentType: string[];
-  client: string[];
+  defaults: Defaults;
 }
 
 /**
@@ -64,6 +68,17 @@ export interface OptionsType extends Document {
  *            type: string
  *          example: ["DEV", "QA", "OFFICE"]
  *          description: List of equipment types
+ *        defaults:
+ *          type: object
+ *          properties:
+ *            status:
+ *              type: string
+ *            category:
+ *              type: string
+ *            equipmentType:
+ *              type: string
+ *          example: {"status": "status1", "category": "category1", "equipmentType": "equipmentType"}
+ *          description: List of default option values
  */
 const optionsSchema: Schema<OptionsType> = new Schema<OptionsType>({
   status: { 
@@ -80,6 +95,16 @@ const optionsSchema: Schema<OptionsType> = new Schema<OptionsType>({
     }],
     required: true },
   equipmentType: { type: [String], required: true },
+  defaults: {
+    type: { 
+      status: { type: String, required: false }, 
+      category: { type: String, required: false },
+      equipmentType: { type: String, required: false },
+      deployableStatus: { type: String, required: false },
+      retrievableStatus: { type: String, required: false },
+      inventoryColumns: { type: [String], required: false },
+    }, 
+  }
 });
 
 const Option = mongoose.model<OptionsType>("Options", optionsSchema);
