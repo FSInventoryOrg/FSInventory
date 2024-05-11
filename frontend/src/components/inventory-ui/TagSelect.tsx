@@ -90,6 +90,8 @@ const TagSelect = ({ onTagSelect, property, option, reset=false, defaults=false 
         return matchingProperty ?? { id: property, text: property };
       });
       setSelectedTags(tags);
+      const tagIds = tags.map(tag => tag.id);
+      onTagSelect(tagIds)
     } else {
       if (!Array.isArray(optionValues)) {
         setSelectedTags(null);
@@ -113,8 +115,10 @@ const TagSelect = ({ onTagSelect, property, option, reset=false, defaults=false 
         const matchingProperty = PROPERTIES.find(prop => prop.id === property);
         return matchingProperty ?? { id: property, text: property };
       });
-    
       setSelectedTags(tags);
+      const tagIds = tags.map(tag => tag.id);
+      onTagSelect(tagIds)
+
     }
   }, [option, optionValues, defaults, defaultOptions]);  
   
@@ -124,6 +128,10 @@ const TagSelect = ({ onTagSelect, property, option, reset=false, defaults=false 
       setSelectedTags(null);
     }
   }, [reset])
+
+  useEffect(() => {
+    console.log(selectedTags)
+  }, [selectedTags])
 
   return (
     <section className="z-10 w-full flex flex-col gap-5">

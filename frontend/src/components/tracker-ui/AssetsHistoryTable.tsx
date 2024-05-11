@@ -23,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ScrollArea } from "../ui/scroll-area"
+import { ScrollArea, ScrollBar } from "../ui/scroll-area"
 import {
   RankingInfo,
   rankItem,
@@ -168,6 +168,7 @@ export function AssetsHistoryTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
+      <ScrollBar orientation="horizontal" />
     </ScrollArea>
   )
 }

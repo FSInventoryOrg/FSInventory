@@ -109,109 +109,131 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
     }
   }, [selectedFilter, assetsCurrent, assetsHistory]);
 
+  const [isSM, setIsSM] = React.useState(false);
+  React.useEffect(() => {
+    const checkScreenSize = () => {
+      setIsSM(window.innerWidth >= 640); 
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
+
   return (
-    <>
-      <div className='h-full flex flex-col'>
-        <div className='flex flex-col gap-2 pb-2'>
-          <div id='banner' className='bg-gradient-to-br from-[#1d2436] to-[#006e54] h-40 rounded-lg p-4 justify-between flex flex-col text-white'>
-            <div className='flex justify-between '>
-              <div className='flex flex-col'>
-                <span className='font-bold text-3xl gap-2 flex'>
-                  {employee.firstName + ' ' + employee.lastName}
-                  {employee.isRegistered && <EditEmployee employeeData={employee} />}
-                </span>
-                <span className={`font-bold ${employee.isRegistered ? '' : 'text-destructive text-sm'}`}>
-                  {employee.isRegistered ? employee.code : 'UNREGISTERED'}
-                </span>
-              </div>
-              <div className='flex gap-3'>
-                <DeleteEmployee employee={employee} />
-                <Button className={`gap-2 text-white ${employee.isActive ? 'bg-[#33CC80]' : 'bg-[#ffa333] hover:bg-[#ffa333]/95'}`}>
-                  {employee.isActive ? (
-                    <>
-                      <CheckCheckIcon size={16} />
-                      Active
-                    </>
-                  ) : (
-                    <>
-                      <AlertCircleIcon size={16} />
-                      Inactive
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-            <div className='flex justify-between'>
-              <div className='flex flex-row text-white w-[50%]'>
+    <div className='h-full flex flex-col'>
+      <div className='flex flex-col gap-2 pb-2'>
+        <div id='banner' className='bg-gradient-to-br from-[#1d2436] to-[#006e54] h-40 rounded-lg p-4 justify-between flex flex-col text-white'>
+          <div className='flex justify-between '>
+            <div className='flex flex-col w-[50%] sm:w-full'>
+              <span className='font-bold text-xl sm:text-3xl gap-2 flex'>
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger className='w-fit text-4xl font-bold text-primary/50 overflow-hidden text-ellipsis'>
-                      <span className='whitespace-nowrap'>{employee.position}</span>
+                    <TooltipTrigger className='w-fit overflow-hidden text-ellipsis'>
+                      <span className='whitespace-nowrap'>{employee.firstName + ' ' + employee.lastName}</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      {employee.position}
+                      {employee.firstName + ' ' + employee.lastName}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-              </div>
-              <div className='flex'>
-                <span className='text-muted-foreground font-medium text-sm self-end text-ellipsis overflow-hidden whitespace-nowrap'>As of {currentDate.toLocaleString()}</span>
-              </div>
+                {employee.isRegistered && isSM && <EditEmployee employeeData={employee} />}
+              </span>
+              <span className={`font-bold text-sm ${employee.isRegistered ? '' : 'text-destructive text-sm'}`}>
+                {employee.isRegistered ? employee.code : 'UNREGISTERED'}
+              </span>
+            </div>
+            <div className='flex gap-1 sm:gap-2 lg:gap-3 items-start'>
+              {!isSM && <EditEmployee employeeData={employee} />}
+              <DeleteEmployee employee={employee} />
+              <Button className={`px-3 sm:px-4 gap-2 text-white ${employee.isActive ? 'bg-[#33CC80]' : 'bg-[#ffa333] hover:bg-[#ffa333]/95'}`}>
+                {employee.isActive ? (
+                  <>
+                    <CheckCheckIcon size={16} />
+                    <span className='hidden sm:block'>Remove Employee</span>
+                  </>
+                ) : (
+                  <>
+                    <AlertCircleIcon size={16} />
+                    <span className='hidden sm:block'>Remove Employee</span>
+                  </>
+                )}
+              </Button>
             </div>
           </div>
-          <div id='statistics' className='relative'>
-            {assetCounts ? <AssetsCount assetCounts={assetCounts} /> : (
-              <div className='flex flex-row gap-2 cursor-pointer w-fit h-[70px]'>
-                <Skeleton className='flex flex-col bg-secondary rounded-lg px-4 py-2 w-[125px]' />
-              </div>
-            )}
+          <div className='flex sm:flex-row flex-col justify-between'>
+            <div className='flex flex-row text-white w-full sm:w-[50%]'>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger className='w-fit text-xl sm:text-4xl font-bold text-primary/50 overflow-hidden text-ellipsis'>
+                    <span className='whitespace-nowrap'>{employee.position}</span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {employee.position}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <div className='flex'>
+              <span className='text-muted-foreground font-medium text-xs sm:text-sm self-end text-ellipsis overflow-hidden whitespace-nowrap'>As of {currentDate.toLocaleString()}</span>
+            </div>
           </div>
         </div>
-        <div className='flex items-center gap-2 pb-2'>
-          <Select value={selectedFilter} onValueChange={(value) => setSelectedFilter(value)}>
-            <SelectTrigger className="w-[250px]">
-              <SelectValue defaultValue="current" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Filter by</SelectLabel>
-                <SelectItem value="current">Current deployed assets</SelectItem>
-                <SelectItem value="history" disabled={!employee.code}>History of deployed assets</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <TooltipProvider delayDuration={100}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info size={20} className='text-border cursor-pointer' />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className='max-w-[200px]'>Assets history for <span className='text-destructive'>unregistered</span> users is not available.</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+        <div id='statistics' className='relative'>
+          {assetCounts ? <AssetsCount assetCounts={assetCounts} /> : (
+            <div className='flex flex-row gap-2 cursor-pointer w-fit h-[70px]'>
+              <Skeleton className='flex flex-col bg-secondary rounded-lg px-4 py-2 w-[125px]' />
+            </div>
+          )}
         </div>
-        {(selectedFilter === 'current') ? (
-          (assetsCurrent !== null) ? (
-            <EmployeeAssetsTable columns={EmployeeAssetsColumns} data={assetsCurrent} /> 
-          ) : ( 
-            <div className='flex relative w-full h-full justify-center items-center border rounded-md'>
-              <div className='h-12 bg-accent w-full absolute top-0 rounded-t-md' />
-              <Spinner className='text-muted-foreground'/>
-            </div>
-          )
-        ) : (
-          (assetsHistory !== null) ? (
-            <AssetsHistoryTable columns={AssetsHistoryColumns} data={assetsHistory} /> 
-          ) : (
-            <div className='flex relative w-full h-full justify-center items-center border rounded-md'>
-              <div className='h-12 bg-accent w-full absolute top-0 rounded-t-md' />
-              <Spinner className='text-muted-foreground'/>
-            </div>
-          )
-        )}
       </div>
-    </>
+      <div className='flex items-center gap-2 pb-2'>
+        <Select value={selectedFilter} onValueChange={(value) => setSelectedFilter(value)}>
+          <SelectTrigger className="w-[250px]">
+            <SelectValue defaultValue="current" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Filter by</SelectLabel>
+              <SelectItem value="current">Current deployed assets</SelectItem>
+              <SelectItem value="history" disabled={!employee.code}>History of deployed assets</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        <TooltipProvider delayDuration={100}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info size={20} className='text-border cursor-pointer' />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className='max-w-[200px]'>Assets history for <span className='text-destructive'>unregistered</span> users is not available.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+      {(selectedFilter === 'current') ? (
+        (assetsCurrent !== null) ? (
+          <EmployeeAssetsTable columns={EmployeeAssetsColumns} data={assetsCurrent} /> 
+        ) : ( 
+          <div className='flex relative w-full h-full justify-center items-center border rounded-md'>
+            <div className='h-12 bg-accent w-full absolute top-0 rounded-t-md' />
+            <Spinner className='text-muted-foreground'/>
+          </div>
+        )
+      ) : (
+        (assetsHistory !== null) ? (
+          <AssetsHistoryTable columns={AssetsHistoryColumns} data={assetsHistory} /> 
+        ) : (
+          <div className='flex relative w-full h-full justify-center items-center border rounded-md'>
+            <div className='h-12 bg-accent w-full absolute top-0 rounded-t-md' />
+            <Spinner className='text-muted-foreground'/>
+          </div>
+        )
+      )}
+    </div>
   )
 }
 
@@ -225,17 +247,39 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
       setOpen(false);
     }, 100)
   };
+
+  const [isSM, setIsSM] = React.useState(false);
+  React.useEffect(() => {
+    const checkScreenSize = () => {
+      setIsSM(window.innerWidth >= 640); 
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button 
-          disabled={!employee.isRegistered}
-          className='gap-2 bg-destructive/30 border-destructive border text-destructive hover:text-destructive-foreground'
-          variant='destructive'
-        >
-          <TrashIcon size={16} />
-          Remove Employee
-        </Button>
+        {isSM ? 
+          <Button 
+            disabled={!employee.isRegistered}
+            className='px-3 sm:px-4 gap-2 bg-destructive/30 border-destructive border text-destructive hover:text-destructive-foreground'
+            variant='destructive'
+          >
+            <TrashIcon size={16} />
+            <span className='hidden sm:block'>Remove Employee</span>
+          </Button>
+          :
+          <Button 
+            size="icon"
+            className="text-white flex justify-center items-center rounded-full h-8 w-8 sm:h-10 sm:w-10 bg-transparent hover:bg-muted-foreground/20 border-0">
+            <TrashIcon size={16} />
+          </Button>
+        }
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

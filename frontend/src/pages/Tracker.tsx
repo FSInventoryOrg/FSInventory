@@ -10,6 +10,15 @@ import { EmployeeTableSuspense } from '@/components/tracker-ui/EmployeeTableSusp
 import DeploymentInfo from '@/components/tracker-ui/DeploymentInfo';
 import Filter from '@/components/graphics/Filter';
 import { useParams } from 'react-router-dom';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { Button } from '@/components/ui/button';
 
 const Tracker = () => {
   const { employeeCode } = useParams();
@@ -19,6 +28,7 @@ const Tracker = () => {
     enabled: !!employeeCode,
   });
   
+  const [open, setOpen] = React.useState(false);
   const [employees, setEmployees] = React.useState<EmployeeType[]>();
   const [selectedEmployee, setSelectedEmployee] = React.useState<EmployeeType>();
 
@@ -33,6 +43,7 @@ const Tracker = () => {
   
   const handleEmployeeSelect = (employee: EmployeeType) => {
     setSelectedEmployee(employee);
+    setOpen(false);
   };
 
   const mergeEmployees = () => {
@@ -144,6 +155,21 @@ const Tracker = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  React.useEffect(() => {
+    const checkScreenSize = () => {
+      if (window.innerWidth >= 1280) {
+        setOpen(false)
+      }
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
   
   return (
     <section 
@@ -151,7 +177,7 @@ const Tracker = () => {
       className="flex gap-6 w-full px-6 pb-6 pt-3" 
       style={{ height }}
     >
-      <aside className="order-first flex xl:w-80 z-50">
+      <aside className="order-first hidden xl:flex xl:w-80 z-50">
         {employees ? (
           <EmployeeTable
             columns={EmployeeColumns} 
@@ -164,12 +190,35 @@ const Tracker = () => {
         )}
       </aside>
       <main className="flex-1 flex flex-col gap-4 w-full">
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <Button className='xl:hidden' variant="outline">View Employees</Button>
+          </SheetTrigger>
+          <SheetContent side='left'>
+            <SheetHeader className='pb-4'>
+              <SheetTitle>Employees</SheetTitle>
+              <SheetDescription>
+                Select an employee below to view their currently deployed and past assets.
+              </SheetDescription>
+            </SheetHeader>
+            {employees ? (
+              <EmployeeTable
+                columns={EmployeeColumns} 
+                data={employees} 
+                onEmployeeSelect={handleEmployeeSelect}
+                onFilter={handleFilters}
+              /> 
+            ) : ( 
+              <EmployeeTableSuspense />
+            )}
+          </SheetContent>
+        </Sheet>
         {selectedEmployee ? (
           <DeploymentInfo key={selectedEmployee._id} employee={selectedEmployee} assignee={selectedEmployee.code ? selectedEmployee.code : `${selectedEmployee.firstName} ${selectedEmployee.lastName}`} />
         ) : (
           <div className='w-full h-full flex flex-col justify-center items-center'>
-            <Filter height={480} width={860} />
-            <span className='text-accent-foreground'>Select an employee to view their deployed assets</span>
+            <Filter height={300} width={300} />
+            <span className='text-sm text-muted-foreground'>Select an employee to view their deployed assets</span>
           </div>
         )}
       </main>
