@@ -100,14 +100,28 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
       window.removeEventListener('resize', checkScreenSize);
     };
   }, []);
+
+  const [isSM, setIsSM] = useState(false);
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsSM(window.innerWidth >= 640); 
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
   
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button 
           size="icon"
-          className="text-white flex justify-center items-center rounded-full h-10 w-10 bg-transparent hover:bg-muted-foreground/20 border-0">
-          <PencilIcon size={20} />
+          className="text-white flex justify-center items-center rounded-full h-8 w-8 sm:h-10 sm:w-10 bg-transparent hover:bg-muted-foreground/20 border-0">
+          {isSM ? <PencilIcon size={20} /> : <PencilIcon size={16} />}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[800px] bg-card p-0 rounded-md">

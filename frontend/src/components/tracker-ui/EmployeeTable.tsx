@@ -137,7 +137,7 @@ export function EmployeeTable<TData, TValue>({
   return (
     <div className="w-full flex flex-col" >
       <div className="flex items-center pb-2 gap-2">
-        <div className="flex items-center">
+        <div className="flex items-center w-full">
           <SearchIcon className="absolute translate-x-3 h-4 w-4"/>
           <Input
             placeholder="Search employee..."
