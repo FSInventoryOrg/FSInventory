@@ -188,6 +188,8 @@ router.put('/deploy/:code', [
 
       const code: string = req.params.code;
       const data: any = req.body;
+      console.log(data.code)
+      console.log(code)
 
       if (data.code !== code) {
         return res.status(400).json({ message: 'Asset code mismatch' });
@@ -335,6 +337,88 @@ router.put('/retrieve/:code', [
     }
   }
 );
+
+/**
+ * @openapi
+ * /api/assets/history/{code}/{index}:
+ *  put:
+ *    tags:
+ *      - Asset
+ *    summary: Remove the deployment history entry for a hardware asset by asset code and index
+ *    parameters:
+ *      - in: path
+ *        name: code
+ *        required: true
+ *        schema:
+ *          type: string
+ *        description: Code of the hardware asset
+ *      - in: path
+ *        name: index
+ *        required: true
+ *        schema:
+ *          type: integer
+ *        description: Index of the deployment history entry to remove
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              deploymentDate:
+ *                type: string
+ *                format: date-time
+ *              recoveryDate:
+ *                type: string
+ *                format: date-time
+ *              assignee:
+ *                type: string
+ *    responses:
+ *      200:
+ *        description: Deployment history entry updated successfully
+ *      400:
+ *        description: Bad request, validation errors
+ *      404:
+ *        description: Hardware asset not found or index out of range
+ *      500:
+ *        description: Internal Server Error
+ *    security:
+ *      - bearerAuth: []
+ */
+router.put("/history/:code/:index", verifyToken, async (req: Request, res: Response) => {
+  try {
+    const { code, index } = req.params;
+
+    // Validate index
+    const indexNumber = parseInt(index);
+    if (isNaN(indexNumber)) {
+      return res.status(400).json({ message: "Invalid index" });
+    }
+
+    // Find hardware asset
+    const hardwareAsset: HardwareType | null = await Hardware.findOne({ code: code });
+    if (!hardwareAsset) {
+      return res.status(404).json({ message: "Hardware asset not found" });
+    }
+
+    // Check if index is within range
+    if (indexNumber < 0 || indexNumber >= hardwareAsset.deploymentHistory.length) {
+      return res.status(404).json({ message: "Index out of range" });
+    }
+
+    // Remove deployment history entry at index
+    hardwareAsset.deploymentHistory.splice(indexNumber, 1);
+
+    // Save hardware asset with updated deployment history
+    await hardwareAsset.save();
+
+    res.status(200).json({ message: "Deployment history entry removed successfully" });
+  } catch (error) {
+    console.error('Error removing deployment history entry:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 /**
  * @openapi

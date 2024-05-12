@@ -23,7 +23,7 @@ const SystemSpecsForm = () => {
           control={control}
           name="processor"
           render={({ field }) => (
-            <FormItem className='w-2/3'>
+            <FormItem className='w-full sm:w-2/3'>
               <FormLabel className='text-secondary-foreground'>Processor</FormLabel>
               <FormControl>
                 <SuggestiveInput 
@@ -41,7 +41,7 @@ const SystemSpecsForm = () => {
           control={control}
           name="memory"
           render={({ field }) => (
-            <FormItem className='w-2/3'>
+            <FormItem className='w-full sm:w-2/3'>
               <FormLabel className='text-secondary-foreground'>Memory</FormLabel>
               <FormControl>
                 <SuggestiveInput 
@@ -59,7 +59,7 @@ const SystemSpecsForm = () => {
           control={control}
           name="storage"
           render={({ field }) => (
-            <FormItem className='w-2/3'>
+            <FormItem className='w-full sm:w-2/3'>
               <FormLabel className='text-secondary-foreground'>Storage (HDD/SSD)</FormLabel>
               <FormControl>
                 <SuggestiveInput 

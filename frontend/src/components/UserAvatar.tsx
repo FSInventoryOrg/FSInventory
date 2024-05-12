@@ -17,11 +17,11 @@ import { CircleUserRound, Settings, Wrench } from 'lucide-react';
 import AppearanceMode from "./AppearanceMode";
 import { UserIcon } from "./icons/UserIcon";
 
-const UserAvatar = () => {
+const UserAvatar = ({ height=40, width=40 }: { height?: number, width?: number }) => {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger className="w-full flex rounded-full font-medium focus:outline outline-primary">
-        <Avatar className="bg-secondary h-10 w-10 hover:opacity-80" >
+        <Avatar className="bg-secondary h-10 w-10 hover:opacity-80" style={{ height: height, width: width }} >
           <AvatarImage alt="@user" />
           <AvatarFallback className="bg-muted"><UserIcon size={100} className="fill-current text-secondary" /></AvatarFallback>
         </Avatar>

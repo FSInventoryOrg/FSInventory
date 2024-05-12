@@ -82,6 +82,22 @@ export const retrieveAsset = async ({ code, retrievedAsset }: { code: string, re
   return true;
 };
 
+export const removeDeploymentHistoryEntry = async (code: string, index: number) => {
+  const response = await fetch(`${API_BASE_URL}/api/assets/history/${code}/${index}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to remove entry from deployment history');
+  }
+
+  return true;
+};
 
 export const updateAssetProperty = async ({ property, value, newValue }: { property: string, value: string, newValue: string }) => {
   const response = await fetch(`${API_BASE_URL}/api/assets/${property}/${value}`, {
@@ -331,6 +347,23 @@ export const addEmployee = async (asset: EmployeeFormData) => {
 
   return responseBody;
 }
+
+export const removeAssetHistoryEntry = async (code: string, index: number) => {
+  const response = await fetch(`${API_BASE_URL}/api/employees/history/${code}/${index}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to remove entry from asset history');
+  }
+
+  return true;
+};
 
 export const updateEmployeeAssetHistory = async ({ code, assetHistory }: { code: string, assetHistory: AssetsHistory }) => {
   const response = await fetch(`${API_BASE_URL}/api/employees/history/${code}`, {

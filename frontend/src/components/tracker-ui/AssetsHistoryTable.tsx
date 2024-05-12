@@ -29,6 +29,7 @@ import {
   rankItem,
 } from '@tanstack/match-sorter-utils'
 import Empty from "../graphics/Empty"
+import { EmployeeType } from "@/types/employee"
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -40,8 +41,9 @@ declare module '@tanstack/table-core' {
 }
 
 interface EmployeeAssetsTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  employee: EmployeeType;
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,6 +65,7 @@ const exactFilter: FilterFn<any> = (row, columnId, value) => {
 };
 
 export function AssetsHistoryTable<TData, TValue>({
+  employee,
   columns,
   data,
 }: EmployeeAssetsTableProps<TData, TValue>) {
@@ -105,6 +108,9 @@ export function AssetsHistoryTable<TData, TValue>({
     },
     initialState: {
       pagination
+    },
+    meta: {
+      employee: employee
     }
   })
 

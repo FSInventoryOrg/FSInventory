@@ -43,7 +43,7 @@ const SignOutButton = () => {
       <AlertDialogTrigger className="font-medium text-lg relative gap-2 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 w-full">
         <LogOut />Log out
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="border-none">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-2xl font-bold">Are you leaving?</AlertDialogTitle>
           <AlertDialogDescription className="">
