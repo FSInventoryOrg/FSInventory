@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTrigger,
   DialogTitle,
+  DialogClose,
 } from "@/components/ui/dialog"
 import {
   FormControl,
@@ -22,7 +23,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as imsService from '@/ims-service'
 import { useAppContext } from '@/hooks/useAppContext'
 import { Spinner } from '../Spinner'
-import { PlusIcon } from "lucide-react"
+import { PlusIcon, XIcon } from "lucide-react"
 import { AssetFormData, AssetSchema} from "@/schemas/AddAssetSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogDescription } from "@radix-ui/react-dialog";
@@ -122,53 +123,59 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
           <PlusIcon className="h-4 w-4"/>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] bg-card overflow-y-scroll max-h-screen scrollbar-hide">
-        <DialogHeader>
-          <DialogTitle>Add a new asset</DialogTitle>
-          <DialogDescription className="text-accent-foreground text-sm">
-            Select an asset type: hardware or software, and fill in the respective forms. Most fields are optional, but other fields such as the asset code are required.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="">
-          <Form {...form}>
-            <form className="flex flex-col w-full gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-              <FormField
-                control={form.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItem className='w-1/2'>
-                    <FormLabel className='text-md text-secondary-foreground'>Asset Code</FormLabel>
-                    <FormControl>
-                      <Input placeholder="FS-XYZ-A" autoComplete="off" type="input" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      This the company asset code.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Tabs defaultValue="Hardware" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="Hardware" onClick={() => handleTabChange("Hardware")}>Hardware</TabsTrigger>
-                  <TabsTrigger value="Software" onClick={() => handleTabChange("Software")} disabled>Software</TabsTrigger>
-                </TabsList>
-                <div className="">
-                  <TabsContent value="Hardware" className="pb-4 px-3">
-                    <GeneralInfoForm />
-                    <SystemSpecsForm />
-                    <MiscellaneousForm />
-                  </TabsContent>
-                  <TabsContent value="Software">
-                  </TabsContent>
-                </div>     
-              </Tabs>            
-              <Button type="submit" disabled={isPending} className="gap-2">
-                {isPending ? <Spinner size={18}/> : null }
-                Add Asset
-              </Button>
-            </form>
-          </Form>
+      <DialogContent tabIndex={-1} className="min-w-full overflow-y-auto h-full bg-transparent justify-center flex border-none px-0 py-0 sm:py-16">
+        <div className="sm:max-w-[800px] bg-card h-fit p-3 sm:p-6 rounded-lg">
+          <DialogHeader className="relative">
+            <DialogClose className="absolute right-0 top-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              <XIcon className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+            <DialogTitle>Add a new asset</DialogTitle>
+            <DialogDescription className="text-accent-foreground text-sm">
+              Select an asset type: hardware or software, and fill in the respective forms. Most fields are optional, but other fields such as the asset code are required.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="pt-4">
+            <Form {...form}>
+              <form className="flex flex-col w-full gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+                <FormField
+                  control={form.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem className='w-1/2'>
+                      <FormLabel className='text-md text-secondary-foreground'>Asset Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="FS-XYZ-A" autoComplete="off" type="input" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        This the company asset code.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Tabs defaultValue="Hardware" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="Hardware" onClick={() => handleTabChange("Hardware")}>Hardware</TabsTrigger>
+                    <TabsTrigger value="Software" onClick={() => handleTabChange("Software")} disabled>Software</TabsTrigger>
+                  </TabsList>
+                  <div className="">
+                    <TabsContent tabIndex={-1} value="Hardware" className="pb-4 px-3">
+                      <GeneralInfoForm />
+                      <SystemSpecsForm />
+                      <MiscellaneousForm />
+                    </TabsContent>
+                    <TabsContent value="Software">
+                    </TabsContent>
+                  </div>     
+                </Tabs>            
+                <Button type="submit" disabled={isPending} className="gap-2">
+                  {isPending ? <Spinner size={18}/> : null }
+                  Add Asset
+                </Button>
+              </form>
+            </Form>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -153,12 +153,12 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
                 {employee.isActive ? (
                   <>
                     <CheckCheckIcon size={16} />
-                    <span className='hidden sm:block'>Remove Employee</span>
+                    <span className='hidden sm:block'>Active</span>
                   </>
                 ) : (
                   <>
                     <AlertCircleIcon size={16} />
-                    <span className='hidden sm:block'>Remove Employee</span>
+                    <span className='hidden sm:block'>Inactive</span>
                   </>
                 )}
               </Button>
@@ -225,7 +225,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
         )
       ) : (
         (assetsHistory !== null) ? (
-          <AssetsHistoryTable columns={AssetsHistoryColumns} data={assetsHistory} /> 
+          <AssetsHistoryTable employee={employee} columns={AssetsHistoryColumns} data={assetsHistory} /> 
         ) : (
           <div className='flex relative w-full h-full justify-center items-center border rounded-md'>
             <div className='h-12 bg-accent w-full absolute top-0 rounded-t-md' />
@@ -281,7 +281,7 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
           </Button>
         }
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className='border-none'>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
@@ -292,7 +292,7 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
         <TrashCan />
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Button onClick={handleDeleteEmployee} variant='destructive'>Yes, I want to remove {employee.name}</Button>
+          <Button onClick={handleDeleteEmployee} variant='destructive'>Yes, I want to remove {employee.firstName + ' ' + employee.lastName}</Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

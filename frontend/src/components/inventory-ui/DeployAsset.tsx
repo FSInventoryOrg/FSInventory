@@ -66,9 +66,11 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAssetsByProperty"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
       setTimeout(() => {
         setOpen(false);
-      }, 500)
+      }, 100)
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
@@ -80,6 +82,7 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
     data.deploymentDate.setHours(currentTime.getHours(), currentTime.getMinutes(), currentTime.getSeconds(), currentTime.getMilliseconds());
     const deployedAsset: AssetFormData & { _id: string } = {
       ...data,
+      code: assetData.code,
       _id: assetData._id,
     }
     mutate({ code: assetData.code, deployedAsset: deployedAsset });

@@ -209,7 +209,7 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
         <AlertDialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2">
           Delete
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent className='border-none'>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-bold">
               Are you absolutely sure?
@@ -220,7 +220,7 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
               <>There are no assets with {format(property)} {optionToEdit}. It is safe to delete this {format(property)}.</>
               }
             </AlertDialogDescription>
-            <TrashCan/>
+            <TrashCan />
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -274,7 +274,7 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className='-translate-y-2' side='right'>
+      <PopoverContent className='-translate-y-2'>
         <div id='main panel' className={`flex flex-col gap-2 ${isCreating || isEditing ? 'hidden': ''}`}>
           <h1 className='w-full text-center font-semibold text-sm'>{capitalize(format(property))}</h1>
           <div className='flex items-center'>
@@ -300,12 +300,22 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
               filteredData.map((value, index) => (
                 <div key={index} className='flex items-center gap-1 my-1.5'>
                   <Checkbox 
+                    className='ml-1'
                     checked={value.value === field.value} 
                     onClick={() => { 
                       if (value.value === field.value) {
                         field.onChange('') 
                       } else {
                         field.onChange(value.value) 
+                      }
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        if (value.value === field.value) {
+                          field.onChange('') 
+                        } else {
+                          field.onChange(value.value) 
+                        }
                       }
                     }}
                   />

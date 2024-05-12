@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog"
@@ -27,7 +28,7 @@ import {
 } from "@/components/ui/popover"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
-import { ArrowRightIcon, PencilIcon, CalendarIcon } from "lucide-react"
+import { ArrowRightIcon, PencilIcon, CalendarIcon, XIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { EmployeeFormData, EmployeeSchema } from "@/schemas/AddEmployeeSchema";
@@ -64,6 +65,7 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
     onSuccess: async () => {
       showToast({ message: "Employee updated successfully!", type: "SUCCESS" });
       queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
       setTimeout(() => {
         setOpen(false);
       }, 500)
@@ -124,8 +126,12 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
           {isSM ? <PencilIcon size={20} /> : <PencilIcon size={16} />}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] bg-card p-0 rounded-md">
+      <DialogContent tabIndex={-1} className="sm:max-w-[800px] bg-card p-0 rounded-md">
         <div className="">
+          <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+            <XIcon className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </DialogClose>
           <Form {...form}>
             <form className="flex flex-col md:flex-row w-full" onSubmit={form.handleSubmit(onSubmit)}>
               <div id='side' className="flex flex-col justify-center items-center md:items-start gap-4 bg-accent rounded-md py-4 md:px-4">

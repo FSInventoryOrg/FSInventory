@@ -177,17 +177,17 @@ export function EmployeeTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   onClick={() => {
-                    // if (row.original.code) {
-                    //   window.location.href = `/employee/${row.original.code}`
-                    // } else {
-                    //   onEmployeeSelect(row.original)
-                    // }
-                    onEmployeeSelect(row.original)
+                    if (row.original.code) {
+                      window.location.href = `/tracker/${row.original.code}`
+                    } else {
+                      onEmployeeSelect(row.original)
+                    }
+                    // onEmployeeSelect(row.original)
                   }}
                   className="cursor-pointer"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="overflow-hidden max-w-[50%]">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
