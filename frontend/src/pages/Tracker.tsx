@@ -27,7 +27,8 @@ const Tracker = () => {
     queryFn: () => imsService.fetchEmployeeByCode(employeeCode || ''),
     enabled: !!employeeCode,
   });
-  
+
+  const [key, setKey] = React.useState(+new Date())
   const [open, setOpen] = React.useState(false);
   const [employees, setEmployees] = React.useState<EmployeeType[]>();
   const [selectedEmployee, setSelectedEmployee] = React.useState<EmployeeType>();
@@ -52,13 +53,13 @@ const Tracker = () => {
     // Add registered employees
     if (registeredEmployees) {
       registeredEmployees.forEach((employee: EmployeeType) => {
-        const fullName = `${employee.firstName} ${employee.lastName}`;
+        const name = `${employee.firstName} ${employee.lastName}`;
         allEmployees.push({
           ...employee,
-          name: `${employee.firstName} ${employee.lastName}`,
+          name: name,
           isRegistered: true,
         });
-          employeesAdded.add(fullName)
+          employeesAdded.add(name)
       });
     }
     // Add unregistered employees
@@ -139,6 +140,7 @@ const Tracker = () => {
   React.useEffect(() => {
     if (employeeCode) {
       setSelectedEmployee(employeeByUrl)
+      setKey(+new Date())
     }
   }, [employeeByUrl, employeeCode])
 
@@ -192,12 +194,12 @@ const Tracker = () => {
       <main className="flex-1 flex flex-col gap-4 w-full">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <Button className='xl:hidden' variant="outline">View Employees</Button>
+            <Button className='xl:hidden bg-accent' variant="outline">View Employees</Button>
           </SheetTrigger>
-          <SheetContent side='left'>
+          <SheetContent side='left' className='h-full overflow-y-scroll w-full'>
             <SheetHeader className='pb-4'>
               <SheetTitle>Employees</SheetTitle>
-              <SheetDescription>
+              <SheetDescription className='hidden sm:flex'>
                 Select an employee below to view their currently deployed and past assets.
               </SheetDescription>
             </SheetHeader>
@@ -214,7 +216,7 @@ const Tracker = () => {
           </SheetContent>
         </Sheet>
         {selectedEmployee ? (
-          <DeploymentInfo key={selectedEmployee._id} employee={selectedEmployee} assignee={selectedEmployee.code ? selectedEmployee.code : `${selectedEmployee.firstName} ${selectedEmployee.lastName}`} />
+          <DeploymentInfo key={key} employee={selectedEmployee} assignee={selectedEmployee.code ? selectedEmployee.code : `${selectedEmployee.firstName} ${selectedEmployee.lastName}`} />
         ) : (
           <div className='w-full h-full flex flex-col justify-center items-center'>
             <Filter height={300} width={300} />

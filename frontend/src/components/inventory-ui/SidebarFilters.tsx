@@ -202,7 +202,7 @@ const SidebarFilters = ({
           </div>
         </div>
         <Button 
-          className='h-full gap-2 rounded-t-none rounded-b-md sm:rounded-l-none sm:rounded-r-md xl:rounded-t-none xl:rounded-b-md w-full sm:w-28 xl:w-full text-sm sm:text-lg xl:gap-2 xl:py-8' 
+          className='h-full gap-2 rounded-t-none rounded-b-md sm:rounded-l-none sm:rounded-r-md xl:rounded-t-none xl:rounded-b-md w-full sm:w-28 xl:w-full text-sm sm:text-lg xl:gap-2 py-8' 
           onClick={() => window.location.reload()}
         >
           <RefreshCcwIcon size={20} /> Reset

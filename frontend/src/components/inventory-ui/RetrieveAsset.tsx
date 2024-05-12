@@ -38,9 +38,11 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAssetsByProperty"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
       setTimeout(() => {
         setOpen(false);
-      }, 500)
+      }, 100)
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
@@ -79,6 +81,7 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
       recoveryDate: new Date,
       recoveredFrom: assetData.assignee,
     }
+    console.log(retrievedAsset)
     retrieveAsset({ code: assetData.code, retrievedAsset: retrievedAsset });
   }
 
@@ -90,7 +93,7 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
           <ArrowFatLinesDown weight="fill" size={16} />
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="border-none">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">Retrieve asset {assetData.code}?</DialogTitle>
           <DialogDescription className="">

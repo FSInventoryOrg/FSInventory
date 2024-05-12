@@ -161,15 +161,18 @@ const SignUpForm = ({ onError }: SignUpFormProps) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel className='flex gap-2 text-md items-center'><LockIcon size={20}/>Password</FormLabel>
-              <div className='flex items-center'>
+              <div className='flex items-center relative'>
                 <FormControl>
                   <Input type={isPasswordVisible ? "text" : "password"} placeholder="" {...field} autoComplete="off" />
                 </FormControl>
-                <div className='absolute right-14 md:right-[88px]'>
-                  <Button type="button" variant="ghost" onClick={handlePasswordVisibility}>
-                    { isPasswordVisible ? <EyeIcon /> : <EyeOffIcon /> }
-                  </Button>
-                </div>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  onClick={handlePasswordVisibility}
+                  className='absolute right-0'
+                >
+                  { isPasswordVisible ? <EyeIcon /> : <EyeOffIcon /> }
+                </Button>
               </div>
               <FormMessage />
             </FormItem>

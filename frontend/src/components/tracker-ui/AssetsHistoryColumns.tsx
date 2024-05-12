@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HardwareType } from "@/types/asset";
-import ActionCell from './EmployeeAssetsAction';
+import ActionCell from './AssetsHistoryAction';
 
 export const AssetsHistoryColumns: ColumnDef<HardwareType>[] = [
   {
@@ -46,6 +46,9 @@ export const AssetsHistoryColumns: ColumnDef<HardwareType>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <ActionCell row={row} />
+    header: "Actions",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    cell: ({ row, table }) => <ActionCell row={row} employeeCode={JSON.stringify((table.options.meta as any).employee.code)} />
+
   },
 ]

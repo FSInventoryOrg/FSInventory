@@ -225,6 +225,72 @@ router.post("/", [
 
 /**
  * @openapi
+ * /api/employees/history/{code}/{index}:
+ *  put:
+ *    tags:
+ *      - Employee
+ *    summary: Remove an asset history entry for an employee by code and index
+ *    parameters:
+ *      - in: path
+ *        name: code
+ *        required: true
+ *        schema:
+ *          type: string
+ *        description: Employee code
+ *      - in: path
+ *        name: index
+ *        required: true
+ *        schema:
+ *          type: integer
+ *        description: Index of the asset history entry to remove
+ *    responses:
+ *      200:
+ *        description: Asset history entry removed successfully
+ *      400:
+ *        description: Bad request, validation errors
+ *      404:
+ *        description: Employee not found or index out of range
+ *      500:
+ *        description: Internal Server Error
+ *    security:
+ *      - bearerAuth: []
+ */
+router.put("/history/:code/:index", verifyToken, async (req: Request, res: Response) => {
+  try {
+    const { code, index } = req.params;
+
+    // Validate index
+    const indexNumber = parseInt(index);
+    if (isNaN(indexNumber)) {
+      return res.status(400).json({ message: "Invalid index" });
+    }
+
+    // Find employee
+    const employee = await Employee.findOne({ code });
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    // Check if index is within range
+    if (indexNumber < 0 || indexNumber >= employee.assetsHistory.length) {
+      return res.status(404).json({ message: "Index out of range" });
+    }
+
+    // Remove asset history entry at index
+    employee.assetsHistory.splice(indexNumber, 1);
+
+    // Save employee with updated assets history
+    await employee.save();
+
+    res.status(200).json({ message: "Asset history entry removed successfully" });
+  } catch (error) {
+    console.error('Error removing asset history entry:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+/**
+ * @openapi
  * /api/employees/history/{code}:
  *  put:
  *    tags:

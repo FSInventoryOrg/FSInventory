@@ -140,12 +140,12 @@ const onSubmit = (data: z.infer<typeof AssetSchema>) => {
               <TabsTrigger value="Software" onClick={() => handleTabChange("Software")} disabled>Software</TabsTrigger>
             </TabsList>
             <div className="">
-              <TabsContent value="Hardware" className="pb-4 px-3">
+              <TabsContent tabIndex={-1} value="Hardware" className="pb-4 px-3">
                 <GeneralInfoForm />
                 <SystemSpecsForm />
                 <MiscellaneousForm />
               </TabsContent>
-              <TabsContent value="Software">
+              <TabsContent tabIndex={-1} value="Software">
               </TabsContent>
             </div>     
           </Tabs>            
