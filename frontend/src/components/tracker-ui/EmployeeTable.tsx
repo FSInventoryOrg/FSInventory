@@ -180,6 +180,7 @@ export function EmployeeTable<TData, TValue>({
                     if (row.original.code) {
                       window.location.href = `/tracker/${row.original.code}`
                     } else {
+                      history.pushState({}, '', '/tracker');
                       onEmployeeSelect(row.original)
                     }
                     // onEmployeeSelect(row.original)

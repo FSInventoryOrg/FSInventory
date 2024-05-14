@@ -41,6 +41,8 @@ import { Checkbox } from "../ui/checkbox";
 const AddEmployee = () => {
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false); 
+  const [employeeName, setEmployeeName] = useState('');
+  const [newEmployeeCode, setNewEmployeeCode] = useState('');
   const [openCalendar, setOpenCalendar] = useState(false);
   const { showToast } = useAppContext();
 
@@ -57,14 +59,34 @@ const AddEmployee = () => {
     }
   });
 
-  const { mutate, isPending } = useMutation({
+  const { mutate: updateAssetsByProperty, isPending: isAssetEditPending } = useMutation({
+    mutationFn: imsService.updateAssetsByProperty,
+  });
+
+  const { mutate, isPending: isAddEmployeePending } = useMutation({
     mutationFn: imsService.addEmployee,
     onSuccess: async () => {
       showToast({ message: "New employee added successfully!", type: "SUCCESS" });
+
+      updateAssetsByProperty({
+        property: 'assignee',
+        value: employeeName,
+        newValue: newEmployeeCode,
+      });
+
+      updateAssetsByProperty({
+        property: 'recoveredFrom',
+        value: employeeName,
+        newValue: newEmployeeCode,
+      });
+
       queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
+      window.location.replace(`/tracker/${newEmployeeCode}`)
+
       setTimeout(() => {
         setOpen(false);
-      }, 500)
+      }, 100)
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
@@ -75,6 +97,8 @@ const AddEmployee = () => {
     const employeeData: EmployeeFormData = {
       ...data,
     }
+    setEmployeeName(`${employeeData.firstName} ${employeeData.lastName}`)
+    setNewEmployeeCode(employeeData.code)
     mutate(employeeData)
   }
 
@@ -283,8 +307,8 @@ const AddEmployee = () => {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" disabled={isPending} className="gap-2">
-                      {isPending ? <Spinner size={18}/> : null }
+                    <Button type="submit" disabled={(isAddEmployeePending || isAssetEditPending) } className="gap-2">
+                      {(isAddEmployeePending || isAssetEditPending) ? <Spinner size={18}/> : null }
                       Create Employee
                       <ArrowRightIcon />
                     </Button>

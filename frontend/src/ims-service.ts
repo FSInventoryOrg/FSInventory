@@ -99,7 +99,7 @@ export const removeDeploymentHistoryEntry = async (code: string, index: number) 
   return true;
 };
 
-export const updateAssetProperty = async ({ property, value, newValue }: { property: string, value: string, newValue: string }) => {
+export const updateAssetsByProperty = async ({ property, value, newValue }: { property: string, value: string, newValue: string }) => {
   const response = await fetch(`${API_BASE_URL}/api/assets/${property}/${value}`, {
     method: "PUT",
     credentials: "include",

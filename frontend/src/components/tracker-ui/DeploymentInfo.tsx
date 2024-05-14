@@ -240,9 +240,17 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
 const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
   const queryClient = useQueryClient()
   const [open, setOpen] = React.useState(false); 
+
+  const { data: employeeAssets } = useQuery<string[]>({ 
+    queryKey: ['fetchAssetsByProperty'],
+    queryFn: () => imsService.fetchAssetsByProperty('assignee', employee.code), 
+  });
+
   const handleDeleteEmployee = async () => {
     await imsService.deleteEmployeeByCode(employee.code);
     queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
+
+    window.location.replace('/tracker')
     setTimeout(() => {
       setOpen(false);
     }, 100)
@@ -282,18 +290,34 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
         }
       </AlertDialogTrigger>
       <AlertDialogContent className='border-none'>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this
-            employee and assets assigned to this employee will be set to IT Storage.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <TrashCan />
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Button onClick={handleDeleteEmployee} variant='destructive'>Yes, I want to remove {employee.firstName + ' ' + employee.lastName}</Button>
-        </AlertDialogFooter>
+        {!(employeeAssets && employeeAssets.length > 0) ? (
+          <>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently unregister this
+                employee.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <TrashCan />
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <Button onClick={handleDeleteEmployee} variant='destructive'>Yes, I want to remove {employee.firstName + ' ' + employee.lastName}</Button>
+            </AlertDialogFooter>
+          </>
+        ) : (
+          <>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Cannot remove this employee</AlertDialogTitle>
+              <AlertDialogDescription>
+                There are {employeeAssets?.length || 0} assets deployed to {employee.firstName + ' ' + employee.lastName}. Retrieve these assets and try again.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Close</AlertDialogCancel>
+            </AlertDialogFooter>
+          </>
+        )}
       </AlertDialogContent>
     </AlertDialog>
   )

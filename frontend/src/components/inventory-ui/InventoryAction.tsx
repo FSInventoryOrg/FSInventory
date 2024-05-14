@@ -56,6 +56,10 @@ const ActionCell: React.FC<CellProps> = ({ row }) => {
     }, 100)
   };
 
+  const handleClose = (close: boolean) => {
+    setIsEditDialogOpen(!close)
+  }
+
   return (
     <div className="justify-center flex">
         <DropdownMenu>
@@ -128,7 +132,7 @@ const ActionCell: React.FC<CellProps> = ({ row }) => {
                 Update information fields for this existing asset via the form below. Asset code can be changed, but entering an existing code of a different asset is not permitted.
               </DialogDescription>
             </DialogHeader>
-            <EditAsset assetData={asset} />
+            <EditAsset assetData={asset} onClose={handleClose} />
             </div>
           </DialogContent>
         </Dialog>
