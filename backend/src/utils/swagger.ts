@@ -33,7 +33,9 @@ const options: swaggerJsdoc.Options = {
   },
   apis: [
     path.resolve(__dirname, '../routes/*.js'),
-    path.resolve(__dirname, '../models/*.schema.js')
+    path.resolve(__dirname, '../models/*.schema.js'),
+    path.resolve(__dirname, '../routes/*.ts'),
+    path.resolve(__dirname, '../models/*.schema.ts')
   ],
 }
 

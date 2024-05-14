@@ -94,7 +94,7 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
       setTimeout(() => {
         setOpen(false);
-      }, 500)
+      }, 100)
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });

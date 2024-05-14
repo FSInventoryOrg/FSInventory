@@ -84,8 +84,8 @@ const SuggestiveInput = React.forwardRef<HTMLInputElement, SuggestiveInputProps>
 
     const handleInputBlur = () => {
       setTimeout(() => {
-        setShowSuggestions(false); // Hide suggestions after a short delay
-      }, 100); // Adjust the delay time as needed
+        setShowSuggestions(false); 
+      }, 100);
     };
 
     return (

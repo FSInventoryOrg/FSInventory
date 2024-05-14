@@ -45,6 +45,7 @@ interface EditEmployeeProps {
 const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false); 
+  const [newEmployeeCode, setNewEmployeeCode] = useState('');
   const { showToast } = useAppContext();
 
   const form = useForm<z.infer<typeof EmployeeSchema>>({
@@ -60,15 +61,34 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
     }
   });
 
-  const { mutate, isPending } = useMutation({
+  const { mutate: updateAssetsByProperty, isPending: isAssetEditPending } = useMutation({
+    mutationFn: imsService.updateAssetsByProperty,
+  });
+
+  const { mutate, isPending: isEditEmployeePending } = useMutation({
     mutationFn: imsService.updateEmployee,
     onSuccess: async () => {
       showToast({ message: "Employee updated successfully!", type: "SUCCESS" });
+
+      updateAssetsByProperty({
+        property: 'assignee',
+        value: employeeData.code,
+        newValue: newEmployeeCode,
+      });
+
+      updateAssetsByProperty({
+        property: 'recoveredFrom',
+        value: employeeData.code,
+        newValue: newEmployeeCode,
+      });
+
       queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
       queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
+      window.location.replace(`/tracker/${newEmployeeCode}`)
+
       setTimeout(() => {
         setOpen(false);
-      }, 500)
+      }, 100)
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
@@ -80,6 +100,7 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
       ...data,
       _id: employeeData._id,
     }
+    setNewEmployeeCode(updatedEmployee.code)
     mutate({ code: employeeData.code, updatedEmployee: updatedEmployee });
   }
 
@@ -274,8 +295,8 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" disabled={isPending} className="gap-2">
-                    {isPending ? <Spinner size={18}/> : null }
+                  <Button type="submit" disabled={(isEditEmployeePending || isAssetEditPending)} className="gap-2">
+                    {(isEditEmployeePending || isAssetEditPending) ? <Spinner size={18}/> : null }
                     Save Employee
                     <ArrowRightIcon />
                   </Button>

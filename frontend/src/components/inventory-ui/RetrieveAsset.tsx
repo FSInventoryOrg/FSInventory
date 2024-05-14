@@ -64,8 +64,8 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
         } else {
           showToast({ message: "Asset retrieved successfully!", type: "SUCCESS" });
           setTimeout(() => {
-            window.location.reload()
-          }, 500)
+            setOpen(false)
+          }, 100)
         }
       }
     },

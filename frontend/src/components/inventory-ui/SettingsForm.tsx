@@ -20,6 +20,7 @@ import {
 import { SlashIcon } from "lucide-react"
 import { Defaults } from "@/types/options"
 import VisibleColumnsForm from "./VisibleColumnsForms"
+import SelectOptionsForm from "./SelectOptionsForm"
 
 const SettingsForm = ({ defaults }: { defaults: Defaults }) => {
   const { showToast } = useAppContext();
@@ -83,6 +84,7 @@ const SettingsForm = ({ defaults }: { defaults: Defaults }) => {
         </Breadcrumb>
         <DefaultOptionsForm />
         <VisibleColumnsForm onTagSelect={setSelectedTags} />
+        <SelectOptionsForm />
         <Button type="submit" disabled={isPending} className="gap-2 w-fit self-end">
           {isPending ? <Spinner size={18}/> : null }
           Save changes
