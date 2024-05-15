@@ -7,6 +7,12 @@ import { Label } from '../ui/label';
 import { Button } from '../ui/button';
 import { ScrollArea } from '../ui/scroll-area';
 import { Separator } from '../ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface EmployeeFilterProps {
   onFilter: (filters: string[]) => void;
@@ -49,12 +55,21 @@ const EmployeeFilter: React.FC<EmployeeFilterProps> = ({ onFilter }) => {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button variant='outline' size='icon' className='p-0 h-8 w-8'>
-          <span className="sr-only">Filter employees</span>
-          <FilterIcon className='h-4 w-4' />
-        </Button>
-      </PopoverTrigger>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <PopoverTrigger asChild>
+              <Button variant='outline' size='icon' className='p-0 h-8 min-w-8 w-8'>
+                <span className="sr-only">Filter employees</span>
+                <FilterIcon className='h-4 w-4' />
+              </Button>
+            </PopoverTrigger>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className='text-xs'>Filter employees</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <PopoverContent className='w-fit p-0'>
         <ScrollArea className='h-[300px]'>
           <Label className='flex text-xs text-accent-foreground p-2'>POSITION</Label>

@@ -23,11 +23,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ScrollArea } from "../ui/scroll-area"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { ScrollArea, ScrollBar } from "../ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { InventoryPagination } from "./InventoryPagination"
 import AddAsset from "./AddAsset"
-import { FilterIcon, SearchIcon } from "lucide-react"
+import { FilterIcon, SearchIcon, SlidersHorizontalIcon } from "lucide-react"
 import {
   RankingInfo,
   rankItem,
@@ -38,8 +44,9 @@ import { TagOption } from "./Options"
 import { useQuery } from '@tanstack/react-query'
 import * as imsService from '@/ims-service'
 import { Button } from "../ui/button"
-import OptionSettings from "./OptionSettings"
 import { PROPERTIES } from "@/lib/data"
+import { Link } from "react-router-dom"
+import { Defaults } from "@/types/options"
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -51,31 +58,33 @@ declare module '@tanstack/table-core' {
 }
 
 interface InventoryTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  defaultOptions: Defaults;
+  DEFAULT_HIDDEN_COLUMNS: string[];
   onToggleFilters: (visible: boolean) => void;
   isFiltersVisible: boolean;
   selectedCategory: string;
 }
 
-const DEFAULT_HIDDEN_COLUMNS = [
-  'category', 
-  'processor', 
-  'memory', 
-  'storage', 
-  'assignee', 
-  'serviceInYears', 
-  'supplierVendor', 
-  'pezaForm8105', 
-  'pezaForm8106', 
-  'isRGE', 
-  'equipmentType', 
-  'remarks',
-  'deploymentDate',
-  'recoveredFrom',
-  'recoveryDate',
-  'client'
-];
+// const DEFAULT_HIDDEN_COLUMNS = [
+//   'category', 
+//   'processor', 
+//   'memory', 
+//   'storage', 
+//   'assignee', 
+//   'serviceInYears', 
+//   'supplierVendor', 
+//   'pezaForm8105', 
+//   'pezaForm8106', 
+//   'isRGE', 
+//   'equipmentType', 
+//   'remarks',
+//   'deploymentDate',
+//   'recoveredFrom',
+//   'recoveryDate',
+//   'client'
+// ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -98,6 +107,8 @@ const exactFilter: FilterFn<any> = (row, columnId, value) => {
 export function InventoryTable<TData, TValue>({
   columns,
   data,
+  defaultOptions,
+  DEFAULT_HIDDEN_COLUMNS,
   onToggleFilters,
   isFiltersVisible,
   selectedCategory,
@@ -160,7 +171,7 @@ export function InventoryTable<TData, TValue>({
         }));
       }
     }
-  }, [selectedCategory, optionValues]);
+  }, [selectedCategory, optionValues, DEFAULT_HIDDEN_COLUMNS]);
 
   const [rowSelection, setRowSelection] = React.useState({})
 
@@ -207,31 +218,63 @@ export function InventoryTable<TData, TValue>({
   
   return (
     <div className="w-full flex flex-col h-full" >
-      <div className="flex items-center pb-4 justify-between">
-        <div className="flex items-center -translate-x-4">
-          <SearchIcon className="translate-x-8 h-4 w-4"/>
-          <Input
-            placeholder="Search asset..."
-            value={globalFilter ?? ''}
-            onChange={(event) => table.setGlobalFilter(event.target.value)}
-            className="max-w-sm pl-10 h-8 font-light rounded-md text-sm w-fit md:w-[700px]"
-          />
+      <div className="w-full flex items-center justify-between pb-3 xl:pb-4 gap-2">
+        <div className="flex gap-2 w-full">
+          {!isFiltersVisible && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    className='h-8 w-8 min-w-8 p-0 bg-inherit'
+                    variant='outline'
+                    size='icon'
+                    onClick={() => {
+                      onToggleFilters(!isFiltersVisible);
+                    }}
+                  >
+                    <span className="sr-only">Toggle visible columns</span>
+                    <FilterIcon className='h-4 w-4' />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className='text-xs'>Show filter settings</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          <div className="flex items-center w-full">
+            <SearchIcon className="absolute translate-x-3 h-4 w-4"/>
+            <Input
+              placeholder="Search asset..."
+              value={globalFilter ?? ''}
+              onChange={(event) => table.setGlobalFilter(event.target.value)}
+              className="w-full pl-10 h-8 font-light rounded-md text-sm md:w-[700px]"
+            />
+          </div>
         </div>
-        <div className="flex gap-2">
-          <OptionSettings />
-          <Button
-            className='h-8 w-8 p-0'
-            variant='outline'
-            size='icon'
-            onClick={() => {
-              onToggleFilters(!isFiltersVisible);
-            }}
-          >
-            <span className="sr-only">Toggle visible columns</span>
-            <FilterIcon className='h-4 w-4' />
-          </Button>
+        <div className="flex gap-2 w-fit">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  asChild
+                  className='h-8 w-8 min-w-8 p-0'
+                  variant='outline'
+                  size='icon'
+                >
+                  <Link to="/inventory/settings">
+                    <span className="sr-only">Settings & preferences</span>
+                    <SlidersHorizontalIcon className='h-4 w-4'/>
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className='text-xs'>Settings & preferences</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <ColumnVisibility table={table} />
-          <AddAsset />
+          {defaultOptions && <AddAsset defaultValues={defaultOptions} />}
         </div>
       </div>
       <ScrollArea className="rounded-md border h-full" style={isXL ? { maxHeight: '' } : {}}>
@@ -280,6 +323,7 @@ export function InventoryTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
+        <ScrollBar orientation="horizontal" />
       </ScrollArea>
       <InventoryPagination table={table}/>
     </div>

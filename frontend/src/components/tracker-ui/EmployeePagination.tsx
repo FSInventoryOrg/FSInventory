@@ -13,7 +13,7 @@ export function EmployeePagination<TData>({
     <div className="flex flex-col sm:flex-row gap-2 sm:gap-0  items-center justify-between pb-2">
       <div className="flex w-full items-center space-x-6 lg:space-x-8">
         <div className="flex w-full justify-between items-center">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center lg:space-x-2">
             <Button
               variant="outline"
               className="hidden h-8 w-8 p-0 lg:flex"

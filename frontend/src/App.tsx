@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Inventory from "./pages/Inventory";
 import Loading from "./pages/Loading";
 import Tracker from "./pages/Tracker";
+import InventoryEdit from "./pages/InventorySettings";
 
 const App = () => {
   const { isLoggedIn, isLoading } = useAppContext();
@@ -27,8 +28,9 @@ const App = () => {
                 <>
                   <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
                   <Route path="/inventory" element={<Layout><Inventory /></Layout>} />
+                  <Route path="/inventory/settings" element={<Layout><InventoryEdit /></Layout>} />
                   <Route path="/tracker" element={<Layout><Tracker /></Layout>} />
-                  <Route path="/employee/:employeeCode" element={<Layout><Tracker /></Layout>} />
+                  <Route path="/tracker/:employeeCode" element={<Layout><Tracker /></Layout>} />
                   {/* <Route path="/metrics" element={<Layout><Metrics /></Layout>} />
                   <Route path="/requests" element={<Layout>Requests</Layout>} /> */}
                 </>

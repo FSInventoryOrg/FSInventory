@@ -12,3 +12,11 @@ export function hexToRgbA(hex: string, alpha: number) {
 
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
+
+export function isWindowScrollable() {
+  const windowHeight = window.innerHeight;
+  const bodyScrollHeight = document.body.scrollHeight;
+  const documentScrollHeight = document.documentElement.scrollHeight;
+
+  return bodyScrollHeight > windowHeight || documentScrollHeight > windowHeight;
+}

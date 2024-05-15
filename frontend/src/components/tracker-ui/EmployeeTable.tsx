@@ -136,20 +136,18 @@ export function EmployeeTable<TData, TValue>({
   
   return (
     <div className="w-full flex flex-col" >
-      <div className="flex items-center pb-2 justify-between">
-        <div className="flex items-center -translate-x-4">
-          <SearchIcon className="translate-x-8 h-4 w-4"/>
+      <div className="flex items-center pb-2 gap-2">
+        <div className="flex items-center w-full">
+          <SearchIcon className="absolute translate-x-3 h-4 w-4"/>
           <Input
             placeholder="Search employee..."
             value={globalFilter ?? ''}
             onChange={(event) => table.setGlobalFilter(event.target.value)}
-            className="max-w-sm w-[205px] pl-10 h-8 font-light rounded-md text-sm"
+            className="max-w-sm w-full pl-10 h-8 font-light rounded-md text-sm"
           />
         </div>
-        <div className="flex gap-2 -translate-x-2 z-20">
-          <EmployeeFilter onFilter={handleFilters} />
-          <AddEmployee />
-        </div>
+        <EmployeeFilter onFilter={handleFilters} />
+        <AddEmployee />
       </div>
       <EmployeePagination table={table}/>
       <ScrollArea className="rounded-md border h-full" style={isXL ? { maxHeight: '' } : {}}>
@@ -179,17 +177,18 @@ export function EmployeeTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   onClick={() => {
-                    // if (row.original.code) {
-                    //   window.location.href = `/employee/${row.original.code}`
-                    // } else {
-                    //   onEmployeeSelect(row.original)
-                    // }
-                    onEmployeeSelect(row.original)
+                    if (row.original.code) {
+                      window.location.href = `/tracker/${row.original.code}`
+                    } else {
+                      history.pushState({}, '', '/tracker');
+                      onEmployeeSelect(row.original)
+                    }
+                    // onEmployeeSelect(row.original)
                   }}
                   className="cursor-pointer"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="overflow-hidden max-w-[50%]">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

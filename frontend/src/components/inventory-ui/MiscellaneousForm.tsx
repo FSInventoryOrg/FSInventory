@@ -28,8 +28,9 @@ import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Textarea } from '../ui/textarea';
 import SuggestiveInput from './SuggestiveInput';
-import Options from './Options';
 import { useState } from 'react';
+import { EmployeeSuggestiveInput } from './DeployAsset';
+import WarningAlert from '../WarningAlert';
 
 const MiscellaneousForm = () => {
   const { control } = useFormContext<AssetFormData>();
@@ -42,15 +43,25 @@ const MiscellaneousForm = () => {
         <span className="flex items-center gap-2 mr-2 text-lg font-semibold text-primary"><LibraryBigIcon size={20}/>Miscellaneous</span>
         <div className="flex-grow border-t border-border border-[1px]"></div>
       </div>
-      <div className='flex gap-2 w-full'>
-      </div>
       <FormLabel className='text-md text-secondary-foreground'>Legal information</FormLabel>
-      <div className='flex gap-2 w-full mt-2'>
+      <FormField
+        control={control}
+        name="client"
+        render={({ field }) => (
+          <FormItem className='w-full sm:w-2/3 mt-2'>
+            <FormControl>
+              <SuggestiveInput property='client' placeholder="Client" autoComplete='off' type='input' field={field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <div className='flex flex-col sm:flex-row gap-2 w-full'>
         <FormField
           control={control}
           name="pezaForm8105"
           render={({ field }) => (
-            <FormItem className='w-1/2'>
+            <FormItem className='w-full sm:w-1/2'>
               <FormControl>
                 <Input placeholder="PEZA Form 8105" autoComplete='off' type='input' {...field} />
               </FormControl>
@@ -62,7 +73,7 @@ const MiscellaneousForm = () => {
           control={control}
           name="pezaForm8106"
           render={({ field }) => (
-            <FormItem className='w-1/2'>
+            <FormItem className='w-full sm:w-1/2'>
               <FormControl>
                 <Input placeholder="PEZA Form 8106" autoComplete='off' type='input' {...field} />
               </FormControl>
@@ -75,7 +86,7 @@ const MiscellaneousForm = () => {
           control={control}
           name="isRGE"
           render={({ field }) => (
-            <FormItem className='w-[280px]'>
+            <FormItem className='w-full sm:w-2/3'>
               <Select
                 onValueChange={(value) => field.onChange(value === 'true' ? true : false)} // Convert string value to boolean
                 defaultValue={field.value ? field.value.toString() : ''} // Convert boolean value to string
@@ -96,26 +107,19 @@ const MiscellaneousForm = () => {
           )}
         />
       <FormLabel className='text-md text-secondary-foreground'>Deployment details</FormLabel>
-      <FormField
-        control={control}
-        name="client"
-        render={({ field }) => (
-          <FormItem className='w-1/2 mt-2'>
-            <FormControl>
-              <SuggestiveInput property='client' placeholder="Client" autoComplete='off' type='input' field={field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <div className='flex gap-2 w-full'>
+      <div className='mt-2 mb-4'>
+        <WarningAlert warningMessage="
+          We recommend using the deploy and retrieve functions to update the deployment information. Leave these fields empty unless absolutely necessary.
+        " />
+      </div>
+      <div className='flex flex-col sm:flex-row gap-2 w-full'>
         <FormField
           control={control}
           name="assignee"
           render={({ field }) => (
             <FormItem className='w-full'>
               <FormControl>
-                <SuggestiveInput property='assignee' placeholder="Assignee" autoComplete='off' type='input' field={field} />
+                <EmployeeSuggestiveInput property='assignee' placeholder="Assignee" autoComplete='off' type='input' field={field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -126,14 +130,14 @@ const MiscellaneousForm = () => {
           name="deploymentDate"
           render={({ field }) => (
             <div className="flex items-center justify-center gap-0">
-              <FormItem className="flex flex-col">
+              <FormItem className="flex flex-col w-full sm:w-fit">
                 <Popover open={openDeploymentDate} onOpenChange={setOpenDeploymentDate}>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "w-[238px] pl-3 text-left font-normal rounded-r-none",
+                          "w-full sm:w-[238px] pl-3 text-left font-normal rounded-r-none",
                           !field.value && "text-muted-foreground"
                         )}
                       >
@@ -161,9 +165,9 @@ const MiscellaneousForm = () => {
                 <FormMessage />
               </FormItem>
               <Button 
-                className='rounded-l-none border-l-0'
+                className='rounded-l-none border-l-0 text-accent-foreground'
                 type='button'
-                variant='secondary'
+                variant='outline'
                 size='icon'
                 onClick={() => {
                   field.onChange(null)
@@ -175,7 +179,7 @@ const MiscellaneousForm = () => {
           )}
         />
       </div>
-      <div className='flex gap-2 w-full'>
+      <div className='flex flex-col sm:flex-row gap-2 w-full'>
         <FormField
           control={control}
           name="recoveredFrom"
@@ -193,14 +197,14 @@ const MiscellaneousForm = () => {
           name="recoveryDate"
           render={({ field }) => (
             <div className="flex items-center justify-center gap-0">
-              <FormItem>
+              <FormItem className='flex flex-col w-full sm:w-fit'>
                 <Popover open={openRecoveryDate} onOpenChange={setOpenRecoveryDate}>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "w-[238px] pl-3 text-left font-normal rounded-r-none",
+                          "w-full sm:w-[238px] pl-3 text-left font-normal rounded-r-none",
                           !field.value && "text-muted-foreground"
                         )}
                       >
@@ -227,9 +231,9 @@ const MiscellaneousForm = () => {
                 </Popover>
               </FormItem>
               <Button 
-                className='rounded-l-none border-l-0'
+                className='rounded-l-none border-l-0 text-accent-foreground'
                 type='button'
-                variant='secondary'
+                variant='outline'
                 size='icon'
                 onClick={() => {
                   field.onChange(null)
@@ -241,16 +245,6 @@ const MiscellaneousForm = () => {
           )}
         />
       </div>
-      <FormField
-        control={control}
-        name="equipmentType"
-        render={({ field }) => (
-          <FormItem className='w-[280px]'>
-            <Options property='equipmentType' field={field} className='w-full' />
-            <FormMessage />
-          </FormItem>
-        )}
-      />
       <FormField
         control={control}
         name="remarks"

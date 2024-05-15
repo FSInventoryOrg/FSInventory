@@ -23,12 +23,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ScrollArea } from "../ui/scroll-area"
+import { ScrollArea, ScrollBar } from "../ui/scroll-area"
 import {
   RankingInfo,
   rankItem,
 } from '@tanstack/match-sorter-utils'
 import Empty from "../graphics/Empty"
+import { EmployeeType } from "@/types/employee"
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -40,8 +41,9 @@ declare module '@tanstack/table-core' {
 }
 
 interface EmployeeAssetsTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  employee: EmployeeType;
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,6 +65,7 @@ const exactFilter: FilterFn<any> = (row, columnId, value) => {
 };
 
 export function AssetsHistoryTable<TData, TValue>({
+  employee,
   columns,
   data,
 }: EmployeeAssetsTableProps<TData, TValue>) {
@@ -105,6 +108,9 @@ export function AssetsHistoryTable<TData, TValue>({
     },
     initialState: {
       pagination
+    },
+    meta: {
+      employee: employee
     }
   })
 
@@ -122,54 +128,53 @@ export function AssetsHistoryTable<TData, TValue>({
   }, []);
 
   return (
-    <div className="w-full flex flex-col h-full" >
-      <ScrollArea className="rounded-md border h-full" style={isXL ? { maxHeight: '' } : {}}>
-        <Table className="text-xs relative">
-          <TableHeader className="sticky top-0 bg-accent z-10 border-b">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
+    <ScrollArea className="rounded-md border h-full" style={isXL ? { maxHeight: '' } : {}}>
+      <Table className="text-xs relative">
+        <TableHeader className="sticky top-0 bg-accent z-10 border-b">
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                )
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
               </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow className="hover:bg-background">
-                <TableCell colSpan={columns.length}>
-                  <div className='h-max flex flex-col items-center justify-center'>
-                    <Empty height={200} width={300} />
-                    <span className="text-muted-foreground">No results found</span>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </ScrollArea>
-    </div>
+            ))
+          ) : (
+            <TableRow className="hover:bg-background">
+              <TableCell colSpan={columns.length}>
+                <div className='h-max flex flex-col items-center justify-center'>
+                  <Empty height={200} width={300} />
+                  <span className="text-muted-foreground">No results found</span>
+                </div>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
   )
 }

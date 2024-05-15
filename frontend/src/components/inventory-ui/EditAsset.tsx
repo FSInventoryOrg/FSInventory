@@ -11,7 +11,7 @@ import {
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as imsService from '@/ims-service'
 import { useAppContext } from '@/hooks/useAppContext'
 import { Spinner } from '../Spinner'
@@ -31,9 +31,10 @@ import { AssetType, HardwareType, SoftwareType } from "@/types/asset";
 
 interface EditAssetProps {
   assetData: AssetType | HardwareType | SoftwareType;
+  onClose: (close: boolean) => void;
 }
 
-const EditAsset = ({ assetData }: EditAssetProps) => {
+const EditAsset = ({ assetData, onClose }: EditAssetProps) => {
   const isHardware = assetData.type === 'Hardware';
   const isSoftware = assetData.type === 'Software';
 
@@ -73,6 +74,8 @@ const EditAsset = ({ assetData }: EditAssetProps) => {
       })
     }
   });
+
+  const queryClient = useQueryClient()
   const { showToast } = useAppContext();
   const [tabValue, setTabValue] = useState<"Hardware" | "Software">("Hardware"); // State to track the tab value
 
@@ -84,9 +87,11 @@ const EditAsset = ({ assetData }: EditAssetProps) => {
     mutationFn: imsService.updateAsset,
     onSuccess: async () => {
       showToast({ message: "Asset updated successfully!", type: "SUCCESS" });
+      queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
       setTimeout(() => {
-        window.location.reload()
-      }, 1000)
+        onClose(true)
+      }, 100)
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
@@ -140,12 +145,12 @@ const onSubmit = (data: z.infer<typeof AssetSchema>) => {
               <TabsTrigger value="Software" onClick={() => handleTabChange("Software")} disabled>Software</TabsTrigger>
             </TabsList>
             <div className="">
-              <TabsContent value="Hardware" className="pb-4 px-3">
+              <TabsContent tabIndex={-1} value="Hardware" className="pb-4 px-3">
                 <GeneralInfoForm />
                 <SystemSpecsForm />
                 <MiscellaneousForm />
               </TabsContent>
-              <TabsContent value="Software">
+              <TabsContent tabIndex={-1} value="Software">
               </TabsContent>
             </div>     
           </Tabs>            

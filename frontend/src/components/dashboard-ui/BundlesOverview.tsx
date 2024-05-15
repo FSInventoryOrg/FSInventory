@@ -4,19 +4,19 @@ import { Skeleton } from '../ui/skeleton';
 import { AppleLogo, WindowsLogo } from "@phosphor-icons/react";
 import { hexToRgbA } from '@/lib/utils';
 
-interface PlatformsOverviewProps {
+interface BundlesOverviewProps {
   windows: number;
   macbooks: number;
 }
 
-const PlatformsOverview = ({ windows, macbooks }: PlatformsOverviewProps) => {
+const BundlesOverview = ({ windows, macbooks }: BundlesOverviewProps) => {
   
   return (
     <div className='grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-1 grid-rows-1 sm:grid-rows-2 gap-7'>
       <div className='flex gap-2 items-center justify-start'>
         {windows ? (
           <div 
-            className='min-h-12 min-w-12 sm:min-h-16 sm:min-w-16 flex justify-center items-center rounded-lg'
+            className='min-h-12 min-w-12 sm:min-h-16 sm:min-w-16 flex justify-center items-center rounded-xl'
             style={{ backgroundColor: hexToRgbA('#6A8CFF', 0.3) }}
           >
             <WindowsLogo weight='duotone' size={32} style={{ color: '#6A8CFF' }} />
@@ -40,7 +40,7 @@ const PlatformsOverview = ({ windows, macbooks }: PlatformsOverviewProps) => {
       <div className='flex gap-2 items-center justify-start'>
         {macbooks ? (
           <div 
-            className='min-h-12 min-w-12 sm:min-h-16 sm:min-w-16 flex justify-center items-center rounded-lg'
+            className='min-h-12 min-w-12 sm:min-h-16 sm:min-w-16 flex justify-center items-center rounded-xl'
             style={{ backgroundColor: hexToRgbA('#8d8d8d', 0.3) }}
           >
             <AppleLogo weight='duotone' size={32} style={{ color: '#8d8d8d' }} />
@@ -65,4 +65,4 @@ const PlatformsOverview = ({ windows, macbooks }: PlatformsOverviewProps) => {
   )
 }
 
-export default PlatformsOverview;
+export default BundlesOverview;

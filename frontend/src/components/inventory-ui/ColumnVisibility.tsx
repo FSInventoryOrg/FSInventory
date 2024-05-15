@@ -3,18 +3,24 @@ import { cn } from "@/lib/utils"
 import { CheckIcon, Columns3Icon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
 } from "@/components/ui/command"
 import { Table } from "@tanstack/react-table"
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { ScrollArea } from '@/components/ui/scroll-area'
 
 interface InventoryFilterProps<TData> {
@@ -29,15 +35,24 @@ export function ColumnVisibility<TData>({
     
     return (
         <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="h-8 w-8 p-0 ml-auto"
-            >
-              <span className="sr-only">Toggle visible columns</span>
-              <Columns3Icon className='h-4 w-4'/>
-            </Button>
-          </PopoverTrigger>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0"
+                  >
+                    <span className="sr-only">Toggle visible columns</span>
+                    <Columns3Icon className='h-4 w-4'/>
+                  </Button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className='text-xs'>Toggle visible columns</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <PopoverContent className="w-full p-0">
               <Command>
                   <CommandInput placeholder="Search ..." />

@@ -12,6 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import CountUp from 'react-countup';
 import * as imsService from '@/ims-service';
 import { useQuery } from '@tanstack/react-query';
@@ -21,12 +27,21 @@ import { Skeleton } from '../ui/skeleton';
 interface SidebarFiltersProps {
   onFilterChange: (status: string) => void;
   onCategoryChange: (status: string) => void;
+  onToggleFilters: (visible: boolean) => void;
+  isFiltersVisible: boolean;
   selectedStatus: string;
   selectedCategory: string;
   totalAssets: number;
 }
 
-const SidebarFilters = ({ onFilterChange, onCategoryChange, selectedStatus, selectedCategory, totalAssets }: SidebarFiltersProps) => {
+const SidebarFilters = ({ 
+    onFilterChange, 
+    onCategoryChange, onToggleFilters, 
+    isFiltersVisible, 
+    selectedStatus, 
+    selectedCategory, 
+    totalAssets 
+  }: SidebarFiltersProps) => {
 
   const { data, isLoading } = useQuery({ queryKey: ['fetchAllAssets', 'Hardware'], queryFn: () => imsService.fetchAllAssets('Hardware') })
   const statusCounts: Record<string, number> = {};
@@ -52,7 +67,7 @@ const SidebarFilters = ({ onFilterChange, onCategoryChange, selectedStatus, sele
 
   return (
     <section className='w-full flex flex-col'>
-      <div className='flex items-end justify-between mr-8 pb-4'>
+      <div className='flex items-end justify-between mr-8 pb-3 xl:pb-4'>
         <h1 className='text-xl font-semibold tracking-wide'>Assets</h1>
         {isLoading ? 
         <Skeleton className='bg-muted w-[120px] rounded-xl h-8 border-border border-2' /> 
@@ -71,9 +86,31 @@ const SidebarFilters = ({ onFilterChange, onCategoryChange, selectedStatus, sele
         </div>    
         }
       </div>
-      <div className='flex xl:flex-col drop-shadow'>
-        <div className='w-full bg-accent xl:rounded-b-none rounded-l-md xl:rounded-t-md p-4 pb-8 flex flex-col gap-4 '>
-          <h2 className='font-semibold flex gap-2 items-center'><FilterIcon size={16}/>Filter Settings</h2>
+      <div className='flex flex-col sm:flex-row xl:flex-col drop-shadow'>
+        <div className='w-full bg-accent rounded-b-none rounded-t-md sm:rounded-l-md xl:rounded-b-none xl:rounded-t-md p-4 pb-8 flex flex-col gap-4 '>
+          <h2 className='font-semibold flex gap-2 items-center'>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    className='h-8 w-8 min-w-8 p-0 bg-inherit'
+                    variant='outline'
+                    size='icon'
+                    onClick={() => {
+                      onToggleFilters(!isFiltersVisible);
+                    }}
+                  >
+                    <span className="sr-only">Toggle filter settings</span>
+                    <FilterIcon className='h-4 w-4' />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className='text-xs'>Hide filter settings</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            Filter Settings
+          </h2>
           <div className='flex flex-col gap-2'>
             <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Type</span>
             <div className='flex gap-2 w-full md:w-fit xl:w-full'>
@@ -165,7 +202,7 @@ const SidebarFilters = ({ onFilterChange, onCategoryChange, selectedStatus, sele
           </div>
         </div>
         <Button 
-          className='h-full gap-2 rounded-l-none rounded-r-md xl:rounded-t-none xl:rounded-b-md w-28 xl:w-full text-lg xl:gap-2 xl:py-8' 
+          className='h-full gap-2 rounded-t-none rounded-b-md sm:rounded-l-none sm:rounded-r-md xl:rounded-t-none xl:rounded-b-md w-full sm:w-28 xl:w-full text-sm sm:text-lg xl:gap-2 py-8' 
           onClick={() => window.location.reload()}
         >
           <RefreshCcwIcon size={20} /> Reset

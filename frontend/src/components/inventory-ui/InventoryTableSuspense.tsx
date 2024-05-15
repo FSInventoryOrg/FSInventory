@@ -9,62 +9,90 @@ import { Button } from "../ui/button"
 import { Input } from "@/components/ui/input"
 import { SearchIcon, ChevronLeftIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon, PlusIcon, Columns3Icon, FilterIcon, SlidersHorizontalIcon } from "lucide-react"
 import { TableSuspense } from "../tracker-ui/TableSuspense"
+import React from "react"
+import { Link } from "react-router-dom"
 
-export function InventoryTableSuspense () {
+interface InventoryTableSuspenseProps {
+  onToggleFilters: (visible: boolean) => void;
+  isFiltersVisible: boolean;
+}
+
+export function InventoryTableSuspense ({ onToggleFilters, isFiltersVisible}: InventoryTableSuspenseProps) {
+  const [isMD, setIsMD] = React.useState(false);
+  React.useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMD(window.innerWidth >= 768); 
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
   return (
     <div className="w-full flex flex-col">
-      <div className="flex items-center pb-4 justify-between">
-        <div className="flex items-center w-[700px] -translate-x-4">
-          <SearchIcon className="translate-x-8 h-4 w-4"/>
-          <Input
-            placeholder="Search asset..."
-            className="max-w-sm pl-10 h-8 font-light rounded-md text-sm"
-            disabled
-          />
+      <div className="w-full flex items-center justify-between pb-4 gap-2">
+        <div className="flex gap-2 w-full">
+          {!isFiltersVisible && (
+            <Button
+              className='h-8 w-8 min-w-8 p-0'
+              variant='outline'
+              size='icon'
+              onClick={() => {
+                onToggleFilters(!isFiltersVisible);
+              }}
+            >
+              <span className="sr-only">Toggle filter settings</span>
+              <FilterIcon className='h-4 w-4' />
+            </Button>
+          )}
+          <div className="flex items-center w-full">
+            <SearchIcon className="absolute translate-x-3 h-4 w-4"/>
+            <Input
+              placeholder="Search asset..."
+              className="w-full pl-10 h-8 font-light rounded-md text-sm md:w-[700px]"
+              disabled
+            />
+          </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-fit">
           <Button
-            variant="outline"
-            size="icon"
-            disabled
-            className="h-8 w-8 p-0 ml-auto"
+            asChild
+            className='h-8 w-8 min-w-8 p-0'
+            variant='outline'
+            size='icon'
           >
-            <span className="sr-only">Toggle visible columns</span>
-            <SlidersHorizontalIcon className='h-4 w-4'/>
+            <Link to="/inventory/settings">
+              <span className="sr-only">Link to inventory settings</span>
+              <SlidersHorizontalIcon className='h-4 w-4'/>
+            </Link>
           </Button>
           <Button
             variant="outline"
             size="icon"
             disabled
-            className="h-8 w-8 p-0 ml-auto"
-          >
-            <span className="sr-only">Toggle visible columns</span>
-            <FilterIcon className='h-4 w-4'/>
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            disabled
-            className="h-8 w-8 p-0 ml-auto"
+            className="h-8 w-8 min-w-8 p-0"
           >
             <span className="sr-only">Toggle visible columns</span>
             <Columns3Icon className='h-4 w-4'/>
           </Button>
-          <Button disabled className="rounded gap-1 font-semibold flex items-center bg-primary text-primary-foreground h-fit p-1.5 px-2 text-sm">
-            Add Asset
+          <Button disabled className="gap-1 font-semibold flex items-center h-8 p-1.5 px-2 text-sm">
+            <span className="hidden md:inline-block text-sm">Add Asset</span>
             <PlusIcon className="h-4 w-4" />
           </Button>
         </div>
       </div>
       <TableSuspense />
-      <div className="flex items-center justify-between pt-4">
+      <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 items-center justify-between pt-4">
         <div className="flex-1 text-sm text-muted-foreground">
           0 of{" "}
           0 row(s) selected.
         </div>
-        <div className="flex items-center space-x-6 lg:space-x-8">
+        <div className="flex w-full sm:w-fit items-center justify-between sm:justify-normal space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Rows per page</p>
+            {isMD && <p className="text-sm font-medium">Rows per page</p>}
             <Select disabled>
               <SelectTrigger className="h-8 w-[70px]">
                 <SelectValue placeholder={10} />

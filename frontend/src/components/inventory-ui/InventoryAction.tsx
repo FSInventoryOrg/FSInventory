@@ -1,6 +1,6 @@
 
 import { useState } from 'react'
-import { MoreHorizontal, CopyIcon, TrashIcon, EyeIcon, PenIcon } from "lucide-react";
+import { MoreHorizontal, CopyIcon, TrashIcon, EyeIcon, PenIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -48,11 +49,16 @@ const ActionCell: React.FC<CellProps> = ({ row }) => {
 
   const handleDeleteAsset = async () => {
     await imsService.deleteAssetByCode(asset.code);
+    queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
     queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
     setTimeout(() => {
       setIsDeleteDialogOpen(false);
     }, 100)
   };
+
+  const handleClose = (close: boolean) => {
+    setIsEditDialogOpen(!close)
+  }
 
   return (
     <div className="justify-center flex">
@@ -99,29 +105,39 @@ const ActionCell: React.FC<CellProps> = ({ row }) => {
           </DropdownMenuContent>
         </DropdownMenu>
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-          <DialogContent className='bg-card'>
+          <DialogContent className='flex flex-col'>
             <DialogHeader>
+              <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                <XIcon className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </DialogClose>
               <DialogTitle>{asset.code}</DialogTitle>
               <DialogDescription>
                 Detailed information on asset {asset.code}, including types, specifications, status, deployment details, current possession, etc.
               </DialogDescription>
-              <AssetDetails asset={asset} />
             </DialogHeader>
+            <AssetDetails asset={asset} />
           </DialogContent>
         </Dialog>
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="sm:max-w-[800px] bg-card overflow-y-scroll max-h-screen scrollbar-hide">
-            <DialogHeader>
+          <DialogContent tabIndex={-1} className="min-w-full overflow-y-auto h-full bg-transparent justify-center flex border-none px-0 py-0 sm:py-16">
+            <div className="sm:max-w-[800px] bg-card h-fit p-3 sm:p-6 rounded-lg">
+            <DialogHeader className='relative'>
+              <DialogClose className="absolute right-0 top-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                <XIcon className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </DialogClose>
               <DialogTitle>Edit this asset</DialogTitle>
               <DialogDescription className="text-muted-foreground text-sm">
                 Update information fields for this existing asset via the form below. Asset code can be changed, but entering an existing code of a different asset is not permitted.
               </DialogDescription>
             </DialogHeader>
-            <EditAsset assetData={asset} />
+            <EditAsset assetData={asset} onClose={handleClose} />
+            </div>
           </DialogContent>
         </Dialog>
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <AlertDialogContent>
+          <AlertDialogContent className='border-none'>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription>
@@ -129,7 +145,7 @@ const ActionCell: React.FC<CellProps> = ({ row }) => {
                 asset and remove all its data from our servers.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <TrashCan/>
+            <TrashCan />
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <Button onClick={handleDeleteAsset} variant='destructive'>Delete asset {asset.code}</Button>

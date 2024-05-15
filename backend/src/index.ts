@@ -39,13 +39,24 @@ app.use(cors({
   credentials: true,
 }))
 
-app.use(express.static(path.join(__dirname, "../../../stockpilot-frontend/dist")))
+app.use(express.static(path.join(__dirname, "../../../frontend/dist")))
 
 app.use("/api/auth", authRoutes)
 app.use("/api/users", userRoutes)
 app.use("/api/assets", assetRoutes)
 app.use("/api/options", optionRoutes)
 app.use("/api/employees", employeeRoutes)
+
+// Catch-all route for unmatched URLs (place it here)
+if (process.env.NODE_ENV !== 'development') {
+  app.get('/*', function(req, res) {
+    res.sendFile(path.join(__dirname, '../../../frontend/dist/index.html'), function(err) {
+      if (err) {
+        res.status(500).send(err);
+      }
+    });
+  });
+}
 
 app.listen(port, () => {
   logger.info(`Server running on http://localhost:${port}`)

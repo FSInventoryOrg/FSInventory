@@ -38,7 +38,7 @@ const GeneralInfoForm = () => {
           control={control}
           name="category"
           render={({ field }) => (
-            <FormItem className='w-[280px]'>
+            <FormItem className='w-full sm:w-2/3'>
               <FormLabel className='text-md text-secondary-foreground'>Category</FormLabel>
               <Options tagSelect={true} property='category' field={field} className='w-full' />
               <FormMessage />
@@ -51,7 +51,7 @@ const GeneralInfoForm = () => {
           control={control}
           name="status"
           render={({ field }) => (
-            <FormItem className='w-[280px]'>
+            <FormItem className='w-full sm:w-2/3'>
               <FormLabel className='text-md text-secondary-foreground'>Status</FormLabel>
               <Options colorSelect={true} property='status' field={field} className='w-full' />
               <FormDescription>
@@ -62,13 +62,26 @@ const GeneralInfoForm = () => {
           )}
         />
       </div>
+      <div className='flex gap-2 w-full'>
+        <FormField
+          control={control}
+          name="equipmentType"
+          render={({ field }) => (
+            <FormItem className='w-full sm:w-2/3'>
+              <FormLabel className='text-md text-secondary-foreground'>Equipment Type</FormLabel>
+              <Options property='equipmentType' field={field} className='w-full' />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
       <FormLabel className='text-md text-secondary-foreground'>Product details</FormLabel>
-      <div className='flex gap-2 w-full mt-2'>
+      <div className='flex flex-col sm:flex-row gap-2 w-full mt-2'>
         <FormField
           control={control}
           name="brand"
           render={({ field }) => (
-            <FormItem className='w-1/3'>
+            <FormItem className='w-full sm:w-1/2'>
               <FormControl>
                 <SuggestiveInput property='brand' placeholder='Brand' autoComplete='off' type='input' field={field} />
               </FormControl>
@@ -80,7 +93,7 @@ const GeneralInfoForm = () => {
           control={control}
           name="modelName"
           render={({ field }) => (
-            <FormItem className='w-full'>
+            <FormItem className='w-full sm:w-1/2'>
               <FormControl>
                 <Input placeholder="Model name" autoComplete='off' type='input' {...field} tabIndex={0} />
               </FormControl>
@@ -89,12 +102,12 @@ const GeneralInfoForm = () => {
           )}
         />
       </div>
-      <div className='flex gap-2 w-full'>
+      <div className='flex flex-col sm:flex-row gap-2 w-full'>
         <FormField
           control={control}
           name="modelNo"
           render={({ field }) => (
-            <FormItem className='w-full'>
+            <FormItem className='w-full sm:w-1/2'>
               <FormControl>
                 <Input placeholder="Model number" autoComplete='off' type='input' {...field} />
               </FormControl>
@@ -106,7 +119,7 @@ const GeneralInfoForm = () => {
           control={control}
           name="serialNo"
           render={({ field }) => (
-            <FormItem className='w-full'>
+            <FormItem className='w-full sm:w-1/2'>
               <FormControl>
                 <Input placeholder="Serial number" autoComplete='off' type='input' {...field} />
               </FormControl>
@@ -115,7 +128,7 @@ const GeneralInfoForm = () => {
           )}
         />
       </div>
-      <div className='flex gap-2 w-full'>
+      <div className='flex flex-col sm:flex-row gap-2 w-full'>
         <FormField
           control={control}
           name="supplierVendor"
@@ -133,14 +146,14 @@ const GeneralInfoForm = () => {
           name="purchaseDate"
           render={({ field }) => (
             <div className="flex items-center justify-center gap-0">
-              <FormItem className="flex flex-col">
+              <FormItem className="flex flex-col w-full sm:w-fit">
                 <Popover open={openPurchaseDate} onOpenChange={setOpenPurchaseDate}>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "w-[238px] pl-3 text-left font-normal rounded-r-none",
+                          "w-full sm:w-[238px] pl-3 text-left font-normal rounded-r-none",
                           !field.value && "text-muted-foreground"
                         )}
                       >
@@ -168,9 +181,9 @@ const GeneralInfoForm = () => {
                 <FormMessage />
               </FormItem>
               <Button 
-                className='rounded-l-none border-l-0'
+                className='rounded-l-none border-l-0 text-accent-foreground'
                 type='button'
-                variant='secondary'
+                variant='outline'
                 size='icon'
                 onClick={() => {
                   field.onChange(null)

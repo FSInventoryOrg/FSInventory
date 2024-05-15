@@ -3,6 +3,7 @@ import { AssetFormData as DeployAssetFormData } from "./schemas/DeployAssetSchem
 import { AssetFormData as RetrieveAssetFormData } from "./schemas/RetrieveAssetSchema";
 import { EmployeeFormData } from "./schemas/AddEmployeeSchema";
 import { AssetsHistory } from "./types/employee";
+import { Defaults } from "./types/options";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -46,7 +47,6 @@ export const updateAsset = async ({ code, updatedAsset }: { code: string, update
 };
 
 export const deployAsset = async ({ code, deployedAsset }: { code: string, deployedAsset: DeployAssetFormData }) => {
-  console.log(deployedAsset)
   const response = await fetch(`${API_BASE_URL}/api/assets/deploy/${code}`, {
     method: "PUT",
     credentials: "include",
@@ -65,7 +65,6 @@ export const deployAsset = async ({ code, deployedAsset }: { code: string, deplo
 };
 
 export const retrieveAsset = async ({ code, retrievedAsset }: { code: string, retrievedAsset: RetrieveAssetFormData }) => {
-  console.log(retrievedAsset)
   const response = await fetch(`${API_BASE_URL}/api/assets/retrieve/${code}`, {
     method: "PUT",
     credentials: "include",
@@ -83,8 +82,24 @@ export const retrieveAsset = async ({ code, retrievedAsset }: { code: string, re
   return true;
 };
 
+export const removeDeploymentHistoryEntry = async (code: string, index: number) => {
+  const response = await fetch(`${API_BASE_URL}/api/assets/history/${code}/${index}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+  });
 
-export const updateAssetProperty = async ({ property, value, newValue }: { property: string, value: string, newValue: string }) => {
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to remove entry from deployment history');
+  }
+
+  return true;
+};
+
+export const updateAssetsByProperty = async ({ property, value, newValue }: { property: string, value: string, newValue: string }) => {
   const response = await fetch(`${API_BASE_URL}/api/assets/${property}/${value}`, {
     method: "PUT",
     credentials: "include",
@@ -226,6 +241,30 @@ export const addOptionValue = async ({property, value}: { property: string, valu
   return response.json();
 };
 
+export const updateOptionDefaults = async (defaults: Defaults) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/options/defaults`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(defaults)
+    });
+
+    const responseBody = await response.json();
+    if (!response.ok) {
+      throw new Error(responseBody.error || 'Failed to update defaults');
+    }
+
+    return responseBody;
+  } catch (error) {
+    console.error('Error updating defaults:', error);
+    throw error;
+  }
+};
+
+
 export const updateOptionValue = async ({ property, value, index }: { property: string, value: string | object, index?: number }) => {
   const url = `${API_BASE_URL}/api/options/${property}`;
   const queryString = index !== undefined ? `?index=${index}` : ''; 
@@ -308,6 +347,23 @@ export const addEmployee = async (asset: EmployeeFormData) => {
 
   return responseBody;
 }
+
+export const removeAssetHistoryEntry = async (code: string, index: number) => {
+  const response = await fetch(`${API_BASE_URL}/api/employees/history/${code}/${index}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to remove entry from asset history');
+  }
+
+  return true;
+};
 
 export const updateEmployeeAssetHistory = async ({ code, assetHistory }: { code: string, assetHistory: AssetsHistory }) => {
   const response = await fetch(`${API_BASE_URL}/api/employees/history/${code}`, {

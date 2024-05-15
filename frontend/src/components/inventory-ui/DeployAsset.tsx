@@ -63,10 +63,14 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
     mutationFn: imsService.deployAsset,
     onSuccess: async () => {
       showToast({ message: "Asset deployed successfully!", type: "SUCCESS" });
+      queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchAssetsByProperty"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
       setTimeout(() => {
         setOpen(false);
-      }, 500)
+      }, 100)
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
@@ -78,6 +82,7 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
     data.deploymentDate.setHours(currentTime.getHours(), currentTime.getMinutes(), currentTime.getSeconds(), currentTime.getMilliseconds());
     const deployedAsset: AssetFormData & { _id: string } = {
       ...data,
+      code: assetData.code,
       _id: assetData._id,
     }
     mutate({ code: assetData.code, deployedAsset: deployedAsset });
@@ -97,7 +102,7 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
           <RocketLaunch weight="fill" size={16} />
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className='h-full overflow-y-scroll w-full'>
         <SheetHeader>
           <SheetTitle>Deploy asset {assetData.code}</SheetTitle>
           <SheetDescription>
@@ -116,7 +121,7 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
                 render={({ field }) => (
                   <FormItem className='w-full'>
                     <FormControl>
-                      <SuggestiveInput 
+                      <EmployeeSuggestiveInput 
                         placeholder='e.g. Juan De La Cruz, Joe Smith' 
                         autoComplete='off' 
                         type='input' 
@@ -195,7 +200,7 @@ interface SuggestiveInputProps extends InputProps {
   field?: any;
 }
 
-const SuggestiveInput = React.forwardRef<HTMLInputElement, SuggestiveInputProps>(
+export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, SuggestiveInputProps>(
   ({ placeholder, field, className, autoComplete, type }, ref) => {
     const { data: employees } = useQuery<EmployeeType[]>({ 
       queryKey: ['fetchAllEmployees'], 

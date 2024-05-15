@@ -31,7 +31,7 @@ export function TableSuspense({ length=12, height='100%' }: { length?: number, h
   return (
     <ScrollArea className="rounded-md border overflow-hidden" style={isXL ? { maxHeight: '', height: height } : {}}>
       <Table className="text-xs">
-        <TableHeader className="sticky top-0 bg-accent z-10 border-b-2">
+        <TableHeader className="sticky top-0 bg-accent z-10 border-b">
             <TableRow>
               <TableHead>
               </TableHead>
