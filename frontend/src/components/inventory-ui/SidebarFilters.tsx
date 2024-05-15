@@ -67,7 +67,7 @@ const SidebarFilters = ({
 
   return (
     <section className='w-full flex flex-col'>
-      <div className='flex items-end justify-between mr-8 pb-4'>
+      <div className='flex items-end justify-between mr-8 pb-3 xl:pb-4'>
         <h1 className='text-xl font-semibold tracking-wide'>Assets</h1>
         {isLoading ? 
         <Skeleton className='bg-muted w-[120px] rounded-xl h-8 border-border border-2' /> 

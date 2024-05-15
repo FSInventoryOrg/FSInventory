@@ -67,7 +67,7 @@ const Inventory = () => {
   return (
     <section 
       id="inventory" 
-      className="flex flex-col xl:flex-row gap-6 w-full px-6 pb-6 pt-3" 
+      className="flex flex-col xl:flex-row gap-3 sm:gap-6 w-full px-3 pb-3 sm:px-6 sm:pb-6 pt-3" 
       style={{ height }}
     >
       {isFiltersVisible && (
