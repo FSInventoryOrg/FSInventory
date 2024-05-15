@@ -102,7 +102,7 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
           <RocketLaunch weight="fill" size={16} />
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className='h-full overflow-y-scroll w-full'>
         <SheetHeader>
           <SheetTitle>Deploy asset {assetData.code}</SheetTitle>
           <SheetDescription>

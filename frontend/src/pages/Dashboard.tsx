@@ -12,7 +12,7 @@ const Dashboard = () => {
   // const { data: softwareData } = useQuery({ queryKey: ['fetchAllAssets', 'Software'], queryFn: () => imsService.fetchAllAssets('Software') })
 
   return (
-    <section id="dashboard" className="px-6 pb-6" >
+    <section id="dashboard" className="px-3 pb-3 sm:px-6 sm:pb-6" >
       <main className="flex-1 flex flex-col gap-4 w-full">
         {!(assetData && hardwareData) ? 
           <DashboardSuspense />

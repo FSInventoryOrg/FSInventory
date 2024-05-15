@@ -275,7 +275,7 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
         {isSM ? 
           <Button 
             disabled={!employee.isRegistered}
-            className='px-3 sm:px-4 gap-2 bg-destructive/30 border-destructive border text-destructive hover:text-destructive-foreground'
+            className='px-3 sm:px-4 gap-2 bg-destructive/20 border-destructive border text-destructive hover:text-destructive-foreground'
             variant='destructive'
           >
             <TrashIcon size={16} />

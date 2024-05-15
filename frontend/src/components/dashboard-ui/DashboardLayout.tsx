@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query'
 import * as imsService from '@/ims-service'
 import AssetsOverview from './AssetsOverview';
 import EmployeesOverview from './EmployeesOverview';
-import PlatformsOverview from './PlatformsOverview';
+import BundlesOverview from './BundlesOverview';
 import { EmployeeType } from '@/types/employee';
 
 //! NEEDS FURTHER REFACTORING / MODULARIZATION
@@ -113,9 +113,9 @@ const countByStatus = (props: DashboardLayoutProps, statusValues: StatusOptions[
     let color = '';
     const statusOption = statusValues.find(option => option.value === status);
     if (statusOption) {
-      color = statusOption.color || '#8d8d8d'; // Use color from statusOptions if available, otherwise default color
+      color = statusOption.color || '#8d8d8d'; 
     } else {
-      color = '#8d8d8d'; // Default color if status option not found
+      color = '#8d8d8d'; 
     }
 
     return {
@@ -128,9 +128,6 @@ const countByStatus = (props: DashboardLayoutProps, statusValues: StatusOptions[
   });
 
   statusCount.sort((a, b) => b.value - a.value);
-  // statusCount.forEach((item, index, array) => {
-  //   item.color = interpolateHsl("#33CC80", "#669199")(index / (array.length - 1));
-  // });
 
   return statusCount;
 };
@@ -310,6 +307,14 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
     queryKey: ['fetchAssetsByProperty', 'category', 'Laptop'],
     queryFn: () => imsService.fetchAssetsByProperty('category', 'Laptop'), 
   });
+  const { data: windowsBundles } = useQuery({ 
+    queryKey: ['fetchAssetsByProperty', 'status', 'Windows Bundle'],
+    queryFn: () => imsService.fetchAssetsByProperty('status', 'Windows Bundle'), 
+  });
+  const { data: macbookBundles } = useQuery({ 
+    queryKey: ['fetchAssetsByProperty', 'status', 'MacBook Bundle'],
+    queryFn: () => imsService.fetchAssetsByProperty('status', 'MacBook Bundle'), 
+  });
 
   const [categoryCount, setCategoryCount] = useState<CategoryCount[]>([]);
   const [statusCount, setStatusCount] = useState<StatusCount[]>([]);
@@ -319,8 +324,8 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
   const [categoryCountByServiceYears, setCategoryCountByServiceYears] = useState<CategoryByServiceYears[]>([]);
   const [activeEmployeesCount, setActiveEmployeesCount] = useState<number>(0);
   const [unregisteredEmployeesCount, setUnregisteredEmployeesCount] = useState<number>(0);
-  const [windowsLaptopCount, setWindowsLaptopCount] = useState<number>(0);
-  const [macbookLaptopCount, setMacbookLaptopCount] = useState<number>(0);
+  const [windowsBundleCount, setWindowsBundleCount] = useState<number>(0);
+  const [macbookBundleCount, setMacbookBundleCount] = useState<number>(0);
 
   useEffect(() => {
     if (assetData && hardwareData && statusValues) {
@@ -341,8 +346,11 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
       const unregisteredEmployeeCount = assignees?.filter(
         (assignee) => !registeredEmployees?.some((employee: EmployeeType) => employee.name === assignee)
       )?.length || 0;
-      const windowsCount = laptops ? laptops.filter((asset: HardwareType) => asset.brand !== 'Apple').length : 0;
-      const macbookCount = laptops ? laptops.filter((asset: HardwareType) => asset.brand === 'Apple').length : 0;
+
+      // const windowsLaptopCount = laptops ? laptops.filter((asset: HardwareType) => asset.brand !== 'Apple').length : 0;
+      // const macbookLaptopCount = laptops ? laptops.filter((asset: HardwareType) => asset.brand === 'Apple').length : 0;
+
+
 
       setCategoryCount(categoryCount);
       setStatusCount(statusCount);
@@ -352,21 +360,21 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
       setCategoryCountByServiceYears(categoryCountByServiceYears);
       setActiveEmployeesCount(activeEmployeesCount);
       setUnregisteredEmployeesCount(unregisteredEmployeeCount);
-      setWindowsLaptopCount(windowsCount);
-      setMacbookLaptopCount(macbookCount);
+      setWindowsBundleCount(windowsBundles?.length || '0');
+      setMacbookBundleCount(macbookBundles?.length || '0');
     }
-  }, [assetData, assignees, hardwareData, laptops, registeredEmployees, statusValues]);
+  }, [assetData, assignees, hardwareData, laptops, registeredEmployees, statusValues, macbookBundles, windowsBundles]);
 
 
   return (
-    <div className='w-full flex flex-col xl:flex-row gap-6'>
-      <div className='w-full flex flex-col gap-6'>   
-        <div className='w-full flex flex-col xl:flex-row gap-6'>
-          <div className='w-full flex flex-col gap-6'>
-            <div className='flex flex-col lg:flex-row gap-6'>
-              <div id="generic metrics" className='w-[100%] xl:w-full flex flex-col xl:flex-row gap-6'>
-                <div className='hidden xl:flex gap-6 w-full'>
-                  <div id='hardware assets overview' className='h-fit w-2/4 bg-muted p-6 rounded-lg drop-shadow flex flex-col gap-6'>
+    <div className='w-full flex flex-col xl:flex-row gap-3 sm:gap-6'>
+      <div className='w-full flex flex-col gap-3 sm:gap-6'>   
+        <div className='w-full flex flex-col xl:flex-row gap-3 sm:gap-6'>
+          <div className='w-full flex flex-col gap-3 sm:gap-6'>
+            <div className='flex flex-col lg:flex-row gap-3 sm:gap-6'>
+              <div id="generic metrics" className='w-[100%] xl:w-full flex flex-col xl:flex-row gap-3 sm:gap-6'>
+                <div className='hidden xl:flex gap-3 sm:gap-6 w-full'>
+                  <div id='hardware assets overview' className='h-fit w-2/4 bg-muted p-3 sm:p-6 rounded-lg drop-shadow flex flex-col gap-3 sm:gap-6'>
                     <div>
                       <h2 className='font-medium text-muted-foreground text-sm'>Overview</h2>
                       <h1 className='text-md font-bold text-primary-foreground whitespace-nowrap inline-block text-ellipsis'>Hardware Assets</h1>
@@ -376,17 +384,17 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
                       <AssetsOverview statusCount={statusCount} />
                     </div>
                   </div>
-                  <div id='platforms overview' className='h-fit w-1/4 bg-muted p-6 rounded-lg drop-shadow flex flex-col gap-6'>
+                  <div id='platforms overview' className='h-fit w-1/4 bg-muted p-3 sm:p-6 rounded-lg drop-shadow flex flex-col gap-3 sm:gap-6'>
                     <div>
                       <h2 className='font-medium text-muted-foreground text-sm'>Overview</h2>
-                      <h1 className='text-md font-bold text-primary-foreground'>OS Platforms</h1>
+                      <h1 className='text-md font-bold text-primary-foreground'>Laptop Bundles</h1>
                       <Separator className="mt-3 h-[2px]" />
                     </div>
                     <div>
-                      <PlatformsOverview windows={windowsLaptopCount} macbooks={macbookLaptopCount} />
+                      <BundlesOverview windows={windowsBundleCount} macbooks={macbookBundleCount} />
                     </div>
                   </div>
-                  <div id='employees overview' className='h-fit w-1/4 bg-muted p-6 rounded-lg drop-shadow flex flex-col gap-6'>
+                  <div id='employees overview' className='h-fit w-1/4 bg-muted p-3 sm:p-6 rounded-lg drop-shadow flex flex-col gap-3 sm:gap-6'>
                     <div>
                       <h2 className='font-medium text-muted-foreground text-sm'>Overview</h2>
                       <h1 className='text-md font-bold text-primary-foreground whitespace-nowrap inline-block text-ellipsis'>Employees</h1>
@@ -397,8 +405,8 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
                     </div>
                   </div>
                 </div>
-                <div className='grid xl:hidden grid-cols-1 sm:grid-cols-2 gap-6'>
-                  <div id='hardware assets overview' className='h-fit col-span-1 sm:col-span-2 bg-muted p-6 rounded-lg drop-shadow flex flex-col gap-6'>
+                <div className='grid xl:hidden grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6'>
+                  <div id='hardware assets overview' className='h-fit col-span-1 sm:col-span-2 bg-muted p-3 sm:p-6 rounded-lg drop-shadow flex flex-col gap-3 sm:gap-6'>
                     <div>
                       <h2 className='font-medium text-muted-foreground text-sm'>Overview</h2>
                       <h1 className='text-md font-bold text-primary-foreground'>Hardware Assets</h1>
@@ -408,18 +416,18 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
                       <AssetsOverview statusCount={statusCount} />
                     </div>
                   </div>
-                  <div className='flex flex-col gap-6'>
-                    <div id='platforms overview' className='h-fit bg-muted p-6 rounded-lg drop-shadow flex flex-col gap-6'>
+                  <div className='flex flex-col gap-3 sm:gap-6'>
+                    <div id='platforms overview' className='h-fit bg-muted p-3 sm:p-6 rounded-lg drop-shadow flex flex-col gap-3 sm:gap-6'>
                       <div>
                         <h2 className='font-medium text-muted-foreground text-sm'>Overview</h2>
-                        <h1 className='text-md font-bold text-primary-foreground whitespace-nowrap inline-block text-ellipsis'>OS Platforms</h1>
+                        <h1 className='text-md font-bold text-primary-foreground whitespace-nowrap inline-block text-ellipsis'>Laptop Bundles</h1>
                         <Separator className="mt-3 h-[2px]" />
                       </div>
                       <div>
-                        <PlatformsOverview windows={windowsLaptopCount} macbooks={macbookLaptopCount} />
+                        <BundlesOverview windows={windowsBundleCount} macbooks={macbookBundleCount} />
                       </div>
                     </div>
-                    <div id='employees overview' className='h-fit bg-muted p-6 rounded-lg drop-shadow flex flex-col gap-6'>
+                    <div id='employees overview' className='h-fit bg-muted p-3 sm:p-6 rounded-lg drop-shadow flex flex-col gap-3 sm:gap-6'>
                       <div>
                         <h2 className='font-medium text-muted-foreground text-sm'>Overview</h2>
                         <h1 className='text-md font-bold text-primary-foreground'>Employees</h1>
@@ -430,7 +438,7 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
                       </div>
                     </div>
                   </div>
-                  <div id="hardware asset distribution" className='w-[100%] bg-muted rounded-lg p-6 flex xl:hidden flex-col gap-2 drop-shadow'>
+                  <div id="hardware asset distribution" className='w-[100%] bg-muted rounded-lg p-3 sm:p-6 flex xl:hidden flex-col gap-2 drop-shadow'>
                     <div>
                       <h2 className='font-medium text-muted-foreground text-sm'>Statistics</h2>
                       <h1 className='text-md font-bold text-primary-foreground'>Hardware asset distribution</h1>
@@ -444,7 +452,7 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
                 </div>
               </div>
             </div>
-            <div id="status by category" className='w-full bg-muted rounded-lg p-6 flex flex-col gap-2 drop-shadow'>
+            <div id="status by category" className='w-full bg-muted rounded-lg p-3 sm:p-6 flex flex-col gap-2 drop-shadow'>
               <div>
                 <h2 className='font-medium text-muted-foreground text-sm'>Statistics</h2>
                 <h1 className='text-md font-bold text-primary-foreground'>Status by category</h1>
@@ -460,7 +468,7 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
               </div>
             </div>
           </div>  
-          <div id="hardware asset distribution" className='w-[35%] bg-muted rounded-lg p-6 hidden xl:flex flex-col gap-2 drop-shadow z-50'>
+          <div id="hardware asset distribution" className='w-[35%] bg-muted rounded-lg p-3 sm:p-6 hidden xl:flex flex-col gap-2 drop-shadow z-50'>
             <div>
               <h2 className='font-medium text-muted-foreground text-sm'>Statistics</h2>
               <h1 className='text-md font-bold text-primary-foreground'>Hardware asset distribution</h1>
@@ -472,8 +480,8 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
             <HardwareDistLegend categoryCount={categoryCount} />
           </div>   
         </div>
-        <div className='flex flex-col xl:flex-row gap-6'>
-          <div id="laptop service years" className='w-full xl:w-1/3 h-fit bg-muted rounded-lg p-6 flex flex-col gap-2 drop-shadow'>
+        <div className='flex flex-col xl:flex-row gap-3 sm:gap-6'>
+          <div id="laptop service years" className='w-full xl:w-1/3 h-fit bg-muted rounded-lg p-3 sm:p-6 flex flex-col gap-2 drop-shadow'>
             <div>
               <h2 className='font-medium text-muted-foreground text-sm'>Statistics</h2>
               <h1 className='text-md font-bold text-primary-foreground'>Deployed laptop service years</h1>
@@ -483,7 +491,7 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
               <LaptopServiceYearsBar data={categoryCountByServiceYears} />
             </div>
           </div>
-          <div id="latest assets added" className='w-full xl:w-2/3 h-full bg-muted rounded-lg p-6 flex flex-col gap-0 drop-shadow'>
+          <div id="latest assets added" className='w-full xl:w-2/3 h-full bg-muted rounded-lg p-3 sm:p-6 flex flex-col gap-0 drop-shadow'>
             <div>
               <h2 className='font-medium text-muted-foreground text-sm'>Activity</h2>
               <h1 className='text-md font-bold text-primary-foreground'>Latest assets added</h1>

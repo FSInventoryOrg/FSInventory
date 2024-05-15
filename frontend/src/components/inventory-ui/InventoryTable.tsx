@@ -218,7 +218,7 @@ export function InventoryTable<TData, TValue>({
   
   return (
     <div className="w-full flex flex-col h-full" >
-      <div className="w-full flex items-center justify-between pb-4 gap-2">
+      <div className="w-full flex items-center justify-between pb-3 xl:pb-4 gap-2">
         <div className="flex gap-2 w-full">
           {!isFiltersVisible && (
             <TooltipProvider>

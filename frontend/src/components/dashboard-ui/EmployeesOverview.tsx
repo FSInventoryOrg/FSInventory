@@ -16,7 +16,7 @@ const EmployeesOverview = ({ activeEmployees, unregisteredEmployees }: Employees
       <div className='flex gap-2 items-center justify-start'>
         {activeEmployees ? (
           <div 
-            className='min-h-12 min-w-12 sm:min-h-16 sm:min-w-16 flex justify-center items-center rounded-lg'
+            className='min-h-12 min-w-12 sm:min-h-16 sm:min-w-16 flex justify-center items-center rounded-xl'
             style={{ backgroundColor: hexToRgbA('#33CC80', 0.3) }}
           >
             <UserCircleCheck weight='duotone' size={32} style={{ color: '#33CC80' }} />
@@ -40,7 +40,7 @@ const EmployeesOverview = ({ activeEmployees, unregisteredEmployees }: Employees
       <div className='flex gap-2 items-center justify-start'>
         {unregisteredEmployees ? (
           <div 
-            className='min-h-12 min-w-12 sm:min-h-16 sm:min-w-16 flex justify-center items-center rounded-lg'
+            className='min-h-12 min-w-12 sm:min-h-16 sm:min-w-16 flex justify-center items-center rounded-xl'
             style={{ backgroundColor: hexToRgbA('#D02F2F', 0.3) }}
           >
             <ShieldWarning weight='duotone' size={32} style={{ color: '#D02F2F' }} />

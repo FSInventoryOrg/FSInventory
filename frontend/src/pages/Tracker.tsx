@@ -176,7 +176,7 @@ const Tracker = () => {
   return (
     <section 
       id="tracker" 
-      className="flex gap-6 w-full px-6 pb-6 pt-3" 
+      className="flex gap-3 sm:gap-6 w-full px-3 pb-3 sm:px-6 sm:pb-6 pt-3" 
       style={{ height }}
     >
       <aside className="order-first hidden xl:flex xl:w-80 z-50">
@@ -191,7 +191,7 @@ const Tracker = () => {
           <EmployeeTableSuspense />
         )}
       </aside>
-      <main className="flex-1 flex flex-col gap-4 w-full">
+      <main className="flex-1 flex flex-col gap-3 w-full">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button className='xl:hidden bg-accent' variant="outline">View Employees</Button>
