@@ -200,6 +200,9 @@ export function InventoryTable<TData, TValue>({
     },
     initialState: {
       pagination
+    },
+    meta: {
+      defaultOptions: defaultOptions
     }
   })
 

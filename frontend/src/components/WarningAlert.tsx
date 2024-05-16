@@ -7,14 +7,15 @@ import {
 
 interface Props {
   warningMessage: string | null | undefined;
+  variant?: "warning" | "warningOutline";
 }
 
-const WarningAlert = ({ warningMessage }: Props) => {
+const WarningAlert = ({ warningMessage, variant="warning" }: Props) => {
   return (
-    <Alert variant="warning">
+    <Alert variant={variant}>
       <AlertTriangleIcon className="h-4 w-4 " />
-      <AlertTitle>Notice:</AlertTitle>
-      <AlertDescription>
+      <AlertTitle className="font-semibold">Warning</AlertTitle>
+      <AlertDescription className="font-medium">
         {warningMessage}
       </AlertDescription>
     </Alert>

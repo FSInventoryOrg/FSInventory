@@ -19,10 +19,11 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from '@/components/ui/button';
+import DeploymentInfoSuspense from '@/components/tracker-ui/DeploymentInfoSuspense';
 
 const Tracker = () => {
   const { employeeCode } = useParams();
-  const { data: employeeByUrl } = useQuery({
+  const { data: employeeByUrl, isLoading: isFetchingEmployeeByUrl } = useQuery({
     queryKey: ['fetchEmployeeByCode', employeeCode], 
     queryFn: () => imsService.fetchEmployeeByCode(employeeCode || ''),
     enabled: !!employeeCode,
@@ -216,7 +217,15 @@ const Tracker = () => {
           </SheetContent>
         </Sheet>
         {selectedEmployee ? (
-          <DeploymentInfo key={key} employee={selectedEmployee} assignee={selectedEmployee.code ? selectedEmployee.code : `${selectedEmployee.firstName} ${selectedEmployee.lastName}`} />
+          isFetchingEmployeeByUrl ? (
+            <DeploymentInfoSuspense />
+          ) : (
+            <DeploymentInfo
+              key={key}
+              employee={selectedEmployee}
+              assignee={selectedEmployee.code ? selectedEmployee.code : `${selectedEmployee.firstName} ${selectedEmployee.lastName}`}
+            />
+          )
         ) : (
           <div className='w-full h-full flex flex-col justify-center items-center'>
             <Filter height={300} width={300} />

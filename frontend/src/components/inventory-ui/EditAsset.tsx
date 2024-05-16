@@ -146,7 +146,7 @@ const onSubmit = (data: z.infer<typeof AssetSchema>) => {
             </TabsList>
             <div className="">
               <TabsContent tabIndex={-1} value="Hardware" className="pb-4 px-3">
-                <GeneralInfoForm />
+                <GeneralInfoForm assetStatus={(assetData as HardwareType).status} />
                 <SystemSpecsForm />
                 <MiscellaneousForm />
               </TabsContent>

@@ -44,4 +44,5 @@ export const PROPERTIES: TagType[] = [
   { id: "recoveryDate", text: "Recovery Date" },
   { id: "client", text: "From Client" },
   { id: "remarks", text: "Remarks"},
+  { id: "deploymentActions", text: "Deployment Actions"},
 ];

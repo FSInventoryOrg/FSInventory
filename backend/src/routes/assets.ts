@@ -187,11 +187,9 @@ router.put('/deploy/:code', [
       }
 
       const code: string = req.params.code;
-      const data: any = req.body;
-      console.log(data.code)
-      console.log(code)
+      const { deployedAsset, newStatus } = req.body;
 
-      if (data.code !== code) {
+      if (deployedAsset.code !== code) {
         return res.status(400).json({ message: 'Asset code mismatch' });
       }
 
@@ -200,26 +198,26 @@ router.put('/deploy/:code', [
         return res.status(404).json({ message: 'Asset not found' });
       }
 
-      if (existingAsset.status === 'Deployed') {
-        return res.status(400).json({ message: 'This asset is already deployed' });
+      if (existingAsset.status === newStatus) {
+        return res.status(400).json({ message: `This asset already has status ${newStatus}` });
       }
-      data.status = 'Deployed'
+      deployedAsset.status = newStatus
 
       const currentUser = await User.findOne({ _id: decodedToken.userId });
-      data.updated = new Date()
+      deployedAsset.updated = new Date()
       if (currentUser) {
-        data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+        deployedAsset.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
       }
 
       const deploymentRecord = {
-        deploymentDate: data.deploymentDate,
-        assignee: data.assignee,
+        deploymentDate: deployedAsset.deploymentDate,
+        assignee: deployedAsset.assignee,
       };
 
-      data.deploymentHistory = [...existingAsset.deploymentHistory, deploymentRecord];
+      deployedAsset.deploymentHistory = [...existingAsset.deploymentHistory, deploymentRecord];
 
       let updatedAsset;
-      await Hardware.updateOne({ code: data.code }, data);
+      await Hardware.updateOne({ code: deployedAsset.code }, deployedAsset);
       updatedAsset = await Hardware.findOne({ code });
       
       res.status(200).json(updatedAsset);
@@ -284,9 +282,9 @@ router.put('/retrieve/:code', [
       }
 
       const code: string = req.params.code;
-      const data: any = req.body;
+      const { retrievedAsset, newStatus } = req.body;
 
-      if (data.code !== code) {
+      if (retrievedAsset.code !== code) {
         return res.status(400).json({ message: 'Asset code mismatch' });
       }
 
@@ -295,19 +293,19 @@ router.put('/retrieve/:code', [
         return res.status(404).json({ message: 'Asset not found' });
       }
 
-      if (existingAsset.status !== 'Deployed') {
-        return res.status(400).json({ message: 'This asset is not deployed' });
+      if (existingAsset.status === newStatus) {
+        return res.status(400).json({ message: `This asset already has status ${newStatus}` });
       }
-      data.status = 'IT Storage'
+      retrievedAsset.status = newStatus
 
       const currentUser = await User.findOne({ _id: decodedToken.userId });
-      data.updated = new Date()
+      retrievedAsset.updated = new Date()
       if (currentUser) {
-        data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+        retrievedAsset.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
       }
 
-      data.assignee = '';
-      data.deploymentDate = null;
+      retrievedAsset.assignee = '';
+      retrievedAsset.deploymentDate = null;
 
       const deploymentHistory = existingAsset.deploymentHistory;
 
@@ -315,19 +313,19 @@ router.put('/retrieve/:code', [
           const lastDeploymentRecordIndex = deploymentHistory.length - 1;
           const lastDeploymentRecord = deploymentHistory[lastDeploymentRecordIndex];
       
-          lastDeploymentRecord.recoveryDate = data.recoveryDate;
+          lastDeploymentRecord.recoveryDate = retrievedAsset.recoveryDate;
       } else {
           deploymentHistory.push({
-              deploymentDate: data.recoveryDate,
-              assignee: data.recoveredFrom,
-              recoveryDate: data.recoveryDate,
+              deploymentDate: retrievedAsset.recoveryDate,
+              assignee: retrievedAsset.recoveredFrom,
+              recoveryDate: retrievedAsset.recoveryDate,
           });
       }
       
-      data.deploymentHistory = deploymentHistory;
+      retrievedAsset.deploymentHistory = deploymentHistory;
       
       let updatedAsset;
-      await Hardware.updateOne({ code: data.code }, data);
+      await Hardware.updateOne({ code: retrievedAsset.code }, retrievedAsset);
       updatedAsset = await Hardware.findOne({ code });      
       
       res.status(200).json(updatedAsset);

@@ -7,6 +7,12 @@ export const InventorySettingsSchema = z.object({
   deployableStatus: z.string().optional(),
   retrievableStatus: z.string().optional(),
   inventoryColumns: z.array(z.string()).optional(),
+}).refine(data => data.deployableStatus !== data.retrievableStatus, {
+  message: "Status for deployable assets and retrievable assets must not be the same",
+  path: ["deployableStatus"],
+}).refine(data => data.deployableStatus !== data.retrievableStatus, {
+  message: "Status for deployable assets and retrievable assets must not be the same",
+  path: ["retrievableStatus"],
 });
 
 export type InventorySettingsFormData = z.infer<typeof InventorySettingsSchema>;

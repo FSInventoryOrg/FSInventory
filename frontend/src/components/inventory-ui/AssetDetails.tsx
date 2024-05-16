@@ -1,5 +1,5 @@
-import { HardwareType } from '@/types/asset'
-import { CreditCardIcon, InfoIcon, LibraryBig, NotebookPenIcon, ScaleIcon, SettingsIcon, TrashIcon } from 'lucide-react';
+import { DeploymentHistory, HardwareType } from '@/types/asset'
+import { CreditCardIcon, InfoIcon, LibraryBig, NotebookPenIcon, ScaleIcon, SettingsIcon } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import * as imsService from '@/ims-service'
@@ -11,6 +11,19 @@ import Empty from '../graphics/Empty';
 import { UserIcon } from '../icons/UserIcon';
 import { Button } from '../ui/button';
 import { useQueryClient } from '@tanstack/react-query';
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { useState } from 'react';
+import { TrashSimple } from '@phosphor-icons/react';
+import { Spinner } from '../Spinner';
+import useEmployeeNameByCode from '@/hooks/useEmployeeNameByCode';
 
 interface AssetDetailsProps {
   asset: HardwareType;
@@ -47,19 +60,106 @@ const renderSection = (title: string, fields: Field[], icon: React.ReactNode) =>
   </div>
 );
 
-const AssetDetails = ({ asset }: AssetDetailsProps) => {
-
+const HistoryEntry = ({ assetCode, record, index }: {assetCode: string, record: DeploymentHistory, index: number}) => {
   const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRemoveDeployment = async (index: number) => {
-    console.log(asset.code, index)
-    await imsService.removeDeploymentHistoryEntry(asset.code, index);
+    console.log(assetCode, index)
+    await imsService.removeDeploymentHistoryEntry(assetCode, index);
     queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
     queryClient.invalidateQueries({ queryKey: ["fetchAssetsByProperty"] })
     queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
     queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
     queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
-  };
+    setIsLoading(true)
+    setTimeout(() => {
+      setOpen(false);
+      setIsLoading(false);
+    }, 500)  };
+  
+  const deploymentDateObj = record.deploymentDate ? new Date(record.deploymentDate) : null;
+  const recoveryDateObj = record.recoveryDate ? new Date(record.recoveryDate) : null;
+
+  const diffInMs = recoveryDateObj ? recoveryDateObj.getTime() - (deploymentDateObj?.getTime() ?? 0) : null;
+
+  // Calculate duration if recoveryDate is defined, otherwise set duration as null
+  const duration = diffInMs !== null ? calculateDuration(diffInMs) : null;
+
+  return (
+    <div className='relative flex flex-row text-sm py-2 px-2 hover:bg-muted rounded-lg'>
+      <Button 
+        size="icon"
+        className="absolute top-2 right-2 flex text-secondary justify-center items-center rounded-full h-8 w-8 sm:h-8 sm:w-8 bg-transparent hover:text-destructive hover:bg-destructive/20 border-0"
+        onClick={() => {
+          setOpen(true)
+        }}
+      >
+        <TrashSimple weight='fill' size={16} />
+      </Button>
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent className='border-none'>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently remove this
+              employee from the asset's deployment timeline.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button className='gap-2' disabled={isLoading} onClick={() => handleRemoveDeployment(index)} variant='destructive'>
+              {isLoading && <Spinner size={16} />}
+              Remove employee {assetCode}
+              </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <div className="h-14 w-14 rounded-full justify-center items-center flex">
+        <UserIcon size={60} className="fill-current text-secondary" />
+      </div>
+      <div className=''>
+        {/* Render assignee */}
+        <div className='flex gap-2 px-2 pb-1'>
+          <div className='w-full flex gap-2 text-sm items-center font-bold uppercase'>
+            {useEmployeeNameByCode(record.assignee).name}
+          </div>
+          <span className='w-fit'></span>
+        </div>
+        {/* Render deployment and recovery dates */}
+        <div className='flex gap-2 px-2'>
+          <div className='w-full flex gap-2 text-xs text-accent-foreground'>
+            <span>{deploymentDateObj ? deploymentDateObj.toDateString() : ''}</span>
+            -
+            <span>{recoveryDateObj ? recoveryDateObj.toDateString() : 'Present'}</span> {/* Display "Present" if recoveryDate is undefined */}
+          </div>
+          <span className='w-fit'></span>
+        </div>
+        {/* Render duration if recoveryDate is defined */}
+        {duration ? 
+          <div className='flex gap-2 px-2'>
+            <div className='w-full flex gap-2 text-xs text-accent-foreground'>
+              <span>{duration}</span>
+            </div>
+            <span className='w-fit'></span>
+          </div>
+          : 
+          <div className='flex gap-2 px-2'>
+            <div className='w-full flex gap-2 text-xs text-accent-foreground'>
+              <span>                      
+                <DeploymentDuration deploymentDate={record.deploymentDate} />
+              </span>
+            </div>
+            <span className='w-fit'></span>
+          </div>
+        }                     
+      </div>
+    </div>
+  );
+}
+
+const AssetDetails = ({ asset }: AssetDetailsProps) => {
 
   const generalInfo: Field[] = [
     { label: 'Code:', value: asset.code },
@@ -98,7 +198,7 @@ const AssetDetails = ({ asset }: AssetDetailsProps) => {
   const otherInfo: Field[] = [
     { label: 'Equipment Type:', value: asset.equipmentType },
     { label: 'From Client:', value: asset.client },
-    { label: 'Assigned To:', value: asset.assignee },
+    { label: 'Assigned To:', value: useEmployeeNameByCode(asset.assignee).name },
     { label: 'Deployment Date:', value: asset.deploymentDate ? new Date(asset.deploymentDate).toLocaleString() : '' },
     { label: 'Recovered From:', value: asset.recoveredFrom },
     { label: 'Date of Recovery:', value: asset.recoveryDate ? new Date(asset.recoveryDate).toLocaleString() : ''},
@@ -164,68 +264,9 @@ const AssetDetails = ({ asset }: AssetDetailsProps) => {
           </ScrollArea>
         </TabsContent>
         <TabsContent value="history">
-          {(asset.deploymentHistory.length !== 0) ? (
+          {asset.deploymentHistory.length !== 0 ? (
             <ScrollArea className='flex flex-col gap-4 h-[350px] pt-3'>
-              {asset.deploymentHistory.map((record, index) => {
-                const deploymentDateObj = record.deploymentDate ? new Date(record.deploymentDate) : null;
-                const recoveryDateObj = record.recoveryDate ? new Date(record.recoveryDate) : null;
-
-                const diffInMs = recoveryDateObj ? recoveryDateObj.getTime() - (deploymentDateObj?.getTime() ?? 0) : null;
-
-                // Calculate duration if recoveryDate is defined, otherwise set duration as null
-                const duration = diffInMs !== null ? calculateDuration(diffInMs) : null;
-
-                return (
-                  <div key={index} className='relative flex flex-row gap-2 text-sm border-t py-4'>
-                    <Button 
-                      size="icon"
-                      className="absolute top-2 right-2 text-destructive flex justify-center items-center rounded-full h-8 w-8 sm:h-8 sm:w-8 bg-transparent hover:bg-destructive/20 border-0"
-                      onClick={() => handleRemoveDeployment(index)}
-                    >
-                      <TrashIcon size={16} />
-                    </Button>
-                    <div className="h-14 w-14 bg-muted rounded-full justify-center items-center flex">
-                      <UserIcon size={55} className="fill-current text-secondary" />
-                    </div>
-                    <div className=''>
-                      {/* Render assignee */}
-                      <div className='flex gap-2 px-2'>
-                        <div className='w-full flex gap-2 text-sm items-center font-bold uppercase'>
-                          {record.assignee}
-                        </div>
-                        <span className='w-fit'></span>
-                      </div>
-                      {/* Render deployment and recovery dates */}
-                      <div className='flex gap-2 px-2'>
-                        <div className='w-full flex gap-2 text-xs text-accent-foreground'>
-                          <span>{deploymentDateObj ? deploymentDateObj.toDateString() : ''}</span>
-                          -
-                          <span>{recoveryDateObj ? recoveryDateObj.toDateString() : 'Present'}</span> {/* Display "Present" if recoveryDate is undefined */}
-                        </div>
-                        <span className='w-fit'></span>
-                      </div>
-                      {/* Render duration if recoveryDate is defined */}
-                      {duration ? 
-                        <div className='flex gap-2 px-2'>
-                          <div className='w-full flex gap-2 text-xs text-accent-foreground'>
-                            <span>{duration}</span>
-                          </div>
-                          <span className='w-fit'></span>
-                        </div>
-                        : 
-                        <div className='flex gap-2 px-2'>
-                          <div className='w-full flex gap-2 text-xs text-accent-foreground'>
-                            <span>                      
-                              <DeploymentDuration deploymentDate={record.deploymentDate} />
-                            </span>
-                          </div>
-                          <span className='w-fit'></span>
-                        </div>
-                      }                     
-                    </div>
-                  </div>
-                );
-              })}
+              {asset.deploymentHistory.map((record, index) => <HistoryEntry key={index} assetCode={asset.code} record={record} index={index} />)}
             </ScrollArea>
           ) : (
             <div className='h-[350px] flex flex-col items-center justify-center'>

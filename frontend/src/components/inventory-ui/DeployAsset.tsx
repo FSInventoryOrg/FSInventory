@@ -38,6 +38,7 @@ import { Calendar } from "../ui/calendar"
 import React from "react"
 import { RocketLaunch } from "@phosphor-icons/react"
 import { EmployeeType } from "@/types/employee";
+import { Defaults } from "@/types/options";
 
 interface DeployAssetProps {
   assetData: HardwareType;
@@ -56,6 +57,11 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
       assignee: '',
       deploymentDate: undefined,
     }
+  });
+
+  const { data: defaultOptions } = useQuery<Defaults>({ 
+    queryKey: ['fetchOptionValues', 'defaults'], 
+    queryFn: () => imsService.fetchOptionValues('defaults'),
   });
 
   const { mutate, isPending } = useMutation({
@@ -85,7 +91,7 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
       code: assetData.code,
       _id: assetData._id,
     }
-    mutate({ code: assetData.code, deployedAsset: deployedAsset });
+    mutate({ code: assetData.code, deployedAsset: deployedAsset, newStatus: defaultOptions?.retrievableStatus || '' });
   }
 
   React.useEffect(() => {
@@ -299,13 +305,13 @@ export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, Sugges
                 key={index} 
                 type='button'
                 variant='ghost'
-                className={cn('p-1 w-full justify-start gap-2 grid-cols-3 grid', {
+                className={cn('p-1 w-full justify-start gap-2', {
                   'bg-accent': index === selectedIndex,
                 })}
                 onClick={() => handleSuggestionClick(option)}
               >
-                <span className="px-3 py-1.5 rounded-md text-start bg-muted font-semibold text-sm text-muted-foreground">{`${option.code}`}</span>
-                <span className="text-start col-span-2">{`${option.firstName} ${option.lastName}`}</span>
+                <span className="px-3 py-1.5 rounded-md text-start font-semibold text-sm text-muted-foreground truncate w-full max-w-[100px]">{`${option.code}`}</span>
+                <span className="text-start col-span-2 truncate">{`${option.firstName} ${option.lastName}`}</span>
               </Button>
             ))}
           </div>

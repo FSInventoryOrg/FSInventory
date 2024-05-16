@@ -79,9 +79,9 @@ const employeeSchema: Schema<EmployeeType> = new mongoose.Schema<EmployeeType>({
   isRegistered: { type: Boolean, required: true },
   assetsHistory: { 
     type: [{
-      deploymentDate: { type: Date, required: true },
-      recoveryDate: { type: Date, required: true},
-      assetCode: { type: String, required: true },
+      deploymentDate: { type: Date, required: false },
+      recoveryDate: { type: Date, required: false },
+      assetCode: { type: String, required: false },
     }],
     required: false },
 });

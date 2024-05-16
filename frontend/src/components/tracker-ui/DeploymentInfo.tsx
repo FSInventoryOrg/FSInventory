@@ -140,7 +140,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                {employee.isRegistered && isSM && <EditEmployee employeeData={employee} />}
+                {employee.isRegistered && !isSM && <EditEmployee employeeData={employee} />}
               </span>
               <span className={`font-bold text-sm ${employee.isRegistered ? '' : 'text-destructive text-sm'}`}>
                 {employee.isRegistered ? employee.code : 'UNREGISTERED'}
@@ -308,13 +308,17 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
         ) : (
           <>
             <AlertDialogHeader>
-              <AlertDialogTitle>Cannot remove this employee</AlertDialogTitle>
+              <AlertDialogTitle className='text-destructive'>Cannot remove this employee</AlertDialogTitle>
               <AlertDialogDescription>
-                There are {employeeAssets?.length || 0} assets deployed to {employee.firstName + ' ' + employee.lastName}. Retrieve these assets and try again.
+                There are {employeeAssets?.length || 0} assets deployed to {employee.firstName + ' ' + employee.lastName}. Retrieve these assets before removing the employee.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Close</AlertDialogCancel>
+              <Button variant='secondary' asChild>
+                <AlertDialogCancel>
+                  Close
+                </AlertDialogCancel>
+              </Button>
             </AlertDialogFooter>
           </>
         )}

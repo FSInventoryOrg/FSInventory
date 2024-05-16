@@ -222,14 +222,24 @@ export const InventoryColumns: ColumnDef<HardwareType>[] = [
     }
   },
   {
-    id: "deployment",
-    cell: ({ row }) => {
-      if (row.original.status === 'Deployed') {
-        return <RetrieveAsset assetData={row.original} />
-      } else if (row.original.status === 'IT Storage') {
-        return <DeployAsset assetData={row.original} />
+    id: "deploymentActions",
+    accessorKey: "deploymentActions",
+    header: "Deployment Actions",
+    cell: ({ row, table }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const deployableStatusJSON = JSON.stringify((table.options.meta as any).defaultOptions.deployableStatus);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const retrievableStatusJSON = JSON.stringify((table.options.meta as any).defaultOptions.retrievableStatus);
+      
+      const deployableStatus = deployableStatusJSON.slice(1, -1);
+      const retrievableStatus = retrievableStatusJSON.slice(1, -1);
+
+      if (row.original.status === deployableStatus) {
+        return <DeployAsset assetData={row.original} />;
+      } else if (row.original.status === retrievableStatus) {
+        return <RetrieveAsset assetData={row.original} />;
       } else {
-        return <></>
+        return <></>;
       }
     }
   },

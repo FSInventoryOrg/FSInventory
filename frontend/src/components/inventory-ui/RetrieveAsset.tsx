@@ -17,6 +17,7 @@ import Retrieve from "../graphics/Retrieve";
 import { ArrowFatLinesDown } from "@phosphor-icons/react";
 import { useState } from "react";
 import { EmployeeType } from "@/types/employee";
+import { Defaults } from "@/types/options";
 
 interface DeployAssetProps {
   assetData: HardwareType;
@@ -29,6 +30,11 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
   const { data: employees } = useQuery<EmployeeType[]>({ 
     queryKey: ['fetchAllEmployees'], 
     queryFn: () => imsService.fetchAllEmployees(),
+  });
+
+  const { data: defaultOptions } = useQuery<Defaults>({ 
+    queryKey: ['fetchOptionValues', 'defaults'], 
+    queryFn: () => imsService.fetchOptionValues('defaults'),
   });
 
   const { mutate: updateEmployee, isPending: updatingEmployee } = useMutation({
@@ -81,8 +87,7 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
       recoveryDate: new Date,
       recoveredFrom: assetData.assignee,
     }
-    console.log(retrievedAsset)
-    retrieveAsset({ code: assetData.code, retrievedAsset: retrievedAsset });
+    retrieveAsset({ code: assetData.code, retrievedAsset: retrievedAsset, newStatus: defaultOptions?.deployableStatus || '' });
   }
 
   return (
@@ -97,7 +102,7 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">Retrieve asset {assetData.code}?</DialogTitle>
           <DialogDescription className="">
-            Retrieving this asset from {assetData.assignee} will remove it from their deployed assets list and set the status of this asset to 'IT Storage'.
+            Retrieving this asset from {assetData.assignee} will remove it from their deployed assets list and set the status of this asset to {defaultOptions?.deployableStatus}.
           </DialogDescription>
           <Retrieve />
         </DialogHeader>

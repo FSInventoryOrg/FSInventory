@@ -3,7 +3,6 @@ import { useFormContext } from "react-hook-form";
 import { AssetFormData } from '@/schemas/AddAssetSchema';
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -22,10 +21,19 @@ import { cn } from "@/lib/utils"
 import SuggestiveInput from './SuggestiveInput';
 import Options from './Options';
 import { useState } from 'react';
+import WarningAlert from '../WarningAlert';
+import * as imsService from '@/ims-service';
+import { useQuery } from '@tanstack/react-query';
+import { Defaults } from '@/types/options';
 
-const GeneralInfoForm = () => {
+const GeneralInfoForm = ({ assetStatus }: { assetStatus: string }) => {
   const { control } = useFormContext<AssetFormData>();
   const [openPurchaseDate, setOpenPurchaseDate] = useState(false);
+
+  const { data: defaultOptions } = useQuery<Defaults>({ 
+    queryKey: ['fetchOptionValues', 'defaults'], 
+    queryFn: () => imsService.fetchOptionValues('defaults'),
+  })
 
   return (
     <div className='flex flex-col gap-2 w-full pb-4'>
@@ -53,10 +61,21 @@ const GeneralInfoForm = () => {
           render={({ field }) => (
             <FormItem className='w-full sm:w-2/3'>
               <FormLabel className='text-md text-secondary-foreground'>Status</FormLabel>
+
+              {defaultOptions && assetStatus === "none" && field.value === defaultOptions.retrievableStatus && (
+                <WarningAlert 
+                  warningMessage={`If you want to DEPLOY an item, set this to ${defaultOptions.deployableStatus} and use the DEPLOY feature instead. Continue with this selection only when necessary.`} 
+                />
+              )}
+
+              {defaultOptions && (assetStatus === defaultOptions.retrievableStatus && field.value === defaultOptions.deployableStatus) && (
+                <WarningAlert 
+                  warningMessage={`If you want to RETRIEVE an item, set this to ${defaultOptions.retrievableStatus} and use the RETRIEVE feature instead. Continue with this selection only when necessary.`} 
+                />
+              )}
+
+
               <Options colorSelect={true} property='status' field={field} className='w-full' />
-              <FormDescription>
-                You can view the different status types here.{" "}
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

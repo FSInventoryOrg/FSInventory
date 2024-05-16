@@ -30,8 +30,7 @@ import {
 import { HardwareType } from '@/types/asset';
 import * as imsService from '@/ims-service'
 import AssetDetails from '../inventory-ui/AssetDetails';
-import TrashCan from '../graphics/TrashCan';
-import { useQueryClient } from '@tanstack/react-query';
+ import { useQueryClient } from '@tanstack/react-query';
 
 interface CellProps {
   row: {
@@ -55,7 +54,6 @@ const ActionCell: React.FC<CellProps> = ({ row, employeeCode }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleRemoveAsset = async () => {
-    console.log(code, row.index)
     await imsService.removeAssetHistoryEntry(code, row.index);
     queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
     queryClient.invalidateQueries({ queryKey: ["fetchAssetsByProperty"] })
@@ -126,7 +124,6 @@ const ActionCell: React.FC<CellProps> = ({ row, employeeCode }) => {
                 asset from the employee's timeline.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <TrashCan />
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <Button onClick={handleRemoveAsset} variant='destructive'>Remove asset {asset.code}</Button>

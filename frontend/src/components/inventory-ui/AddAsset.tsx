@@ -161,7 +161,7 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
                   </TabsList>
                   <div className="">
                     <TabsContent tabIndex={-1} value="Hardware" className="pb-4 px-3">
-                      <GeneralInfoForm />
+                      <GeneralInfoForm assetStatus="none" />
                       <SystemSpecsForm />
                       <MiscellaneousForm />
                     </TabsContent>

@@ -38,7 +38,6 @@ router.get("/", async (req: Request, res: Response) => {
   }
 });
 
-
 /**
  * @openapi
  * /api/employees/{code}:
@@ -333,37 +332,37 @@ router.put("/history/:code",
       return res.status(400).json({ message: errors.array() })
     }
     try {
-        const token = req.cookies.auth_token;
-        const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+      const token = req.cookies.auth_token;
+      const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
 
-        if (decodedToken.role !== "ADMIN") {
-          return res.status(403).json({ message: "Only users with admin role can perform this action" });
-        }
+      if (decodedToken.role !== "ADMIN") {
+        return res.status(403).json({ message: "Only users with admin role can perform this action" });
+      }
 
-        const code: string = req.params.code;
-        const data: any = req.body;
+      const code: string = req.params.code;
+      const data: any = req.body;
 
-        const existingEmployee = await Employee.findOne({ code });
+      const existingEmployee = await Employee.findOne({ code });
 
-        if (!existingEmployee) {
-          return res.status(404).json({ message: 'Employee not found' });
-        }
+      if (!existingEmployee) {
+        return res.status(404).json({ message: 'Employee not found' });
+      }
 
-        const assetsHistory = existingEmployee.assetsHistory;
+      const assetsHistory = existingEmployee.assetsHistory;
 
-        assetsHistory.push({
-          deploymentDate: data.recoveryDate,
-          assetCode: data.assetCode,
-          recoveryDate: data.recoveryDate,
-        });
+      assetsHistory.push({
+        deploymentDate: data.recoveryDate,
+        assetCode: data.assetCode,
+        recoveryDate: data.recoveryDate,
+      });
 
-        data.assetsHistory = assetsHistory;
+      data.assetsHistory = assetsHistory;
 
-        let updatedEmployee;
-        await Employee.updateOne({ code: code }, data);
-        updatedEmployee = await Employee.findOne({ code });      
-        
-        res.status(200).json(updatedEmployee);
+      let updatedEmployee;
+      await Employee.updateOne({ code: code }, data);
+      updatedEmployee = await Employee.findOne({ code });      
+      
+      res.status(200).json(updatedEmployee);
     } catch (error) {
       console.error('Error updating employee:', error);
       res.status(500).json({ error: 'Internal Server Error' });

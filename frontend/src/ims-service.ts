@@ -46,14 +46,14 @@ export const updateAsset = async ({ code, updatedAsset }: { code: string, update
   return true;
 };
 
-export const deployAsset = async ({ code, deployedAsset }: { code: string, deployedAsset: DeployAssetFormData }) => {
+export const deployAsset = async ({ code, deployedAsset, newStatus }: { code: string, deployedAsset: DeployAssetFormData, newStatus: string }) => {
   const response = await fetch(`${API_BASE_URL}/api/assets/deploy/${code}`, {
     method: "PUT",
     credentials: "include",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(deployedAsset)
+    body: JSON.stringify({ deployedAsset, newStatus })
   });
 
   if (!response.ok) {
@@ -64,14 +64,14 @@ export const deployAsset = async ({ code, deployedAsset }: { code: string, deplo
   return true;
 };
 
-export const retrieveAsset = async ({ code, retrievedAsset }: { code: string, retrievedAsset: RetrieveAssetFormData }) => {
+export const retrieveAsset = async ({ code, retrievedAsset, newStatus }: { code: string, retrievedAsset: RetrieveAssetFormData, newStatus: string }) => {
   const response = await fetch(`${API_BASE_URL}/api/assets/retrieve/${code}`, {
     method: "PUT",
     credentials: "include",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(retrievedAsset)
+    body: JSON.stringify({ retrievedAsset, newStatus })
   });
 
   if (!response.ok) {
