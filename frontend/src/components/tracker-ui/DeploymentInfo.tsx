@@ -112,7 +112,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
   const [isSM, setIsSM] = React.useState(false);
   React.useEffect(() => {
     const checkScreenSize = () => {
-      setIsSM(window.innerWidth >= 640); 
+      setIsSM(window.innerWidth <= 640); 
     };
 
     checkScreenSize();
@@ -147,7 +147,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
               </span>
             </div>
             <div className='flex gap-1 sm:gap-2 lg:gap-3 items-start'>
-              {!isSM && <EditEmployee employeeData={employee} />}
+              {isSM && <EditEmployee employeeData={employee} />}
               <DeleteEmployee employee={employee} />
               <Button className={`px-3 sm:px-4 gap-2 text-white ${employee.isActive ? 'bg-[#33CC80]' : 'bg-[#ffa333] hover:bg-[#ffa333]/95'}`}>
                 {employee.isActive ? (
@@ -259,7 +259,7 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
   const [isSM, setIsSM] = React.useState(false);
   React.useEffect(() => {
     const checkScreenSize = () => {
-      setIsSM(window.innerWidth >= 640); 
+      setIsSM(window.innerWidth <= 640); 
     };
 
     checkScreenSize();
@@ -272,7 +272,7 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        {isSM ? 
+        {!isSM ? 
           <Button 
             disabled={!employee.isRegistered}
             className='px-3 sm:px-4 gap-2 bg-destructive/20 border-destructive border text-destructive hover:text-destructive-foreground'

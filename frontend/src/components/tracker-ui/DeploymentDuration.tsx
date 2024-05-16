@@ -37,11 +37,15 @@ const DeploymentDuration = ({ deploymentDate }: { deploymentDate?: Date }) => {
   }, [deploymentDate]); // Run effect when deploymentDate changes
 
   return (
-    <div className={`w-fit flex items-center text-start text-primary text-xs font-semibold justify-start`}>
-      {isLoading ? (
-        <Spinner className="text-primary h-5" size={14} /> // Show spinner while loading
-      ) : (
+    <div className="w-fit flex items-center text-start text-primary text-xs font-semibold justify-start">
+      {(!isLoading && deploymentDate) ? (
         duration // Show duration if available
+      ) : (
+        isLoading ? (
+          <Spinner className="text-primary h-5" size={14} /> // Show spinner while loading
+        ) : (
+          <></> // Show nothing if not loading and no deploymentDate
+        )
       )}
     </div>
   );

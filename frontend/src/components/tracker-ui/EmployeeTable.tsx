@@ -35,6 +35,7 @@ import AddEmployee from "./AddEmployee"
 import { EmployeePagination } from "./EmployeePagination"
 import { EmployeeType } from "@/types/employee"
 import EmployeeFilter from "./EmployeeFilter"
+import { useNavigate } from "react-router-dom"
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -77,6 +78,7 @@ export function EmployeeTable<TData, TValue>({
   onFilter,
 }: EmployeeTableProps<TData, TValue>) {
 
+  const navigate = useNavigate();
   const [isXL, setIsXL] = React.useState(false);
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -177,13 +179,12 @@ export function EmployeeTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   onClick={() => {
+                    onEmployeeSelect(row.original)
                     if (row.original.code) {
-                      window.location.href = `/tracker/${row.original.code}`
+                      navigate(`/tracker/${row.original.code}`)
                     } else {
-                      history.pushState({}, '', '/tracker');
-                      onEmployeeSelect(row.original)
+                      navigate('/tracker')
                     }
-                    // onEmployeeSelect(row.original)
                   }}
                   className="cursor-pointer"
                 >
