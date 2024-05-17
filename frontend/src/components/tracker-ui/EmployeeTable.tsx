@@ -199,7 +199,7 @@ export function EmployeeTable<TData, TValue>({
               <TableRow className="h-full hover:bg-background">
                 <TableCell colSpan={columns.length}>
                   <div className='h-max flex flex-col items-center justify-center'>
-                    <Empty height={200} width={300} />
+                    <Empty height={200} width={200} />
                     <span className="text-muted-foreground">No results found</span>
                   </div>
                 </TableCell>

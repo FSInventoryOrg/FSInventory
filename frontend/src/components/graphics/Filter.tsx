@@ -2,8 +2,8 @@ import { cn } from '@/lib/utils'
 
 interface GraphicsProps {
   className?: string;
-  height: number;
-  width: number;
+  height?: number;
+  width?: number;
 }
 
 const Filter = ({ className, height, width }: GraphicsProps) => {
