@@ -3,7 +3,6 @@ import { Tag as TagType } from "../ui/tag-input";
 import { useQuery } from '@tanstack/react-query'
 import * as imsService from '@/ims-service'
 import { TagOption } from './Options';
-import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { motion } from "framer-motion"
 import {
@@ -120,7 +119,7 @@ const TagSelect = ({ onTagSelect, property, option, reset=false, defaults=false 
       onTagSelect(tagIds)
 
     }
-  }, [option, optionValues, defaults, defaultOptions]);  
+  }, [option, optionValues, defaults, defaultOptions, onTagSelect]);  
   
 
   useEffect(() => {
@@ -134,31 +133,29 @@ const TagSelect = ({ onTagSelect, property, option, reset=false, defaults=false 
   }, [selectedTags])
 
   return (
-    <section className="z-10 w-full flex flex-col gap-5">
-      <div className='flex gap-1 flex-wrap items-center h-fit'>
-        <ul className="flex flex-wrap gap-1 items-center h-fit">
-          {selectedTags && selectedTags.map((tag, index) => (
-            <motion.li
-              key={index}
-              variants={fadeInAnimationVariants}
-              initial="initial"
-              whileInView="animate"
-              custom={index}
-            >
-              <Tag key={tag.id} text={tag.text} id={tag.id} onRemove={handleRemoveTag} />
-            </motion.li>
-          ))}
+    <>
+      <ul className="w-full flex flex-wrap gap-1.5">
+        {selectedTags && selectedTags.map((tag, index) => (
           <motion.li
+            key={index}
             variants={fadeInAnimationVariants}
             initial="initial"
             whileInView="animate"
-            custom={selectedTags ? selectedTags.length : 0}
+            custom={index}
           >
-            <AddTag selectedTags={selectedTags} onAdd={handleAddTag} />
+            <Tag key={tag.id} text={tag.text} id={tag.id} onRemove={handleRemoveTag} />
           </motion.li>
-        </ul>
-      </div>
-    </section>
+        ))}
+        <motion.li
+          variants={fadeInAnimationVariants}
+          initial="initial"
+          whileInView="animate"
+          custom={selectedTags ? selectedTags.length : 0}
+        >
+          <AddTag selectedTags={selectedTags} onAdd={handleAddTag} />
+        </motion.li>
+      </ul>
+    </>
   );
 }
 
@@ -174,10 +171,7 @@ const Tag = ({ text, id, onRemove }: TagProps) => {
   };
 
   return (
-    <Badge 
-      className="rounded font-light animate-fadeIn text-secondary-foreground inline-flex items-center text-xs transition-all gap-1 px-2 border border-border h-6" 
-      variant='secondary'
-    >
+    <div className="bg-secondary rounded animate-fadeIn text-secondary-foreground inline-flex items-center text-sm transition-all gap-2 px-2 border border-border h-8" >
       <span className='block text-nowrap'>{text}</span>
       <Button 
         className='h-4 w-4 rounded hover:bg-transparent text-accent-foreground' 
@@ -186,9 +180,9 @@ const Tag = ({ text, id, onRemove }: TagProps) => {
         type='button' 
         onClick={handleRemoveClick}
       >
-        <XIcon size={12} />
+        <XIcon size={14} />
       </Button>
-    </Badge>
+    </div>
   );
 };
 
@@ -228,12 +222,12 @@ const AddTag: React.FC<AddTagProps> = ({ selectedTags, onAdd }) => {
           variant="secondary" 
           size="icon" 
           type="button" 
-          className='h-6 w-6 rounded border border-border'
+          className='h-full rounded border border-border'
           onClick={() => {
             setIsOpen(!isOpen)
           }}
         >
-          <PlusIcon size={12} />
+          <PlusIcon size={16} />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0 border-0">
