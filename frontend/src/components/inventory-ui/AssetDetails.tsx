@@ -1,5 +1,5 @@
 import { DeploymentHistory, HardwareType } from '@/types/asset'
-import { CreditCardIcon, InfoIcon, LibraryBig, NotebookPenIcon, ScaleIcon, SettingsIcon } from 'lucide-react';
+import { CreditCardIcon, InfoIcon, LibraryBig, NotebookPenIcon, RocketIcon, SettingsIcon } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import * as imsService from '@/ims-service'
@@ -24,6 +24,7 @@ import { useState } from 'react';
 import { TrashSimple } from '@phosphor-icons/react';
 import { Spinner } from '../Spinner';
 import useEmployeeNameByCode from '@/hooks/useEmployeeNameByCode';
+import { Link } from 'react-router-dom';
 
 interface AssetDetailsProps {
   asset: HardwareType;
@@ -64,7 +65,8 @@ const HistoryEntry = ({ assetCode, record, index }: {assetCode: string, record: 
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const { name } = useEmployeeNameByCode(record.assignee);
+  
   const handleRemoveDeployment = async (index: number) => {
     console.log(assetCode, index)
     await imsService.removeDeploymentHistoryEntry(assetCode, index);
@@ -123,7 +125,11 @@ const HistoryEntry = ({ assetCode, record, index }: {assetCode: string, record: 
         {/* Render assignee */}
         <div className='flex gap-2 px-2 pb-1'>
           <div className='w-full flex gap-2 text-sm items-center font-bold uppercase'>
-            {useEmployeeNameByCode(record.assignee).name}
+            {(name && name !== 'Unknown') ? (
+              <>{name}</>
+            ) : (
+              <>{`Unknown`}</>
+            )}
           </div>
           <span className='w-fit'></span>
         </div>
@@ -161,11 +167,20 @@ const HistoryEntry = ({ assetCode, record, index }: {assetCode: string, record: 
 
 const AssetDetails = ({ asset }: AssetDetailsProps) => {
 
+  const dateCreated = asset.created ? new Date(asset.created) : null;
+  const dateUpdated = asset.updated ? new Date(asset.updated) : null;
+  const assignee = useEmployeeNameByCode(asset.assignee).name
+  const recoveredFrom = useEmployeeNameByCode(asset.recoveredFrom).name
+
+  console.log(assignee)
+
+
   const generalInfo: Field[] = [
     { label: 'Code:', value: asset.code },
     { label: 'Type:', value: asset.type },
     { label: 'Status:', value: asset.status },
     { label: 'Category:', value: asset.category },
+    { label: 'Equipment Type:', value: asset.equipmentType },
     { label: 'Brand:', value: asset.brand },
     { label: 'Model Name:', value: asset.modelName },
     { label: 'Model Number:', value: asset.modelNo },
@@ -189,56 +204,49 @@ const AssetDetails = ({ asset }: AssetDetailsProps) => {
       { label: 'Supplier/Vendor:', value: asset.supplierVendor }
   ];
 
-  const legalInfo: Field[] = [
-    { label: 'PEZA Form 8105:', value: asset.pezaForm8105 },
-    { label: 'PEZA Form 8106:', value: asset.pezaForm8105 },
-    { label: 'Is RGE:', value: asset.isRGE ? 'YES' : 'NO' }
-  ]
-
-  const otherInfo: Field[] = [
-    { label: 'Equipment Type:', value: asset.equipmentType },
-    { label: 'From Client:', value: asset.client },
-    { label: 'Assigned To:', value: useEmployeeNameByCode(asset.assignee).name },
+  const deploymentInfo: Field[] = [
+    { label: 'Assigned To:', value: assignee ? `${assignee} (${asset.assignee})` : asset.assignee },
     { label: 'Deployment Date:', value: asset.deploymentDate ? new Date(asset.deploymentDate).toLocaleString() : '' },
-    { label: 'Recovered From:', value: asset.recoveredFrom },
+    { label: 'Recovered From:', value: recoveredFrom ? `${recoveredFrom} (${asset.recoveredFrom})` : asset.recoveredFrom },
     { label: 'Date of Recovery:', value: asset.recoveryDate ? new Date(asset.recoveryDate).toLocaleString() : ''},
   ]
 
-  const dateCreated = asset.created ? new Date(asset.created) : null;
-  const dateUpdated = asset.updated ? new Date(asset.updated) : null;
+  const otherInfo: Field[] = [
+    { label: 'PEZA Form 8105:', value: asset.pezaForm8105 },
+    { label: 'PEZA Form 8106:', value: asset.pezaForm8105 },
+    { label: 'Is RGE:', value: asset.isRGE ? 'YES' : 'NO' },
+    { label: 'From Client:', value: asset.client },
+  ]
 
   return (
     <div className=''>
       <div className='flex justify-between'>
-        <div className='text-sm w-fit bg-accent text-accent-foreground font-semibold border-border border rounded-full px-2.5 py-1 flex items-center gap-2'>
-          <StatusBadge status={asset.status} />
+        <div className='text-accent-foreground text-sm'>
+          <div className='text-sm w-fit bg-accent text-accent-foreground font-semibold border-border border rounded-full px-2.5 py-1 flex items-center gap-2'>
+            <StatusBadge status={asset.status} />
+          </div>
+          {assignee && assignee !== 'Unknown' ? (
+            <div>
+              Assigned to&nbsp;
+              <Link to={`/tracker/${asset.assignee}`} className='text-sm text-secondary-foreground underline-offset-2 underline font-semibold'>
+                {assignee}&nbsp;
+                <span className=''>({asset.assignee})</span>
+              </Link> 
+            </div>
+          ) : (
+            asset.assignee && (
+              <div>
+                Assigned to&nbsp;
+                <span className='text-sm text-secondary-foreground font-semibold'>
+                  {asset.assignee}&nbsp; 
+                  <span className='text-destructive text-xs'>{`(UNR)`}</span>
+                </span> 
+              </div>
+            )
+          )}
         </div>
         {asset.status === 'Deployed' && <RetrieveAsset assetData={asset} />}
         {asset.status === 'IT Storage' && <DeployAsset assetData={asset} />}
-      </div>
-      <div className='text-muted-foreground flex flex-col pt-2'>
-        <div className='italic text-xs'>
-          Asset added on&nbsp;
-          <span className=''>
-            {dateCreated ? dateCreated.toLocaleString() : ''}
-          </span>
-          {asset.createdBy && (
-            <span>&nbsp;by {asset.createdBy}.</span>
-          )}
-        </div>
-        {dateUpdated && dateCreated && dateUpdated.getTime() !== dateCreated.getTime() && (
-          <div className='text-sm'>
-            <span className='font-bold'>
-              Last updated:&nbsp;
-            </span>
-            <span className='underline underline-offset-2'>
-              {dateUpdated.toLocaleString()}
-              {asset.updatedBy && (
-                <span>&nbsp;by {asset.updatedBy}.</span>
-              )}
-            </span>
-          </div>
-        )}
       </div>
       <Tabs defaultValue="details" className="w-full pt-4">
         <TabsList className='w-full'>
@@ -250,7 +258,7 @@ const AssetDetails = ({ asset }: AssetDetailsProps) => {
             {renderSection('General Information', generalInfo, <InfoIcon size={16} className='text-primary' />)}
             {renderSection('System Specifications', systemSpecs, <SettingsIcon size={16} className='text-primary' />)}
             {renderSection('Purchase Details', purchaseDetails, <CreditCardIcon size={16} className='text-primary' />)}
-            {renderSection('Legal Information', legalInfo, <ScaleIcon size={16} className='text-primary' />)}
+            {renderSection('Deployment Information', deploymentInfo, <RocketIcon size={16} className='text-primary' />)}
             {renderSection('Miscellaneous', otherInfo, <LibraryBig size={16} className='text-primary' />)}
             <div className='flex flex-col gap-1 text-sm border-t mt-4'>
               <h1 className='static -translate-y-3 translate-x-3 bg-background px-1 text-secondary-foreground flex items-center gap-1.5 w-fit'>
@@ -276,6 +284,30 @@ const AssetDetails = ({ asset }: AssetDetailsProps) => {
           )}
         </TabsContent>
       </Tabs>
+      <div className='text-muted-foreground flex flex-col pt-2'>
+        <div className='italic text-xs'>
+          Asset added on&nbsp;
+          <span className=''>
+            {dateCreated ? dateCreated.toLocaleString() : ''}
+          </span>
+          {asset.createdBy && (
+            <span>&nbsp;by {asset.createdBy}.</span>
+          )}
+        </div>
+        {dateUpdated && dateCreated && dateUpdated.getTime() !== dateCreated.getTime() && (
+          <div className='text-sm'>
+            <span className='font-bold'>
+              Last updated:&nbsp;
+            </span>
+            <span className='underline underline-offset-2'>
+              {dateUpdated.toLocaleString()}
+              {asset.updatedBy && (
+                <span>&nbsp;by {asset.updatedBy}.</span>
+              )}
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

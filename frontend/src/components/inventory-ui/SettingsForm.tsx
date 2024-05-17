@@ -21,8 +21,10 @@ import { SlashIcon } from "lucide-react"
 import { Defaults } from "@/types/options"
 import VisibleColumnsForm from "./VisibleColumnsForms"
 import SelectOptionsForm from "./SelectOptionsForm"
+import { useNavigate } from "react-router-dom"
 
 const SettingsForm = ({ defaults }: { defaults: Defaults }) => {
+  const navigate = useNavigate()
   const { showToast } = useAppContext();
   const [selectedTags, setSelectedTags] = React.useState<string[]>(['']);
 
@@ -43,7 +45,7 @@ const SettingsForm = ({ defaults }: { defaults: Defaults }) => {
     onSuccess: async () => {
       showToast({ message: "Inventory settings and preferences saved!", type: "SUCCESS" });
       setTimeout(() => {
-        window.location.href = '/inventory';
+        navigate('/inventory')
       }, 500)
     },
     onError: (error: Error) => {

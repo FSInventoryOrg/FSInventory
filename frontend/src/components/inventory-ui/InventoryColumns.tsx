@@ -9,6 +9,7 @@ import ActionCell from './InventoryAction';
 import StatusBadge from "./StatusBadge";
 import RetrieveAsset from "./RetrieveAsset";
 import DeployAsset from "./DeployAsset";
+import EmployeeNameByCode from "./EmployeeNameToCode";
 
 export const InventoryColumns: ColumnDef<HardwareType>[] = [
   {
@@ -105,6 +106,7 @@ export const InventoryColumns: ColumnDef<HardwareType>[] = [
   {
     accessorKey: "assignee",
     header: "Assignee",
+    cell: ({ row }) => <EmployeeNameByCode employeeCode={row.original.assignee} />
   },
   {
     accessorKey: "purchaseDate",
@@ -197,6 +199,7 @@ export const InventoryColumns: ColumnDef<HardwareType>[] = [
   {
     accessorKey: "recoveredFrom",
     header: "Recovered From",
+    cell: ({ row }) => <EmployeeNameByCode employeeCode={row.original.recoveredFrom} />
   },
   {
     accessorKey: "recoveryDate",

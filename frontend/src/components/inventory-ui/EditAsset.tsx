@@ -89,6 +89,7 @@ const EditAsset = ({ assetData, onClose }: EditAssetProps) => {
       showToast({ message: "Asset updated successfully!", type: "SUCCESS" });
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
       setTimeout(() => {
         onClose(true)
       }, 100)

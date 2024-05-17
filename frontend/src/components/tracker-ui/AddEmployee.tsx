@@ -37,8 +37,10 @@ import { FullScaleIcon } from "../icons/FullScaleIcon";
 import { Separator } from "../ui/separator";
 import { UserIcon } from "../icons/UserIcon";
 import { Checkbox } from "../ui/checkbox";
+import { useNavigate } from "react-router-dom";
 
 const AddEmployee = () => {
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false); 
   const [employeeName, setEmployeeName] = useState('');
@@ -82,7 +84,7 @@ const AddEmployee = () => {
 
       queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
       queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
-      window.location.replace(`/tracker/${newEmployeeCode}`)
+      navigate(`/tracker/${newEmployeeCode}`)
 
       setTimeout(() => {
         setOpen(false);

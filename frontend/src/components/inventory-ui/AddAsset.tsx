@@ -92,6 +92,7 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
       showToast({ message: "New asset added successfully!", type: "SUCCESS" });
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
       setTimeout(() => {
         setOpen(false);
       }, 100)

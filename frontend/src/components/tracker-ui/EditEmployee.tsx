@@ -37,12 +37,14 @@ import { Separator } from "../ui/separator";
 import { UserIcon } from "../icons/UserIcon";
 import { Checkbox } from "../ui/checkbox";
 import { EmployeeType } from "@/types/employee";
+import { useNavigate } from "react-router-dom";
 
 interface EditEmployeeProps {
   employeeData: EmployeeType;
 }
 
 const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false); 
   const [newEmployeeCode, setNewEmployeeCode] = useState('');
@@ -84,7 +86,7 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
 
       queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
       queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
-      window.location.replace(`/tracker/${newEmployeeCode}`)
+      navigate(`/tracker/${newEmployeeCode}`)
 
       setTimeout(() => {
         setOpen(false);
