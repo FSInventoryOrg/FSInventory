@@ -226,13 +226,17 @@ export const InventoryColumns: ColumnDef<HardwareType>[] = [
   },
   {
     id: "deploymentActions",
-    accessorKey: "deploymentActions",
-    header: "Deployment Actions",
     cell: ({ row, table }) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const deployableStatusJSON = JSON.stringify((table.options.meta as any).defaultOptions.deployableStatus);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const retrievableStatusJSON = JSON.stringify((table.options.meta as any).defaultOptions.retrievableStatus);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const defaultOptions = (table.options.meta as any).defaultOptions;
+    
+    if (!defaultOptions || !defaultOptions.deployableStatus || !defaultOptions.retrievableStatus) {
+      return <></>
+    }
+
+    const deployableStatusJSON = JSON.stringify(defaultOptions.deployableStatus);
+    const retrievableStatusJSON = JSON.stringify(defaultOptions.retrievableStatus);
+    
       
       const deployableStatus = deployableStatusJSON.slice(1, -1);
       const retrievableStatus = retrievableStatusJSON.slice(1, -1);

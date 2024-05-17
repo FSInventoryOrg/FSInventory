@@ -19,8 +19,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { SlashIcon } from "lucide-react"
 import { Defaults } from "@/types/options"
-import VisibleColumnsForm from "./VisibleColumnsForms"
-import SelectOptionsForm from "./SelectOptionsForm"
+import VisibleColumnsForm from "./VisibleColumnsForm"
 import { useNavigate } from "react-router-dom"
 
 const SettingsForm = ({ defaults }: { defaults: Defaults }) => {
@@ -86,7 +85,6 @@ const SettingsForm = ({ defaults }: { defaults: Defaults }) => {
         </Breadcrumb>
         <DefaultOptionsForm />
         <VisibleColumnsForm onTagSelect={setSelectedTags} />
-        <SelectOptionsForm />
         <Button type="submit" disabled={isPending} className="gap-2 w-fit self-end">
           {isPending ? <Spinner size={18}/> : null }
           Save changes

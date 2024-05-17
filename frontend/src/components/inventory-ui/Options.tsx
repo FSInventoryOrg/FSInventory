@@ -21,7 +21,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { ScrollArea } from '../ui/scroll-area';
-import { ChevronLeftIcon, ChevronsUpDownIcon, PencilIcon, XIcon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronsUpDownIcon, XIcon } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,7 @@ import { Spinner } from '../Spinner';
 import TrashCan from '../graphics/TrashCan'
 import TagSelect from './TagSelect'
 import ColorSelect from './ColorSelect'
+import { PencilSimple } from '@phosphor-icons/react'
 
 export type ColorOption = {
   value: string;
@@ -350,7 +351,7 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
                     <span className='max-w-28 overflow-hidden text-ellipsis'>{typeof value === 'object' ? value.value : value}</span>
                   </Button>
                   <Button
-                    className='mr-3 w-12 h-8'
+                    className='mr-3 w-12 h-8 text-muted-foreground'
                     variant='ghost'
                     type='button'
                     size='icon'
@@ -360,7 +361,7 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
                       setOptionToEdit(typeof value === 'object' ? value.value : value)
                     }}
                   >
-                    <PencilIcon size={16} />
+                    <PencilSimple weight='fill' size={16} />
                   </Button>
                 </div>
               ))

@@ -37,7 +37,6 @@ const ColorSelect = ({ onColorSelect, property, option, reset }: ColorSelectProp
       const colorOption = optionValues.find(value =>
         typeof value === 'object' && 'value' in value && value.value === option
       ) as ColorOption | undefined;
-  
       if (colorOption) {
         const { color } = colorOption;
         if (color && color !== '') {
@@ -45,6 +44,9 @@ const ColorSelect = ({ onColorSelect, property, option, reset }: ColorSelectProp
           if (colorObject) {
             setSelectedColor(colorObject)
           }
+        }
+        else {
+          setSelectedColor(null)
         }
       }
     } else {

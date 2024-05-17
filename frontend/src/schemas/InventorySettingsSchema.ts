@@ -17,7 +17,7 @@ export const InventorySettingsSchema = z.object({
   path: ["deployableStatus"],
 }).refine(data => {
   if (data.deployableStatus !== '-' && data.retrievableStatus !== '-') {
-    return data.retrievableStatus !== data.retrievableStatus;
+    return data.deployableStatus !== data.retrievableStatus;
   }
   return true;
 }, {

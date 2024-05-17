@@ -23,6 +23,7 @@ import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
 import { PlusIcon, XIcon } from 'lucide-react';
 import { PROPERTIES } from '@/lib/data';
 import { Defaults } from '@/types/options';
+import { Badge } from '../ui/badge';
 
 const fadeInAnimationVariants = {
   initial: {
@@ -43,10 +44,11 @@ interface TagSelectProps {
   property?: string;
   option?: string;
   reset?: boolean;
+  size?: "sm" | "lg";
   defaults?: boolean;
 }
 
-const TagSelect = ({ onTagSelect, property, option, reset=false, defaults=false }: TagSelectProps) => {
+const TagSelect = ({ onTagSelect, property, option, reset=false, size="sm", defaults=false }: TagSelectProps) => {
   const [selectedTags, setSelectedTags] = useState<TagType[] | null>(null);
 
   const { data: optionValues } = useQuery<TagOption[]>({ 
@@ -119,7 +121,8 @@ const TagSelect = ({ onTagSelect, property, option, reset=false, defaults=false 
       onTagSelect(tagIds)
 
     }
-  }, [option, optionValues, defaults, defaultOptions, onTagSelect]);  
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [option, optionValues, defaults, defaultOptions]);  
   
 
   useEffect(() => {
@@ -128,13 +131,9 @@ const TagSelect = ({ onTagSelect, property, option, reset=false, defaults=false 
     }
   }, [reset])
 
-  useEffect(() => {
-    console.log(selectedTags)
-  }, [selectedTags])
-
   return (
     <>
-      <ul className="w-full flex flex-wrap gap-1.5">
+      <ul className={`${size === "sm" ? `gap-1` : `gap-1.5`} w-full flex flex-wrap`}>
         {selectedTags && selectedTags.map((tag, index) => (
           <motion.li
             key={index}
@@ -143,7 +142,7 @@ const TagSelect = ({ onTagSelect, property, option, reset=false, defaults=false 
             whileInView="animate"
             custom={index}
           >
-            <Tag key={tag.id} text={tag.text} id={tag.id} onRemove={handleRemoveTag} />
+            <Tag key={tag.id} text={tag.text} id={tag.id} onRemove={handleRemoveTag} size={size} />
           </motion.li>
         ))}
         <motion.li
@@ -152,7 +151,7 @@ const TagSelect = ({ onTagSelect, property, option, reset=false, defaults=false 
           whileInView="animate"
           custom={selectedTags ? selectedTags.length : 0}
         >
-          <AddTag selectedTags={selectedTags} onAdd={handleAddTag} />
+          <AddTag selectedTags={selectedTags} onAdd={handleAddTag} size={size} />
         </motion.li>
       </ul>
     </>
@@ -163,15 +162,18 @@ interface TagProps {
   text: string;
   id: string;
   onRemove: (id: string) => void;
+  size: "sm" | "lg"
 }
 
-const Tag = ({ text, id, onRemove }: TagProps) => {
+const Tag = ({ text, id, onRemove, size }: TagProps) => {
   const handleRemoveClick = () => {
     onRemove(id);
   };
 
   return (
-    <div className="bg-secondary rounded animate-fadeIn text-secondary-foreground inline-flex items-center text-sm transition-all gap-2 px-2 border border-border h-8" >
+    <Badge 
+      variant='secondary'
+      className={`${size === "sm" ? `h-6 text-xs px-1` : `h-8 text-sm px-2.5`} bg-secondary flex items-center gap-2 rounded`}>
       <span className='block text-nowrap'>{text}</span>
       <Button 
         className='h-4 w-4 rounded hover:bg-transparent text-accent-foreground' 
@@ -182,16 +184,17 @@ const Tag = ({ text, id, onRemove }: TagProps) => {
       >
         <XIcon size={14} />
       </Button>
-    </div>
+    </Badge>
   );
 };
 
 interface AddTagProps {
   selectedTags?: TagType[] | null;
   onAdd: (id: string) => void;
+  size: "sm" | "lg"
 }
 
-const AddTag: React.FC<AddTagProps> = ({ selectedTags, onAdd }) => {
+const AddTag: React.FC<AddTagProps> = ({ selectedTags, onAdd, size }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const handleKeyDown = () => {
@@ -219,15 +222,13 @@ const AddTag: React.FC<AddTagProps> = ({ selectedTags, onAdd }) => {
     <Popover>
       <PopoverTrigger asChild>
         <Button 
-          variant="secondary" 
-          size="icon" 
-          type="button" 
-          className='h-full rounded border border-border'
+          variant='secondary'
+          className={`${size === "sm" ? `h-6 text-xs px-1.5` : `h-8 text-sm px-2`} bg-secondary flex items-center rounded`}
           onClick={() => {
             setIsOpen(!isOpen)
           }}
         >
-          <PlusIcon size={16} />
+          <span>{size === "sm" ? <PlusIcon size={14} className='p-0 m-0' /> : <PlusIcon size={16} />}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0 border-0">

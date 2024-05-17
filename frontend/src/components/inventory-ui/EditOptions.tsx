@@ -3,9 +3,6 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import * as imsService from '@/ims-service'
 import { useAppContext } from '@/hooks/useAppContext'
 import {
-  FormControl,
-} from "@/components/ui/form"
-import {
   AlertDialog,
   AlertDialogCancel,
   AlertDialogContent,
@@ -21,7 +18,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { ScrollArea } from '../ui/scroll-area';
-import { ChevronLeftIcon, ChevronsUpDownIcon, PencilIcon, XIcon } from 'lucide-react';
+import { ChevronLeftIcon, XIcon } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input";
@@ -31,6 +28,7 @@ import { Spinner } from '../Spinner';
 import TrashCan from '../graphics/TrashCan'
 import TagSelect from './TagSelect'
 import ColorSelect from './ColorSelect'
+import { PencilSimple } from '@phosphor-icons/react'
 
 export type ColorOption = {
   value: string;
@@ -226,18 +224,11 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true} >
       <PopoverTrigger className={cn(className)} asChild>
-        <FormControl>
-          <Button
-            variant="outline"
-            role="combobox"
-            className={cn(
-              "justify-between text-muted-foreground",
-            )}
-          >
-            Edit {format(property)} options
-            <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </FormControl>
+        <Button 
+          size="icon"
+          className="text-muted-foreground absolute right-0 top-0 -translate-y-1 flex justify-center items-center rounded-full h-7 w-7 p-0 bg-transparent hover:bg-muted-foreground/20 border-0">
+          <PencilSimple weight='fill' size={16} />
+        </Button>
       </PopoverTrigger>
       <PopoverContent className=''>
         <div 
@@ -276,7 +267,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
                     />
                   }
                   <Button
-                    className='mr-3 w-10 h-8'
+                    className='mr-3 w-10 h-8 text-muted-foreground'
                     variant='ghost'
                     type='button'
                     size='icon'
@@ -286,7 +277,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
                       setOptionToEdit(typeof value === 'object' ? value.value : value)
                     }}
                   >
-                    <PencilIcon size={16} />
+                    <PencilSimple weight='fill' size={16} />
                   </Button>
                 </div>
               ))

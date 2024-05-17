@@ -86,13 +86,13 @@ router.post('/', [
       return res.status(400).json({ message: errors.array() })
     }
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+      // const token = req.cookies.auth_token;
+      // const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
 
-      if (decodedToken.role !== "ADMIN") {
-        return res.status(403).json({ message: "Only users with admin role can perform this action" });
-      }
-      const currentUser = await User.findOne({ _id: decodedToken.userId });
+      // if (decodedToken.role !== "ADMIN") {
+      //   return res.status(403).json({ message: "Only users with admin role can perform this action" });
+      // }
+      // const currentUser = await User.findOne({ _id: decodedToken.userId });
     
       const data: any = req.body;
       const currentDate = new Date();
@@ -100,10 +100,10 @@ router.post('/', [
       data.created = currentDate;
       data.updated = currentDate;
 
-      if (currentUser) {
-        data.createdBy = `${currentUser.firstName} ${currentUser.lastName}`;
-        data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
-      }
+      // if (currentUser) {
+      //   data.createdBy = `${currentUser.firstName} ${currentUser.lastName}`;
+      //   data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+      // }
 
       if (data.type === 'Hardware') {
         const existingAsset = await Hardware.findOne({ code: data.code });

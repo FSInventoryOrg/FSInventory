@@ -10,7 +10,7 @@ const VisibleColumnsForm = ({ onTagSelect }: { onTagSelect: (tags: string[]) => 
         <h3 className='text-accent-foreground'>Determines the default asset properties to show as columns in the inventory table.</h3>
       </div>
       <div className="flex flex-col items-center justify-center w-full">
-        <TagSelect onTagSelect={onTagSelect} defaults={true} property="defaults" />
+        <TagSelect onTagSelect={onTagSelect} defaults={true} property="defaults" size="lg" />
       </div>
       <Separator className="my-4" />
     </div>

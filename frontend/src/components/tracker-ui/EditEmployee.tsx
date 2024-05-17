@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/popover"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
-import { ArrowRightIcon, PencilIcon, CalendarIcon, XIcon } from "lucide-react"
+import { ArrowRightIcon, CalendarIcon, PencilIcon, XIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { EmployeeFormData, EmployeeSchema } from "@/schemas/AddEmployeeSchema";

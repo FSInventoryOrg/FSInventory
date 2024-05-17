@@ -341,11 +341,11 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
       const categoryCountByServiceYears = countCategoryByServiceYears({ assetData, hardwareData }, "Laptop");
       const activeEmployeesCount = registeredEmployees?.filter(
         (employee: EmployeeType) => employee.isActive
-      ).length || 0;
+      );
     
       const unregisteredEmployeeCount = assignees?.filter(
         (assignee) => !registeredEmployees?.some((employee: EmployeeType) => employee.name === assignee)
-      )?.length || 0;
+      );
 
       // const windowsLaptopCount = laptops ? laptops.filter((asset: HardwareType) => asset.brand !== 'Apple').length : 0;
       // const macbookLaptopCount = laptops ? laptops.filter((asset: HardwareType) => asset.brand === 'Apple').length : 0;
@@ -358,10 +358,10 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
       setStatusKeys(statusKeys);
       setCategoryCountByStatus(categoryCountByStatus);
       setCategoryCountByServiceYears(categoryCountByServiceYears);
-      setActiveEmployeesCount(activeEmployeesCount);
-      setUnregisteredEmployeesCount(unregisteredEmployeeCount);
-      setWindowsBundleCount(windowsBundles?.length || '0');
-      setMacbookBundleCount(macbookBundles?.length || '0');
+      setActiveEmployeesCount(activeEmployeesCount?.length || 0);
+      setUnregisteredEmployeesCount(unregisteredEmployeeCount?.length || 0);
+      setWindowsBundleCount(windowsBundles?.length || 0);
+      setMacbookBundleCount(macbookBundles?.length || 0);
     }
   }, [assetData, assignees, hardwareData, laptops, registeredEmployees, statusValues, macbookBundles, windowsBundles]);
 

@@ -23,6 +23,7 @@ import * as imsService from '@/ims-service';
 import { useQuery } from '@tanstack/react-query';
 import { HardwareType } from '@/types/asset';
 import { Skeleton } from '../ui/skeleton';
+import EditOptions from './EditOptions'
 
 interface SidebarFiltersProps {
   onFilterChange: (status: string) => void;
@@ -36,7 +37,8 @@ interface SidebarFiltersProps {
 
 const SidebarFilters = ({ 
     onFilterChange, 
-    onCategoryChange, onToggleFilters, 
+    onCategoryChange, 
+    onToggleFilters, 
     isFiltersVisible, 
     selectedStatus, 
     selectedCategory, 
@@ -125,7 +127,10 @@ const SidebarFilters = ({
             </div>
           </div>
           <div className='flex flex-col gap-2'>
-            <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Status</span>
+            <div className='flex relative'>
+              <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Status</span>
+              <EditOptions colorSelect={true} property='status' className='w-full' />
+            </div>            
             <div className='grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-2 gap-2'>
               {isLoading ? 
                 <>
@@ -166,7 +171,10 @@ const SidebarFilters = ({
             </div>
           </div>
           <div className='flex flex-col gap-2'>
-            <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Category</span>
+            <div className='flex relative'>
+              <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Category</span>
+              <EditOptions tagSelect={true} property='category' className='w-full' />
+            </div>
             <div className='flex gap-2'>
               {isLoading ? 
                 <Select disabled>
@@ -175,7 +183,7 @@ const SidebarFilters = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectLabel>Hardware</SelectLabel>
+                      <SelectLabel>Categories</SelectLabel>
                       <SelectItem value='all'>All</SelectItem>
                     </SelectGroup>
                   </SelectContent>
@@ -187,7 +195,7 @@ const SidebarFilters = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectLabel>Hardware</SelectLabel>
+                      <SelectLabel>Categories</SelectLabel>
                       <SelectItem value='all'>All</SelectItem>
                       {[...categories].map((category: string) => (
                         <SelectItem key={category} value={category} className='w-full'>
@@ -198,6 +206,12 @@ const SidebarFilters = ({
                   </SelectContent>
                 </Select>
               }
+            </div>
+          </div>
+          <div className='flex flex-col gap-2'>
+            <div className='flex relative'>
+              <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Equipment Type</span>
+              <EditOptions property='equipmentType' className='w-full' />
             </div>
           </div>
         </div>
