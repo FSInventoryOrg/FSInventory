@@ -54,7 +54,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Docker files
-.dockerignore
-Dockerfile
 docker-compose.yaml
+Dockerfile
+.dockerignore
 

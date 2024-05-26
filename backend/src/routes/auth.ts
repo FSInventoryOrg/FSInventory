@@ -65,15 +65,17 @@ router.post("/login", [
           role: user.role
         }, 
         process.env.JWT_SECRET_KEY as string, 
-        { expiresIn: "1d" },
+        { expiresIn: "30d" },
       );
       
       res.cookie("auth_token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        maxAge: 86400000,
-      });
+        maxAge: 86400000 * 30,
+      })
+
       res.status(200).json({ userId: user._id })
+      
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "Something went wrong" });
