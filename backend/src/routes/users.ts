@@ -108,7 +108,7 @@ router.get("/", verifyToken, async (req: Request, res: Response) => {
     const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
     const userId = decodedToken.userId;
 
-    const user: UserType | null = await User.findById(userId);
+    const user: UserType | null = await User.findById(userId, { password: false});
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
