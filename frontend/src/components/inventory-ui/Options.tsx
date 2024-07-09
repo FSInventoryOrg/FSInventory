@@ -163,13 +163,8 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
       mutationFn: () => imsService.deleteOption(property, optionToEdit),
     })
 
-    const { mutate: deleteAssets, isPending: isAssetDeletePending } = useMutation({
-      mutationFn: () => imsService.deleteAssetsByProperty(property, optionToEdit),
-    })
-
     const handleDelete = async () => {
       await deleteOption();
-      await deleteAssets()
       if (optionValues) {
         const indexOfValueToDelete = optionValues.findIndex(option => {
           if (typeof option === 'string') {
@@ -212,19 +207,24 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
         <AlertDialogContent className='border-none'>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-bold">
-              Are you absolutely sure?
+              {
+                assetCount ?
+                `Unable to delete ${format(property)}` :
+                'Are you absolutely sure?'
+              }
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {assetCount ? 
-              <>There are {assetCount} assets with {format(property)} of {optionToEdit}. Deleting this {format(property)} will also remove those assets from our database.</> :
-              <>There are no assets with {format(property)} {optionToEdit}. It is safe to delete this {format(property)}.</>
+              {
+                assetCount ? 
+                <>There are {assetCount} assets with {format(property)} of {optionToEdit}. Deleting this {format(property)} is not allowed.</> :
+                <>There are no assets with {format(property)} {optionToEdit}. It is safe to delete this {format(property)}.</>
               }
             </AlertDialogDescription>
             <TrashCan />
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <Button variant='destructive' onClick={handleDelete} disabled={isOptionDeletePending || isAssetDeletePending} >Delete {optionToEdit}</Button>
+            { !assetCount && <Button variant='destructive' onClick={handleDelete} disabled={isOptionDeletePending} >Delete {optionToEdit}</Button> }
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
