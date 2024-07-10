@@ -7,4 +7,5 @@ export interface UserType {
   lastName: string;
   joinDate: Date;
   role: "USER" | "ADMIN";
+  avatar: string
 }

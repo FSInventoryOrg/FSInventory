@@ -23,7 +23,7 @@ import { UserType } from "@/types/user";
 import { UserSchema } from "@/schemas/UserSchema";
 import AccountManagement from "./AccountManagement";
 import ProfileCardDetails from "./ProfileCardDetails";
-import { UserIcon } from "../icons/UserIcon";
+import ProfilePicture from "./ProfilePicture";
 
 interface UserProfileProps {
   userData: UserType;
@@ -114,9 +114,7 @@ const UserProfile = ({ userData }: UserProfileProps) => {
             {!isMD && (
               <FullScaleIcon size={80} className="fill-current text-primary" />
             )}
-            <div className="h-56 w-56 bg-muted border-border border rounded-full justify-center items-center flex">
-              <UserIcon size={220} className="fill-current text-secondary" />
-            </div>
+            <ProfilePicture src={userData.avatar} userId={userData._id} />
             <ProfileCardDetails userData={userData} />
           </>
         ) : (
@@ -124,9 +122,7 @@ const UserProfile = ({ userData }: UserProfileProps) => {
             {!isMD && (
               <FullScaleIcon size={40} className="fill-current text-primary" />
             )}
-            <div className="h-24 w-24 bg-muted border-border border rounded-full justify-center items-center flex">
-              <UserIcon size={110} className="fill-current text-secondary" />
-            </div>
+            <ProfilePicture src={userData.avatar} userId={userData._id} />
             <ProfileCardDetails userData={userData} />
           </>
         )}
