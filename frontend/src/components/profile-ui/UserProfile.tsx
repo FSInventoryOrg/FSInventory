@@ -22,6 +22,7 @@ import { FullScaleIcon } from "../icons/FullScaleIcon";
 import { UserType } from "@/types/user";
 import { UserSchema } from "@/schemas/UserSchema";
 import AccountManagement from "./AccountManagement";
+import ProfileCardDetails from "./ProfileCardDetails";
 import { UserIcon } from "../icons/UserIcon";
 
 interface UserProfileProps {
@@ -116,6 +117,7 @@ const UserProfile = ({ userData }: UserProfileProps) => {
             <div className="h-56 w-56 bg-muted border-border border rounded-full justify-center items-center flex">
               <UserIcon size={220} className="fill-current text-secondary" />
             </div>
+            <ProfileCardDetails userData={userData} />
           </>
         ) : (
           <>
@@ -125,6 +127,7 @@ const UserProfile = ({ userData }: UserProfileProps) => {
             <div className="h-24 w-24 bg-muted border-border border rounded-full justify-center items-center flex">
               <UserIcon size={110} className="fill-current text-secondary" />
             </div>
+            <ProfileCardDetails userData={userData} />
           </>
         )}
       </div>
