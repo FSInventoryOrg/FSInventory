@@ -4,6 +4,7 @@ import { AssetFormData as RetrieveAssetFormData } from "./schemas/RetrieveAssetS
 import { EmployeeFormData } from "./schemas/AddEmployeeSchema";
 import { AssetsHistory } from "./types/employee";
 import { Defaults } from "./types/options";
+import { UserFormData } from "./schemas/UserSchema";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -450,3 +451,35 @@ export const deleteEmployeeByCode = async (code: string) => {
 
   return true;
 };
+
+
+/* USER PROFILE */
+export const fetchUserData = async ()=> {
+  const response = await fetch(`${API_BASE_URL}/api/users`, {
+    credentials: 'include',
+  })
+
+  if(!response.ok) {
+    throw new Error("Error fetching user");
+  }
+
+  return response.json();
+}
+
+export const updateUserData = async (user: UserFormData) => {
+  const response = await fetch(`${API_BASE_URL}/api/users/`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(user)
+    });
+
+    if (!response.ok) {
+      const responseBody = await response.json();
+      throw new Error(responseBody.message ||'Failed to update profile');
+    }
+    return true;
+        
+}
