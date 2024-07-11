@@ -27,19 +27,28 @@ import { Skeleton } from '../ui/skeleton';
 interface SidebarFiltersProps {
   onFilterChange: (status: string) => void;
   onCategoryChange: (status: string) => void;
+  onProcessorChange: (processor: string) => void;
+  onMemoryChange: (memory: string) => void;
+  onStorageChange: (storage: string) => void;
   onToggleFilters: (visible: boolean) => void;
   isFiltersVisible: boolean;
   selectedStatus: string;
   selectedCategory: string;
+  selectedSystemSpecs: Record<string, string>;
   totalAssets: number;
 }
 
 const SidebarFilters = ({ 
     onFilterChange, 
-    onCategoryChange, onToggleFilters, 
+    onCategoryChange,
+    onProcessorChange,
+    onMemoryChange,
+    onStorageChange,
+    onToggleFilters, 
     isFiltersVisible, 
     selectedStatus, 
     selectedCategory, 
+    selectedSystemSpecs,
     totalAssets 
   }: SidebarFiltersProps) => {
 
@@ -47,17 +56,35 @@ const SidebarFilters = ({
   const statusCounts: Record<string, number> = {};
   const categoriesCounts: Record<string, number> = {};
   const categories = new Set<string>();
+  const processors = new Array<string>();
+  const memories = new Array<string>();
+  const storage = new Array<string>();
 
   const [prevTotalAssets, setPrevTotalAssets] = React.useState<number>(0)
 
   if (data) {
-    data.forEach((asset: HardwareType) => {
+    const processorSet = new Set<string>();
+    const memorySet = new Set<string>();
+    const storageSet = new Set<string>();
+    
+    data.forEach((asset: HardwareType) => {      
       statusCounts[asset.status] = (statusCounts[asset.status] || 0) + 1;
-    });
-    data.forEach((asset: HardwareType) => {
+
       categories.add(asset.category);
       categoriesCounts[asset.category] = (categoriesCounts[asset.category] || 0) + 1;
+      
+      asset.processor && processorSet.add(asset.processor);
+      asset.memory && memorySet.add(asset.memory);
+      asset.storage && storageSet.add(asset.storage)
     });
+    processors.push(...processorSet);
+    processors.sort((a, b) => a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase()));
+
+    memories.push(...memorySet);
+    memories.sort((a, b) => a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase()));
+    
+    storage.push(...storageSet);
+    storage.sort((a, b) => a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase()));
   }
 
   const handleStatusClick = (status: string) => {
@@ -198,6 +225,60 @@ const SidebarFilters = ({
                   </SelectContent>
                 </Select>
               }
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Processor</span>
+            <div className='flex gap-2'>
+              <Select disabled={isLoading} onValueChange={onProcessorChange} value={selectedSystemSpecs.processor}>
+                <SelectTrigger className="w-full rounded-xl border-2 font-semibold">
+                  <SelectValue placeholder="All" />
+                  <SelectContent>
+                    <SelectItem value='all'>All</SelectItem>
+                    {[...processors].map((processor: string) => (
+                      <SelectItem key={processor} value={processor} className='w-full'>
+                          {processor}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </SelectTrigger>
+              </Select>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Memory</span>
+            <div className='flex gap-2'>
+              <Select disabled={isLoading} onValueChange={onMemoryChange} value={selectedSystemSpecs.memory}>
+                <SelectTrigger className="w-full rounded-xl border-2 font-semibold">
+                  <SelectValue placeholder="All" />
+                  <SelectContent>
+                    <SelectItem value='all'>All</SelectItem>
+                    {[...memories].map((memory: string) => (
+                      <SelectItem key={memory} value={memory} className='w-full'>
+                          {memory}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </SelectTrigger>
+              </Select>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Storage</span>
+            <div className='flex gap-2'>
+              <Select disabled={isLoading} onValueChange={onStorageChange} value={selectedSystemSpecs.storage}>
+                <SelectTrigger className="w-full rounded-xl border-2 font-semibold">
+                  <SelectValue placeholder="All" />
+                  <SelectContent>
+                    <SelectItem value='all'>All</SelectItem>
+                    {[...storage].map((strg: string) => (
+                      <SelectItem key={strg} value={strg} className='w-full'>
+                          {strg}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </SelectTrigger>
+              </Select>
             </div>
           </div>
         </div>
