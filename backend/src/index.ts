@@ -3,11 +3,16 @@ import cors from 'cors'
 import "dotenv/config";
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
+
 import userRoutes from './routes/users';
 import authRoutes from './routes/auth';
 import assetRoutes from './routes/assets'
+import assetCounterRoutes from './routes/asset-counter'
 import optionRoutes from './routes/options'
 import employeeRoutes from './routes/employees'
+import uploadRoutes from './routes/upload'
+import downloadRoutes from './routes/download'
+
 import logger from './utils/logger';
 import swaggerDocs from './utils/swagger';
 import { startChangeStream } from './utils/change-stream';
@@ -15,6 +20,9 @@ import path from 'path';
 
 const DEFAULT_PORT = 3000;
 const port = Number(process.env.PORT) || DEFAULT_PORT;
+
+const HOST = `192.168.1.108`;
+const FRONTENDLOC = `../../frontend/dist`;
 
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string);
 const db = mongoose.connection;
@@ -39,18 +47,21 @@ app.use(cors({
   credentials: true,
 }))
 
-app.use(express.static(path.join(__dirname, "../../../frontend/dist")))
+app.use(express.static(path.join(__dirname, FRONTENDLOC)))
 
 app.use("/api/auth", authRoutes)
 app.use("/api/users", userRoutes)
 app.use("/api/assets", assetRoutes)
 app.use("/api/options", optionRoutes)
 app.use("/api/employees", employeeRoutes)
+app.use("/api/assetcounter", assetCounterRoutes)
+app.use("/api/upload", uploadRoutes)
+app.use("/api/download", downloadRoutes)
 
 // Catch-all route for unmatched URLs (place it here)
 if (process.env.NODE_ENV !== 'development') {
   app.get('/*', function(req, res) {
-    res.sendFile(path.join(__dirname, '../../../frontend/dist/index.html'), function(err) {
+    res.sendFile(path.join(__dirname, `${FRONTENDLOC}/index.html`), function(err) {
       if (err) {
         res.status(500).send(err);
       }
@@ -58,7 +69,7 @@ if (process.env.NODE_ENV !== 'development') {
   });
 }
 
-app.listen(port, () => {
-  logger.info(`Server running on http://localhost:${port}`)
+app.listen(port, HOST, () => {
+  logger.info(`Server running on http://${HOST}:${port}`)
   swaggerDocs(app, port);
 })

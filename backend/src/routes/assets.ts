@@ -6,6 +6,7 @@ import { check, validationResult } from 'express-validator'
 import verifyToken from '../middleware/auth';
 import jwt from "jsonwebtoken";
 import User from '../models/user.schema';
+import { getCodeAndIncrement } from '../utils/asset-counter';
 
 const router = express.Router();
 
@@ -111,6 +112,8 @@ router.post('/', [
           return res.status(400).json({ message: "Asset code already exists" });
         }
 
+        data['code'] = await getCodeAndIncrement(data['category'], data['type']);
+
         const newAsset = new Hardware(data);
         await newAsset.save();
 
@@ -188,8 +191,6 @@ router.put('/deploy/:code', [
 
       const code: string = req.params.code;
       const data: any = req.body;
-      console.log(data.code)
-      console.log(code)
 
       if (data.code !== code) {
         return res.status(400).json({ message: 'Asset code mismatch' });
@@ -534,6 +535,8 @@ router.put('/:code', [
       if (currentUser) {
         data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
       }
+
+      delete data['code'];
 
       let updatedAsset;
       if (data.type === 'Hardware') {
@@ -907,6 +910,8 @@ router.put('/:property/:value', [
       if (!existingAssets || existingAssets.length === 0) {
         return res.status(404).json({ message: `No assets found with { ${property} : ${value} }` });
       }
+
+      if (updateData['code']) delete updateData['code'];
 
       await Hardware.updateMany({ [property]: value }, updateData);
       res.status(200).json({ message: 'Assets updated successfully' });
