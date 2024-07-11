@@ -147,6 +147,19 @@ export const fetchAllAssetsByStatusAndCategory = async (type: string, status: st
   return response.json();
 }
 
+export const fetchAssetsByFilter = async (filter: {[key: string]: string}) => {
+  const queryString = new URLSearchParams(filter).toString();
+  const response = await fetch(`${API_BASE_URL}/api/assets?${queryString}`, {
+    credentials: 'include',
+  });
+
+  if(!response.ok) {
+    throw new Error("Error fetching assets");
+  }
+
+  return response.json();
+}
+
 export const fetchAssetByCode = async (code: string) => {
   const response = await fetch(`${API_BASE_URL}/api/assets/${code}`, {
     credentials: 'include',

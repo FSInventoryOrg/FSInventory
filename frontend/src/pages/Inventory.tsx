@@ -13,22 +13,27 @@ import { PROPERTIES } from '@/lib/data';
 const Inventory = () => {
   const [selectedStatus, setSelectedStatus] = React.useState<string>('');
   const [selectedCategory, setSelectedCategory] = React.useState<string>('');
+  const [selectedSystemSpecs, setSelectedSystemSpecs] = React.useState<Record<string, string>>({ processor: '', memory: '', storage: '' });
   const [isFiltersVisible, setIsFiltersVisible] = React.useState<boolean>(true);
 
   const handleFilterChange = (status: string) => {
-    if (status === 'all' ) {
-      setSelectedStatus('');
-    } else {
-      setSelectedStatus(status);
-    }
+    setSelectedStatus(status === 'all' ? '' : status);
   };
 
   const handleCategoryChange = (category: string) => {
-    if (category === 'all' ) {
-      setSelectedCategory('');
-    } else {
-      setSelectedCategory(category);
-    }
+    setSelectedCategory(category === 'all' ? '' : category);
+  };
+
+  const handleProcessorChange = (processor: string) => {
+    setSelectedSystemSpecs((prev) => ({ ...prev, processor: processor === 'all' ? '' : processor }));
+  };
+
+  const handleMemoryChange = (memory: string) => {
+    setSelectedSystemSpecs((prev) => ({ ...prev, memory: memory === 'all' ? '' : memory }));
+  };
+
+  const handleStorageChange = (storage: string) => {
+    setSelectedSystemSpecs((prev) => ({ ...prev, storage: storage === 'all' ? '' : storage }));
   };
 
   const handleToggleFilters = () => {
@@ -36,8 +41,15 @@ const Inventory = () => {
   }
 
   const { data } = useQuery({ 
-    queryKey: ['fetchAllAssetsByStatusAndCategory', 'Hardware', selectedStatus, selectedCategory], 
-    queryFn: () => imsService.fetchAllAssetsByStatusAndCategory('Hardware', selectedStatus, selectedCategory) 
+    queryKey: ['fetchAllAssetsByStatusAndCategory', 'Hardware', selectedStatus, selectedCategory, selectedSystemSpecs], 
+    queryFn: () => imsService.fetchAssetsByFilter({
+      type: 'Hardware',
+      status: selectedStatus,
+      category: selectedCategory,
+      processor: selectedSystemSpecs.processor,
+      memory: selectedSystemSpecs.memory,
+      storage: selectedSystemSpecs.storage,
+    }) 
   })
 
   const { data: defaultOptions } = useQuery<Defaults>({ 
@@ -75,10 +87,14 @@ const Inventory = () => {
           <SidebarFilters
             onFilterChange={handleFilterChange}
             onCategoryChange={handleCategoryChange}
+            onProcessorChange={handleProcessorChange}
+            onMemoryChange={handleMemoryChange}
+            onStorageChange={handleStorageChange}
             onToggleFilters={handleToggleFilters} 
             isFiltersVisible={isFiltersVisible} 
             selectedStatus={selectedStatus}
             selectedCategory={selectedCategory}
+            selectedSystemSpecs={selectedSystemSpecs}
             totalAssets={data?.length ?? 0}
           />
         </aside>
