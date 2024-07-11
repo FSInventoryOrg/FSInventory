@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Link } from "react-router-dom"
 import SignOutButton from "./auth-ui/SignOutButton";
 import { CircleUserRound, Settings, Wrench } from 'lucide-react';
 import AppearanceMode from "./AppearanceMode";
@@ -30,7 +31,7 @@ const UserAvatar = ({ height=40, width=40 }: { height?: number, width?: number }
         <DropdownMenuLabel >My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem className="gap-2 font-medium text-md" disabled><CircleUserRound/> Profile</DropdownMenuItem>
+          <Link to="/profile"><DropdownMenuItem className="gap-2 font-medium text-md"><CircleUserRound/> Profile</DropdownMenuItem></Link>
           <DropdownMenuItem className="gap-2 font-medium text-md" disabled><Settings /> Settings</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
