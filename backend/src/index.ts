@@ -21,7 +21,7 @@ import path from 'path';
 const DEFAULT_PORT = 3000;
 const port = Number(process.env.PORT) || DEFAULT_PORT;
 
-const HOST = `192.168.1.108`;
+const HOST = (process.env.HOST as string) || `localhost`;
 const FRONTENDLOC = `../../frontend/dist`;
 
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string);
