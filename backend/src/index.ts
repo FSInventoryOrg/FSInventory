@@ -3,12 +3,16 @@ import cors from 'cors'
 import "dotenv/config";
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
+
 import userRoutes from './routes/users';
 import authRoutes from './routes/auth';
 import assetRoutes from './routes/assets'
 import assetCounterRoutes from './routes/asset-counter'
 import optionRoutes from './routes/options'
 import employeeRoutes from './routes/employees'
+import uploadRoutes from './routes/upload'
+import downloadRoutes from './routes/download'
+
 import logger from './utils/logger';
 import swaggerDocs from './utils/swagger';
 import { startChangeStream } from './utils/change-stream';
@@ -51,6 +55,8 @@ app.use("/api/assets", assetRoutes)
 app.use("/api/options", optionRoutes)
 app.use("/api/employees", employeeRoutes)
 app.use("/api/assetcounter", assetCounterRoutes)
+app.use("/api/upload", uploadRoutes)
+app.use("/api/download", downloadRoutes)
 
 // Catch-all route for unmatched URLs (place it here)
 if (process.env.NODE_ENV !== 'development') {
