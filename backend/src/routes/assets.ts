@@ -582,6 +582,20 @@ router.put('/:code', [
  *        schema:
  *          type: string
  *        description: Filter assets by category (e.g. Laptop, Mobile, Keyboard, Mouse, etc.)
+ *      - in: query
+ *        name: processor
+ *        schema:
+ *          type: string
+ *        description: Filter assets by processor (e.g. Intel, AMD, Apple M1, etc.)
+ *      - in: query
+ *        name: memory
+ *        schema:
+ *          type: string
+ *        description: Filter assets by memory capacity (e.g. 8GB, 16GB, 32GB, etc.)
+ *      - in: query
+ *        name: storage
+ *        schema:
+ *          type: string
  *    responses:
  *      200:
  *        description: A list of assets
@@ -594,20 +608,12 @@ router.put('/:code', [
  */
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const { type, status, category } = req.query;
-    let query: any = {}; 
-
-    if (type) {
-      query.type = type; 
-    }
-
-    if (status) {
-      query.status = status; 
-    }
-
-    if (category) {
-      query.category = category;
-    }
+    const { type, status, category, processor, memory, storage } = req.query;
+    const allowedFilter = { type, status, category, processor, memory, storage };
+    
+    let query = Object.fromEntries(
+      Object.entries(allowedFilter).filter(([_, v]) => v !== undefined && v !== null && v !== '')
+    );
 
     let assets;
 

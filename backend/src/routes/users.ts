@@ -122,4 +122,44 @@ router.get("/", verifyToken, async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/users:
+ *  put:
+ *    tags:
+ *      - User
+ *    summary:  Update user details
+ *    responses:
+ *      200:
+ *        description: User found
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/User'
+ *      404:
+ *        description: User not found
+ *      500:
+ *        description: Internal server error
+ *    security:
+ *      - bearerAuth: []
+ */
+router.put("/", verifyToken, async (req: Request, res: Response) => {
+  const token = req.cookies.auth_token;
+    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+    const userId = decodedToken.userId;
+    const updatedUser: UserType = req.body;
+
+    try {
+      const existingUser = await User.findOneAndUpdate(
+        { _id: userId }, updatedUser)
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      return res.status(200).json(existingUser);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Something went wrong" });
+    }
+  });
+
 export default router;
