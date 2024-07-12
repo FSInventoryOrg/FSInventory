@@ -33,35 +33,33 @@ const ProfilePicture = ({ src, userId, onSave }: ProfilePictureProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-col items-center">
-        <div className="relative h-64 w-64 bg-muted border-border border rounded-full justify-center items-center flex">
-          <Avatar className="w-64 h-64">
+    <div className="flex flex-col items-center">
+      <div className="relative w-32 h-32 md:w-64 md:h-64 bg-muted border-border border rounded-full justify-center items-center flex">
+        <Avatar className="w-32 h-32 md:w-64 md:h-64">
           <AvatarImage src={src} />
-            <AvatarFallback>
-              <UserIcon
-                size={220}
-                className=" w-64 h-64 fill-current text-secondary"
-              />
-            </AvatarFallback>
-          </Avatar>
-          <input
-            type="file"
-            style={{ display: "none" }}
+          <AvatarFallback>
+            <UserIcon
+              size={220}
+              className=" w-64 h-64 fill-current text-secondary"
+            />
+          </AvatarFallback>
+        </Avatar>
+        <input
+          type="file"
+          style={{ display: "none" }}
           ref={fileInputRef}
-            accept="image/*"
-            onChange={handleUpload}
-          />
-          <Button
-            className="absolute rounded-full right-2 bottom-2 border-4 h-12 w-12 border-bg-accent items-center justify-center"
-            size="icon"
-            onClick={handleButtonClick}
-          >
-            <Camera size={24} />
-          </Button>
-        </div>
+          accept="image/*"
+          onChange={handleUpload}
+        />
+        <Button
+          className="absolute rounded-full right-0 bottom-0 md:right-2 md:bottom-2 border-4 h-10 w-10 md:h-12 md:w-12 border-bg-accent items-center justify-center"
+          size="icon"
+          onClick={handleButtonClick}
+        >
+          <Camera size={24} />
+        </Button>
       </div>
-    </form>
+    </div>
   );
 };
 
