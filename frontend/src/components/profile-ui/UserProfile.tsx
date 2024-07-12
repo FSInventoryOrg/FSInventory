@@ -130,10 +130,13 @@ const UserProfile = ({ userData }: UserProfileProps) => {
         id="side"
         className="flex flex-col items-center md:items-start  bg-accent rounded-md gap-4 py-4 md:px-4"
       >
-        <FullScaleIcon
-          size={isSM && !isMD ? 80 : 40}
-          className="fill-current text-primary"
-        />
+        {!isMD && (
+          <FullScaleIcon
+            size={isSM && !isMD ? 80 : 40}
+            className="fill-current text-primary"
+          />
+        )}
+
         <ProfilePicture
           src={avatar ? `${API_URL}${avatar}` : undefined}
           userId={userData._id}
