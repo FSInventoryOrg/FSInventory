@@ -30,8 +30,10 @@ interface UserProfileProps {
 }
 
 const UserProfile = ({ userData }: UserProfileProps) => {
+  const API_URL = import.meta.env.VITE_API_BASE_URL;
   const queryClient = useQueryClient();
   const { showToast } = useAppContext();
+  const [avatar, setAvatar] = useState(userData.avatar);
 
   const getUserData = () => ({
     ...userData,
@@ -65,6 +67,25 @@ const UserProfile = ({ userData }: UserProfileProps) => {
       showToast({ message: error.message, type: "ERROR" });
     },
   });
+
+  const { mutate: updatePicture, isPending: isUpdatePicturePending } =
+    useMutation({
+      mutationFn: imsService.uploadUserPicture,
+      onSuccess: async (attachment) => {
+        await imsService.updateUserData({
+          ...userData,
+          avatar: attachment.downloadLink,
+        });
+        setAvatar(avatar);
+        showToast({
+          message: "Profile picture updated succesfully!",
+          type: "SUCCESS",
+        });
+      },
+      onError: (error: Error) => {
+        showToast({ message: error.message, type: "ERROR" });
+      },
+    });
 
   const onSubmit = (data: z.infer<typeof UserSchema>) => {
     mutate(data);
@@ -109,23 +130,18 @@ const UserProfile = ({ userData }: UserProfileProps) => {
         id="side"
         className="flex flex-col items-center md:items-start  bg-accent rounded-md gap-4 py-4 md:px-4"
       >
-        {isSM ? (
-          <>
-            {!isMD && (
-              <FullScaleIcon size={80} className="fill-current text-primary" />
-            )}
-            <ProfilePicture src={userData.avatar} userId={userData._id} />
-            <ProfileCardDetails userData={userData} />
-          </>
-        ) : (
-          <>
-            {!isMD && (
-              <FullScaleIcon size={40} className="fill-current text-primary" />
-            )}
-            <ProfilePicture src={userData.avatar} userId={userData._id} />
-            <ProfileCardDetails userData={userData} />
-          </>
-        )}
+        <FullScaleIcon
+          size={isSM && !isMD ? 80 : 40}
+          className="fill-current text-primary"
+        />
+        <ProfilePicture
+          src={avatar ? `${API_URL}${avatar}` : undefined}
+          userId={userData._id}
+          onSave={(data: any) => {
+            updatePicture(data);
+          }}
+        />
+        <ProfileCardDetails userData={userData} />
       </div>
       <div className="flex flex-col w-full p-4">
         <Form {...form}>

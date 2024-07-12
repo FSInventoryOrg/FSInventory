@@ -496,3 +496,22 @@ export const updateUserData = async (user: UserFormData) => {
     return true;
         
 }
+
+export const uploadUserPicture = async (form: any) => {
+  const response = await fetch(`${API_BASE_URL}/api/upload/user`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(form)
+  });
+
+  const responseBody = await response.json();
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+
+  return responseBody;
+
+}
