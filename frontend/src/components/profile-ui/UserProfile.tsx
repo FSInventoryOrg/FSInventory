@@ -24,13 +24,13 @@ import { UserSchema } from "@/schemas/UserSchema";
 import AccountManagement from "./AccountManagement";
 import ProfileCardDetails from "./ProfileCardDetails";
 import ProfilePicture from "./ProfilePicture";
+import { prependHostIfMissing } from "@/lib/utils";
 
 interface UserProfileProps {
   userData: UserType;
 }
 
 const UserProfile = ({ userData }: UserProfileProps) => {
-  const API_URL = import.meta.env.VITE_API_BASE_URL;
   const queryClient = useQueryClient();
   const { showToast } = useAppContext();
   const [avatar, setAvatar] = useState(userData.avatar);
@@ -76,7 +76,7 @@ const UserProfile = ({ userData }: UserProfileProps) => {
           ...userData,
           avatar: attachment.downloadLink,
         });
-        setAvatar(avatar);
+        setAvatar(attachment.downloadLink);
         showToast({
           message: "Profile picture updated succesfully!",
           type: "SUCCESS",
@@ -138,7 +138,7 @@ const UserProfile = ({ userData }: UserProfileProps) => {
         )}
 
         <ProfilePicture
-          src={avatar ? `${API_URL}${avatar}` : undefined}
+          src={prependHostIfMissing(avatar)}
           userId={userData._id}
           onSave={(data: any) => {
             updatePicture(data);
