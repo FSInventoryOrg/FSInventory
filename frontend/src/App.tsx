@@ -13,6 +13,7 @@ import Loading from "./pages/Loading";
 import Tracker from "./pages/Tracker";
 import InventoryEdit from "./pages/InventorySettings";
 import Profile from "./pages/Profile";
+import Settings from "./pages/SettingsPage";
 
 const App = () => {
   const { isLoggedIn, isLoading } = useAppContext();
@@ -33,9 +34,10 @@ const App = () => {
                   <Route path="/tracker" element={<Layout><Tracker /></Layout>} />
                   <Route path="/tracker/:employeeCode" element={<Layout><Tracker /></Layout>} />
                   <Route path="/profile" element={<Layout><Profile/></Layout>}/>
-                    {/* <Route path="/metrics" element={<Layout><Metrics /></Layout>} />
+                  <Route path="/settings/*" element={<Layout><Settings /></Layout>}/>
+                  {/* <Route path="/metrics" element={<Layout><Metrics /></Layout>} />
                   <Route path="/requests" element={<Layout>Requests</Layout>} /> */}
-                  </>
+                </>
               )}
               <Route path="*" element={<Navigate to="/" />} />
             </>
