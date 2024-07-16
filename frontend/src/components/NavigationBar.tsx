@@ -10,8 +10,12 @@ import { Button } from "./ui/button"
 import { BarChartIcon, ClipboardListIcon, FlagIcon, GaugeCircleIcon, TargetIcon } from "lucide-react"
 import { Bell, Gear } from "@phosphor-icons/react"
 import { FullScaleIcon } from "./icons/FullScaleIcon"
+import useUserData from "@/hooks/useUserData"
 
 const NavigationBar = () => {
+
+  const { data: userData } = useUserData()
+  
   return (
     <section className="flex w-full justify-between py-6 px-6 z-0">
       <div className="flex items-center justify-center">
@@ -124,7 +128,7 @@ const NavigationBar = () => {
           </NavigationMenuList>
           <NavigationMenuList className="ml-4">
             <NavigationMenuItem>
-              <UserAvatar />
+              <UserAvatar image={userData?.avatar}/>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>        

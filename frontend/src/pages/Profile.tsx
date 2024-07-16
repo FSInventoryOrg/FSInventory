@@ -1,15 +1,9 @@
-import * as imsService from "@/ims-service";
-import { useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/Spinner";
 import UserProfile from "@/components/profile-ui/UserProfile";
-import { UserType } from "@/types/user";
+import useUserData from "@/hooks/useUserData";
 
 const Profile = () => {
-  const { data: userData } = useQuery<UserType>({
-    queryKey: ["fetchUserData"],
-    queryFn: () => imsService.fetchUserData(),
-  });
-
+  const { data: userData } = useUserData();
   if (!userData) {
     return (
       <div
