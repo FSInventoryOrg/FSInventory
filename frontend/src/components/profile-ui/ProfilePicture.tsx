@@ -27,13 +27,17 @@ const ProfilePicture = ({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const validateFile = (file?: File) => {
+    
     const maxFileSize = 5 * 1024 * 1024; // 5MB
     if (!file)
       return {
         isValid: false,
         type: ERROR_TYPES.NO_FILE,
         message: "No file selected",
-      };
+      }
+    if (!file.type.startsWith('image/')) {
+      return { isValid: false, type: ERROR_TYPES.INVALID_TYPE, message: file.type + " is not a valid image type"};
+    }
     if (file.size > maxFileSize) {
       return {
         isValid: false,
@@ -52,7 +56,7 @@ const ProfilePicture = ({
   const handleUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
-    const { isValid, type, message } = validateFile(file);
+    const { isValid, message } = validateFile(file);
 
     if (file && isValid) {
       const reader = new FileReader();
@@ -67,10 +71,8 @@ const ProfilePicture = ({
       };
       reader.readAsDataURL(file);
     } else {
-      if (type === ERROR_TYPES.FILE_TOO_LARGE) {
         resetFile();
-        onError(message);
-      }
+        message && onError(message);
     }
   };
 
