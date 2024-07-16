@@ -90,7 +90,7 @@ const UserProfile = ({ userData }: UserProfileProps) => {
   };
 
   useEffect(() => {
-    reset(getUserData());
+    reset(getUserData(), { keepDirtyValues: true, keepErrors: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData]);
 
