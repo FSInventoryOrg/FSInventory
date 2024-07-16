@@ -134,6 +134,7 @@ const UserProfile = ({ userData }: UserProfileProps) => {
         user={userData}
         avatar={avatar}
         onSave={handleUploadPicture}
+        onError={(message) => showToast({ message, type: "ERROR" })}
       />
       <div className="flex flex-col w-full p-4">
         <Form {...form}>

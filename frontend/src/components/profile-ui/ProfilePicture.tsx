@@ -9,13 +9,52 @@ interface ProfilePictureProps {
   src: string | undefined;
   userId: string;
   onSave: (data: UploadImage) => void;
+  onError: (message: string) => void;
 }
 
-const ProfilePicture = ({ src, userId, onSave }: ProfilePictureProps) => {
+const ERROR_TYPES = {
+  NO_FILE: "NO_FILE",
+  INVALID_TYPE: "INVALID_TYPE",
+  FILE_TOO_LARGE: "FILE_TOO_LARGE",
+};
+
+const ProfilePicture = ({
+  src,
+  userId,
+  onSave,
+  onError,
+}: ProfilePictureProps) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const validateFile = (file?: File) => {
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
+    if (!file)
+      return {
+        isValid: false,
+        type: ERROR_TYPES.NO_FILE,
+        message: "No file selected",
+      };
+    if (file.size > maxFileSize) {
+      return {
+        isValid: false,
+        type: ERROR_TYPES.FILE_TOO_LARGE,
+        message: `File size exceeds 5MB`,
+      };
+    }
+    return { isValid: true };
+  };
+
+  const resetFile = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
   const handleUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
+
+    const { isValid, type, message } = validateFile(file);
+
+    if (file && isValid) {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result;
@@ -27,6 +66,11 @@ const ProfilePicture = ({ src, userId, onSave }: ProfilePictureProps) => {
         onSave(payload);
       };
       reader.readAsDataURL(file);
+    } else {
+      if (type === ERROR_TYPES.FILE_TOO_LARGE) {
+        resetFile();
+        onError(message);
+      }
     }
   };
 

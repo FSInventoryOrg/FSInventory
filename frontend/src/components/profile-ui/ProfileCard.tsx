@@ -10,6 +10,7 @@ interface ProfileCardProps {
   user: UserType;
   avatar: string;
   onSave: (data: UploadImage) => void;
+  onError: (message: string) => void;
 }
 
 const ProfileCard = ({
@@ -18,6 +19,7 @@ const ProfileCard = ({
   avatar,
   user,
   onSave,
+  onError,
 }: ProfileCardProps) => {
   return (
     <div
@@ -35,6 +37,7 @@ const ProfileCard = ({
         src={prependHostIfMissing(avatar)}
         userId={user._id}
         onSave={onSave}
+        onError={onError}
       />
       <ProfileCardDetails userData={user} />
     </div>
