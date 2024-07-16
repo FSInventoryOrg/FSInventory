@@ -22,7 +22,7 @@ const ProfileCard = ({
   return (
     <div
       id="side"
-      className="flex flex-col items-center bg-accent rounded-md gap-4 py-4 md:px-4"
+      className="flex flex-col md:max-w-80 items-center bg-accent rounded-md gap-4 py-4 md:px-4"
     >
       {!isMD && (
         <FullScaleIcon
