@@ -17,13 +17,14 @@ import SignOutButton from "./auth-ui/SignOutButton";
 import { CircleUserRound, Settings, Wrench } from 'lucide-react';
 import AppearanceMode from "./AppearanceMode";
 import { UserIcon } from "./icons/UserIcon";
+import { prependHostIfMissing } from "@/lib/utils";
 
-const UserAvatar = ({ height=40, width=40 }: { height?: number, width?: number }) => {
+const UserAvatar = ({ height=40, width=40, image }: { height?: number, width?: number, image?: string }) => {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger className="w-full flex rounded-full font-medium focus:outline outline-primary">
         <Avatar className="bg-secondary h-10 w-10 hover:opacity-80" style={{ height: height, width: width }} >
-          <AvatarImage alt="@user" />
+          <AvatarImage src={prependHostIfMissing(image)} alt="@user" />
           <AvatarFallback className="bg-muted"><UserIcon size={100} className="fill-current text-secondary" /></AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
