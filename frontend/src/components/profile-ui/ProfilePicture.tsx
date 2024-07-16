@@ -3,11 +3,12 @@ import { Button } from "../ui/button";
 import { Camera } from "lucide-react";
 import { UserIcon } from "../icons/UserIcon";
 import { ChangeEvent, useRef } from "react";
+import { UploadImage } from "@/types/user";
 
 interface ProfilePictureProps {
   src: string | undefined;
   userId: string;
-  onSave: (data: object) => void;
+  onSave: (data: UploadImage) => void;
 }
 
 const ProfilePicture = ({ src, userId, onSave }: ProfilePictureProps) => {
@@ -18,7 +19,11 @@ const ProfilePicture = ({ src, userId, onSave }: ProfilePictureProps) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result;
-        const payload = { src: base64String, filename: file.name, userId };
+        const payload = {
+          src: base64String as string,
+          filename: file.name,
+          userId,
+        };
         onSave(payload);
       };
       reader.readAsDataURL(file);

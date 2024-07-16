@@ -4,7 +4,8 @@ import { AssetFormData as RetrieveAssetFormData } from "./schemas/RetrieveAssetS
 import { EmployeeFormData } from "./schemas/AddEmployeeSchema";
 import { AssetsHistory } from "./types/employee";
 import { Defaults } from "./types/options";
-import { UserFormData } from "./schemas/UserSchema";
+import { UserData } from "./schemas/UserSchema";
+import { UploadImage } from "./types/user";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -479,7 +480,7 @@ export const fetchUserData = async ()=> {
   return response.json();
 }
 
-export const updateUserData = async (user: UserFormData) => {
+export const updateUserData = async (user: UserData) => {
   const response = await fetch(`${API_BASE_URL}/api/users/`, {
       method: "PUT",
       credentials: "include",
@@ -497,7 +498,7 @@ export const updateUserData = async (user: UserFormData) => {
         
 }
 
-export const uploadUserPicture = async (form: any) => {
+export const uploadUserPicture = async (form: UploadImage) => {
   const response = await fetch(`${API_BASE_URL}/api/upload/user`, {
     method: "POST",
     credentials: "include",

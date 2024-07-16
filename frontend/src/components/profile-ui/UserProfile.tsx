@@ -19,12 +19,10 @@ import { InfoIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { FullScaleIcon } from "../icons/FullScaleIcon";
-import { UserType } from "@/types/user";
+import { UploadImage, UserType } from "@/types/user";
 import { UserSchema } from "@/schemas/UserSchema";
 import AccountManagement from "./AccountManagement";
-import ProfileCardDetails from "./ProfileCardDetails";
-import ProfilePicture from "./ProfilePicture";
-import { prependHostIfMissing } from "@/lib/utils";
+import ProfileCard from "./ProfileCard";
 
 interface UserProfileProps {
   userData: UserType;
@@ -68,24 +66,24 @@ const UserProfile = ({ userData }: UserProfileProps) => {
     },
   });
 
-  const { mutate: updatePicture, isPending: isUpdatePicturePending } =
-    useMutation({
-      mutationFn: imsService.uploadUserPicture,
-      onSuccess: async (attachment) => {
-        await imsService.updateUserData({
-          ...userData,
-          avatar: attachment.downloadLink,
-        });
-        setAvatar(attachment.downloadLink);
-        showToast({
-          message: "Profile picture updated succesfully!",
-          type: "SUCCESS",
-        });
-      },
-      onError: (error: Error) => {
-        showToast({ message: error.message, type: "ERROR" });
-      },
-    });
+  const { mutate: updatePicture } = useMutation({
+    mutationFn: imsService.uploadUserPicture,
+    onSuccess: async (attachment) => {
+      await imsService.updateUserData({
+        ...userData,
+        avatar: attachment.downloadLink,
+      });
+      queryClient.invalidateQueries({ queryKey: ["fetchUserData"] });
+      setAvatar(attachment.downloadLink);
+      showToast({
+        message: "Profile picture updated succesfully!",
+        type: "SUCCESS",
+      });
+    },
+    onError: (error: Error) => {
+      showToast({ message: error.message, type: "ERROR" });
+    },
+  });
 
   const onSubmit = (data: z.infer<typeof UserSchema>) => {
     mutate(data);
@@ -124,28 +122,19 @@ const UserProfile = ({ userData }: UserProfileProps) => {
     };
   }, []);
 
+  const handleUploadPicture = (data: UploadImage) => {
+    updatePicture(data);
+  };
+
   return (
     <div className="flex flex-col md:flex-row w-full">
-      <div
-        id="side"
-        className="flex flex-col items-center md:items-start  bg-accent rounded-md gap-4 py-4 md:px-4"
-      >
-        {!isMD && (
-          <FullScaleIcon
-            size={isSM && !isMD ? 80 : 40}
-            className="fill-current text-primary"
-          />
-        )}
-
-        <ProfilePicture
-          src={prependHostIfMissing(avatar)}
-          userId={userData._id}
-          onSave={(data: any) => {
-            updatePicture(data);
-          }}
-        />
-        <ProfileCardDetails userData={userData} />
-      </div>
+      <ProfileCard
+        isSM={isSM}
+        isMD={isMD}
+        user={userData}
+        avatar={avatar}
+        onSave={handleUploadPicture}
+      />
       <div className="flex flex-col w-full p-4">
         <Form {...form}>
           <form

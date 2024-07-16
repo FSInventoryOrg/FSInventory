@@ -9,3 +9,9 @@ export interface UserType {
   role: "USER" | "ADMIN";
   avatar: string
 }
+
+export interface UploadImage {
+  src: string;
+  filename: string;
+  userId: string;
+}
