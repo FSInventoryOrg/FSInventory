@@ -9,6 +9,7 @@ export interface UserType {
   lastName: string;
   joinDate: Date;
   role: "USER" | "ADMIN";
+  avatar: string;
 }
 
 /**
@@ -61,6 +62,7 @@ const userSchema: Schema<UserType> = new mongoose.Schema<UserType>({
   lastName: { type: String, required: true },
   joinDate: { type: Date, required: true },
   role: { type: String, enum: ["USER", "ADMIN"], required: true },
+  avatar: {type: String, required: false }
 });
 
 /* HASH PASSWORD */

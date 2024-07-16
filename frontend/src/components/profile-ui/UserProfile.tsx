@@ -19,11 +19,10 @@ import { InfoIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { FullScaleIcon } from "../icons/FullScaleIcon";
-import { UserType } from "@/types/user";
+import { UploadImage, UserType } from "@/types/user";
 import { UserSchema } from "@/schemas/UserSchema";
 import AccountManagement from "./AccountManagement";
-import ProfileCardDetails from "./ProfileCardDetails";
-import { UserIcon } from "../icons/UserIcon";
+import ProfileCard from "./ProfileCard";
 
 interface UserProfileProps {
   userData: UserType;
@@ -32,6 +31,7 @@ interface UserProfileProps {
 const UserProfile = ({ userData }: UserProfileProps) => {
   const queryClient = useQueryClient();
   const { showToast } = useAppContext();
+  const [avatar, setAvatar] = useState(userData.avatar);
 
   const getUserData = () => ({
     ...userData,
@@ -66,12 +66,31 @@ const UserProfile = ({ userData }: UserProfileProps) => {
     },
   });
 
+  const { mutate: updatePicture } = useMutation({
+    mutationFn: imsService.uploadUserPicture,
+    onSuccess: async (attachment) => {
+      await imsService.updateUserData({
+        ...userData,
+        avatar: attachment.downloadLink,
+      });
+      queryClient.invalidateQueries({ queryKey: ["fetchUserData"] });
+      setAvatar(attachment.downloadLink);
+      showToast({
+        message: "Profile picture updated succesfully!",
+        type: "SUCCESS",
+      });
+    },
+    onError: (error: Error) => {
+      showToast({ message: error.message, type: "ERROR" });
+    },
+  });
+
   const onSubmit = (data: z.infer<typeof UserSchema>) => {
     mutate(data);
   };
 
   useEffect(() => {
-    reset(getUserData());
+    reset(getUserData(), { keepDirtyValues: true, keepErrors: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData]);
 
@@ -103,34 +122,20 @@ const UserProfile = ({ userData }: UserProfileProps) => {
     };
   }, []);
 
+  const handleUploadPicture = (data: UploadImage) => {
+    updatePicture(data);
+  };
+
   return (
     <div className="flex flex-col md:flex-row w-full">
-      <div
-        id="side"
-        className="flex flex-col items-center md:items-start  bg-accent rounded-md gap-4 py-4 md:px-4"
-      >
-        {isSM ? (
-          <>
-            {!isMD && (
-              <FullScaleIcon size={80} className="fill-current text-primary" />
-            )}
-            <div className="h-56 w-56 bg-muted border-border border rounded-full justify-center items-center flex">
-              <UserIcon size={220} className="fill-current text-secondary" />
-            </div>
-            <ProfileCardDetails userData={userData} />
-          </>
-        ) : (
-          <>
-            {!isMD && (
-              <FullScaleIcon size={40} className="fill-current text-primary" />
-            )}
-            <div className="h-24 w-24 bg-muted border-border border rounded-full justify-center items-center flex">
-              <UserIcon size={110} className="fill-current text-secondary" />
-            </div>
-            <ProfileCardDetails userData={userData} />
-          </>
-        )}
-      </div>
+      <ProfileCard
+        isSM={isSM}
+        isMD={isMD}
+        user={userData}
+        avatar={avatar}
+        onSave={handleUploadPicture}
+        onError={(message) => showToast({ message, type: "ERROR" })}
+      />
       <div className="flex flex-col w-full p-4">
         <Form {...form}>
           <form

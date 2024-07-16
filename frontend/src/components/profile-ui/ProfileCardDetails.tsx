@@ -5,10 +5,11 @@ import { UserType } from "@/types/user";
 interface UserProfileProps {
   userData: UserType;
 }
+
 const ProfileCardDetails = ({ userData }: UserProfileProps) => {
   return (
     <>
-      <div className="w-full flex flex-col items-center ">
+      <div className="w-full flex flex-col text-center ">
         <h1 className="text-lg font-bold">{`${userData.firstName} ${userData.lastName}`}</h1>
         {userData.role === "ADMIN" && (
           <h3 className=" text-lg font-semibold leading-6 text-muted-foreground">
