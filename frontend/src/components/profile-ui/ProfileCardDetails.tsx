@@ -17,7 +17,7 @@ const ProfileCardDetails = ({ userData }: UserProfileProps) => {
           </h3>
         )}
       </div>
-      <div className="flex flex-col text-sm mx-auto text-gray-200">
+      <div className="flex flex-col text-sm mx-auto text-secondary-foreground">
         <div className="flex flex-row">
           {userData.joinDate && (
             <span className="flex py-2 font-semibold">
