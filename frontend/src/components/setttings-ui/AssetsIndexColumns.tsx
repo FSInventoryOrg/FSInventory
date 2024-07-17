@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AssetCounter } from "@/types/asset";
-import AddAssetIndex from "./AddAssetIndex";
+import EditAssetIndex from "./EditAssetIndex";
 
 export const AssetIndexColumns: ColumnDef<AssetCounter>[] = [
   {
@@ -44,15 +44,13 @@ export const AssetIndexColumns: ColumnDef<AssetCounter>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("category")}</div>
+      <div className="capitalize">{row.getValue("category")}</div>
     ),
   },
   {
     accessorKey: "prefixCode",
     header: "Prefix Code",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("prefixCode")}</div>
-    ),
+    cell: ({ row }) => <div>{row.getValue("prefixCode")}</div>,
   },
   {
     accessorKey: "threshold",
@@ -75,7 +73,7 @@ export const AssetIndexColumns: ColumnDef<AssetCounter>[] = [
           {/* <Button variant="ghost" size="icon" className="text-primary">
             <Edit />
           </Button> */}
-          <AddAssetIndex />
+          <EditAssetIndex data={row.original} />
           <Button variant="ghost" size="icon" className="text-destructive">
             <Trash />
           </Button>

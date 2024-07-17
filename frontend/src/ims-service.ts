@@ -496,3 +496,16 @@ export const updateUserData = async (user: UserFormData) => {
     return true;
         
 }
+
+// Asset counters
+export const fetchAssetCounters = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/assetcounter`, {
+    credentials: 'include',
+  })
+
+  if(!response.ok) {
+    throw new Error("Error fetching user");
+  }
+
+  return response.json();
+}

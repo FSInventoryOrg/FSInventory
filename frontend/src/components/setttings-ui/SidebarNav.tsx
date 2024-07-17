@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "../ui/button";
@@ -22,7 +22,7 @@ const SidebarNav = ({ className, items, ...props }: SidebarNavProps) => {
       x-chunk="dashboard-04-chunk-0"
     >
       {items.map((item) => (
-        <Link
+        <NavLink
           key={item.href}
           to={item.href}
           className={cn(
@@ -35,7 +35,7 @@ const SidebarNav = ({ className, items, ...props }: SidebarNavProps) => {
           )}
         >
           {item.title}
-        </Link>
+        </NavLink>
       ))}
     </nav>
   );

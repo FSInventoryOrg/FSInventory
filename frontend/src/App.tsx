@@ -13,7 +13,7 @@ import Loading from "./pages/Loading";
 import Tracker from "./pages/Tracker";
 import InventoryEdit from "./pages/InventorySettings";
 import Profile from "./pages/Profile";
-import Settings from "./pages/SettingsPage";
+import Settings from "./pages/Settings";
 
 const App = () => {
   const { isLoggedIn, isLoading } = useAppContext();
