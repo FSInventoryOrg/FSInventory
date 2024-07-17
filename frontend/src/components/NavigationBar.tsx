@@ -112,8 +112,10 @@ const NavigationBar = () => {
         <NavigationMenu>
           <NavigationMenuList className="gap-1 hidden md:flex">
             <NavigationMenuItem className="justify-center flex">
-              <Button size="icon" className="rounded-xl" variant="secondary">
-                <Gear weight="fill" size={28}/>
+              <Button asChild size="icon" className="rounded-xl" variant="secondary">
+                <Link to="/settings">
+                  <Gear weight="fill" size={28}/>
+                </Link>
               </Button>
             </NavigationMenuItem>
             <NavigationMenuItem className="justify-center flex">
