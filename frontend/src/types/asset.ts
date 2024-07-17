@@ -45,7 +45,7 @@ export interface SoftwareType extends AssetType {
 }
 
 export type AssetCounter = {
-  id: string;
+  _id?: string;
   category: string;
   prefixCode: string;
   threshold: number;

@@ -1,7 +1,10 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { AssetCounterSchema } from "@/schemas/AssetCounterSchema";
+import {
+  AssetCounterFormData,
+  AssetCounterSchema,
+} from "@/schemas/AssetCounterSchema";
 import { AssetCounter } from "@/types/asset";
 import { useAppContext } from "@/hooks/useAppContext";
 import {
@@ -33,10 +36,22 @@ const EditAssetCounter = ({ assetCounter, onClose }: EditAssetCounterProps) => {
   });
   const { showToast } = useAppContext();
 
+  const onSubmit = (data: z.infer<typeof AssetCounterSchema>) => {
+    console.log(data);
+    const updatedAssetCounter: AssetCounterFormData & { _id: string } = {
+      ...data,
+      _id: assetCounter._id,
+    };
+    console.log(updatedAssetCounter);
+  };
+
   return (
     <>
       <Form {...form}>
-        <form className="flex flex-col w-full gap-4">
+        <form
+          className="flex flex-col w-full gap-4"
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
           <FormField
             control={form.control}
             name="category"
@@ -81,7 +96,13 @@ const EditAssetCounter = ({ assetCounter, onClose }: EditAssetCounterProps) => {
               <FormItem>
                 <FormLabel>Threshold</FormLabel>
                 <FormControl>
-                  <Input autoComplete="off" type="input" {...field} />
+                  <Input
+                    autoComplete="off"
+                    type="number"
+                    className="[&::-webkit-inner-spin-button]:appearance-none"
+                    {...field}
+                    onChange={(event) => field.onChange(+event.target.value)} // convert to int
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
