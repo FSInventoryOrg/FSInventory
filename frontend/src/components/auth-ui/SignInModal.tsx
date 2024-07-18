@@ -10,17 +10,24 @@ import {
 import { Button } from "@/components/ui/button"
 import SignInForm from './SignInForm'
 import ErrorAlert from '../ErrorAlert'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { XIcon } from "lucide-react"
 
 const SignInModal = () => {
+  const [open, setOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>();
 
+  useEffect(() => {
+    if (open) {
+      setErrorMessage(null);
+    }
+  }, [open]);
+  
   const handleErrorAlert = (errorMessage: string | null) => {
     setErrorMessage(errorMessage)
   }
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className='font-bold text-md' variant="secondary">Sign in</Button>
       </DialogTrigger>
