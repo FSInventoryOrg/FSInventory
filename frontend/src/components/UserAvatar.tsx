@@ -32,7 +32,11 @@ const UserAvatar = ({ height=40, width=40 }: { height?: number, width?: number }
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <Link to="/profile"><DropdownMenuItem className="gap-2 font-medium text-md"><CircleUserRound/> Profile</DropdownMenuItem></Link>
-          <DropdownMenuItem className="gap-2 font-medium text-md" disabled><Settings /> Settings</DropdownMenuItem>
+          <Link to="/settings">
+            <DropdownMenuItem className="gap-2 font-medium text-md">
+              <Settings /> Settings
+            </DropdownMenuItem>
+          </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <div className="font-medium text-md relative gap-2 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 w-full"><AppearanceMode /> Appearance</div>
