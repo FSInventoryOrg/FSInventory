@@ -30,6 +30,7 @@ import {
 import { AssetIndexColumns } from "./AssetsIndexColumns";
 import { AssetCounter } from "@/types/asset";
 import { InventoryPagination } from "../inventory-ui/InventoryPagination";
+import { Input } from "../ui/input";
 
 // const data: AssetCounter[] = [
 //   {
@@ -72,15 +73,17 @@ export default function AssetIndexTable({ data }) {
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
-        {/* <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+      <div className="flex items-center py-4 gap-2">
+        <Input
+          placeholder="Filter categories..."
+          value={
+            (table.getColumn("category")?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("category")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
-        /> */}
+        />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
