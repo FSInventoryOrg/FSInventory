@@ -5,6 +5,7 @@ import { ArrowUpDown, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AssetCounter } from "@/types/asset";
 import EditAssetIndex from "./EditAssetIndex";
+import DeleteAssetIndex from "./DeleteAssetIndex";
 
 export const AssetIndexColumns: ColumnDef<AssetCounter>[] = [
   {
@@ -74,9 +75,7 @@ export const AssetIndexColumns: ColumnDef<AssetCounter>[] = [
             <Edit />
           </Button> */}
           <EditAssetIndex data={row.original} />
-          <Button variant="ghost" size="icon" className="text-destructive">
-            <Trash />
-          </Button>
+          <DeleteAssetIndex />
         </>
       );
     },
