@@ -509,3 +509,39 @@ export const fetchAssetCounters = async () => {
 
   return response.json();
 }
+export const postAssetCounter = async (data) => {
+  const response = await fetch(`${API_BASE_URL}/api/assetcounter/`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.error);
+  }
+
+  return response.json();
+}
+export const updateAssetCounter = async (data) => {
+  if (!data._id) {
+    return postAssetCounter(data);
+  } 
+
+  const response = await fetch(`${API_BASE_URL}/api/assetcounter/${data.prefixCode}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const responseBody = await response.json();
+      throw new Error(responseBody.message ||'Failed to update asset counter');
+    }
+    return true;    
+}

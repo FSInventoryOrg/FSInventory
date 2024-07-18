@@ -50,5 +50,6 @@ export type AssetCounter = {
   prefixCode: string;
   threshold: number;
   counter: number;
+  type: "Hardware" | "Software";
 };
 

@@ -7,6 +7,7 @@ import {
 } from "@/schemas/AssetCounterSchema";
 import { AssetCounter } from "@/types/asset";
 import { useAppContext } from "@/hooks/useAppContext";
+import * as imsService from "@/ims-service";
 import {
   FormControl,
   FormField,
@@ -17,6 +18,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface EditAssetCounterProps {
   assetCounter: Partial<AssetCounter>;
@@ -34,7 +36,22 @@ const EditAssetCounter = ({ assetCounter, onClose }: EditAssetCounterProps) => {
     defaultValues: assetCounter,
     mode: "onBlur",
   });
+  const queryClient = useQueryClient();
   const { showToast } = useAppContext();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: imsService.updateAssetCounter,
+    onSuccess: async () => {
+      showToast({
+        message: "Asset counter updated successfully!",
+        type: "SUCCESS",
+      });
+      queryClient.invalidateQueries({ queryKey: ["fetchAssetCounters"] });
+      setTimeout(() => {
+        onClose(true);
+      }, 100);
+    },
+  });
 
   const onSubmit = (data: z.infer<typeof AssetCounterSchema>) => {
     console.log(data);
@@ -43,6 +60,8 @@ const EditAssetCounter = ({ assetCounter, onClose }: EditAssetCounterProps) => {
       _id: assetCounter._id,
     };
     console.log(updatedAssetCounter);
+
+    mutate(updatedAssetCounter);
   };
 
   return (

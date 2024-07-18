@@ -9,13 +9,17 @@ import {
 import { Edit } from "lucide-react";
 import EditAssetCounter from "./EditAssetCounter";
 import { AssetCounter } from "@/types/asset";
+import { useState } from "react";
 
 interface EditProps {
   data: AssetCounter;
 }
+
 const EditAssetIndex = ({ data }: EditProps) => {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon" className="text-primary">
           <Edit />
@@ -25,7 +29,7 @@ const EditAssetIndex = ({ data }: EditProps) => {
         <DialogHeader>
           <DialogTitle>Edit Asset Counter</DialogTitle>
         </DialogHeader>
-        <EditAssetCounter assetCounter={data} onClose={() => {}} />
+        <EditAssetCounter assetCounter={data} onClose={() => setOpen(false)} />
       </DialogContent>
     </Dialog>
   );

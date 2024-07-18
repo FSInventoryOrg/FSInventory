@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, PlusCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +31,8 @@ import { AssetIndexColumns } from "./AssetsIndexColumns";
 import { AssetCounter } from "@/types/asset";
 import { InventoryPagination } from "../inventory-ui/InventoryPagination";
 import { Input } from "../ui/input";
+import AddAsset from "../inventory-ui/AddAsset";
+import AddAssetCounter from "./AddAssetCounter";
 
 // const data: AssetCounter[] = [
 //   {
@@ -84,7 +86,8 @@ export default function AssetIndexTable({ data }) {
           }
           className="max-w-sm"
         />
-        <DropdownMenu>
+
+      {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
               Columns <ChevronDown className="ml-2 h-4 w-4" />
@@ -110,7 +113,10 @@ export default function AssetIndexTable({ data }) {
               })}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button>Add New</Button>
+        <Button>Add New</Button> */}
+      <div className="ml-auto flex items-center gap-2">
+        <AddAssetCounter />
+      </div>
       </div>
       <div className="rounded-md border">
         <Table>

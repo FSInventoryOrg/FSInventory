@@ -8,6 +8,7 @@ export const AssetCounterSchema = z.object({
       .int()
       .positive({ message: "Threshold must be a positive integer" }),
     counter: z.number().optional(),
+    type: z.enum(["Hardware", "Software"]),
   });
 
   export type AssetCounterFormData = z.infer<typeof AssetCounterSchema>;
