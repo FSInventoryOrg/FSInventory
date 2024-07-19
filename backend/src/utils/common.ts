@@ -90,14 +90,16 @@ export const setGitlabCreds = async(user: string, token: string) => {
         config = readFileSync(location).toString().split('\n');
 
         let mainSplit = `url = https://`;
-        let lastSplit = `@gitlab.com/`;
+        let lastSplit = `gitlab.com/`;
         let findIndex = config.findIndex((f: string) => { return f.includes(mainSplit)});
 
         if(findIndex > -1) {
             let splitIndex = config[findIndex].split(mainSplit);
             let splitLast = splitIndex[1].split(lastSplit);
 
-            config[findIndex] = `${splitIndex[0]}${mainSplit}${user}:${token}${lastSplit}${splitLast[1]}`
+            config[findIndex] = `${splitIndex[0]}${mainSplit}${user}:${token}@${lastSplit}${splitLast[1]}`
+
+            console.log(config[findIndex]);
         }
 
         let cloneURL = config[findIndex].split('url =')[1].trim();

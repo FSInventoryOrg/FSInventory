@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/tooltip"
 import { ScrollArea, ScrollBar } from "../ui/scroll-area"
 import { Input } from "@/components/ui/input"
-import { InventoryPagination } from "./InventoryPagination"
+import { DataTablePagination } from "@/components/DataTablePagination";
 import AddAsset from "./AddAsset"
 import { FilterIcon, SearchIcon, SlidersHorizontalIcon } from "lucide-react"
 import {
@@ -325,7 +325,7 @@ export function InventoryTable<TData, TValue>({
         </Table>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
-      <InventoryPagination table={table}/>
+      <DataTablePagination table={table}/>
     </div>
   )
 }

@@ -5,6 +5,7 @@ import { EmployeeFormData } from "./schemas/AddEmployeeSchema";
 import { AssetsHistory } from "./types/employee";
 import { Defaults } from "./types/options";
 import { UserData } from "./schemas/UserSchema";
+import { AssetCounterFormData } from "./schemas/AssetCounterSchema";
 import { UploadImage } from "./types/user";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -515,4 +516,53 @@ export const uploadUserPicture = async (form: UploadImage) => {
 
   return responseBody;
 
+}
+
+// Asset counters
+export const fetchAssetCounters = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/assetcounter`, {
+    credentials: 'include',
+  })
+
+  if(!response.ok) {
+    throw new Error("Error fetching user");
+  }
+
+  return response.json();
+}
+export const postAssetCounter = async (data) => {
+  const response = await fetch(`${API_BASE_URL}/api/assetcounter/`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.error);
+  }
+
+  return response.json();
+}
+export const updateAssetCounter = async ({ prefixCode, updatedAssetCounter }: { prefixCode: string, updatedAssetCounter: AssetCounterFormData }) => {
+  if (!updatedAssetCounter._id) {
+    return postAssetCounter(updatedAssetCounter);
+  } 
+
+  const response = await fetch(`${API_BASE_URL}/api/assetcounter/${prefixCode}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(updatedAssetCounter)
+    });
+
+    if (!response.ok) {
+      const responseBody = await response.json();
+      throw new Error(responseBody.message ||'Failed to update asset counter');
+    }
+    return true;    
 }
