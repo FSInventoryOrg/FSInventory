@@ -7,4 +7,11 @@ export interface UserType {
   lastName: string;
   joinDate: Date;
   role: "USER" | "ADMIN";
+  avatar: string
+}
+
+export interface UploadImage {
+  src: string;
+  filename: string;
+  userId: string;
 }

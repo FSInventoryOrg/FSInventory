@@ -12,6 +12,7 @@ import optionRoutes from './routes/options'
 import employeeRoutes from './routes/employees'
 import uploadRoutes from './routes/upload'
 import downloadRoutes from './routes/download'
+import configRoutes from './system/config'
 
 import logger from './utils/logger';
 import swaggerDocs from './utils/swagger';
@@ -40,8 +41,8 @@ startChangeStream();
 const app = express();
 
 app.use(cookieParser());
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
+app.use(express.json({limit: "200mb"}))
+app.use(express.urlencoded({limit: "200mb", extended: true}))
 app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true,
@@ -57,6 +58,7 @@ app.use("/api/employees", employeeRoutes)
 app.use("/api/assetcounter", assetCounterRoutes)
 app.use("/api/upload", uploadRoutes)
 app.use("/api/download", downloadRoutes)
+app.use("/config", configRoutes)
 
 // Catch-all route for unmatched URLs (place it here)
 if (process.env.NODE_ENV !== 'development') {

@@ -10,8 +10,12 @@ import { Button } from "./ui/button"
 import { BarChartIcon, ClipboardListIcon, FlagIcon, GaugeCircleIcon, TargetIcon } from "lucide-react"
 import { Bell, Gear } from "@phosphor-icons/react"
 import { FullScaleIcon } from "./icons/FullScaleIcon"
+import useUserData from "@/hooks/useUserData"
 
 const NavigationBar = () => {
+
+  const { data: userData } = useUserData()
+  
   return (
     <section className="flex w-full justify-between py-6 px-6 z-0">
       <div className="flex items-center justify-center">
@@ -89,19 +93,15 @@ const NavigationBar = () => {
               <TargetIcon className={location.pathname.startsWith('/tracker') ? "text-primary" : ""} />
               <span className="hidden lg:inline-block">Tracker</span>
             </Link>   
-            <Button disabled className={`${location.pathname.startsWith('/metrics') ? "bg-secondary" : "bg-none"} rounded-none xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border-t-2 border-b-2 xl:border-2 font-semibold text-md flex gap-2 items-center`} variant="outline">
+            <Link to="/metrics" className={`${location.pathname.startsWith('/metrics') ? "bg-secondary" : "bg-none"} rounded-none xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`} style={{ textDecoration: 'none' }}>
               <BarChartIcon className={location.pathname.startsWith('/metrics') ? "text-primary" : ""} />
               <span className="hidden lg:inline-block">Metrics</span>
-            </Button>
+            </Link> 
             <Button disabled className={`${location.pathname.startsWith('/requests') ? "bg-secondary" : "bg-none"} rounded-l-none rounded-r-xl xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border-t-2 border-b-2 border-r-2 xl:border-2 font-semibold text-md flex gap-2 items-center`} variant="outline">
               <FlagIcon className={location.pathname.startsWith('/requests') ? "text-primary" : ""} />
               <span className="hidden lg:inline-block">Requests</span>
             </Button>
-            {/* <Link to="/metrics" className={`${location.pathname.startsWith('/metrics') ? "bg-secondary" : "bg-none"} disabled-link rounded-none xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`} style={{ textDecoration: 'none' }}>
-              <BarChartIcon className={location.pathname.startsWith('/metrics') ? "text-primary" : ""} />
-              <span className="hidden lg:inline-block">Metrics</span>
-            </Link> 
-            <Link to="/requests" className={`${location.pathname.startsWith('/requests') ? "bg-secondary" : "bg-none"}  rounded-l-none rounded-r-xl xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 border-r    -2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`} style={{ textDecoration: 'none' }}>
+            {/* <Link to="/requests" className={`${location.pathname.startsWith('/requests') ? "bg-secondary" : "bg-none"}  rounded-l-none rounded-r-xl xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 border-r    -2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`} style={{ textDecoration: 'none' }}>
               <FlagIcon className={location.pathname.startsWith('/requests') ? "text-primary" : ""} />
               <span className="hidden lg:inline-block">Requests</span>
             </Link>   */}
@@ -126,7 +126,7 @@ const NavigationBar = () => {
           </NavigationMenuList>
           <NavigationMenuList className="ml-4">
             <NavigationMenuItem>
-              <UserAvatar />
+              <UserAvatar image={userData?.avatar}/>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>        

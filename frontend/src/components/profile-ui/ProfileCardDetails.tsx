@@ -5,10 +5,11 @@ import { UserType } from "@/types/user";
 interface UserProfileProps {
   userData: UserType;
 }
+
 const ProfileCardDetails = ({ userData }: UserProfileProps) => {
   return (
     <>
-      <div className="w-full flex flex-col items-center ">
+      <div className="w-full flex flex-col text-center ">
         <h1 className="text-lg font-bold">{`${userData.firstName} ${userData.lastName}`}</h1>
         {userData.role === "ADMIN" && (
           <h3 className=" text-lg font-semibold leading-6 text-muted-foreground">
@@ -16,7 +17,7 @@ const ProfileCardDetails = ({ userData }: UserProfileProps) => {
           </h3>
         )}
       </div>
-      <div className="flex flex-col text-sm mx-auto text-gray-200">
+      <div className="flex flex-col text-sm mx-auto text-secondary-foreground">
         <div className="flex flex-row">
           {userData.joinDate && (
             <span className="flex py-2 font-semibold">

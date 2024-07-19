@@ -44,7 +44,7 @@ router.post('/', [
                 data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
             }
 
-            data['counter'] = 0;
+            // data['counter'] = 0;
 
             const existingCounter = await AssetCounter.aggregate().match({
                 $expr: {
@@ -128,7 +128,7 @@ router.put('/:prefixCode', [
             if (!findCounter) return res.status(404).json({ message: "Asset Counter not found" });
 
             if(data['prefixCode']) data['prefixCode'] = data['prefixCode'].toUpperCase();
-            delete data['counter'];
+            // delete data['counter'];
             delete data._id;
 
             const currentUser = await User.findOne({ _id: decodedToken.userId });

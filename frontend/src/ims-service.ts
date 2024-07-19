@@ -4,8 +4,9 @@ import { AssetFormData as RetrieveAssetFormData } from "./schemas/RetrieveAssetS
 import { EmployeeFormData } from "./schemas/AddEmployeeSchema";
 import { AssetsHistory } from "./types/employee";
 import { Defaults } from "./types/options";
-import { UserFormData } from "./schemas/UserSchema";
+import { UserData } from "./schemas/UserSchema";
 import { AssetCounterFormData } from "./schemas/AssetCounterSchema";
+import { UploadImage } from "./types/user";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -480,7 +481,7 @@ export const fetchUserData = async ()=> {
   return response.json();
 }
 
-export const updateUserData = async (user: UserFormData) => {
+export const updateUserData = async (user: UserData) => {
   const response = await fetch(`${API_BASE_URL}/api/users/`, {
       method: "PUT",
       credentials: "include",
@@ -496,6 +497,25 @@ export const updateUserData = async (user: UserFormData) => {
     }
     return true;
         
+}
+
+export const uploadUserPicture = async (form: UploadImage) => {
+  const response = await fetch(`${API_BASE_URL}/api/upload/user`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(form)
+  });
+
+  const responseBody = await response.json();
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+
+  return responseBody;
+
 }
 
 // Asset counters
