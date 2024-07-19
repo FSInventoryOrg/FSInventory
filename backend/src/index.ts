@@ -12,6 +12,7 @@ import optionRoutes from './routes/options'
 import employeeRoutes from './routes/employees'
 import uploadRoutes from './routes/upload'
 import downloadRoutes from './routes/download'
+import configRoutes from './system/config'
 
 import logger from './utils/logger';
 import swaggerDocs from './utils/swagger';
@@ -57,6 +58,7 @@ app.use("/api/employees", employeeRoutes)
 app.use("/api/assetcounter", assetCounterRoutes)
 app.use("/api/upload", uploadRoutes)
 app.use("/api/download", downloadRoutes)
+app.use("/config", configRoutes)
 
 // Catch-all route for unmatched URLs (place it here)
 if (process.env.NODE_ENV !== 'development') {
