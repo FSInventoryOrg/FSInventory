@@ -1,13 +1,12 @@
 import { Checkbox } from "@radix-ui/react-checkbox";
 import { ColumnDef } from "@tanstack/react-table";
-
-import { ArrowUpDown, Trash } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AssetCounter } from "@/types/asset";
+import { AssetCounterType } from "@/types/asset";
 import EditAssetIndex from "./EditAssetIndex";
 import DeleteAssetIndex from "./DeleteAssetIndex";
 
-export const AssetIndexColumns: ColumnDef<AssetCounter>[] = [
+export const AssetIndexColumns: ColumnDef<AssetCounterType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -71,11 +70,8 @@ export const AssetIndexColumns: ColumnDef<AssetCounter>[] = [
     cell: ({ row }) => {
       return (
         <>
-          {/* <Button variant="ghost" size="icon" className="text-primary">
-            <Edit />
-          </Button> */}
           <EditAssetIndex data={row.original} />
-          <DeleteAssetIndex />
+          <DeleteAssetIndex data={row.original} />
         </>
       );
     },

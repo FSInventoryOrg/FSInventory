@@ -5,7 +5,7 @@ import {
   AssetCounterFormData,
   AssetCounterSchema,
 } from "@/schemas/AssetCounterSchema";
-import { AssetCounter } from "@/types/asset";
+import { AssetCounterType } from "@/types/asset";
 import { useAppContext } from "@/hooks/useAppContext";
 import * as imsService from "@/ims-service";
 import {
@@ -15,29 +15,37 @@ import {
   FormLabel,
   Form,
   FormMessage,
+  FormDescription,
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Spinner } from "../Spinner";
 
 interface EditAssetCounterProps {
-  assetCounter: Partial<AssetCounter>;
+  assetCounter: Partial<AssetCounterType>;
   onClose: (close: boolean) => void;
+  onError: (message: string) => void;
 }
 
-const defaultValues: Partial<AssetCounter> = {
-  prefixCode: "",
-  threshold: 0,
-};
-
-const EditAssetCounter = ({ assetCounter, onClose }: EditAssetCounterProps) => {
+const EditAssetCounter = ({
+  assetCounter,
+  onClose,
+  onError,
+}: EditAssetCounterProps) => {
   const form = useForm<z.infer<typeof AssetCounterSchema>>({
     resolver: zodResolver(AssetCounterSchema),
     defaultValues: assetCounter,
-    mode: "onBlur",
+    mode: "onChange",
   });
   const queryClient = useQueryClient();
   const { showToast } = useAppContext();
+
+  const {
+    formState: { errors },
+  } = form;
+
+  const isValid = !Object.keys(errors).length;
 
   const { mutate, isPending } = useMutation({
     mutationFn: imsService.updateAssetCounter,
@@ -51,17 +59,23 @@ const EditAssetCounter = ({ assetCounter, onClose }: EditAssetCounterProps) => {
         onClose(true);
       }, 100);
     },
+    onError: (error: Error) => {
+      onError(error.message);
+    },
   });
 
   const onSubmit = (data: z.infer<typeof AssetCounterSchema>) => {
-    console.log(data);
-    const updatedAssetCounter: AssetCounterFormData & { _id: string } = {
+    const updatedAssetCounter: AssetCounterFormData & {
+      _id: string | undefined;
+    } = {
       ...data,
       _id: assetCounter._id,
     };
-    console.log(updatedAssetCounter);
 
-    mutate(updatedAssetCounter);
+    mutate({
+      prefixCode: assetCounter.prefixCode as string,
+      updatedAssetCounter,
+    });
   };
 
   return (
@@ -77,6 +91,7 @@ const EditAssetCounter = ({ assetCounter, onClose }: EditAssetCounterProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Category</FormLabel>
+
                 <FormControl>
                   <Input
                     className="cursor-default"
@@ -87,6 +102,7 @@ const EditAssetCounter = ({ assetCounter, onClose }: EditAssetCounterProps) => {
                     {...field}
                   />
                 </FormControl>
+                <FormDescription>This field cannot be edited</FormDescription>
               </FormItem>
             )}
           />
@@ -117,18 +133,38 @@ const EditAssetCounter = ({ assetCounter, onClose }: EditAssetCounterProps) => {
                 <FormControl>
                   <Input
                     autoComplete="off"
-                    type="number"
+                    type="input"
                     className="[&::-webkit-inner-spin-button]:appearance-none"
                     {...field}
-                    onChange={(event) => field.onChange(+event.target.value)} // convert to int
+                    onChange={(event) => {
+                      field.onChange(event.target.value);
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit" disabled={false} className="gap-2 self-end">
-            {/* {isPending ? <Spinner size={18}/> : null } */}
+          <FormField
+            control={form.control}
+            name="counter"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Index Count</FormLabel>
+                <FormControl>
+                  <Input
+                    autoComplete="off"
+                    type="input"
+                    className="[&::-webkit-inner-spin-button]:appearance-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" disabled={!isValid} className="gap-2 self-end">
+            {isPending ? <Spinner size={18} /> : null}
             Save changes
           </Button>
         </form>

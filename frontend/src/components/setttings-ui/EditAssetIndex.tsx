@@ -8,15 +8,25 @@ import {
 } from "@/components/ui/dialog";
 import { Edit } from "lucide-react";
 import EditAssetCounter from "./EditAssetCounter";
-import { AssetCounter } from "@/types/asset";
-import { useState } from "react";
+import { AssetCounterType } from "@/types/asset";
+import { useEffect, useState } from "react";
+import ErrorAlert from "../ErrorAlert";
 
 interface EditProps {
-  data: AssetCounter;
+  data: AssetCounterType;
 }
 
 const EditAssetIndex = ({ data }: EditProps) => {
   const [open, setOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>();
+
+  const handleErrorAlert = (errorMessage: string | null) => {
+    setErrorMessage(errorMessage);
+  };
+
+  useEffect(() => {
+    setErrorMessage(null);
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -29,7 +39,12 @@ const EditAssetIndex = ({ data }: EditProps) => {
         <DialogHeader>
           <DialogTitle>Edit Asset Counter</DialogTitle>
         </DialogHeader>
-        <EditAssetCounter assetCounter={data} onClose={() => setOpen(false)} />
+        {errorMessage ? <ErrorAlert errorMessage={errorMessage} /> : null}
+        <EditAssetCounter
+          assetCounter={data}
+          onClose={() => setOpen(false)}
+          onError={handleErrorAlert}
+        />
       </DialogContent>
     </Dialog>
   );
