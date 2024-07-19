@@ -114,6 +114,8 @@ router.post('/', [
 
         data['code'] = await getCodeAndIncrement(data['category'], data['type']);
 
+        if (!data['code']) return res.status(422).json({ message: `Need to configure the index of ${data['type']} - ${data['category']}` });
+
         const newAsset = new Hardware(data);
         await newAsset.save();
 
