@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as imsService from "@/ims-service";
 import {
   AlertDialog,
@@ -39,9 +39,14 @@ const DeletePropertyDialog = ({
     queryFn: () => imsService.fetchAssetCount(property, value),
   });
 
+  const queryClient = useQueryClient()
+
   const { mutate: deleteOption, isPending: isOptionDeletePending } =
     useMutation({
       mutationFn: () => imsService.deleteOption(property, value),
+      onSuccess: async()=> {
+        queryClient.invalidateQueries({ queryKey: ["fetchAssetCounters"] })
+      }
     });
 
   const handleDelete = async () => {
