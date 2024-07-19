@@ -73,7 +73,7 @@ export const setGitlabCreds = async(user: string, token: string) => {
 
     if (existsSync(cloneFolder)) {
         try {
-            rmdirSync(cloneFolder)
+            execSync(`rm -rf ${cloneFolder}`)
         } catch(errDelete) {
             execSync(`sudo rm -rf ${cloneFolder}`)
         }
@@ -117,7 +117,7 @@ export const setGitlabCreds = async(user: string, token: string) => {
             if(!readme) return null
 
             try {
-                rmdirSync(cloneFolder)
+                execSync(`rm -rf ${cloneFolder}`)
             } catch(errDelete) {
                 execSync(`sudo rm -rf ${cloneFolder}`)
             }
