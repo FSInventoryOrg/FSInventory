@@ -68,13 +68,15 @@ const StatusDistributionChart = ({
     const counts: Record<string, number> = {};
     let total = 0;
 
+    statusList.forEach((status) => {
+      if (!counts[status]) counts[status] = 0;
+    });
+
     data.forEach((asset) => {
       const status = asset?.status;
 
       if (status && statusList.includes(status)) {
-        if (!counts[status]) counts[status] = 1;
-        else counts[status]++;
-
+        counts[status]++;
         total++;
       }
     });
