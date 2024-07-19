@@ -70,10 +70,12 @@ const StatusDistributionTable = ({
 
   // Count the total number of assets per category
   categories.forEach((category) => {
-    counts[category].total = Object.values(counts[category]).reduce(
-      (acc, curr) => acc + curr,
-      0
-    );
+    if (counts[category]) {
+      counts[category].total = Object.values(counts[category]).reduce(
+        (acc, curr) => acc + curr,
+        0
+      );
+    }
   });
 
   return (
