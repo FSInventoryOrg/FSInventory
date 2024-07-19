@@ -1,8 +1,8 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "../ui/button";
 interface SidebarNavProps {
+  className?: any;
   items: {
     href: string;
     title: string;

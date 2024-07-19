@@ -5,7 +5,6 @@ import { EmployeeFormData } from "./schemas/AddEmployeeSchema";
 import { AssetsHistory } from "./types/employee";
 import { Defaults } from "./types/options";
 import { UserData } from "./schemas/UserSchema";
-import { AssetCounterFormData } from "./schemas/AssetCounterSchema";
 import { UploadImage } from "./types/user";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -530,7 +529,7 @@ export const fetchAssetCounters = async () => {
 
   return response.json();
 }
-export const postAssetCounter = async (data) => {
+export const postAssetCounter = async (data: any) => {
   const response = await fetch(`${API_BASE_URL}/api/assetcounter/`, {
     method: 'POST',
     credentials: 'include',
@@ -546,7 +545,7 @@ export const postAssetCounter = async (data) => {
 
   return response.json();
 }
-export const updateAssetCounter = async ({ prefixCode, updatedAssetCounter }: { prefixCode: string, updatedAssetCounter: AssetCounterFormData }) => {
+export const updateAssetCounter = async ({ prefixCode, updatedAssetCounter }: { prefixCode: string, updatedAssetCounter: any }) => {
   if (!updatedAssetCounter._id) {
     return postAssetCounter(updatedAssetCounter);
   } 
