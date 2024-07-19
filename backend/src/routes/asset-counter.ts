@@ -44,7 +44,8 @@ router.post('/', [
                 data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
             }
 
-            // data['counter'] = 0;
+            if (!data.counter) data['counter'] = 0;
+            if (data['prefixCode']) data['prefixCode'] = data['prefixCode'].toUpperCase().trim();
 
             const existingCounter = await AssetCounter.aggregate().match({
                 $expr: {
@@ -66,9 +67,7 @@ router.post('/', [
                 }
             })
 
-            if (existingCounter.length) return res.status(400).json({ message: "Prefix Code already exists or Asset Type and Category already have a prefix Code" });
-
-            if(data['prefixCode']) data['prefixCode'] = data['prefixCode'].toUpperCase();
+            if (existingCounter.length > 0) return res.status(400).json({ message: "Prefix Code already exists or Asset Type and Category already have a prefix Code" });
 
             const newAssetCounter = new AssetCounter(data);
             await newAssetCounter.save();
@@ -108,36 +107,37 @@ router.put('/:prefixCode', [
             const prefixCode: string = req.params.prefixCode;
             const data: any = req.body;
 
+            if (data['prefixCode']) data['prefixCode'] = data['prefixCode'].toUpperCase().trim();
+
             const existingAssetCounter = await AssetCounter.aggregate().match({
                 $expr: {
-                    $and: [
+                    $or: [
                         {
-                            $eq: ['$prefixCode', prefixCode]
+                            $in: ['$prefixCode', [prefixCode, data['prefixCode']]]
                         }
                     ]
                 }
             })
 
-            const findSameCounter = existingAssetCounter.find(f => { return f['prefixCode'] === data['prefixCode'] && f['_id'].toString() !== data['_id']});
+            const findSameCounter = existingAssetCounter.find(f => { return f['prefixCode'] === data['prefixCode'] && f['_id'].toString() !== data['_id'] });
             if (findSameCounter) return res.status(400).json({ message: "Asset code already exists" });
 
-            const findSameCatType = existingAssetCounter.find(f => { return f['category'] === data['category'] && f['type'] === data['type'] && f['_id'].toString() !== data['_id']});
+            const findSameCatType = existingAssetCounter.find(f => { return f['category'] === data['category'] && f['type'] === data['type'] && f['_id'].toString() !== data['_id'] });
             if (findSameCatType) return res.status(400).json({ message: "Asset Type and Category already have a prefix Code" });
 
-            const findCounter = existingAssetCounter.find(f => { return f['_id'].toString() === data['_id']});
+            const findCounter = existingAssetCounter.find(f => { return f['_id'].toString() === data['_id'] });
             if (!findCounter) return res.status(404).json({ message: "Asset Counter not found" });
 
-            if(data['prefixCode']) data['prefixCode'] = data['prefixCode'].toUpperCase();
             // delete data['counter'];
+
+            const ID = `${data._id}`;
             delete data._id;
 
             const currentUser = await User.findOne({ _id: decodedToken.userId });
             data.updated = new Date()
-            if (currentUser) {
-                data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
-            }
+            if (currentUser) data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
 
-            const updatedAsset = await AssetCounter.findOneAndUpdate({ prefixCode }, data, { new: true });
+            const updatedAsset = await AssetCounter.findOneAndUpdate({ _id: ID }, data, { new: true });
 
             res.status(200).json(updatedAsset);
         } catch (error) {
