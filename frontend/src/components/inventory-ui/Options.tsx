@@ -6,16 +6,6 @@ import {
   FormControl,
 } from "@/components/ui/form"
 import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -29,9 +19,9 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from "@/components/ui/checkbox"
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '../Spinner';
-import TrashCan from '../graphics/TrashCan'
 import TagSelect from './TagSelect'
 import ColorSelect from './ColorSelect'
+import DeletePropertyDialog from './DeletePropertyDialog'
 
 export type ColorOption = {
   value: string;
@@ -69,6 +59,7 @@ function format(str: string): string {
 
 const Options = ({ property, colorSelect=false, tagSelect=false, field, className }: OptionsProps) => {
   const [open, setOpen] = React.useState(false)
+  const [openDeleteOptionDialog, setOpenDeleteOptionDialog] = React.useState(false)
   const { showToast } = useAppContext();
   const [newOption, setNewOption] = React.useState<OptionType>({ property: property, value: '' });
   const [optionToEdit, setOptionToEdit] = React.useState<string>('');
@@ -153,82 +144,39 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
     mutationFn: imsService.updateAssetsByProperty,
   });
 
-  const DeleteOption = () => {
-    const { data: assetCount } = useQuery<number>({ 
-      queryKey: ['fetchAssetCount', property, optionToEdit], 
-      queryFn: () => imsService.fetchAssetCount(property, optionToEdit),
-    })
-    
-    const { mutate: deleteOption, isPending: isOptionDeletePending } = useMutation({
-      mutationFn: () => imsService.deleteOption(property, optionToEdit),
-    })
-
-    const handleDelete = async () => {
-      await deleteOption();
-      if (optionValues) {
-        const indexOfValueToDelete = optionValues.findIndex(option => {
-          if (typeof option === 'string') {
-            return option === optionToEdit;
-          } else if (typeof option === 'object' && option.value) {
-            return option.value === optionToEdit;
-          }
-          return false;
-        });
+  const handleDelete = () => {
+    if (optionValues) {
+      const indexOfValueToDelete = optionValues.findIndex(option => {
+        if (typeof option === 'string') {
+          return option === optionToEdit;
+        } else if (typeof option === 'object' && option.value) {
+          return option.value === optionToEdit;
+        }
+        return false;
+      });
+      
+      if (indexOfValueToDelete !== -1) {
+        const valueToDelete = optionValues[indexOfValueToDelete];
         
-        if (indexOfValueToDelete !== -1) {
-          const valueToDelete = optionValues[indexOfValueToDelete];
-          
-          // Check if optionValues[indexOfValueToDelete] is a string
-          if (typeof valueToDelete === 'string') {
-            if (valueToDelete === field.value) {
-              field.onChange('');
-            }
-          } 
-          // Check if optionValues[indexOfValueToDelete] is an object with a 'value' property
-          else if (typeof valueToDelete === 'object' && 'value' in valueToDelete) {
-            if (valueToDelete.value === field.value) {
-              field.onChange('');
-            }
+        // Check if optionValues[indexOfValueToDelete] is a string
+        if (typeof valueToDelete === 'string') {
+          if (valueToDelete === field.value) {
+            field.onChange('');
           }
-        }        
-      }
-      setOpen(false)
-      setTimeout(() => {
-        setOpen(true);
-      }, 100);
-      showToast({ message: `Option deleted successfully!`, type: "SUCCESS" });
-    };
-
-    return (
-      <AlertDialog>
-        <AlertDialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2">
-          Delete
-        </AlertDialogTrigger>
-        <AlertDialogContent className='border-none'>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl font-bold">
-              {
-                assetCount ?
-                `Unable to delete ${format(property)}` :
-                'Are you absolutely sure?'
-              }
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {
-                assetCount ? 
-                <>There are {assetCount} assets with {format(property)} of {optionToEdit}. Deleting this {format(property)} is not allowed.</> :
-                <>There are no assets with {format(property)} {optionToEdit}. It is safe to delete this {format(property)}.</>
-              }
-            </AlertDialogDescription>
-            <TrashCan />
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            { !assetCount && <Button variant='destructive' onClick={handleDelete} disabled={isOptionDeletePending} >Delete {optionToEdit}</Button> }
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    )
+        } 
+        // Check if optionValues[indexOfValueToDelete] is an object with a 'value' property
+        else if (typeof valueToDelete === 'object' && 'value' in valueToDelete) {
+          if (valueToDelete.value === field.value) {
+            field.onChange('');
+          }
+        }
+      }        
+    }
+    setOpen(false)
+    setTimeout(() => {
+      setOpen(true);
+    }, 100);
+    showToast({ message: `Option deleted successfully!`, type: "SUCCESS" });
   }
 
   React.useEffect(() => {
@@ -508,7 +456,22 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
               {(isOptionEditPending || isAssetEditPending) ? <Spinner size={18}/> : null }
               Save
             </Button>
-            <DeleteOption />
+            <Button className="inline-flex items-center justify-center whitespace-nowrap rounded-md 
+              text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none 
+              focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none 
+              disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
+              onClick={(event)=>{
+                event.preventDefault(); 
+                setOpenDeleteOptionDialog(true)}}>
+                Delete
+            </Button>
+            <DeletePropertyDialog
+              open={openDeleteOptionDialog}
+              setOpen={setOpenDeleteOptionDialog}
+              property={property}
+              value={optionToEdit}
+              onDelete={handleDelete}
+            />
           </div>
         </div>
       </PopoverContent>
