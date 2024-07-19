@@ -54,7 +54,7 @@ export const setFSEnvironment = async(data: any) => {
     let keys = Object.keys(data);
 
     keys.forEach(key => {
-        environment[key.toUpperCase()] = data['key']
+        environment[key.toUpperCase()] = data[key]
     })
 
     let fsKeys = Object.keys(environment);
@@ -82,8 +82,11 @@ export const setGitlabCreds = async(user: string, token: string) => {
     mkdirSync(cloneFolder, 0o777);
 
     try {
-        if(!readFileSync(`${location}_copy`)) copyFileSync(location, `${location}_copy`)
-    } catch(errCopy) {}
+        let copyConfig = readFileSync(`${location}_copy`).toString()
+        if(!copyConfig) copyFileSync(location, `${location}_copy`)  
+    } catch(errCopy) {
+        copyFileSync(location, `${location}_copy`)
+    }
 
     let config: string[] = [];
     try {
@@ -96,10 +99,8 @@ export const setGitlabCreds = async(user: string, token: string) => {
         if(findIndex > -1) {
             let splitIndex = config[findIndex].split(mainSplit);
             let splitLast = splitIndex[1].split(lastSplit);
-
-            config[findIndex] = `${splitIndex[0]}${mainSplit}${user}:${token}@${lastSplit}${splitLast[1]}`
-
-            console.log(config[findIndex]);
+            
+            config[findIndex] = `${splitIndex[0]}${mainSplit}${encodeURIComponent(user)}:${encodeURIComponent(token)}@${lastSplit}${splitLast[1]}`
         }
 
         let cloneURL = config[findIndex].split('url =')[1].trim();
@@ -124,8 +125,7 @@ export const setGitlabCreds = async(user: string, token: string) => {
             return null
         }
         
-        console.log(config.join('\n'))
-        // writeFileSync(location, config.join('\n'));
+        writeFileSync(location, config.join('\n'));
         return true;
     } catch(err) {
         return null;
