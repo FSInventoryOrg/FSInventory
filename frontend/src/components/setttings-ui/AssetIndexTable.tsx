@@ -10,16 +10,12 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  FilterFn,
 } from "@tanstack/react-table";
-import { ChevronDown, PlusCircle } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  rankItem,
+} from '@tanstack/match-sorter-utils'
+
 import {
   Table,
   TableBody,
@@ -29,24 +25,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AssetIndexColumns } from "./AssetsIndexColumns";
-import { AssetCounter } from "@/types/asset";
-import { InventoryPagination } from "../inventory-ui/InventoryPagination";
 import { Input } from "../ui/input";
-import AddAsset from "../inventory-ui/AddAsset";
-import AddAssetCounter from "./AddAssetCounter";
 import { ScrollArea } from "../ui/scroll-area";
+import { DataTablePagination } from "../DataTablePagination";
+import { AssetCounterType } from "@/types/asset";
 
-// const data: AssetCounter[] = [
-//   {
-//     id: "m5gr84i9",
-//     category: "Laptop",
-//     prefixCode: "FS-LAP",
-//     threshold: 100,
-//     counter: 2,
-//   },
-// ];
 
-export default function AssetIndexTable({ data }) {
+interface AssetIndexTableProps {
+  data: AssetCounterType[]
+}
+
+export default function AssetIndexTable({ data }:  AssetIndexTableProps ) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -56,8 +45,17 @@ export default function AssetIndexTable({ data }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [pagination] = React.useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 5,
+    pageSize: 10,
   });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  const itemRank = rankItem(row.getValue(columnId), value)
+  addMeta({
+    itemRank,
+  })
+  return itemRank.passed
+}
 
   const table = useReactTable({
     data,
@@ -70,6 +68,7 @@ export default function AssetIndexTable({ data }) {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    enableRowSelection: false,
     state: {
       sorting,
       columnFilters,
@@ -79,11 +78,13 @@ export default function AssetIndexTable({ data }) {
     initialState: {
       pagination,
     },
-    filterFns: undefined,
+    filterFns: {
+      fuzzy: fuzzyFilter,
+    },
   });
 
   return (
-    <div className="w-full">
+    <div className="md:w-5/6 flex flex-col h-[calc(100vh-16rem)]">
       <div className="flex items-center py-4 gap-2">
         <Input
           placeholder="Filter categories..."
@@ -93,44 +94,17 @@ export default function AssetIndexTable({ data }) {
           onChange={(event) =>
             table.getColumn("category")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="md:max-w-sm"
         />
-
-      {/* <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Button>Add New</Button> */}
-      <div className="ml-auto flex items-center gap-2">
-        <AddAssetCounter />
+        {/* NOTE: No feature yet to add new asset counter. A new entry to this table
+         is added if there is a new category. */}
+        {/* <div className="ml-auto flex items-center gap-2">
+              <AddAssetCounter />
+            </div> */}
       </div>
-      </div>
-      {/* <div className="rounded-md border"> */}
-      <ScrollArea className="rounded-md border h-full">
-        <Table className="text-xs relative">
-          <TableHeader>
+      <ScrollArea className=" w-full rounded-md border h-full">
+        <Table className="text-xs relative ">
+          <TableHeader className="sticky top-0 bg-accent z-10 border-b">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -178,7 +152,6 @@ export default function AssetIndexTable({ data }) {
           </TableBody>
         </Table>
       </ScrollArea>
-      {/* </div> */}
       <DataTablePagination table={table} />
     </div>
   );
