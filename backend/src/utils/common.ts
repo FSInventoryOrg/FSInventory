@@ -1,5 +1,6 @@
 import path from "path";
-import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
+import { execSync } from 'child_process';
+import { mkdirSync, existsSync, readFileSync, writeFileSync, chmodSync, rmdirSync, copyFileSync } from 'fs';
 
 const directory = path.join(path.resolve(), '../');
 
@@ -26,5 +27,105 @@ export const getFile = async (filepath: string) => {
         return readFileSync(tmpFolder)
     } catch(err) {
         return null
+    }
+}
+
+export const getParentDirectory = () => {
+    return path.join(directory, '../')
+}
+
+export const setFSEnvironment = async(data: any) => {
+    const location = '/.fsenv';
+
+    let environment: any = {};
+
+    try {
+        let tmp: any = readFileSync(location).toString().split('\n');
+
+        environment = tmp.reduce((accum: any, value: any, index: number) => {
+            let splitVal = value.split('=');
+
+            accum[splitVal[0].trim()] = splitVal[1].trim();
+
+            return accum
+        }, {})
+    } catch(err) {}
+
+    let keys = Object.keys(data);
+
+    keys.forEach(key => {
+        environment[key.toUpperCase()] = data['key']
+    })
+
+    let fsKeys = Object.keys(environment);
+    let newEnvriment = '';
+    fsKeys.forEach(key => {
+        newEnvriment +=`${key}=${environment[key]}\n`
+    })
+
+    writeFileSync(location, newEnvriment);
+    chmodSync(location, 0o777);
+}
+
+export const setGitlabCreds = async(user: string, token: string) => {
+    const location = `${getParentDirectory()}/.git/config`;
+    const cloneFolder = `/home/clonefsims`;
+
+    if (existsSync(cloneFolder)) {
+        try {
+            rmdirSync(cloneFolder)
+        } catch(errDelete) {
+            execSync(`sudo rm -rf ${cloneFolder}`)
+        }
+    }
+
+    mkdirSync(cloneFolder, 0o777);
+
+    try {
+        if(!readFileSync(`${location}_copy`)) copyFileSync(location, `${location}_copy`)
+    } catch(errCopy) {}
+
+    let config: string[] = [];
+    try {
+        config = readFileSync(location).toString().split('\n');
+
+        let mainSplit = `url = https://`;
+        let lastSplit = `@gitlab.com/`;
+        let findIndex = config.findIndex((f: string) => { return f.includes(mainSplit)});
+
+        if(findIndex > -1) {
+            let splitIndex = config[findIndex].split(mainSplit);
+            let splitLast = splitIndex[1].split(lastSplit);
+
+            config[findIndex] = `${splitIndex[0]}${mainSplit}${user}:${token}${lastSplit}${splitLast[1]}`
+        }
+
+        let cloneURL = config[findIndex].split('url =')[1].trim();
+
+        try {
+            try {
+                execSync(`git clone ${cloneURL} ${cloneFolder}`);
+            } catch(errExec) {
+                execSync(`sudo git clone ${cloneURL} ${cloneFolder}`);
+            }
+
+            let readme = readFileSync(`${cloneFolder}/README.md`).toString();
+
+            if(!readme) return null
+
+            try {
+                rmdirSync(cloneFolder)
+            } catch(errDelete) {
+                execSync(`sudo rm -rf ${cloneFolder}`)
+            }
+        } catch(errFetch) {
+            return null
+        }
+        
+        console.log(config.join('\n'))
+        // writeFileSync(location, config.join('\n'));
+        return true;
+    } catch(err) {
+        return null;
     }
 }
