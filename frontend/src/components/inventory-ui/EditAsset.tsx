@@ -130,7 +130,7 @@ const onSubmit = (data: z.infer<typeof AssetSchema>) => {
               <FormItem className='w-1/2'>
                 <FormLabel className='text-md text-secondary-foreground'>Asset Code</FormLabel>
                 <FormControl>
-                  <Input placeholder="FS-XYZ-A" autoComplete="off" type="input" {...field} />
+                  <Input placeholder="FS-XYZ-A" autoComplete="off" type="input" {...field} readOnly disabled/>
                 </FormControl>
                 <FormDescription>
                   This the company asset code.
