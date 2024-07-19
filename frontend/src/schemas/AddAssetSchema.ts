@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const AssetSchema = z.object({
   type: z.enum(["Hardware", "Software"]),
-  code: z.string().min(1, "Asset code is required"),
+  code: z.string().optional(),
   category: z.string().min(1, "Select an asset category"),
   brand: z.string().optional(),
   modelName: z.string().optional(),
