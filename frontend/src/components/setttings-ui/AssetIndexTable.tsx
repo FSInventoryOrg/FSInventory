@@ -3,6 +3,7 @@ import {
   ColumnFiltersState,
   SortingState,
   VisibilityState,
+  PaginationState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -33,6 +34,7 @@ import { InventoryPagination } from "../inventory-ui/InventoryPagination";
 import { Input } from "../ui/input";
 import AddAsset from "../inventory-ui/AddAsset";
 import AddAssetCounter from "./AddAssetCounter";
+import { ScrollArea } from "../ui/scroll-area";
 
 // const data: AssetCounter[] = [
 //   {
@@ -52,6 +54,10 @@ export default function AssetIndexTable({ data }) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [pagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 5,
+  });
 
   const table = useReactTable({
     data,
@@ -69,6 +75,9 @@ export default function AssetIndexTable({ data }) {
       columnFilters,
       columnVisibility,
       rowSelection,
+    },
+    initialState: {
+      pagination,
     },
     filterFns: undefined,
   });
@@ -118,8 +127,9 @@ export default function AssetIndexTable({ data }) {
         <AddAssetCounter />
       </div>
       </div>
-      <div className="rounded-md border">
-        <Table>
+      {/* <div className="rounded-md border"> */}
+      <ScrollArea className="rounded-md border h-full">
+        <Table className="text-xs relative">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -167,8 +177,9 @@ export default function AssetIndexTable({ data }) {
             )}
           </TableBody>
         </Table>
-      </div>
-      <InventoryPagination table={table} />
+      </ScrollArea>
+      {/* </div> */}
+      <DataTablePagination table={table} />
     </div>
   );
 }
