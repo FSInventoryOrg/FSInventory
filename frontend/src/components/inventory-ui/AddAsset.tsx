@@ -138,22 +138,6 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
           <div className="pt-4">
             <Form {...form}>
               <form className="flex flex-col w-full gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-                <FormField
-                  control={form.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItem className='w-1/2'>
-                      <FormLabel className='text-md text-secondary-foreground'>Asset Code</FormLabel>
-                      <FormControl>
-                        <Input placeholder="FS-XYZ-A" autoComplete="off" type="input" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        This the company asset code.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <Tabs defaultValue="Hardware" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="Hardware" onClick={() => handleTabChange("Hardware")}>Hardware</TabsTrigger>
