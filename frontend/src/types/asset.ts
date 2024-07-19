@@ -44,7 +44,7 @@ export interface SoftwareType extends AssetType {
   version: string;
 }
 
-export type AssetCounter = {
+export type AssetCounterType = {
   _id?: string;
   category: string;
   prefixCode: string;
