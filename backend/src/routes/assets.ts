@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import Hardware, { DeploymentHistory, HardwareType } from '../models/hardware.schema';
-import Software, { SoftwareType } from '../models/software.schema'; 
+import Software, { SoftwareType } from '../models/software.schema';
 import Asset, { AssetType } from '../models/asset.schema';
 import { check, validationResult } from 'express-validator'
 import verifyToken from '../middleware/auth';
@@ -9,6 +9,22 @@ import User from '../models/user.schema';
 import { getCodeAndIncrement } from '../utils/asset-counter';
 
 const router = express.Router();
+
+const checkSerialNo = async (serialNum: string, assetID?: string) => {
+  const recordSerial = await Asset.aggregate().match({
+    $expr: {
+      $and: [
+        { $eq: ['$serialNo', serialNum]}
+      ]
+    }
+  })
+
+  if (recordSerial.length > 1) return 'Multiple Serial Number Entity Found';
+  else if (recordSerial.length === 1) {
+    if (recordSerial[0]['_id'].toString() === assetID) return 'SUCCESS'
+    else return 'Serial Number Already Exists'
+  } else return 'SUCCESS'
+}
 
 /**
  * @openapi
@@ -39,51 +55,51 @@ const router = express.Router();
  *    security:
  *      - bearerAuth: []
  */
-router.post('/', [ 
-    check("type").exists().withMessage("Asset type is required").isIn(['Hardware', 'Software']).withMessage("Invalid asset type"),
-    check("brand").optional().isString().withMessage("Brand must be a string"),
-    check("modelName").optional().isString().withMessage("Model name must be a string"),
-    check("modelNo").optional().isString().withMessage("Model number must be a string"),
-    check("serialNo").optional().isString().withMessage("Serial number must be a string"),
-    // Additional checks for hardware-specific properties 
-    check("status", "Asset status is required").custom((value, { req }) => {
-        if (req.body.type === 'Hardware') {
-            return !!value;
-        }
-        return true; 
-    }),
-    check("category", "Asset category is required").custom((value, { req }) => {
-      if (req.body.type === 'Hardware') {
-          return !!value;
-      }
-      return true; 
+router.post('/', [
+  check("type").exists().withMessage("Asset type is required").isIn(['Hardware', 'Software']).withMessage("Invalid asset type"),
+  check("brand").optional().isString().withMessage("Brand must be a string"),
+  check("modelName").optional().isString().withMessage("Model name must be a string"),
+  check("modelNo").optional().isString().withMessage("Model number must be a string"),
+  check("serialNo").optional().isString().withMessage("Serial number must be a string"),
+  // Additional checks for hardware-specific properties 
+  check("status", "Asset status is required").custom((value, { req }) => {
+    if (req.body.type === 'Hardware') {
+      return !!value;
+    }
+    return true;
   }),
-    check("processor").optional().isString().withMessage("Processor must be a string"),
-    check("memory").optional().isString().withMessage("Memory must be a string"),
-    check("storage").optional().isString().withMessage("Storage must be a string"),
-    check("assignee").optional().isString().withMessage("Assignee must be a string"),
-    check("purchaseDate").optional().isISO8601().toDate().withMessage("Invalid purchase date"),
-    check("supplierVendor").optional().isString().withMessage("Supplier vendor must be a string"),
-    check("pezaForm8105").optional().isString().withMessage("PEZA form 8105 must be a string"),
-    check("pezaForm8106").optional().isString().withMessage("PEZA form 8106 must be a string"),
-    check("isRGE").optional().isBoolean().withMessage("isRGE must be a boolean"),
-    check("equipmentType", "Equipment type is required").custom((value, { req }) => {
-      if (req.body.type === 'Hardware') {
-          return !!value;
-      }
-      return true; 
-    }),
-    check("remarks").optional().isString().withMessage("Remarks must be a string"),
-    check("deploymentDate").optional().isISO8601().toDate().withMessage("Invalid deployment date"),
-    check("recoveredFrom").optional().isString().withMessage("Recovered from must be a string"),
-    check("recoveryDate").optional().isISO8601().toDate().withMessage("Invalid recovery date"),
-    // Additional checks for software-specific properties
-    check("license").optional().isString().withMessage("License must be a string"),
-    check("version").optional().isString().withMessage("Version must be a string"),
-  ],
+  check("category", "Asset category is required").custom((value, { req }) => {
+    if (req.body.type === 'Hardware') {
+      return !!value;
+    }
+    return true;
+  }),
+  check("processor").optional().isString().withMessage("Processor must be a string"),
+  check("memory").optional().isString().withMessage("Memory must be a string"),
+  check("storage").optional().isString().withMessage("Storage must be a string"),
+  check("assignee").optional().isString().withMessage("Assignee must be a string"),
+  check("purchaseDate").optional().isISO8601().toDate().withMessage("Invalid purchase date"),
+  check("supplierVendor").optional().isString().withMessage("Supplier vendor must be a string"),
+  check("pezaForm8105").optional().isString().withMessage("PEZA form 8105 must be a string"),
+  check("pezaForm8106").optional().isString().withMessage("PEZA form 8106 must be a string"),
+  check("isRGE").optional().isBoolean().withMessage("isRGE must be a boolean"),
+  check("equipmentType", "Equipment type is required").custom((value, { req }) => {
+    if (req.body.type === 'Hardware') {
+      return !!value;
+    }
+    return true;
+  }),
+  check("remarks").optional().isString().withMessage("Remarks must be a string"),
+  check("deploymentDate").optional().isISO8601().toDate().withMessage("Invalid deployment date"),
+  check("recoveredFrom").optional().isString().withMessage("Recovered from must be a string"),
+  check("recoveryDate").optional().isISO8601().toDate().withMessage("Invalid recovery date"),
+  // Additional checks for software-specific properties
+  check("license").optional().isString().withMessage("License must be a string"),
+  check("version").optional().isString().withMessage("Version must be a string"),
+],
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array() })
     }
     try {
@@ -94,10 +110,10 @@ router.post('/', [
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
       }
       const currentUser = await User.findOne({ _id: decodedToken.userId });
-    
+
       const data: any = req.body;
       const currentDate = new Date();
-    
+
       data.created = currentDate;
       data.updated = currentDate;
 
@@ -116,11 +132,14 @@ router.post('/', [
 
         if (!data['code']) return res.status(422).json({ message: `Need to configure the index of ${data['type']} - ${data['category']}` });
 
+        const checkSerial = await checkSerialNo(data['serialNo']);
+        if (checkSerial !== 'SUCCESS') return res.status(422).json({ message: checkSerial });
+
         const newAsset = new Hardware(data);
         await newAsset.save();
 
         return res.status(201).json(newAsset);
-      } else { 
+      } else {
         const existingAsset = await Software.findOne({ code: data.code });
         if (existingAsset) {
           return res.status(400).json({ message: "Asset code already exists" });
@@ -175,8 +194,8 @@ router.post('/', [
  *      - bearerAuth: []
  */
 router.put('/deploy/:code', [
-    check('assignee').optional().isString().withMessage('Assignee must be a string'),
-  ], 
+  check('assignee').optional().isString().withMessage('Assignee must be a string'),
+],
   verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -224,7 +243,7 @@ router.put('/deploy/:code', [
       let updatedAsset;
       await Hardware.updateOne({ code: data.code }, data);
       updatedAsset = await Hardware.findOne({ code });
-      
+
       res.status(200).json(updatedAsset);
     } catch (error) {
       console.error('Error updating assets:', error);
@@ -270,8 +289,8 @@ router.put('/deploy/:code', [
  *      - bearerAuth: []
  */
 router.put('/retrieve/:code', [
-    check('recoveredFrom').optional().isString().withMessage('Recovered From must be a string'),
-  ], 
+  check('recoveredFrom').optional().isString().withMessage('Recovered From must be a string'),
+],
   verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -315,24 +334,24 @@ router.put('/retrieve/:code', [
       const deploymentHistory = existingAsset.deploymentHistory;
 
       if (deploymentHistory.length > 0) {
-          const lastDeploymentRecordIndex = deploymentHistory.length - 1;
-          const lastDeploymentRecord = deploymentHistory[lastDeploymentRecordIndex];
-      
-          lastDeploymentRecord.recoveryDate = data.recoveryDate;
+        const lastDeploymentRecordIndex = deploymentHistory.length - 1;
+        const lastDeploymentRecord = deploymentHistory[lastDeploymentRecordIndex];
+
+        lastDeploymentRecord.recoveryDate = data.recoveryDate;
       } else {
-          deploymentHistory.push({
-              deploymentDate: data.recoveryDate,
-              assignee: data.recoveredFrom,
-              recoveryDate: data.recoveryDate,
-          });
+        deploymentHistory.push({
+          deploymentDate: data.recoveryDate,
+          assignee: data.recoveredFrom,
+          recoveryDate: data.recoveryDate,
+        });
       }
-      
+
       data.deploymentHistory = deploymentHistory;
-      
+
       let updatedAsset;
       await Hardware.updateOne({ code: data.code }, data);
-      updatedAsset = await Hardware.findOne({ code });      
-      
+      updatedAsset = await Hardware.findOne({ code });
+
       res.status(200).json(updatedAsset);
     } catch (error) {
       console.error('Error updating assets:', error);
@@ -462,51 +481,51 @@ router.put("/history/:code/:index", verifyToken, async (req: Request, res: Respo
  *      - bearerAuth: []
  */
 router.put('/:code', [
-    check("type").exists().withMessage("Asset type is required").isIn(['Hardware', 'Software']).withMessage("Invalid asset type"),
-    check("brand").optional().isString().withMessage("Brand must be a string"),
-    check("modelName").optional().isString().withMessage("Model name must be a string"),
-    check("modelNo").optional().isString().withMessage("Model number must be a string"),
-    check("serialNo").optional().isString().withMessage("Serial number must be a string"),
-    // Additional checks for hardware-specific properties 
-    check("status", "Asset status is required").custom((value, { req }) => {
-        if (req.body.type === 'Hardware') {
-            return !!value;
-        }
-        return true; 
-    }),
-    check("category", "Asset category is required").custom((value, { req }) => {
-      if (req.body.type === 'Hardware') {
-          return !!value;
-      }
-      return true; 
+  check("type").exists().withMessage("Asset type is required").isIn(['Hardware', 'Software']).withMessage("Invalid asset type"),
+  check("brand").optional().isString().withMessage("Brand must be a string"),
+  check("modelName").optional().isString().withMessage("Model name must be a string"),
+  check("modelNo").optional().isString().withMessage("Model number must be a string"),
+  check("serialNo").optional().isString().withMessage("Serial number must be a string"),
+  // Additional checks for hardware-specific properties 
+  check("status", "Asset status is required").custom((value, { req }) => {
+    if (req.body.type === 'Hardware') {
+      return !!value;
+    }
+    return true;
   }),
-    check("processor").optional().isString().withMessage("Processor must be a string"),
-    check("memory").optional().isString().withMessage("Memory must be a string"),
-    check("storage").optional().isString().withMessage("Storage must be a string"),
-    check("assignee").optional().isString().withMessage("Assignee must be a string"),
-    check("purchaseDate").optional().isISO8601().toDate().withMessage("Invalid purchase date"),
-    check("supplierVendor").optional().isString().withMessage("Supplier vendor must be a string"),
-    check("pezaForm8105").optional().isString().withMessage("PEZA form 8105 must be a string"),
-    check("pezaForm8106").optional().isString().withMessage("PEZA form 8106 must be a string"),
-    check("isRGE").optional().isBoolean().withMessage("isRGE must be a boolean"),
-    check("equipmentType", "Equipment type is required").custom((value, { req }) => {
-      if (req.body.type === 'Hardware') {
-          return !!value;
-      }
-      return true; 
-    }),
-    check("remarks").optional().isString().withMessage("Remarks must be a string"),
-    check("deploymentDate").optional().isISO8601().toDate().withMessage("Invalid deployment date"),
-    check("recoveredFrom").optional().isString().withMessage("Recovered from must be a string"),
-    check("recoveryDate").optional().isISO8601().toDate().withMessage("Invalid recovery date"),
-    // Additional checks for software-specific properties
-    check("license").optional().isString().withMessage("License must be a string"),
-    check("version").optional().isString().withMessage("Version must be a string"),
-  ],
+  check("category", "Asset category is required").custom((value, { req }) => {
+    if (req.body.type === 'Hardware') {
+      return !!value;
+    }
+    return true;
+  }),
+  check("processor").optional().isString().withMessage("Processor must be a string"),
+  check("memory").optional().isString().withMessage("Memory must be a string"),
+  check("storage").optional().isString().withMessage("Storage must be a string"),
+  check("assignee").optional().isString().withMessage("Assignee must be a string"),
+  check("purchaseDate").optional().isISO8601().toDate().withMessage("Invalid purchase date"),
+  check("supplierVendor").optional().isString().withMessage("Supplier vendor must be a string"),
+  check("pezaForm8105").optional().isString().withMessage("PEZA form 8105 must be a string"),
+  check("pezaForm8106").optional().isString().withMessage("PEZA form 8106 must be a string"),
+  check("isRGE").optional().isBoolean().withMessage("isRGE must be a boolean"),
+  check("equipmentType", "Equipment type is required").custom((value, { req }) => {
+    if (req.body.type === 'Hardware') {
+      return !!value;
+    }
+    return true;
+  }),
+  check("remarks").optional().isString().withMessage("Remarks must be a string"),
+  check("deploymentDate").optional().isISO8601().toDate().withMessage("Invalid deployment date"),
+  check("recoveredFrom").optional().isString().withMessage("Recovered from must be a string"),
+  check("recoveryDate").optional().isISO8601().toDate().withMessage("Invalid recovery date"),
+  // Additional checks for software-specific properties
+  check("license").optional().isString().withMessage("License must be a string"),
+  check("version").optional().isString().withMessage("Version must be a string"),
+],
   verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array() })
     }
     try {
@@ -520,10 +539,16 @@ router.put('/:code', [
       const code: string = req.params.code;
       const data: any = req.body;
 
-      const existingAssetCode = await Asset.findOne({ code: data.code });
+      const existingAssetCode: any = await Asset.findOne({ code: data.code });
       if (existingAssetCode && existingAssetCode._id.toString() !== data._id) {
         return res.status(400).json({ message: "Asset code already exists" });
       }
+
+      if (data['serialNo']) {
+        const checkSerial = await checkSerialNo(data['serialNo'], existingAssetCode._id.toString());
+        if (checkSerial !== 'SUCCESS') return res.status(422).json({ message: checkSerial });
+      }
+
       delete data._id;
 
       const existingAsset = await Asset.findOne({ code });
@@ -552,7 +577,7 @@ router.put('/:code', [
       } else {
         updatedAsset = await Software.findOneAndUpdate({ code: code }, data, { new: true });
       }
-      
+
       res.status(200).json(updatedAsset);
     } catch (error) {
       console.error('Error updating asset:', error);
@@ -612,7 +637,7 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const { type, status, category, processor, memory, storage } = req.query;
     const allowedFilter = { type, status, category, processor, memory, storage };
-    
+
     let query = Object.fromEntries(
       Object.entries(allowedFilter).filter(([_, v]) => v !== undefined && v !== null && v !== '')
     );
@@ -730,7 +755,7 @@ router.get('/count/:property?/:value?', async (req: Request, res: Response) => {
 router.get('/uniqueValues/:property', async (req: Request, res: Response) => {
   try {
     const { property } = req.params;
-    let query: any = {}; 
+    let query: any = {};
 
     let aggregationPipeline: any[] = [];
 
@@ -865,27 +890,27 @@ router.get('/:property/:value', async (req: Request, res: Response) => {
  *      - bearerAuth: []
  */
 router.put('/:property/:value', [
-    check('category').optional().isString().withMessage('Category must be a string'),
-    check('processor').optional().isString().withMessage('Processor must be a string'),
-    check('memory').optional().isString().withMessage('Memory must be a string'),
-    check('storage').optional().isString().withMessage('Storage must be a string'),
-    check('status').optional().isString().withMessage('Status must be a string'),
-    check('assignee').optional().isString().withMessage('Assignee must be a string'),
-    check('purchaseDate').optional().isISO8601().toDate().withMessage('Invalid purchase date'),
-    check('supplierVendor').optional().isString().withMessage('Supplier vendor must be a string'),
-    check('pezaForm8105').optional().isString().withMessage('PEZA form 8105 must be a string'),
-    check('pezaForm8106').optional().isString().withMessage('PEZA form 8106 must be a string'),
-    check('isRGE').optional().isBoolean().withMessage('isRGE must be a boolean'),
-    check('equipmentType').optional().isString().withMessage('Equipment type must be a string'),
-    check('remarks').optional().isString().withMessage('Remarks must be a string'),
-    check('deploymentDate').optional().isISO8601().toDate().withMessage('Invalid deployment date'),
-    check('recoveredFrom').optional().isString().withMessage('Recovered from must be a string'),
-    check('recoveryDate').optional().isISO8601().toDate().withMessage('Invalid recovery date'),
-  ], 
+  check('category').optional().isString().withMessage('Category must be a string'),
+  check('processor').optional().isString().withMessage('Processor must be a string'),
+  check('memory').optional().isString().withMessage('Memory must be a string'),
+  check('storage').optional().isString().withMessage('Storage must be a string'),
+  check('status').optional().isString().withMessage('Status must be a string'),
+  check('assignee').optional().isString().withMessage('Assignee must be a string'),
+  check('purchaseDate').optional().isISO8601().toDate().withMessage('Invalid purchase date'),
+  check('supplierVendor').optional().isString().withMessage('Supplier vendor must be a string'),
+  check('pezaForm8105').optional().isString().withMessage('PEZA form 8105 must be a string'),
+  check('pezaForm8106').optional().isString().withMessage('PEZA form 8106 must be a string'),
+  check('isRGE').optional().isBoolean().withMessage('isRGE must be a boolean'),
+  check('equipmentType').optional().isString().withMessage('Equipment type must be a string'),
+  check('remarks').optional().isString().withMessage('Remarks must be a string'),
+  check('deploymentDate').optional().isISO8601().toDate().withMessage('Invalid deployment date'),
+  check('recoveredFrom').optional().isString().withMessage('Recovered from must be a string'),
+  check('recoveryDate').optional().isISO8601().toDate().withMessage('Invalid recovery date'),
+],
   verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array() })
     }
     try {
