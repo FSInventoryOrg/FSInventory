@@ -16,6 +16,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Metrics from "./pages/Metrics";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const App = () => {
   const { isLoggedIn, isLoading } = useAppContext();
@@ -42,6 +43,7 @@ const App = () => {
                 </>
               )}
               <Route path="/forgot-password" element={<ForgotPassword/>}/>
+              <Route path="/reset-password" element={<ResetPassword/>}/>
               <Route path="*" element={<Navigate to="/" />} />
             </>
           )}
