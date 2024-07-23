@@ -15,6 +15,7 @@ import InventoryEdit from "./pages/InventorySettings";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Metrics from "./pages/Metrics";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const App = () => {
   const { isLoggedIn, isLoading } = useAppContext();
@@ -40,6 +41,7 @@ const App = () => {
                   {/* <Route path="/requests" element={<Layout>Requests</Layout>} /> */}
                 </>
               )}
+              <Route path="/forgot-password" element={<ForgotPassword/>}/>
               <Route path="*" element={<Navigate to="/" />} />
             </>
           )}
