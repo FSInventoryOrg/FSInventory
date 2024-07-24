@@ -1,7 +1,7 @@
 import { AlertTriangleIcon, Check } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-interface Props {
+export interface Props {
   message: string | null | undefined;
   type: "success" | "warning" | "error";
 }
@@ -23,7 +23,7 @@ const CustomAlert = ({ type, message }: Props) => {
     if (type === "warning") return { variant: "warning", title: "Notice:" };
     return { variant: type, title: "" };
   };
-  
+
   const alert = getVariant();
 
   return (

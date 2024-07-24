@@ -1,5 +1,6 @@
 import { SignUpFormData } from "./components/auth-ui/SignUpForm";
 import { SignInFormData } from "./components/auth-ui/SignInForm";
+import { ForgotPasswordFormData } from "./schemas/ForgotPasswordSchema";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -54,6 +55,22 @@ export const register = async (formData: SignUpFormData) => {
     body: JSON.stringify(formData),
   })
 
+  const responseBody = await response.json();
+
+  if(!response.ok) {
+    throw new Error(responseBody.message)
+  }
+}
+
+export const forgotPassword = async ( formData : ForgotPasswordFormData) => {
+  const response = await fetch(`${API_BASE_URL}/api/users/forgotPassword`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(formData),
+  })
   const responseBody = await response.json();
 
   if(!response.ok) {

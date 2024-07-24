@@ -12,12 +12,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { KeyRound, MailIcon } from "lucide-react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useMutation } from "@tanstack/react-query";
+import * as authService from "@/auth-service";
+import { useNavigate } from "react-router-dom";
+import { Spinner } from "../Spinner";
+import { ForgotPasswordSchema } from "@/schemas/ForgotPasswordSchema";
 
-const ForgotPasswordSchema = z.object({
-  email: z.string().min(1, "Email cannot be empty").email(),
-});
+interface ForgotPasswordFormProps {
+  onError: (errorMessage: string | null) => void;
+}
 
-const ForgotPasswordForm = () => {
+const ForgotPasswordForm = ({ onError }: ForgotPasswordFormProps) => {
+  const navigate = useNavigate();
   const form = useForm({
     resolver: zodResolver(ForgotPasswordSchema),
     defaultValues: {
@@ -25,8 +31,23 @@ const ForgotPasswordForm = () => {
     },
   });
 
+  const handleError = (errorMessage: string) => {
+    onError(errorMessage);
+  };
+  const mutation = useMutation({
+    mutationFn: authService.forgotPassword,
+    onSuccess: async () => {
+      // When email sent is valid, user is redirected to the Reset Password Page
+      navigate("/reset-password");
+    },
+    onError: async (error: Error) => {
+      handleError(error.message);
+    },
+  });
+
   const onSubmit = (data: z.infer<typeof ForgotPasswordSchema>) => {
     console.log(data);
+    mutation.mutate(data);
   };
 
   return (
@@ -54,6 +75,7 @@ const ForgotPasswordForm = () => {
           )}
         />
         <Button type="submit" className="mt-4 ">
+          {form.formState.isSubmitting ? <Spinner size={18} /> : null}
           Reset Password
         </Button>
       </form>
