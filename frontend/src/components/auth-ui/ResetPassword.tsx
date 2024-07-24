@@ -12,28 +12,68 @@ import { Input } from "../ui/input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAppContext } from "@/hooks/useAppContext";
+import { useNavigate, useParams } from "react-router-dom";
+import * as authService from "@/auth-service";
+import {
+  ResetPasswordSchema,
+  ResetPasswordFormData,
+} from "@/schemas/ResetPasswordSchema";
+import { PasswordInput } from "../PasswordInput";
 
-const ResetPasswordSchema = z
-  .object({
-    newPassword: z
-      .string()
-      .min(8, "New password must be at least 8 characters"),
-    confirmPassword: z
-      .string()
-      .min(8, "Confirm password must be at least 8 characters"),
-  })
-  .refine((data) => data.confirmPassword === data.newPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
+type ResetPasswordParams = {
+  token: string;
+};
 
-const ResetPassword = () => {
+interface ResetPasswordFormProps {
+  onError: (errorMessage: string | null) => void;
+}
+
+const ResetPassword = ({ onError }: ResetPasswordFormProps) => {
+  const { token } = useParams<ResetPasswordParams>();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { showToast } = useAppContext();
   const form = useForm({
     resolver: zodResolver(ResetPasswordSchema),
+    mode: "onBlur",
+  });
+
+  const { mutate: logout } = useMutation({
+    mutationFn: authService.logout,
+    onSuccess: async () => {
+      navigate("/");
+      await queryClient.invalidateQueries({ queryKey: ["validateToken"] });
+    },
+    onError: (error: Error) => {
+      showToast({ message: error.message, type: "ERROR" });
+    },
+  });
+  const handleError = (errorMessage: string) => {
+    onError(errorMessage);
+  };
+
+  const mutation = useMutation({
+    mutationFn: authService.resetPassword,
+    onSuccess: async () => {
+      // Once user successfully updates pasword, log them out to let them login
+      // with the new credentials.
+      showToast({
+        message:
+          "Password changed successfully. Please login with your new credentials.",
+        type: "SUCCESS",
+      });
+      logout();
+    },
+    onError: async (error: Error) => {
+      handleError(error.message);
+    },
   });
 
   const onSubmit = (data: z.infer<typeof ResetPasswordSchema>) => {
     console.log(data);
+    mutation.mutate({ newPassword: data.newPassword, token });
   };
 
   return (
@@ -46,39 +86,43 @@ const ResetPassword = () => {
             Please enter your new password below.
           </p>
           <FormField
-          control={form.control}
-          name="newPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-l font-medium">New Password</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder="Enter your current password"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            control={form.control}
+            name="newPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-l font-medium">
+                  New Password
+                </FormLabel>
+                <FormControl>
+                  <PasswordInput
+                    {...field}
+                    placeholder="Enter your new password"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-l font-medium">Confirm Password</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder="Enter your current password"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-l font-medium">
+                  Confirm Password
+                </FormLabel>
+                <FormControl>
+                  <PasswordInput
+                    {...field}
+                    placeholder="Confirm your new password"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <Button type="submit" className="mt-4 ">
-            Save password and Sign in <ArrowRight className="font-light"/>
+            Save password and Sign in <ArrowRight className="font-light" />
           </Button>
         </form>
       </Form>

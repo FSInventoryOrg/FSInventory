@@ -43,7 +43,7 @@ const App = () => {
                 </>
               )}
               <Route path="/forgot-password" element={<ForgotPassword/>}/>
-              <Route path="/reset-password" element={<ResetPassword/>}/>
+              <Route path="/reset-password/:token" element={<ResetPassword/>}/>
               <Route path="*" element={<Navigate to="/" />} />
             </>
           )}

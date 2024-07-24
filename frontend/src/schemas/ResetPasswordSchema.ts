@@ -18,7 +18,7 @@ export const ResetPasswordSchema = z
 
 export type ResetPasswordFormData = {
     newPassword: string 
-    token: string
+    token?: string
 }
 
 const CurrentWithNewPasswordSchema = z.object({
