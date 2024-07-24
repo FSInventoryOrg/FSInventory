@@ -5,6 +5,7 @@ import verifyToken from '../middleware/auth';
 import jwt from "jsonwebtoken";
 import User from '../models/user.schema';
 import { getCodeAndIncrement, getHardwareIndexes } from '../utils/asset-counter';
+import { auditAssets, deleteNotif } from '../utils/common';
 
 const router = express.Router();
 
@@ -72,6 +73,7 @@ router.post('/', [
             const newAssetCounter = new AssetCounter(data);
             await newAssetCounter.save();
 
+            await auditAssets();
             return res.status(201).json(newAssetCounter);
         } catch (error) {
             console.error('Error creating asset counter:', error);
@@ -139,6 +141,7 @@ router.put('/:prefixCode', [
 
             const updatedAsset = await AssetCounter.findOneAndUpdate({ _id: ID }, data, { new: true });
 
+            await auditAssets();
             res.status(200).json(updatedAsset);
         } catch (error) {
             console.error('Error updating asset counter:', error);
@@ -201,6 +204,8 @@ router.delete('/:prefixCode', verifyToken, async (req: Request, res: Response) =
 
         await AssetCounter.deleteOne({ prefixCode });
 
+        await auditAssets();
+        await deleteNotif(`AssetCounter-${assetcounter['_id']}`)
         res.status(200).json({ message: 'Asset Counter deleted successfully' });
     } catch (error) {
         console.error('Error deleting asset counter:', error);

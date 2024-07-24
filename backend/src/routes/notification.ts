@@ -1,9 +1,8 @@
 import express, { Request, Response } from 'express';
 import jwt from "jsonwebtoken";
 import verifyToken from '../middleware/auth';
-import Notification from '../models/notification.schema';
+import Notification, { NotificationType } from '../models/notification.schema';
 import mongoose from 'mongoose';
-import mongodb from 'mongodb';
 
 const router = express.Router();
 
@@ -15,16 +14,33 @@ router.get('/', verifyToken, async (req: Request, res: Response) => {
         const notifications: any = await Notification.aggregate().match({
             $expr: {
                 $and: [
-                    { $in: ['$target_users', [decodedToken.userId]]}
+                    { $in: [decodedToken.userId, '$target_users']}
                 ]
             }
         }).sort({
             updated: -1
-        }).limit(50);
+        });
+
+        let newData = notifications.reduce((accum: NotificationType[], value: NotificationType, index: number) => {
+            let singleData: any = {
+                _id: value['_id'].toString(),
+                message: value['message'],
+                message_html: value['message_html'],
+                openTab: value['openTab'],
+                url: value['url'],
+                date: value['updated'],
+                read: value['seen_users'].includes(decodedToken.userId)
+            };
+
+
+            accum.push(singleData);
+            return accum;
+        }, []);
 
         let notifDetails = {
-            unread: notifications.filter((f: any)=> !f.seen_users.includes(decodedToken.userId)).length,
-            data: notifications
+            unread: newData.filter((f: any)=> !f['read']).length,
+            count: newData.length,
+            data: newData
         }
 
         return res.status(200).json(notifDetails);
@@ -43,8 +59,8 @@ router.patch('/', verifyToken, async (req: Request, res: Response) => {
 
         if (!Array.isArray(requestBody)) return res.status(422).json({ message: 'Payload should be arrays of _ids' });
         
-        let mongoIDs = requestBody.reduce((accum, value, index) => {
-            let valueID = new mongodb.ObjectId(value);
+        let mongoIDs = requestBody.reduce((accum, value: string, index) => {
+            let valueID = new mongoose.Types.ObjectId(value);
             accum.push(valueID);
             return accum;
         }, []);
@@ -52,7 +68,7 @@ router.patch('/', verifyToken, async (req: Request, res: Response) => {
         const notifications: any = await Notification.aggregate().match({
             $expr: {
                 $and: [
-                    { $in: ['$target_users', [decodedToken.userId]]},
+                    { $in: [decodedToken.userId, '$target_users']},
                     { $in: ['$_id', mongoIDs]}
                 ]
             }
