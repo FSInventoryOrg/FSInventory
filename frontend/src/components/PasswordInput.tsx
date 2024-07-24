@@ -26,10 +26,19 @@ const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
           className="absolute inset-y-0 right-0 flex cursor-pointer items-center p-3 text-muted-foreground"
           onClick={() => setShowPassword((prev) => !prev)}
         >
-          {createElement(showPassword ? EyeOffIcon : EyeIcon, {
+          {createElement(showPassword ? EyeIcon : EyeOffIcon, {
             className: "h-6 w-6",
           })}
         </Button>
+        {/* hides browsers password toggles */}
+				<style>{`
+					.hide-password-toggle::-ms-reveal,
+					.hide-password-toggle::-ms-clear {
+						visibility: hidden;
+						pointer-events: none;
+						display: none;
+					}
+				`}</style>
       </Box>
     );
   }
