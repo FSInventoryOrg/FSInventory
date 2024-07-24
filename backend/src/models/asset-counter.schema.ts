@@ -11,6 +11,8 @@ export interface AssetCounterType extends Document {
   prefixCode: string;
   counter: number;
   threshold: number;
+  totalCount: number;
+  status: "In Stock" | "Depleting"
 }
 
 const assetCounterSchema: Schema<AssetCounterType> = new Schema<AssetCounterType>({
@@ -19,10 +21,12 @@ const assetCounterSchema: Schema<AssetCounterType> = new Schema<AssetCounterType
   updated: { type: Date, required: true },
   updatedBy: { type: String, required: false},
   type: { type: String, enum: ["Hardware", "Software"], required: true },
+  status: { type: String, enum: ["In Stock", "Depleting"], required: false },
   category: { type: String, required: true, unique: true },
   prefixCode: { type: String, required: true },
   counter: { type: Number, required: false },
-  threshold: { type: Number, required: true }
+  threshold: { type: Number, required: true },
+  totalCount: { type: Number, required: true }
 });
 
 const AssetCounter = mongoose.model<AssetCounterType>("AssetCounter", assetCounterSchema);

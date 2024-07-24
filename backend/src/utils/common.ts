@@ -1,6 +1,11 @@
 import path from "path";
 import { execSync } from 'child_process';
 import { mkdirSync, existsSync, readFileSync, writeFileSync, chmodSync, rmdirSync, copyFileSync } from 'fs';
+import AssetCounter from "../models/asset-counter.schema";
+import Asset from "../models/asset.schema";
+import Notification, { NotificationType } from "../models/notification.schema";
+import User from "../models/user.schema";
+import mongoose from "mongoose";
 
 const directory = path.join(path.resolve(), '../');
 
@@ -130,4 +135,79 @@ export const setGitlabCreds = async(user: string, token: string) => {
     } catch(err) {
         return null;
     }
+}
+
+export const auditAssets = async() => {
+    const assetIndex = await AssetCounter.find({});
+    const adminUsers = await User.find({ role: 'ADMIN'});
+
+    const assetStatueses = ["Shelved", "IT Storage", "ITS Storage", ""];
+    const categories = assetIndex.map(f => { return f['category']}).filter(f => { return f})
+
+    if (!categories) return;
+
+    const assets = await Asset.aggregate().match({
+        $expr: {
+            $and: [
+                { $eq: ['$type', 'Hardware']},
+                { $in: ['$category', categories]},
+                { $in: ['$status', assetStatueses]}
+            ]
+        }
+    }).group({
+        _id: {
+            category: '$category',
+            type: '$type'
+        },
+        count: { $sum: 1 }
+    })
+
+    const admins = adminUsers.map(f => { return f._id.toString() });
+
+    assetIndex.forEach(async(value) => {
+        const findIndex = assets.find((f: any) => { return f._id.category === value['category'] && f._id.type === value['type']});
+
+        if (findIndex) {
+            let newValue = {
+                totalCount: findIndex['count'],
+                status: findIndex['count'] < value['threshold'] ? 'Depleting' : 'In Stock'
+            }
+
+            let notifValue: any = {
+                url: '/settings/assetcontrol',
+                openTab: false,
+                message: `Asset ${value['type']} - ${value['category']} is ${newValue['status']}`,
+                target_users: admins,
+                uniqueLabel: `AssetCounter-${value['_id']}`
+            };
+            
+            if (newValue['status'] === 'Depleting') {
+                notifValue['message_html'] = `<p>Asset <strong>${value['type']} - ${value['category']}</strong> is <strong style="color: red">${newValue['status']}</strong></p>`,
+                notifValue['updated'] = new Date();
+                notifValue['seen_users'] = [];
+                
+                await triggerNotif(notifValue);
+            } else if (newValue['status'] === 'In Stock' && findIndex['status'] === 'Depleting') {
+                notifValue['message_html'] = `<p>Asset <strong>${value['type']} - ${value['category']}</strong> is <strong style="color: green">${newValue['status']}</strong></p>`,
+                notifValue['seen_users'] = admins;
+                await triggerNotif(notifValue)
+            }
+
+            await AssetCounter.updateOne({ _id: value['_id']}, newValue)
+        }
+    })
+}
+
+export const triggerNotif = async(data: NotificationType) => {
+    if (!data['uniqueLabel']) return
+    if (!data['url']) {
+        data['url'] = '#';
+        data['openTab'] = false;
+    }
+    await Notification.updateMany({ uniqueLabel: data['uniqueLabel']}, data, { upsert: true})
+}
+
+export const deleteNotif = async(uniqueLabel: string) => {
+    if (!uniqueLabel) return
+    await Notification.deleteMany({uniqueLabel: uniqueLabel})
 }

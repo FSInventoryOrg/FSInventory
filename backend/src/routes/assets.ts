@@ -7,6 +7,7 @@ import verifyToken from '../middleware/auth';
 import jwt from "jsonwebtoken";
 import User from '../models/user.schema';
 import { getCodeAndIncrement } from '../utils/asset-counter';
+import { auditAssets } from '../utils/common';
 
 const router = express.Router();
 
@@ -26,35 +27,6 @@ const checkSerialNo = async (serialNum: string, assetID?: string) => {
   } else return 'SUCCESS'
 }
 
-/**
- * @openapi
- * /api/assets:
- *  post:
- *    tags:
- *      - Asset
- *    summary: Creates a new asset
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema: 
- *            $ref: '#/components/schemas/Hardware'
- *    responses:
- *      201:
- *        description: Asset created successfully
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Hardware'
- *      400:
- *        description: Invalid request body or asset code already exists
- *      403:
- *        description: Only users with admin role can perform this action
- *      500:
- *        description: Internal server error
- *    security:
- *      - bearerAuth: []
- */
 router.post('/', [
   check("type").exists().withMessage("Asset type is required").isIn(['Hardware', 'Software']).withMessage("Invalid asset type"),
   check("brand").optional().isString().withMessage("Brand must be a string"),
@@ -139,6 +111,7 @@ router.post('/', [
 
         const newAsset = new Hardware(data);
         await newAsset.save();
+        await auditAssets();
 
         return res.status(201).json(newAsset);
       } else {
@@ -159,42 +132,6 @@ router.post('/', [
   }
 );
 
-/**
- * @openapi
- * /api/assets/deploy/{code}:
- *  put:
- *    tags:
- *      - Asset
- *    summary: Update deployment properties of asset via its code
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Asset code
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/AssetUpdate'
- *    responses:
- *      200:
- *        description: Updated assets
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/Hardware'
- *      404:
- *        description: Asset code mismatch or asset is already deployed
- *      500:
- *        description: Internal server error
- *    security:
- *      - bearerAuth: []
- */
 router.put('/deploy/:code', [
   check('assignee').optional().isString().withMessage('Assignee must be a string'),
 ],
@@ -246,6 +183,8 @@ router.put('/deploy/:code', [
       await Hardware.updateOne({ code: data.code }, data);
       updatedAsset = await Hardware.findOne({ code });
 
+      await auditAssets();
+
       res.status(200).json(updatedAsset);
     } catch (error) {
       console.error('Error updating assets:', error);
@@ -254,42 +193,6 @@ router.put('/deploy/:code', [
   }
 );
 
-/**
- * @openapi
- * /api/assets/retrieve/{code}:
- *  put:
- *    tags:
- *      - Asset
- *    summary: Update recovery properties of asset via its code
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Asset code
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/AssetUpdate'
- *    responses:
- *      200:
- *        description: Updated assets
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/Hardware'
- *      404:
- *        description: Asset code mismatch or asset is not yet deployed
- *      500:
- *        description: Internal server error
- *    security:
- *      - bearerAuth: []
- */
 router.put('/retrieve/:code', [
   check('recoveredFrom').optional().isString().withMessage('Recovered From must be a string'),
 ],
@@ -354,6 +257,7 @@ router.put('/retrieve/:code', [
       await Hardware.updateOne({ code: data.code }, data);
       updatedAsset = await Hardware.findOne({ code });
 
+      await auditAssets();
       res.status(200).json(updatedAsset);
     } catch (error) {
       console.error('Error updating assets:', error);
@@ -362,53 +266,6 @@ router.put('/retrieve/:code', [
   }
 );
 
-/**
- * @openapi
- * /api/assets/history/{code}/{index}:
- *  put:
- *    tags:
- *      - Asset
- *    summary: Remove the deployment history entry for a hardware asset by asset code and index
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Code of the hardware asset
- *      - in: path
- *        name: index
- *        required: true
- *        schema:
- *          type: integer
- *        description: Index of the deployment history entry to remove
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              deploymentDate:
- *                type: string
- *                format: date-time
- *              recoveryDate:
- *                type: string
- *                format: date-time
- *              assignee:
- *                type: string
- *    responses:
- *      200:
- *        description: Deployment history entry updated successfully
- *      400:
- *        description: Bad request, validation errors
- *      404:
- *        description: Hardware asset not found or index out of range
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.put("/history/:code/:index", verifyToken, async (req: Request, res: Response) => {
   try {
     const { code, index } = req.params;
@@ -435,6 +292,7 @@ router.put("/history/:code/:index", verifyToken, async (req: Request, res: Respo
 
     // Save hardware asset with updated deployment history
     await hardwareAsset.save();
+    await auditAssets();
 
     res.status(200).json({ message: "Deployment history entry removed successfully" });
   } catch (error) {
@@ -444,44 +302,6 @@ router.put("/history/:code/:index", verifyToken, async (req: Request, res: Respo
 });
 
 
-/**
- * @openapi
- * /api/assets/{code}:
- *  put:
- *    tags:
- *      - Asset
- *    summary: Update an asset by its code
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Asset code
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/Hardware'
- *    responses:
- *      200:
- *        description: Asset updated successfully
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Hardware'
- *      400:
- *        description: Invalid request body or asset code already exists
- *      403:
- *        description: Only users with admin role can perform this action
- *      404:
- *        description: Asset not found
- *      500:
- *        description: Internal server error
- *    security:
- *      - bearerAuth: []
- */
 router.put('/:code', [
   check("type").exists().withMessage("Asset type is required").isIn(['Hardware', 'Software']).withMessage("Invalid asset type"),
   check("brand").optional().isString().withMessage("Brand must be a string"),
@@ -576,6 +396,8 @@ router.put('/:code', [
 
         // Update the asset
         updatedAsset = await Hardware.findOneAndUpdate({ code: code }, data, { new: true });
+
+        await auditAssets();
       } else {
         updatedAsset = await Software.findOneAndUpdate({ code: code }, data, { new: true });
       }
@@ -588,53 +410,6 @@ router.put('/:code', [
   }
 );
 
-/**
- * @openapi
- * /api/assets:
- *  get:
- *    tags:
- *      - Asset
- *    summary: Get all assets
- *    parameters:
- *      - in: query
- *        name: type
- *        schema:
- *          type: string
- *        description: Filter assets by type (e.g. Hardware, Software)
- *      - in: query
- *        name: status
- *        schema:
- *          type: string
- *        description: Filter assets by status (e.g. Deployed, Damaged, IT Storage, etc.)
- *      - in: query
- *        name: category
- *        schema:
- *          type: string
- *        description: Filter assets by category (e.g. Laptop, Mobile, Keyboard, Mouse, etc.)
- *      - in: query
- *        name: processor
- *        schema:
- *          type: string
- *        description: Filter assets by processor (e.g. Intel, AMD, Apple M1, etc.)
- *      - in: query
- *        name: memory
- *        schema:
- *          type: string
- *        description: Filter assets by memory capacity (e.g. 8GB, 16GB, 32GB, etc.)
- *      - in: query
- *        name: storage
- *        schema:
- *          type: string
- *    responses:
- *      200:
- *        description: A list of assets
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/Hardware'
- */
 router.get('/', async (req: Request, res: Response) => {
   try {
     const { type, status, category, processor, memory, storage } = req.query;
@@ -660,41 +435,6 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /api/assets/count/{property}/{value}:
- *  get:
- *    tags:
- *      - Asset
- *    summary: Get total number of assets with a specific property value
- *    parameters:
- *      - in: path
- *        name: property
- *        required: false
- *        schema:
- *          type: string
- *        description: Asset property to filter by
- *      - in: path
- *        name: value
- *        required: false
- *        schema:
- *          type: string
- *        description: Value of the property to filter by
- *    responses:
- *      200:
- *        description: Successful response
- *        content:
- *          application/json:
- *            schema:
- *              type: number
- *              description: Total number of assets with the specified property value
- *              example:
- *                10
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.get('/count/:property?/:value?', async (req: Request, res: Response) => {
   try {
     const { property, value } = req.params;
@@ -714,46 +454,6 @@ router.get('/count/:property?/:value?', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /api/assets/uniqueValues/{property}:
- *  get:
- *    tags:
- *      - Asset
- *    summary: Get array of unique values for an asset's property
- *    parameters:
- *      - in: path
- *        name: property
- *        required: true
- *        schema:
- *          type: string
- *        description: Asset property to parse unique values from
- *    responses:
- *      200:
- *        description: Successful response
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                type: string
- *              example:
- *                - Laptop
- *                - Headset
- *                - Monitors
- *                - Mouse
- *                - Connectors/Adapters
- *                - Desktop
- *                - Keyboard
- *                - Others
- *                - Mobile
- *      404:
- *        description: Asset not found
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.get('/uniqueValues/:property', async (req: Request, res: Response) => {
   try {
     const { property } = req.params;
@@ -799,34 +499,6 @@ router.get('/uniqueValues/:property', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /api/assets/{property}/{value}:
- *  get:
- *    tags:
- *      - Asset
- *    summary: Get all assets via a specific property
- *    parameters:
- *      - in: params
- *        name: property
- *        schema:
- *          type: string
- *        description: Property to filter assets by
- *      - in: params
- *        name: value
- *        schema:
- *          type: string
- *        description: Value of property to filter assets by
- *    responses:
- *      200:
- *        description: A list of assets
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/Hardware'
- */
 router.get('/:property/:value', async (req: Request, res: Response) => {
   try {
     const { property, value } = req.params;
@@ -849,48 +521,6 @@ router.get('/:property/:value', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /api/assets/{property}/{value}:
- *  put:
- *    tags:
- *      - Asset
- *    summary: Update all assets with a specific property-value pair
- *    parameters:
- *      - in: path
- *        name: property
- *        required: true
- *        schema:
- *          type: string
- *        description: Property to filter assets by
- *      - in: path
- *        name: value
- *        required: true
- *        schema:
- *          type: string
- *        description: Value of property to filter assets by
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/AssetUpdate'
- *    responses:
- *      200:
- *        description: Updated assets
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/Hardware'
- *      404:
- *        description: No assets found with the specified property-value pair
- *      500:
- *        description: Internal server error
- *    security:
- *      - bearerAuth: []
- */
 router.put('/:property/:value', [
   check('category').optional().isString().withMessage('Category must be a string'),
   check('processor').optional().isString().withMessage('Processor must be a string'),
@@ -943,6 +573,7 @@ router.put('/:property/:value', [
       if (updateData['code']) delete updateData['code'];
 
       await Hardware.updateMany({ [property]: value }, updateData);
+      await auditAssets();
       res.status(200).json({ message: 'Assets updated successfully' });
     } catch (error) {
       console.error('Error updating assets:', error);
@@ -951,32 +582,6 @@ router.put('/:property/:value', [
   }
 );
 
-/**
- * @openapi
- * /api/assets/{code}:
- *  get:
- *    tags:
- *      - Asset
- *    summary: Get an asset by its code
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Asset code
- *    responses:
- *      200:
- *        description: Successful response
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Hardware'
- *      404:
- *        description: Asset not found
- *      500:
- *        description: Internal server error
- */
 router.get('/:code', async (req: Request, res: Response) => {
   try {
     const code: string = req.params.code;
@@ -994,40 +599,6 @@ router.get('/:code', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /api/assets/{property}/{value}:
- *  delete:
- *    tags:
- *      - Asset
- *    summary: Delete assets via a specific property
- *    parameters:
- *      - in: path
- *        name: property
- *        schema:
- *          type: string
- *        description: Property to filter assets by
- *      - in: path
- *        name: value
- *        schema:
- *          type: string
- *        description: Value of property to filter assets by
- *    responses:
- *      200:
- *        description: Successful response
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  description: Success message
- *      404:
- *        description: No assets found
- *      500:
- *        description: Internal server error
- */
 router.delete('/:property/:value', verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
@@ -1047,6 +618,7 @@ router.delete('/:property/:value', verifyToken, async (req: Request, res: Respon
       return res.status(404).json({ message: 'No assets found' });
     }
 
+    await auditAssets();
     res.status(200).json({ message: 'Assets deleted successfully' });
   } catch (error) {
     console.error('Error deleting assets:', error);
@@ -1054,32 +626,6 @@ router.delete('/:property/:value', verifyToken, async (req: Request, res: Respon
   }
 });
 
-/**
- * @openapi
- * /api/assets/{code}:
- *  delete:
- *    tags:
- *      - Asset
- *    summary: Delete an asset by its code
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Asset code
- *    responses:
- *      200:
- *        description: Asset deleted successfully
- *      403:
- *        description: Only users with admin role can perform this action
- *      404:
- *        description: Asset not found
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.delete('/:code', verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
@@ -1097,7 +643,7 @@ router.delete('/:code', verifyToken, async (req: Request, res: Response) => {
     }
 
     await Asset.deleteOne({ code });
-
+    await auditAssets();
     res.status(200).json({ message: 'Asset deleted successfully' });
   } catch (error) {
     console.error('Error deleting asset:', error);
