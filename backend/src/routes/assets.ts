@@ -128,12 +128,14 @@ router.post('/', [
           return res.status(400).json({ message: "Asset code already exists" });
         }
 
-        data['code'] = await getCodeAndIncrement(data['category'], data['type']);
-
-        if (!data['code']) return res.status(422).json({ message: `Need to configure the index of ${data['type']} - ${data['category']}` });
+        if (!data['serialNo']) return res.status(422).json({ message: 'Serial Number is required' });
+        if (!data['category']) return res.status(422).json({ message: 'Category is required' });
 
         const checkSerial = await checkSerialNo(data['serialNo']);
         if (checkSerial !== 'SUCCESS') return res.status(422).json({ message: checkSerial });
+
+        data['code'] = await getCodeAndIncrement(data['category'], data['type']);
+        if (!data['code']) return res.status(422).json({ message: `Need to configure the index of ${data['type']} - ${data['category']}` });
 
         const newAsset = new Hardware(data);
         await newAsset.save();
