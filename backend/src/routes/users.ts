@@ -146,6 +146,10 @@ router.patch('/resetPassword', async(req: Request, res: Response) => {
 
     if (!user) res.status(404).json({ message: "User not found" });
     
+    const isMatchNew = await compareHash(user.password, newPassword);
+
+    if(isMatchNew) return res.status(404).json({ message: "New password is same with the original password" });
+
     await OTPTransaction.updateOne({ _id: OTPT._id }, { status: 'USED'})
 
     const hashedPass = await generateHash(newPassword);
@@ -188,9 +192,11 @@ router.patch('/changePassword', verifyToken, async(req: Request, res: Response) 
  
     if (!user) res.status(404).json({ message: "User not found" });
 
-    const isMatch = await compareHash(user.password, currentPassword);
+    const isMatchCurrent = await compareHash(user.password, currentPassword);
+    const isMatchNew = await compareHash(user.password, newPassword);
 
-    if(!isMatch) return res.status(404).json({ message: "Current password does not matched from the original password" });
+    if(!isMatchCurrent) return res.status(404).json({ message: "Current password does not matched from the original password" });
+    if(isMatchNew) return res.status(404).json({ message: "New password is same with the original password" });
 
     const hashedPass = await generateHash(newPassword);
     await User.updateOne({ _id: user._id }, { password: hashedPass });
