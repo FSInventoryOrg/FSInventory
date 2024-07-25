@@ -16,7 +16,7 @@ import { useAppContext } from "@/hooks/useAppContext";
 import { useNavigate, useParams } from "react-router-dom";
 import * as authService from "@/auth-service";
 import {
-  ResetPasswordSchema,
+  ResetPasswordSchema
 } from "@/schemas/ResetPasswordSchema";
 import { PasswordInput } from "../PasswordInput";
 
@@ -70,7 +70,7 @@ const ResetPassword = ({ onError }: ResetPasswordFormProps) => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof ResetPasswordSchema>) => {
+  const onSubmit: any = (data: z.infer<typeof ResetPasswordSchema>) => {
     mutation.mutate({ newPassword: data.newPassword, token });
   };
 

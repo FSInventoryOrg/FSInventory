@@ -77,8 +77,7 @@ export const forgotPassword = async ( formData : ForgotPasswordFormData) => {
   if(!response.ok) {
     throw new Error(responseBody.message)
   }
-  return response.json();
-  
+  return responseBody;
 }
 
 export const resetPassword = async (formData: ResetPasswordFormData) => {
