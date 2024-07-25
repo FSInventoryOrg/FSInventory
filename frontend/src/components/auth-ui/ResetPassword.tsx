@@ -8,7 +8,6 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { Input } from "../ui/input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -18,7 +17,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import * as authService from "@/auth-service";
 import {
   ResetPasswordSchema,
-  ResetPasswordFormData,
 } from "@/schemas/ResetPasswordSchema";
 import { PasswordInput } from "../PasswordInput";
 
@@ -35,7 +33,8 @@ const ResetPassword = ({ onError }: ResetPasswordFormProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { showToast } = useAppContext();
-  const form = useForm({
+  
+  const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
     mode: "onBlur",
   });
@@ -72,7 +71,6 @@ const ResetPassword = ({ onError }: ResetPasswordFormProps) => {
   });
 
   const onSubmit = (data: z.infer<typeof ResetPasswordSchema>) => {
-    console.log(data);
     mutation.mutate({ newPassword: data.newPassword, token });
   };
 
