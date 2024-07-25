@@ -17,7 +17,7 @@ import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as authService from '@/auth-service'
 import { useAppContext } from '@/hooks/useAppContext'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Spinner } from '../Spinner'
 
 export type SignInFormData = {
@@ -89,7 +89,12 @@ const SignInForm = ({ onError }: SignInFormProps) => {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className='flex gap-2 text-md items-center'><LockIcon size={20}/>Password</FormLabel>
+              <FormLabel className='flex gap-2 text-md items-center'><LockIcon size={20}/>
+                Password
+                <Link to="/forgot-password" className="ml-auto inline-block text-sm underline">
+                  Forgot your password?
+                </Link>
+              </FormLabel>
               <div className='flex items-center relative'>
                 <FormControl>
                   <Input type={isPasswordVisible ? "text" : "password"} placeholder="" {...field} autoComplete="off" />

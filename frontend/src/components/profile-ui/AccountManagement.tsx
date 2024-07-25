@@ -1,4 +1,5 @@
 import { KeyIcon } from "lucide-react";
+import PasswordChange from "./PasswordChange";
 
 const AccountManagement = () => {
   return (
@@ -7,6 +8,7 @@ const AccountManagement = () => {
         <KeyIcon size={16} className="text-primary" />
         Account Management
       </h1>
+      <PasswordChange/>
     </div>
   );
 };

@@ -12,7 +12,7 @@ export interface AssetCounterType extends Document {
   counter: number;
   threshold: number;
   totalCount: number;
-  status: "In Stock" | "Depleting"
+  status: "In Stock" | "Depleting" | ""
 }
 
 const assetCounterSchema: Schema<AssetCounterType> = new Schema<AssetCounterType>({
@@ -21,7 +21,7 @@ const assetCounterSchema: Schema<AssetCounterType> = new Schema<AssetCounterType
   updated: { type: Date, required: true },
   updatedBy: { type: String, required: false},
   type: { type: String, enum: ["Hardware", "Software"], required: true },
-  status: { type: String, enum: ["In Stock", "Depleting"], required: false },
+  status: { type: String, enum: ["In Stock", "Depleting", ""], required: false },
   category: { type: String, required: true, unique: true },
   prefixCode: { type: String, required: true },
   counter: { type: Number, required: false },

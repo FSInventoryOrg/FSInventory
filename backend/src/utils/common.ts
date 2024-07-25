@@ -6,6 +6,8 @@ import Asset from "../models/asset.schema";
 import Notification, { NotificationType } from "../models/notification.schema";
 import User from "../models/user.schema";
 import mongoose from "mongoose";
+import OTPTransaction from "../models/otptransactions.schema";
+import bcrypt from 'bcryptjs'
 
 const directory = path.join(path.resolve(), '../');
 
@@ -187,7 +189,7 @@ export const auditAssets = async() => {
                 notifValue['seen_users'] = [];
                 
                 await triggerNotif(notifValue);
-            } else if (newValue['status'] === 'In Stock' && findIndex['status'] === 'Depleting') {
+            } else if (newValue['status'] === 'In Stock' && value['status'] === 'Depleting') {
                 notifValue['message_html'] = `<p>Asset <strong>${value['type']} - ${value['category']}</strong> is <strong style="color: green">${newValue['status']}</strong></p>`,
                 notifValue['seen_users'] = admins;
                 await triggerNotif(notifValue)
@@ -210,4 +212,30 @@ export const triggerNotif = async(data: NotificationType) => {
 export const deleteNotif = async(uniqueLabel: string) => {
     if (!uniqueLabel) return
     await Notification.deleteMany({uniqueLabel: uniqueLabel})
+}
+
+export const generateOTP = async(email: string, purpose: string, code?: string) => {
+    const MSExpiration = 600000;
+    const codeToUse = code ? code : new mongoose.Types.ObjectId();
+
+    const newOTPTransDoc = {
+      _id: codeToUse,
+      email: email,
+      expirationDate: new Date(new Date().getTime() + MSExpiration),
+      purpose: purpose,
+      otp: codeToUse.toString(),
+      status: "NOT TAKEN"
+    }
+
+    const newOTPTransaction = new OTPTransaction(newOTPTransDoc);
+    await newOTPTransaction.save();
+
+    return {
+        otp: codeToUse.toString(),
+        expiration: newOTPTransDoc.expirationDate
+    }
+}
+
+export const generateHash = async(value: string) => {
+   return await bcrypt.hash(value, 8)
 }

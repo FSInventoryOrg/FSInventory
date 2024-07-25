@@ -47,6 +47,8 @@ router.post('/', [
 
             if (!data.counter) data['counter'] = 0;
             if (data['prefixCode']) data['prefixCode'] = data['prefixCode'].toUpperCase().trim();
+            data['totalCount'] = 0;
+            data['status'] = "";
 
             const existingCounter = await AssetCounter.aggregate().match({
                 $expr: {
@@ -131,6 +133,8 @@ router.put('/:prefixCode', [
             if (!findCounter) return res.status(404).json({ message: "Asset Counter not found" });
 
             // delete data['counter'];
+            delete data['totalCount'];
+            delete data['status'];
 
             const ID = `${data._id}`;
             delete data._id;
