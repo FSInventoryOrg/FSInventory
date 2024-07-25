@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
 import { check, validationResult } from "express-validator";
-import bcrypt from "bcryptjs"
 import User from "../models/user.schema";
 import jwt from "jsonwebtoken";
 import verifyToken from "../middleware/auth";
+import { compareHash } from "../utils/common";
 
 const router = express.Router();
 
@@ -55,7 +55,7 @@ router.post("/login", [
         return res.status(400).json({ message: "Invalid credentials" });
       }
 
-      const isMatch = await bcrypt.compare(password, user.password);
+      const isMatch = await compareHash(user.password, password);
       if (!isMatch) {
         return res.status(400).json({ message: "Invalid credentials" });
       }

@@ -4,9 +4,8 @@ import User from '../models/user.schema';
 import { UserType } from '../models/user.schema';
 import { check, validationResult } from 'express-validator'
 import verifyToken from '../middleware/auth';
-import OTPTransaction, { OTPTransactionType } from '../models/otptransactions.schema';
-import mongoose, { mongo } from 'mongoose';
-import { generateHash, generateOTP } from '../utils/common';
+import OTPTransaction from '../models/otptransactions.schema';
+import { compareHash, generateHash, generateOTP } from '../utils/common';
 
 const router = express.Router();
 
@@ -166,6 +165,35 @@ router.patch('/resetPassword', async(req: Request, res: Response) => {
       secure: process.env.NODE_ENV === "production",
       maxAge: 86400000,
     })
+
+    return res.status(200).send({ message: "You have changed your password successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+})
+
+router.patch('/changePassword', verifyToken, async(req: Request, res: Response) => {
+  try {
+    const token = req.cookies.auth_token;
+    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+    const userId = decodedToken.userId;
+
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword) return res.status(422).json({ message: "Current Password is required to proceed with resetting the password" });
+    if (!newPassword) return res.status(422).json({ message: "New Password is required to proceed with resetting the password" });
+
+    const user: any = await User.findOne({ _id: userId});
+ 
+    if (!user) res.status(404).json({ message: "User not found" });
+
+    const isMatch = await compareHash(user.password, currentPassword);
+
+    if(!isMatch) return res.status(404).json({ message: "Current password does not matched from the original password" });
+
+    const hashedPass = await generateHash(newPassword);
+    await User.updateOne({ _id: user._id }, { password: hashedPass });
 
     return res.status(200).send({ message: "You have changed your password successfully" });
   } catch (error) {

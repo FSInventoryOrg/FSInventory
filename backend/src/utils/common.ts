@@ -239,3 +239,7 @@ export const generateOTP = async(email: string, purpose: string, code?: string) 
 export const generateHash = async(value: string) => {
    return await bcrypt.hash(value, 8)
 }
+
+export const compareHash = async(hashed: string, unhashed: string) => {
+    return await bcrypt.compare(unhashed, hashed)
+}
