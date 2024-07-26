@@ -11,19 +11,48 @@ import {
 import { PasswordInput } from "../PasswordInput";
 import { Button } from "../ui/button";
 import { ChangePasswordSchema } from "@/schemas/ResetPasswordSchema";
+import { z } from "zod";
+import * as authService from "@/auth-service";
+import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 
-const ChangePasswordForm = () => {
-  const form = useForm({
+
+interface ChangePasswordFormProps {
+  onError: (errorMessage: string | null) => void;
+  onSuccess: ()=> void;
+}
+const ChangePasswordForm = ({ onError, onSuccess }: ChangePasswordFormProps) => {
+  const form = useForm<z.infer<typeof ChangePasswordSchema>>({
     resolver: zodResolver(ChangePasswordSchema),
     mode: 'onChange'
   });
 
-  const onSubmit = () => {
-    console.log("Button clicked");
+  const currentPassword = form.watch("currentPassword")
+  const newPassword = form.watch("newPassword")
+  useEffect(()=> {
+    if(currentPassword && newPassword) form.trigger("newPassword")
+    if(newPassword) form.trigger("confirmPassword")
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[currentPassword, newPassword])
+
+  const handleError = (errorMessage: string) => {
+    onError(errorMessage);
   };
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
+  const mutation = useMutation({
+    mutationFn: authService.changePassword,
+    onSuccess: async () => {
+      // Once user successfully updates pasword, log them out to let them login
+      // with the new credentials.
+      onSuccess();
+    },
+    onError: async (error: Error) => {
+      handleError(error.message);
+    },
+  });
+
+  const onSubmit = (data: z.infer<typeof ChangePasswordSchema>) => {
+    mutation.mutate({currentPassword: data.currentPassword, newPassword: data.newPassword})
   };
   return (
     <Form {...form}>
@@ -77,7 +106,7 @@ const ChangePasswordForm = () => {
             </FormItem>
           )}
         />
-        <Button className="w-full gap-2" type="submit" onClick={handleClick}>
+        <Button className="w-full gap-2" type="submit" disabled={!form.formState.isValid}>
           Update Password
         </Button>
       </form>

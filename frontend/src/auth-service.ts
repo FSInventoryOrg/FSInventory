@@ -1,7 +1,7 @@
 import { SignUpFormData } from "./components/auth-ui/SignUpForm";
 import { SignInFormData } from "./components/auth-ui/SignInForm";
 import { ForgotPasswordFormData } from "./schemas/ForgotPasswordSchema";
-import { ResetPasswordFormData } from "./schemas/ResetPasswordSchema";
+import { ChangePasswordFormData, ResetPasswordFormData } from "./schemas/ResetPasswordSchema";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -82,6 +82,22 @@ export const forgotPassword = async ( formData : ForgotPasswordFormData) => {
 
 export const resetPassword = async (formData: ResetPasswordFormData) => {
   const response = await fetch(`${API_BASE_URL}/api/users/resetPassword`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(formData),
+  })
+  const responseBody = await response.json();
+
+  if(!response.ok) {
+    throw new Error(responseBody.message)
+  }
+}
+
+export const changePassword = async (formData: ChangePasswordFormData) => {
+  const response = await fetch(`${API_BASE_URL}/api/users/changePassword`, {
     method: 'PATCH',
     credentials: 'include',
     headers: {

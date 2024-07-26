@@ -13,12 +13,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAppContext } from "@/hooks/useAppContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import * as authService from "@/auth-service";
 import {
   ResetPasswordSchema
 } from "@/schemas/ResetPasswordSchema";
 import { PasswordInput } from "../PasswordInput";
+import { useEffect } from "react";
 
 type ResetPasswordParams = {
   token: string;
@@ -26,11 +27,11 @@ type ResetPasswordParams = {
 
 interface ResetPasswordFormProps {
   onError: (errorMessage: string | null) => void;
+  onSuccess: () => void;
 }
 
-const ResetPassword = ({ onError }: ResetPasswordFormProps) => {
+const ResetPassword = ({ onError, onSuccess }: ResetPasswordFormProps) => {
   const { token } = useParams<ResetPasswordParams>();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { showToast } = useAppContext();
   
@@ -39,16 +40,13 @@ const ResetPassword = ({ onError }: ResetPasswordFormProps) => {
     mode: "onChange",
   });
 
-  const { mutate: logout } = useMutation({
-    mutationFn: authService.logout,
-    onSuccess: async () => {
-      navigate("/");
-      await queryClient.invalidateQueries({ queryKey: ["validateToken"] });
-    },
-    onError: (error: Error) => {
-      showToast({ message: error.message, type: "ERROR" });
-    },
-  });
+  const password = form.watch("newPassword")
+
+  useEffect(() => {
+    if(password) form.trigger("confirmPassword")
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [password]);
+
   const handleError = (errorMessage: string) => {
     onError(errorMessage);
   };
@@ -56,21 +54,16 @@ const ResetPassword = ({ onError }: ResetPasswordFormProps) => {
   const mutation = useMutation({
     mutationFn: authService.resetPassword,
     onSuccess: async () => {
-      // Once user successfully updates pasword, log them out to let them login
-      // with the new credentials.
-      showToast({
-        message:
-          "Password changed successfully. Please login with your new credentials.",
-        type: "SUCCESS",
-      });
-      logout();
+      onSuccess()
+      showToast({ message: "You have logged in to the session.", type: "SUCCESS" });
+      await queryClient.invalidateQueries({ queryKey: ["validateToken"]});
     },
     onError: async (error: Error) => {
       handleError(error.message);
     },
   });
 
-  const onSubmit: any = (data: z.infer<typeof ResetPasswordSchema>) => {
+  const onSubmit = (data: z.infer<typeof ResetPasswordSchema>) => {
     mutation.mutate({ newPassword: data.newPassword, token });
   };
 
@@ -119,7 +112,7 @@ const ResetPassword = ({ onError }: ResetPasswordFormProps) => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="mt-4 ">
+          <Button type="submit" className="mt-4 " disabled={!form.formState.isValid}>
             Save password and Sign in <ArrowRight className="font-light" />
           </Button>
         </form>
