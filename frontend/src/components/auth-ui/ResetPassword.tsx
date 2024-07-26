@@ -36,7 +36,7 @@ const ResetPassword = ({ onError }: ResetPasswordFormProps) => {
   
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const { mutate: logout } = useMutation({
