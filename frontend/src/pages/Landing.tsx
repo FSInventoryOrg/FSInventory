@@ -1,5 +1,6 @@
 import Hero from '@/components/landing-ui/Hero'
 import AppearanceMode from '@/components/AppearanceMode'
+import { Toaster } from '@/components/ui/toaster'
 
 const Landing = () => {
   return (
@@ -8,6 +9,7 @@ const Landing = () => {
         <AppearanceMode />
       </div>
       <Hero />
+      <Toaster />
     </div>
   )
 }
