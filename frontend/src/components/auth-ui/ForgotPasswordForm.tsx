@@ -52,13 +52,18 @@ const ForgotPasswordForm = ({ onError }: ForgotPasswordFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col w-full gap-3"
+      >
         <KeyRound className="ml-2 h-10 w-10" />
-        <h1 className="text-3xl font-bold">Forgot Password ?</h1>
-        <p className="my-2 text-sm text-muted-foreground">
-          Enter your email address below and we'll send you the reset
-          instructions.{" "}
-        </p>
+        <div>
+          <h1 className="text-3xl font-bold">Forgot Password ?</h1>
+          <p className="my-2 text-sm text-muted-foreground">
+            Enter your email address below and we'll send you the reset
+            instructions.{" "}
+          </p>
+        </div>
         <FormField
           control={form.control}
           name="email"
