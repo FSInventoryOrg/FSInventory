@@ -145,11 +145,11 @@ router.patch('/resetPassword', async(req: Request, res: Response) => {
     });
 
     if (arrayOTPT.length > 1) return res.status(404).json({ message: "Not a valid OTP transaction" });
-    else if (arrayOTPT.length === 0) return res.status(404).json({ message: "Could not reset the password, it seems the token is already expired" });
+    else if (arrayOTPT.length === 0) return res.status(404).json({ message: "Token is expired. Cannot reset password." });
 
     const OTPT = arrayOTPT[0];
 
-    const user: any = await User.findOne({ email: OTPT.email});
+    const user: any = await User.findOne({ email: OTPT.email}).select("+password")
 
     if (!user) res.status(404).json({ message: "User not found" });
     
@@ -196,14 +196,14 @@ router.patch('/changePassword', verifyToken, async(req: Request, res: Response) 
     if (!currentPassword) return res.status(422).json({ message: "Current Password is required to proceed with resetting the password" });
     if (!newPassword) return res.status(422).json({ message: "New Password is required to proceed with resetting the password" });
 
-    const user: any = await User.findOne({ _id: userId});
+    const user: any = await User.findOne({ _id: userId}).select("+password")
  
     if (!user) res.status(404).json({ message: "User not found" });
 
     const isMatchCurrent = await compareHash(user.password, currentPassword);
     const isMatchNew = await compareHash(user.password, newPassword);
 
-    if(!isMatchCurrent) return res.status(404).json({ message: "Current password does not matched from the original password" });
+    if(!isMatchCurrent) return res.status(404).json({ message: "Current password does not match the original password" });
     if(isMatchNew) return res.status(404).json({ message: "New password is same with the original password" });
 
     const hashedPass = await generateHash(newPassword);

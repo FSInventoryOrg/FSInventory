@@ -36,3 +36,5 @@ const CurrentWithNewPasswordSchema = z.object({
 })
 
 export const ChangePasswordSchema = z.intersection(ResetPasswordSchema, CurrentWithNewPasswordSchema)
+
+export type ChangePasswordFormData = z.infer<typeof CurrentWithNewPasswordSchema>;

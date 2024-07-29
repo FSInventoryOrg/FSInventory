@@ -7,30 +7,41 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const ForgotPassword = () => {
-  const [alert, setAlert] = useState({type: '', message: ''})
+  const [alert, setAlert] = useState({ type: "", message: "" });
   return (
-    <>
+    <div className="flex min-h-screen justify-center items-center">
       <div className="absolute top-2 right-2 drop-shadow-md">
         <AppearanceMode />
       </div>
-      <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
-        <div className="hidden bg-muted lg:block">
-          <div className="flex items-center justify-center mx-auto h-full">
-            <ForgotGraphic height={600} width={600} />
+      <section className="flex w-full justify-center">
+        <div className="flex w-full min-h-screen lg:grid lg:grid-cols-2">
+          <div className="hidden bg-muted lg:block">
+            <div className="flex items-center justify-center mx-auto h-full">
+              <ForgotGraphic height={600} width={600} />
+            </div>
+          </div>
+          <div className="flex grow items-center justify-center pt-20 md:py-12 h-full">
+            <div className="mx-auto grid w-[350px]">
+              {alert.message && (
+                <Alert
+                  type={alert.type as Props["type"]}
+                  message={alert.message}
+                />
+              )}
+              <ForgotPasswordForm
+                onError={(errorMessage) =>
+                  setAlert({ type: "error", message: errorMessage as string })
+                }
+              />
+              <Link className="text-sm pt-6 hover:underline" to="/">
+                <ArrowLeft className="inline-block" />
+                Back to login
+              </Link>
+            </div>
           </div>
         </div>
-        <div className="flex items-center justify-center py-12">
-          <div className="mx-auto grid w-[350px] gap-6">
-            {alert.message && <Alert type={alert.type as Props['type']} message={alert.message}/>}
-            <ForgotPasswordForm onError={(errorMessage)=> setAlert({type:'error', message: errorMessage as string})} />
-            <Link className="text-sm" to="/">
-              <ArrowLeft className="inline-block" />
-              Back to login
-            </Link>
-          </div>
-        </div>
-      </div>
-    </>
+      </section>
+    </div>
   );
 };
 export default ForgotPassword;
