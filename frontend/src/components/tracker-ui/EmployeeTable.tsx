@@ -178,7 +178,9 @@ export function EmployeeTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                   onClick={() => {
                     if (row.original.code) {
-                      window.location.href = `/tracker/${row.original.code}`
+                      // window.location.href = `/tracker/${row.original.code}`
+                      history.pushState({}, '', `/tracker/${row.original.code}`);
+                      onEmployeeSelect(row.original)
                     } else {
                       history.pushState({}, '', '/tracker');
                       onEmployeeSelect(row.original)

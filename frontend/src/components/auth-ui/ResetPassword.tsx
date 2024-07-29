@@ -68,7 +68,7 @@ const ResetPassword = ({ onError, onSuccess }: ResetPasswordFormProps) => {
           <KeyRound className="ml-2 h-10 w-10" />
           <h1 className="text-3xl font-bold">Reset Password</h1>
           <p className="my-2 text-sm text-muted-foreground">
-            Please enter OTP send in your email.
+            Please enter OTP sent in your email.
           </p>
           <FormField
             control={form.control}
@@ -76,7 +76,7 @@ const ResetPassword = ({ onError, onSuccess }: ResetPasswordFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-l font-medium">
-                  6 Digit OTP
+                  OTP
                 </FormLabel>
                 <FormControl>
                   <PasswordInput
