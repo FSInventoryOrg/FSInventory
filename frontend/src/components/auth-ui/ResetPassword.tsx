@@ -13,23 +13,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAppContext } from "@/hooks/useAppContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as authService from "@/auth-service";
 import {
   ResetPasswordSchema
 } from "@/schemas/ResetPasswordSchema";
 import { PasswordInput } from "../PasswordInput";
 
-type ResetPasswordParams = {
-  token: string;
-};
-
 interface ResetPasswordFormProps {
   onError: (errorMessage: string | null) => void;
 }
 
 const ResetPassword = ({ onError }: ResetPasswordFormProps) => {
-  const { token } = useParams<ResetPasswordParams>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { showToast } = useAppContext();
@@ -71,7 +66,7 @@ const ResetPassword = ({ onError }: ResetPasswordFormProps) => {
   });
 
   const onSubmit: any = (data: z.infer<typeof ResetPasswordSchema>) => {
-    mutation.mutate({ newPassword: data.newPassword, token });
+    mutation.mutate({ newPassword: data.newPassword, token: data.otp });
   };
 
   return (
@@ -80,6 +75,27 @@ const ResetPassword = ({ onError }: ResetPasswordFormProps) => {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <KeyRound className="ml-2 h-10 w-10" />
           <h1 className="text-3xl font-bold">Reset Password</h1>
+          <p className="my-2 text-sm text-muted-foreground">
+            Please enter OTP send in your email.
+          </p>
+          <FormField
+            control={form.control}
+            name="otp"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-l font-medium">
+                  6 Digit OTP
+                </FormLabel>
+                <FormControl>
+                  <PasswordInput
+                    {...field}
+                    placeholder="Enter the 6 digit otp"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <p className="my-2 text-sm text-muted-foreground">
             Please enter your new password below.
           </p>

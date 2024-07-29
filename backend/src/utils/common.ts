@@ -216,10 +216,11 @@ export const deleteNotif = async(uniqueLabel: string) => {
 
 export const generateOTP = async(email: string, purpose: string, code?: string) => {
     const MSExpiration = 600000;
-    const codeToUse = code ? code : new mongoose.Types.ObjectId();
+    const newID =  new mongoose.Types.ObjectId();
+    const codeToUse = code ? code : newID;
 
     const newOTPTransDoc = {
-      _id: codeToUse,
+      _id: newID,
       email: email,
       expirationDate: new Date(new Date().getTime() + MSExpiration),
       purpose: purpose,
@@ -235,6 +236,8 @@ export const generateOTP = async(email: string, purpose: string, code?: string) 
         expiration: newOTPTransDoc.expirationDate
     }
 }
+
+export const generateRandom6Digits = () => { return Math.floor(100000 + Math.random() * 900000).toString() }
 
 export const generateHash = async(value: string) => {
    return await bcrypt.hash(value, 8)

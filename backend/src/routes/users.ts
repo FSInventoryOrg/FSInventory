@@ -5,7 +5,8 @@ import { UserType } from '../models/user.schema';
 import { check, validationResult } from 'express-validator'
 import verifyToken from '../middleware/auth';
 import OTPTransaction from '../models/otptransactions.schema';
-import { compareHash, generateHash, generateOTP } from '../utils/common';
+import { compareHash, generateHash, generateOTP, generateRandom6Digits } from '../utils/common';
+import { sendMail } from '../system/mailer';
 
 const router = express.Router();
 
@@ -107,9 +108,15 @@ router.post('/forgotPassword', async(req: Request, res: Response) => {
 
     if (!user) return res.status(404).json({ message: "User email could not be found" });
 
-    const { otp, expiration } = await generateOTP(email, "Resetting password");
+    const { otp, expiration } = await generateOTP(email, "Resetting password", generateRandom6Digits());
 
-    return res.status(200).json({ message: `Token will expire on ${expiration.toLocaleString()}`, token: otp })
+    await sendMail({
+      subject: 'FS IMS Account - Password Reset Confirmation', 
+      htmlMessage: `Hi ${user['firstName']}, please use this OTP <strong style="font-size: 18px !important;">${otp}</strong> to reset your password`, 
+      recipient: [email]
+    })
+
+    return res.status(200).json({ message: `OTP has been sent to your email and will expire on ${expiration.toLocaleString()}`})
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Something went wrong" });
@@ -146,6 +153,7 @@ router.patch('/resetPassword', async(req: Request, res: Response) => {
 
     if (!user) res.status(404).json({ message: "User not found" });
     
+    console.log(user)
     const isMatchNew = await compareHash(user.password, newPassword);
 
     if(isMatchNew) return res.status(404).json({ message: "New password is same with the original password" });

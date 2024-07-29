@@ -9,6 +9,9 @@ export const ResetPasswordSchema = z
     confirmPassword: z
       .string()
       .min(8, "Confirm password must be at least 8 characters"),
+    otp: z
+      .string()
+      .min(6, "Confirm password must be at least 8 characters"),
   })
   .refine((data) => data.confirmPassword === data.newPassword, {
     message: "Passwords don't match",
