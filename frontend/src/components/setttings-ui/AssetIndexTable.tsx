@@ -85,7 +85,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 
   return (
     <div className="md:w-5/6 flex flex-col h-[calc(100vh-16rem)]">
-      <div className="flex items-center py-4 gap-2">
+      <div className="flex items-center pb-4 gap-2">
         <Input
           placeholder="Filter categories..."
           value={

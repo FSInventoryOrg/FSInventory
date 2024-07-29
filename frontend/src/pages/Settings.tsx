@@ -1,13 +1,18 @@
-import AssetIndexControl from "@/components/setttings-ui/AssetIndexControl";
-import SidebarNav from "@/components/setttings-ui/SidebarNav";
-import { Separator } from "@/components/ui/separator";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from 'react-router-dom';
+import SidebarNav from '@/components/setttings-ui/SidebarNav';
+import AssetIndexControl from '@/components/setttings-ui/AssetIndexControl';
+import NotificationsControl from '@/components/setttings-ui/NotificationsControl';
+import { Separator } from '@/components/ui/separator';
 
 const Settings = () => {
   const settingsNavItems = [
     {
-      title: "Asset Index",
-      href: "/settings/assetcontrol",
+      title: 'Asset Index',
+      href: '/settings/assetcontrol',
+    },
+    {
+      title: 'Notifications',
+      href: '/settings/notifications',
     },
   ];
 
@@ -31,6 +36,7 @@ const Settings = () => {
           <Routes>
             <Route path="/" element={<Navigate to="assetcontrol" />} />
             <Route path="/assetcontrol" element={<AssetIndexControl />} />
+            <Route path="/notifications" element={<NotificationsControl />} />
           </Routes>
         </div>
       </div>

@@ -175,7 +175,7 @@ export const fetchAssetByCode = async (code: string) => {
 }
 
 export const fetchAssetCount = async (property: string, value: string) => {
-  const response = await fetch(`${API_BASE_URL}/api/assets/count/${property}/${value}`, {
+  const response = await fetch(`${API_BASE_URL}/api/assets/count/${property}/${encodeURIComponent(value)}`, {
     credentials: 'include',
   });
 
@@ -283,15 +283,15 @@ export const updateOptionDefaults = async (defaults: Defaults) => {
 
 export const updateOptionValue = async ({ property, value, index }: { property: string, value: string | object, index?: number }) => {
   const url = `${API_BASE_URL}/api/options/${property}`;
-  const queryString = index !== undefined ? `?index=${index}` : ''; 
+  const queryString = index !== undefined ? `?index=${index}` : '';
 
   const response = await fetch(url + queryString, {
     method: 'PUT',
-    credentials: 'include', 
+    credentials: 'include',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ value })
+    body: JSON.stringify({ value }),
   });
 
   if (!response.ok) {
@@ -567,3 +567,32 @@ export const updateAssetCounter = async ({ prefixCode, updatedAssetCounter }: { 
     }
     return true;    
 }
+
+export const fetchNotifications = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/notification`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Error fetching notifications');
+  }
+
+  return response.json();
+};
+
+export const markNotificationAsRead = async (notificationId: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/notification`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify([notificationId]),
+  });
+
+  if (!response.ok) {
+    throw new Error('Error marking notification as read');
+  }
+
+  return true;
+};

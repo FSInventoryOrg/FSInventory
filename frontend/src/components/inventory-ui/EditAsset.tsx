@@ -89,12 +89,13 @@ const EditAsset = ({ assetData, onClose }: EditAssetProps) => {
       showToast({ message: "Asset updated successfully!", type: "SUCCESS" });
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
-      setTimeout(() => {
-        onClose(true)
-      }, 100)
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
+    },
+    onSettled: async () => {
+      onClose(true)
     }
   });
 

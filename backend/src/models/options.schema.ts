@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export type StatusOptions = {
   value: string;
   color?: string;
+  tracked?: boolean;
 }
 
 export type CategoryOptions = {
@@ -84,7 +85,8 @@ const optionsSchema: Schema<OptionsType> = new Schema<OptionsType>({
   status: { 
     type: [{ 
       value: { type: String, required: true }, 
-      color: { type: String, required: false } 
+      color: { type: String, required: false },
+      tracked: { type: Boolean, required: false }
     }], 
     required: true 
   },
