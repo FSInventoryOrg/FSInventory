@@ -153,7 +153,6 @@ router.patch('/resetPassword', async(req: Request, res: Response) => {
 
     if (!user) res.status(404).json({ message: "User not found" });
     
-    console.log(user)
     const isMatchNew = await compareHash(user.password, newPassword);
 
     if(isMatchNew) return res.status(404).json({ message: "New password is same with the original password" });

@@ -7,27 +7,6 @@ import { EmployeeType } from '../models/employee.schema';
 
 const router = express.Router();
 
-/**
- * @openapi
- * /api/employees:
- *  get:
- *    tags:
- *      - Employee
- *    summary: Get all employees
- *    responses:
- *      200:
- *        description: Successful response
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/EmployeeType'
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.get("/", async (req: Request, res: Response) => {
   try {
     const employees: EmployeeType[] = await Employee.find();
@@ -39,34 +18,6 @@ router.get("/", async (req: Request, res: Response) => {
 });
 
 
-/**
- * @openapi
- * /api/employees/{code}:
- *  get:
- *    tags:
- *      - Employee
- *    summary: Get one employee by code
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Employee code
- *    responses:
- *      200:
- *        description: Successful response
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/EmployeeType'
- *      404:
- *        description: Employee not found
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.get("/:code", async (req: Request, res: Response) => {
   const { code } = req.params;
   try {
@@ -81,36 +32,6 @@ router.get("/:code", async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /api/employees/uniqueValues/{property}:
- *  get:
- *    tags:
- *      - Employee
- *    summary: Get array of unique values for an employee's property
- *    parameters:
- *      - in: path
- *        name: property
- *        required: true
- *        schema:
- *          type: string
- *        description: Employee property to parse unique values from
- *    responses:
- *      200:
- *        description: Successful response
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                type: string
- *      404:
- *        description: Asset not found
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.get('/uniqueValues/:property', async (req: Request, res: Response) => {
   try {
     const { property } = req.params;
