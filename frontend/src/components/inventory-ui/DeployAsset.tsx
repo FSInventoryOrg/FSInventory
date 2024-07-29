@@ -62,19 +62,22 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
     mutationKey: ['deployAsset'],
     mutationFn: imsService.deployAsset,
     onSuccess: async () => {
-      showToast({ message: "Asset deployed successfully!", type: "SUCCESS" });
-      queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
-      queryClient.invalidateQueries({ queryKey: ["fetchAssetsByProperty"] })
-      queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
-      queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
-      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
-      setTimeout(() => {
-        setOpen(false);
-      }, 100)
+      showToast({ message: 'Asset deployed successfully!', type: 'SUCCESS' });
+      queryClient.invalidateQueries({ queryKey: ['fetchAllAssets'] });
+      queryClient.invalidateQueries({ queryKey: ['fetchAssetsByProperty'] });
+      queryClient.invalidateQueries({
+        queryKey: ['fetchAllAssetsByStatusAndCategory'],
+      });
+      queryClient.invalidateQueries({ queryKey: ['fetchEmployees'] });
+      queryClient.invalidateQueries({ queryKey: ['fetchEmployeeByCode'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
     onError: (error: Error) => {
-      showToast({ message: error.message, type: "ERROR" });
-    }
+      showToast({ message: error.message, type: 'ERROR' });
+    },
+    onSettled: async () => {
+      setOpen(false);
+    },
   });
 
   const onSubmit = (data: z.infer<typeof AssetSchema>) => {

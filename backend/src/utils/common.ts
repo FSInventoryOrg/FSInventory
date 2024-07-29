@@ -190,7 +190,7 @@ export const auditAssets = async() => {
                 
                 await triggerNotif(notifValue);
             } else if (newValue['status'] === 'In Stock' && value['status'] === 'Depleting') {
-                notifValue['message_html'] = `<p>Asset <strong>${value['type']} - ${value['category']}</strong> is <strong style="color: green">${newValue['status']}</strong></p>`,
+                notifValue['message_html'] = `<p>Asset <strong>${value['type']} - ${value['category']}</strong> is <strong style="color: green">${newValue['status']}</strong></p>`
                 notifValue['seen_users'] = admins;
                 await triggerNotif(notifValue)
             }

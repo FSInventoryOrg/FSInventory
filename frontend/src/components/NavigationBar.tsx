@@ -5,17 +5,22 @@ import {
 } from "@/components/ui/navigation-menu"
 import { Link } from "react-router-dom"
 import UserAvatar from "./UserAvatar"
-import Hamburger from "./Hamburger"
-import { Button } from "./ui/button"
-import { ClipboardListIcon, FlagIcon, GaugeCircleIcon, TargetIcon } from "lucide-react"
-import { Bell, Gear } from "@phosphor-icons/react"
-import { FullScaleIcon } from "./icons/FullScaleIcon"
-import useUserData from "@/hooks/useUserData"
+import Notification from './Notification';
+import Hamburger from './Hamburger';
+import { Button } from './ui/button';
+import {
+  ClipboardListIcon,
+  FlagIcon,
+  GaugeCircleIcon,
+  TargetIcon,
+} from 'lucide-react';
+import { Gear } from '@phosphor-icons/react';
+import { FullScaleIcon } from './icons/FullScaleIcon';
+import useUserData from '@/hooks/useUserData';
 
 const NavigationBar = () => {
+  const { data: userData } = useUserData();
 
-  const { data: userData } = useUserData()
-  
   return (
     <section className="flex w-full justify-between py-6 px-6 z-0">
       <div className="flex items-center justify-center">
@@ -25,7 +30,12 @@ const NavigationBar = () => {
               <Hamburger />
             </NavigationMenuItem>
             <NavigationMenuItem className="flex items-center">
-              <Link className="flex items-center justify-center gap-1 text-primary" to="/" reloadDocument tabIndex={-1}>
+              <Link
+                className="flex items-center justify-center gap-1 text-primary"
+                to="/"
+                reloadDocument
+                tabIndex={-1}
+              >
                 {/* <svg fill="currentColor" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="36px" height="36px" viewBox="0 0 425.178 425.178" xmlSpace="preserve">
                   <g>
                     <g>
@@ -71,8 +81,13 @@ const NavigationBar = () => {
                     </g>
                   </g>
                 </svg> */}
-                <FullScaleIcon size={36} className="fill-current text-primary" />
-                <span className="text-2xl font-bold tracking-tighter text-secondary-foreground">stockpilot</span>
+                <FullScaleIcon
+                  size={36}
+                  className="fill-current text-primary"
+                />
+                <span className="text-2xl font-bold tracking-tighter text-secondary-foreground">
+                  stockpilot
+                </span>
               </Link>
             </NavigationMenuItem>
           </NavigationMenuList>
@@ -80,21 +95,75 @@ const NavigationBar = () => {
       </div>
       <div className="hidden sm:flex items-center justify-center">
         <NavigationMenu>
-          <NavigationMenuList className="space-x-0 xl:space-x-3">   
-            <Link to="/dashboard" className={`${location.pathname.startsWith('/dashboard') ? "bg-secondary" : "bg-none"}  rounded-r-none rounded-l-xl xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 border-l-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`} style={{ textDecoration: 'none' }}>
-              <GaugeCircleIcon className={location.pathname.startsWith('/dashboard') ? "text-primary" : ""} />
+          <NavigationMenuList className="space-x-0 xl:space-x-3">
+            <Link
+              to="/dashboard"
+              className={`${
+                location.pathname.startsWith('/dashboard')
+                  ? 'bg-secondary'
+                  : 'bg-none'
+              }  rounded-r-none rounded-l-xl xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 border-l-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`}
+              style={{ textDecoration: 'none' }}
+            >
+              <GaugeCircleIcon
+                className={
+                  location.pathname.startsWith('/dashboard')
+                    ? 'text-primary'
+                    : ''
+                }
+              />
               <span className="hidden lg:inline-block">Dashboard</span>
-            </Link>       
-            <Link to="/inventory" className={`${location.pathname.startsWith('/inventory') ? "bg-secondary" : "bg-none"} rounded-none xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`} style={{ textDecoration: 'none' }}>
-              <ClipboardListIcon className={location.pathname.startsWith('/inventory') ? "text-primary" : ""} />
+            </Link>
+            <Link
+              to="/inventory"
+              className={`${
+                location.pathname.startsWith('/inventory')
+                  ? 'bg-secondary'
+                  : 'bg-none'
+              } rounded-none xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`}
+              style={{ textDecoration: 'none' }}
+            >
+              <ClipboardListIcon
+                className={
+                  location.pathname.startsWith('/inventory')
+                    ? 'text-primary'
+                    : ''
+                }
+              />
               <span className="hidden lg:inline-block">Inventory</span>
             </Link>
-            <Link to="/tracker" className={`${location.pathname.startsWith('/tracker') ? "bg-secondary" : "bg-none"} rounded-none xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`} style={{ textDecoration: 'none' }}>
-              <TargetIcon className={location.pathname.startsWith('/tracker') ? "text-primary" : ""} />
+            <Link
+              to="/tracker"
+              className={`${
+                location.pathname.startsWith('/tracker')
+                  ? 'bg-secondary'
+                  : 'bg-none'
+              } rounded-none xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`}
+              style={{ textDecoration: 'none' }}
+            >
+              <TargetIcon
+                className={
+                  location.pathname.startsWith('/tracker') ? 'text-primary' : ''
+                }
+              />
               <span className="hidden lg:inline-block">Tracker</span>
             </Link>
-            <Button disabled className={`${location.pathname.startsWith('/requests') ? "bg-secondary" : "bg-none"} rounded-l-none rounded-r-xl xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border-t-2 border-b-2 border-r-2 xl:border-2 font-semibold text-md flex gap-2 items-center`} variant="outline">
-              <FlagIcon className={location.pathname.startsWith('/requests') ? "text-primary" : ""} />
+            <Button
+              disabled
+              className={`${
+                location.pathname.startsWith('/requests')
+                  ? 'bg-secondary'
+                  : 'bg-none'
+              } rounded-l-none rounded-r-xl xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border-t-2 border-b-2 border-r-2 xl:border-2 font-semibold text-md flex gap-2 items-center`}
+              variant="outline"
+            >
+              <FlagIcon
+                className={
+                  location.pathname.startsWith('/requests')
+                    ? 'text-primary'
+                    : ''
+                }
+              />
               <span className="hidden lg:inline-block">Requests</span>
             </Button>
             {/* <Link to="/requests" className={`${location.pathname.startsWith('/requests') ? "bg-secondary" : "bg-none"}  rounded-l-none rounded-r-xl xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 border-r    -2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`} style={{ textDecoration: 'none' }}>
@@ -102,33 +171,36 @@ const NavigationBar = () => {
               <span className="hidden lg:inline-block">Requests</span>
             </Link>   */}
           </NavigationMenuList>
-        </NavigationMenu>        
+        </NavigationMenu>
       </div>
       <div className="flex items-center justify-center">
         <NavigationMenu>
           <NavigationMenuList className="gap-1 hidden md:flex">
             <NavigationMenuItem className="justify-center flex">
-              <Button asChild size="icon" className="rounded-xl" variant="secondary">
+              <Button
+                asChild
+                size="icon"
+                className="rounded-xl"
+                variant="secondary"
+              >
                 <Link to="/settings">
-                  <Gear weight="fill" size={28}/>
+                  <Gear weight="fill" size={28} />
                 </Link>
               </Button>
             </NavigationMenuItem>
             <NavigationMenuItem className="justify-center flex">
-              <Button size="icon" className="rounded-xl" variant="secondary">
-                <Bell weight="fill" size={28}/>
-              </Button>
+              <Notification />
             </NavigationMenuItem>
           </NavigationMenuList>
           <NavigationMenuList className="ml-4">
             <NavigationMenuItem>
-              <UserAvatar image={userData?.avatar}/>
+              <UserAvatar image={userData?.avatar} />
             </NavigationMenuItem>
           </NavigationMenuList>
-        </NavigationMenu>        
+        </NavigationMenu>
       </div>
     </section>
-  )
-}
+  );
+};
 
 export default NavigationBar;

@@ -34,19 +34,22 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
   const { mutate: updateEmployee, isPending: updatingEmployee } = useMutation({
     mutationFn: imsService.updateEmployeeAssetHistory,
     onSuccess: async () => {
-      showToast({ message: "Asset retrieved successfully!", type: "SUCCESS" });
-      queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
-      queryClient.invalidateQueries({ queryKey: ["fetchAssetsByProperty"] })
-      queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
-      queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
-      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
-      setTimeout(() => {
-        setOpen(false);
-      }, 100)
+      showToast({ message: 'Asset retrieved successfully!', type: 'SUCCESS' });
+      queryClient.invalidateQueries({ queryKey: ['fetchAllAssets'] });
+      queryClient.invalidateQueries({ queryKey: ['fetchAssetsByProperty'] });
+      queryClient.invalidateQueries({
+        queryKey: ['fetchAllAssetsByStatusAndCategory'],
+      });
+      queryClient.invalidateQueries({ queryKey: ['fetchEmployees'] });
+      queryClient.invalidateQueries({ queryKey: ['fetchEmployeeByCode'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
     onError: (error: Error) => {
-      showToast({ message: error.message, type: "ERROR" });
-    }
+      showToast({ message: error.message, type: 'ERROR' });
+    },
+    onSettled: async () => {
+      setOpen(false);
+    },
   });
 
   const { mutate: retrieveAsset, isPending: retrievalPending } = useMutation({
@@ -78,10 +81,9 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
     const retrievedAsset = {
       _id: assetData._id,
       code: assetData.code,
-      recoveryDate: new Date,
+      recoveryDate: new Date(),
       recoveredFrom: assetData.assignee,
-    }
-    console.log(retrievedAsset)
+    };
     retrieveAsset({ code: assetData.code, retrievedAsset: retrievedAsset });
   }
 

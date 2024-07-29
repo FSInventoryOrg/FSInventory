@@ -51,16 +51,17 @@ const EditAssetCounter = ({
     mutationFn: imsService.updateAssetCounter,
     onSuccess: async () => {
       showToast({
-        message: "Asset counter updated successfully!",
-        type: "SUCCESS",
+        message: 'Asset counter updated successfully!',
+        type: 'SUCCESS',
       });
-      queryClient.invalidateQueries({ queryKey: ["fetchAssetCounters"] });
-      setTimeout(() => {
-        onClose(true);
-      }, 100);
+      queryClient.invalidateQueries({ queryKey: ['fetchAssetCounters'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
     onError: (error: Error) => {
       onError(error.message);
+    },
+    onSettled: async () => {
+      onClose(true);
     },
   });
 
