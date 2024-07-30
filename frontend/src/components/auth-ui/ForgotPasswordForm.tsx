@@ -7,8 +7,8 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { KeyRound, MailIcon } from "lucide-react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -17,6 +17,7 @@ import * as authService from "@/auth-service";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "../Spinner";
 import { ForgotPasswordSchema } from "@/schemas/ForgotPasswordSchema";
+import { useAppContext } from '@/hooks/useAppContext';
 
 interface ForgotPasswordFormProps {
   onError: (errorMessage: string | null) => void;
@@ -24,6 +25,7 @@ interface ForgotPasswordFormProps {
 
 const ForgotPasswordForm = ({ onError }: ForgotPasswordFormProps) => {
   const navigate = useNavigate();
+  const { showToast } = useAppContext();
   const form = useForm({
     resolver: zodResolver(ForgotPasswordSchema),
     defaultValues: {
@@ -39,6 +41,8 @@ const ForgotPasswordForm = ({ onError }: ForgotPasswordFormProps) => {
     onSuccess: async () => {
       // When email sent is valid, user is redirected to the Reset Password Page
       navigate('/reset-password');
+      showToast({ message: "OTP has been sent to your email.", type: "SUCCESS" });
+
     },
     onError: async (error: Error) => {
       handleError(error.message);
