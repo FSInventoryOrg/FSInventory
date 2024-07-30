@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 import OTPTransaction from "../models/otptransactions.schema";
 import bcrypt from 'bcryptjs'
 import Option from "../models/options.schema";
+import { MongoClient } from "mongodb";
 
 const directory = path.join(path.resolve(), '../');
 
@@ -257,4 +258,14 @@ export const fetchExternalSource = async(url: string, headers: any) => {
     return await new Promise((resolve, reject) => {
         fetch(url, headers).then(response => response.json()).then(data => resolve(data)).catch(err => reject())
     })
+}
+
+export const rotateLogs = async() => {
+    const conn = await MongoClient.connect(process.env.MONGODB_CONNECTION_STRING as string);
+    const db = conn.db('admin');
+    await db.admin().command({ logRotate: 1 });
+    conn.close();
+    
+    console.log('System logs has been rotated');
+    setTimeout(() => { rotateLogs() }, 3600000)
 }
