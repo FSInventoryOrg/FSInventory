@@ -66,6 +66,11 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
           updateEmployee({ code: assetData.assignee, assetHistory: assetHistory })
         } else {
           showToast({ message: "Asset retrieved successfully!", type: "SUCCESS" });
+          queryClient.invalidateQueries({ queryKey: ['fetchAllAssets', 'Hardware'] });
+          queryClient.invalidateQueries({
+            queryKey: ['fetchAllAssetsByStatusAndCategory'],
+          });
+          queryClient.invalidateQueries({ queryKey: ['notifications'] });
           setTimeout(() => {
             setOpen(false)
           }, 100)
