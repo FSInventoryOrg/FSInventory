@@ -1,6 +1,7 @@
 
 import { z } from "zod";
 
+
 export const ResetPasswordSchema = z
   .object({
     newPassword: z
@@ -9,14 +10,17 @@ export const ResetPasswordSchema = z
     confirmPassword: z
       .string()
       .min(8, "Confirm password must be at least 8 characters"),
-    otp: z
-      .string()
-      .min(6, "Confirm password must be at least 8 characters"),
   })
   .refine((data) => data.confirmPassword === data.newPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
   });
+
+export const ResetPasswordSchemaWithOTP = ResetPasswordSchema.and(
+  z.object({
+     otp: z.string().min(6, "OTP must be at least 6 characters")
+    })
+  );
 
 
 export type ResetPasswordFormData = {

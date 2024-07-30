@@ -3,6 +3,7 @@ import AppearanceMode from "@/components/AppearanceMode";
 import PasswordChangedSuccess from "@/components/auth-ui/PasswordChangedSuccess";
 import ResetPassword from "@/components/auth-ui/ResetPassword";
 import { default as ForgotGraphic } from "@/components/graphics/Forgot";
+import { Toaster } from '@/components/ui/toaster';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -59,6 +60,7 @@ const ResetPasswordPage = () => {
             </div>
           </div>
         </div>
+        <Toaster/>
       </section>
     </div>
   );

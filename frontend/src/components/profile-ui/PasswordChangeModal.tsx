@@ -62,7 +62,7 @@ const PasswordChangeModal = ({ disabled }: PasswordChangeProps) => {
         {showSuccessSplash ? (
           <PasswordChangedSuccess
             redirectPath={{ name: "login", path: "/login" }}
-            delay={5000}
+            delay={3000}
             skipWait={false}
             onComplete={logout}
           />
