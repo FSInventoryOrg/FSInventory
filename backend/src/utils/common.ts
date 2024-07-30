@@ -8,6 +8,7 @@ import User from "../models/user.schema";
 import mongoose from "mongoose";
 import OTPTransaction from "../models/otptransactions.schema";
 import bcrypt from 'bcryptjs'
+import Option from "../models/options.schema";
 
 const directory = path.join(path.resolve(), '../');
 
@@ -142,8 +143,13 @@ export const setGitlabCreds = async(user: string, token: string) => {
 export const auditAssets = async() => {
     const assetIndex = await AssetCounter.find({});
     const adminUsers = await User.find({ role: 'ADMIN'});
+    const optionsTrack: any = await Option.find({});
 
-    const assetStatueses = ["Shelved", "IT Storage", "ITS Storage", ""];
+    let tracks = [];
+
+    if (optionsTrack) tracks = optionsTrack['status'] ? optionsTrack['status'].filter((f: any) =>  f['tracked']).map((f: any) => f['value']) : []
+
+    const assetStatueses = tracks.length > 0 ? tracks : ["Shelved", "IT Storage", "ITS Storage", ""];
     const categories = assetIndex.map(f => { return f['category']}).filter(f => { return f})
 
     if (!categories) return;
@@ -245,4 +251,10 @@ export const generateHash = async(value: string) => {
 
 export const compareHash = async(hashed: string, unhashed: string) => {
     return await bcrypt.compare(unhashed, hashed)
+}
+
+export const fetchExternalSource = async(url: string, headers: any) => {
+    return await new Promise((resolve, reject) => {
+        fetch(url, headers).then(response => response.json()).then(data => resolve(data)).catch(err => reject())
+    })
 }

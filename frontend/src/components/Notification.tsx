@@ -91,12 +91,12 @@ const Notification = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      const notifications = notifs?.data.filter(
-        (notification: NotificationType) =>
-          !notification.message.toLocaleLowerCase().includes('in stock') ||
-          !notification.read
-      );
-      setNotifications(notifications);
+      // const notifications = notifs?.data.filter(
+      //   (notification: NotificationType) =>
+      //     !notification.message.toLocaleLowerCase().includes('in stock') ||
+      //     !notification.read
+      // );
+      setNotifications(notifs?.data);
     }
   }, [notifs, isLoading]);
 
@@ -104,9 +104,9 @@ const Notification = () => {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger className="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-secondary text-secondary-foreground hover:bg-secondary/80">
         <Bell weight="fill" size={28} />
-        {!!notifications?.length && (
+        {!!notifs?.unread && (
           <span className="absolute top-0 right-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-secondary-foreground bg-primary rounded-full -mt-1 -mr-1">
-            {notifications?.length}
+            {notifs?.unread}
           </span>
         )}
       </DropdownMenuTrigger>

@@ -596,3 +596,33 @@ export const markNotificationAsRead = async (notificationId: string) => {
 
   return true;
 };
+
+export const oauthLogin = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/oauthLogin`);
+
+  if (!response.ok) {
+    throw new Error('Error signing in to OAuth provider');
+  }
+
+  const responseBody = await response.json();
+
+  window.location.href = responseBody['url']
+};
+
+export const verifyOAuthCode = async (code: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/verifyOAuthCode`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({code: code})
+  });
+
+  if (!response.ok) {
+    throw new Error('Error verifying the OAuth code');
+  }
+
+  const responseBody = await response.json();
+
+  return responseBody;
+};
