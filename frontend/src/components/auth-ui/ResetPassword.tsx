@@ -15,7 +15,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAppContext } from "@/hooks/useAppContext";
 import * as authService from "@/auth-service";
 import {
-  ResetPasswordSchema
+  ResetPasswordSchemaWithOTP
 } from "@/schemas/ResetPasswordSchema";
 import { PasswordInput } from "../PasswordInput";
 import { useEffect } from "react";
@@ -29,8 +29,8 @@ const ResetPassword = ({ onError, onSuccess }: ResetPasswordFormProps) => {
   const queryClient = useQueryClient();
   const { showToast } = useAppContext();
   
-  const form = useForm<z.infer<typeof ResetPasswordSchema>>({
-    resolver: zodResolver(ResetPasswordSchema),
+  const form = useForm<z.infer<typeof ResetPasswordSchemaWithOTP>>({
+    resolver: zodResolver(ResetPasswordSchemaWithOTP),
     mode: "onChange",
   });
 
@@ -57,7 +57,7 @@ const ResetPassword = ({ onError, onSuccess }: ResetPasswordFormProps) => {
     },
   });
 
-  const onSubmit: any = (data: z.infer<typeof ResetPasswordSchema>) => {
+  const onSubmit = (data: z.infer<typeof ResetPasswordSchemaWithOTP>) => {
     mutation.mutate({ newPassword: data.newPassword, token: data.otp });
   };
 
