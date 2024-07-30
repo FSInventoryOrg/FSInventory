@@ -50,7 +50,7 @@ export const AssetIndexColumns: ColumnDef<AssetCounterType>[] = [
   {
     accessorKey: "prefixCode",
     header: "Prefix Code",
-    cell: ({ row }) => <div>{row.getValue("prefixCode")}</div>,
+    cell: ({ row }) => <div className='uppercase'>{row.getValue("prefixCode")}</div>,
   },
   {
     accessorKey: "threshold",
