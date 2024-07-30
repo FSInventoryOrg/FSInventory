@@ -36,9 +36,9 @@ const ForgotPasswordForm = ({ onError }: ForgotPasswordFormProps) => {
   };
   const mutation = useMutation({
     mutationFn: authService.forgotPassword,
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       // When email sent is valid, user is redirected to the Reset Password Page
-      navigate(`/reset-password/${data.token}`);
+      navigate('/reset-password');
     },
     onError: async (error: Error) => {
       handleError(error.message);
