@@ -15,6 +15,7 @@ import EmployeesOverview from './EmployeesOverview';
 import BundlesOverview from './BundlesOverview';
 import AssetTypeDistribution from './AssetTypeDistribution';
 import { EmployeeType } from '@/types/employee';
+import { COLORS } from '@/lib/data';
 
 //! NEEDS FURTHER REFACTORING / MODULARIZATION
 
@@ -89,16 +90,8 @@ const countByCategory = (props: DashboardLayoutProps): CategoryCount[] => {
 
   categoryCount.sort((a, b) => b.value - a.value);
 
-  categoryCount.forEach((item, index, array) => {
-    item.color = interpolateRgbBasis([
-      '#e41a1c', // red
-      '#984ea3', // purple
-      '#377eb8', // blue
-      '#4daf4a', // green
-      '#ffff33', // yellow
-      '#ff7f00', // orange
-      '#f781bf', // pink
-    ])(index / (array.length - 1));
+  categoryCount.forEach((item, index) => {
+    item.color = COLORS[index]?.color || '#8d8d8d';
   });
 
   return categoryCount;
