@@ -42,6 +42,11 @@ const Tracker = () => {
     queryFn: () => imsService.fetchAssetUniqueValuesByProperty('assignee'),
   });
   
+  const { data: employeePositions } = useQuery<string[]>({ 
+    queryKey: ['fetch', 'position'], 
+    queryFn: () => imsService.fetchEmployeeUniqueValuesByProperty('position'),
+  });
+
   const handleEmployeeSelect = (employee: EmployeeType) => {
     setSelectedEmployee(employee);
     setOpen(false);
@@ -102,28 +107,23 @@ const Tracker = () => {
     if (!allEmployees) return; // Ensure employees data is available
   
     const filteredEmployees = allEmployees.filter((employee) => {
-      if (!filters.includes('Active') && employee.isActive) return false;
-
-      if (!filters.includes('Inactive') && !employee.isActive) return false;
-  
-      if (!filters.includes('Registered') && employee.isRegistered) return false;
-  
-      if (!filters.includes('Unregistered') && !employee.isRegistered) return false;
-  
-      // Check if the employee matches any additional filters
-      const additionalFilters = filters.filter((filter) => !['Active', 'Inactive', 'Registered', 'Unregistered'].includes(filter));
-      if (additionalFilters.length > 0) {
-        return additionalFilters.some((filter) => {
-          return Object.values(employee).some((value) => {
-            if (filters.includes(filter)) {
-              return value.toString() === filter;
-            }
-            return value.toString().toLowerCase().includes(filter.toLowerCase());
-          });
-        });
-      }
-  
-      return true; // Include the employee if it matches all criteria
+      const statuses = ['Active', 'Inactive', 'Registered', 'Unregistered']
+      return filters.some((filter) => {
+        if (statuses.includes(filter)) {
+          if (filter==='Active' && !employee.isActive) return false
+          if (filter==='Inactive' && employee.isActive) return false
+          if (filter==='Registered' && !employee.isRegistered) return false
+          if (filter==='Unregistered' && employee.isRegistered) return false
+          return true
+        } 
+        else if (employeePositions?.includes(filter)) {
+          // filter for position
+          return employee.position?.toLowerCase() === filter.toLowerCase();
+        }
+        return Object.values(employee).some((value)=> {
+            return value?.toString().toLowerCase() === filter.toLowerCase() 
+        })
+      })
     });
   
     setEmployees(filteredEmployees);
