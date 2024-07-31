@@ -67,7 +67,15 @@ export function exportToExcel(columns: string[], data: any, fileName: string) {
   }).format(new Date());
 
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-  XLSX.writeFile(workbook, `${fileName}-${currentDate}.xlsx`, {
-    compression: true,
+
+  return new Promise<void>((resolve, reject) => {
+    try {
+      XLSX.writeFile(workbook, `${fileName}-${currentDate}.xlsx`, {
+        compression: true,
+      });
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }

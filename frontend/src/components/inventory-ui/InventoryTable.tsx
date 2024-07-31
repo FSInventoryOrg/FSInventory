@@ -122,6 +122,7 @@ export function InventoryTable<TData, TValue>({
     pageIndex: 0,
     pageSize: 20,
   });
+  const [isDownloading, setIsDownloading] = React.useState(false);
 
   const { data: optionValues } = useQuery<TagOption[]>({
     queryKey: ['fetchOptionValues', 'category'],
@@ -225,12 +226,14 @@ export function InventoryTable<TData, TValue>({
     };
   }, []);
 
-  const handleDownloadReport = () => {
+  const handleDownloadReport = async () => {
+    setIsDownloading(true);
     const columnVisibility = table.getState()?.columnVisibility;
     const columns = Object.keys(columnVisibility).filter(
       (key) => columnVisibility[key] === true
     );
-    exportToExcel(columns, data, 'Inventory_Report');
+    await exportToExcel(columns, data, 'Inventory_Report');
+    setIsDownloading(false);
   };
 
   return (
@@ -278,6 +281,7 @@ export function InventoryTable<TData, TValue>({
                   variant="outline"
                   size="icon"
                   onClick={handleDownloadReport}
+                  disabled={isDownloading}
                 >
                   <>
                     <span className="sr-only">Export Data</span>

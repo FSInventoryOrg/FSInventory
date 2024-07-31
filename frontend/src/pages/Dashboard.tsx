@@ -1,5 +1,5 @@
 'use client';
-
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { usePDF, Margin } from 'react-to-pdf';
 import { Download } from '@phosphor-icons/react';
@@ -15,6 +15,8 @@ import {
 import * as imsService from '@/ims-service';
 
 const Dashboard = () => {
+  const [isDownloading, setIsDownloading] = useState(false);
+
   const { data: assetData } = useQuery({
     queryKey: ['fetchAllAssets'],
     queryFn: () => imsService.fetchAllAssets(),
@@ -41,9 +43,15 @@ const Dashboard = () => {
     },
   });
 
+  const handleDownloadReport = async () => {
+    setIsDownloading(true);
+    await toPDF();
+    setIsDownloading(false);
+  };
+
   return (
     <section id="dashboard" className="px-3 pb-3 sm:px-6 sm:pb-6">
-      <main className="flex-1 flex flex-col gap-4 w-full" ref={targetRef}>
+      <main className="flex-1 flex flex-col gap-4 w-full mb-16" ref={targetRef}>
         {!(assetData && hardwareData) ? (
           <DashboardSuspense />
         ) : (
@@ -54,9 +62,10 @@ const Dashboard = () => {
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              onClick={() => toPDF()}
+              onClick={handleDownloadReport}
               className="fixed bottom-6 right-6 rounded-full shadow-lg z-10"
               size="icon"
+              disabled={isDownloading}
             >
               <span className="sr-only">Export Dashboard to PDF</span>
               <Download className="text-xl" />
