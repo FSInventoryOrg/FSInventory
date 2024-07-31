@@ -90,13 +90,13 @@ const EditAsset = ({ assetData, onClose }: EditAssetProps) => {
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      setTimeout(() => {
+        onClose(true)
+      }, 100);
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
     },
-    onSettled: async () => {
-      onClose(true)
-    }
   });
 
 const onSubmit = (data: z.infer<typeof AssetSchema>) => {

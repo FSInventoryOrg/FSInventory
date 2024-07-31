@@ -56,12 +56,12 @@ const EditAssetCounter = ({
       });
       queryClient.invalidateQueries({ queryKey: ['fetchAssetCounters'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      setTimeout(() => {
+        onClose(true);
+      }, 100);
     },
     onError: (error: Error) => {
       onError(error.message);
-    },
-    onSettled: async () => {
-      onClose(true);
     },
   });
 
