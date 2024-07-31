@@ -71,12 +71,12 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
       queryClient.invalidateQueries({ queryKey: ['fetchEmployees'] });
       queryClient.invalidateQueries({ queryKey: ['fetchEmployeeByCode'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      setTimeout(() => {
+        setOpen(false);
+      }, 100);
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: 'ERROR' });
-    },
-    onSettled: async () => {
-      setOpen(false);
     },
   });
 
