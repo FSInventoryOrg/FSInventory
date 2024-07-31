@@ -37,7 +37,7 @@ const Tracker = () => {
     queryKey: ['fetchEmployees'],
     queryFn: () => imsService.fetchAllEmployees(), 
   });
-  const { data: unregisteredEmployees } = useQuery<string[]>({ 
+  const { data: assignees } = useQuery<string[]>({ 
     queryKey: ['fetch', 'assignee'], 
     queryFn: () => imsService.fetchAssetUniqueValuesByProperty('assignee'),
   });
@@ -55,6 +55,7 @@ const Tracker = () => {
   const mergeEmployees = () => {
     const allEmployees: EmployeeType[] = [];
     const employeesAdded = new Set<string>();
+    const employeeCodes = new Set<string>();
     // Add registered employees
     if (registeredEmployees) {
       registeredEmployees.forEach((employee: EmployeeType) => {
@@ -65,11 +66,14 @@ const Tracker = () => {
           isRegistered: true,
         });
           employeesAdded.add(name)
+          employeeCodes.add(employee.code)
       });
     }
-    // Add unregistered employees
-    if (unregisteredEmployees) {
-      unregisteredEmployees.forEach((name: string) => {
+    if (assignees) {
+      assignees.forEach((name: string) => {
+        // Skip employee codes 
+        if (name && employeeCodes.has(name)) return; 
+        // Unregistered employees are added to allEmployees
         const nameParts = name.split(' ');
         const lastName = nameParts.pop()!;
         const firstName = nameParts.join(' ');
@@ -131,11 +135,11 @@ const Tracker = () => {
   
   React.useEffect(() => {
     const allEmployees = mergeEmployees();
-    if (unregisteredEmployees) {
+    if (assignees) {
       setEmployees(allEmployees);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registeredEmployees, unregisteredEmployees])
+  }, [registeredEmployees, assignees])
 
   React.useEffect(() => {
     if (employeeCode) {
