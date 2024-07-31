@@ -100,6 +100,30 @@ router.post('/', [
           return res.status(400).json({ message: "Asset code already exists" });
         }
 
+        if (data['assignee']) {
+          data['status'] = 'Deployed';
+          data['deploymentHistory'] = [
+            {
+              assignee: data['assignee'],
+              deploymentDate: data['deploymentDate'] ? data['deploymentDate'] : new Date()
+            }
+          ]
+        } else if(data['status'] === 'Deployed' && !data['assignee']) data['status'] = 'IT Storage'
+
+        if (data['recoveredFrom']) {
+          const recovery = {
+            assignee: data['recoveredFrom'],
+            recoveryDate: data['recoveryDate'] ? data['recoveryDate'] : new Date()
+          }
+          if (!Array.isArray(data['deploymentHistory'])) data['deploymentHistory'] = [recovery]
+          else {
+            const findIndex = data['deploymentHistory'].findIndex((f: any) => { return f['assignee'] === data['recoveredFrom']})
+
+            if(findIndex > -1) data['deploymentHistory'][findIndex] = {...data['deploymentHistory'][findIndex], ...recovery}
+            else data['deploymentHistory'].push(recovery)
+          }
+        }
+
         if (!data['serialNo']) return res.status(422).json({ message: 'Serial Number is required' });
         if (!data['category']) return res.status(422).json({ message: 'Category is required' });
 
@@ -301,7 +325,6 @@ router.put("/history/:code/:index", verifyToken, async (req: Request, res: Respo
   }
 });
 
-
 router.put('/:code', [
   check("type").exists().withMessage("Asset type is required").isIn(['Hardware', 'Software']).withMessage("Invalid asset type"),
   check("brand").optional().isString().withMessage("Brand must be a string"),
@@ -373,7 +396,7 @@ router.put('/:code', [
 
       delete data._id;
 
-      const existingAsset = await Asset.findOne({ code });
+      const existingAsset: any = await Asset.findOne({ code });
 
       if (!existingAsset) {
         return res.status(404).json({ message: 'Asset not found' });
@@ -389,6 +412,53 @@ router.put('/:code', [
 
       let updatedAsset;
       if (data.type === 'Hardware') {
+        let depHist = existingAsset['deploymentHistory']
+        if (!Array.isArray(depHist)) depHist = [];
+        else depHist = depHist.reverse();
+
+        const recoveryProcess = () => {
+          if(existingAsset['assignee']) {
+            const findIndex = depHist.findIndex((f: any) => { return f['assignee'] === existingAsset['assignee'] })
+            const recovery = {
+              assignee: existingAsset['assignee'],
+              recoveryDate: data['recoveryDate'] ? data['recoveryDate'] : new Date()
+            }
+            if (findIndex > -1) depHist[findIndex] = { ...depHist[findIndex], ...recovery }
+            else depHist.unshift(recovery)
+          }
+        }
+
+        if(data['assignee']) {
+          data['status'] = "Deployed";
+          if(data['assignee'] !== existingAsset['assignee']) {
+            recoveryProcess();
+            const deploy = {
+              assignee: data['assignee'],
+              deploymentDate: data['deploymentDate'] ? data['deploymentDate'] : new Date()
+            }
+            depHist.unshift(deploy)
+          }
+        } else if(data['status'] === 'Deployed' && !data['assignee']) {
+          data['status'] = "IT Storage";
+          if(data['assignee'] !== existingAsset['assignee']) recoveryProcess()
+        }
+
+        if(data['recoveredFrom']) {
+          if(data['recoveredFrom'] !== existingAsset['recoveredFrom']) {
+            const findIndex = depHist.findIndex((f: any) => { return f['assignee'] === data['recoveredFrom'] })
+            const recovery = {
+              assignee: data['recoveredFrom'],
+              recoveryDate: data['recoveryDate'] ? data['recoveryDate'] : new Date()
+            }
+            if (findIndex > -1) depHist[findIndex] = { ...depHist[findIndex], ...recovery }
+            else depHist.unshift(recovery)
+          }
+        }
+
+        depHist = depHist.reverse();
+
+        if(depHist.length > 0) data['deploymentHistory'] = depHist
+        
         // Remove undefined date properties and set them to null
         data.deploymentDate ??= null;
         data.purchaseDate ??= null;
@@ -503,7 +573,8 @@ router.get('/:property/:value', async (req: Request, res: Response) => {
   try {
     const { property, value } = req.params;
     let query: any = {};
-    query[property as string] = value
+
+    query[property as string] = value ? value.trim() : ""
 
     let assets;
 

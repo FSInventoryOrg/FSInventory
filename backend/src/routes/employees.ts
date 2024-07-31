@@ -4,6 +4,8 @@ import verifyToken from '../middleware/auth';
 import jwt from "jsonwebtoken";
 import Employee, { AssetsHistory } from '../models/employee.schema';
 import { EmployeeType } from '../models/employee.schema';
+import Asset from '../models/asset.schema';
+import Hardware from '../models/hardware.schema';
 
 const router = express.Router();
 
@@ -35,7 +37,7 @@ router.get("/:code", async (req: Request, res: Response) => {
 router.get('/uniqueValues/:property', async (req: Request, res: Response) => {
   try {
     const { property } = req.params;
-    let query: any = {}; 
+    let query: any = {};
 
     let aggregationPipeline: any[] = [];
 
@@ -77,45 +79,18 @@ router.get('/uniqueValues/:property', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /api/employees:
- *  post:
- *    tags:
- *      - Employee
- *    summary: Create a new employee
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/EmployeeType'
- *    responses:
- *      201:
- *        description: Employee created successfully
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/EmployeeType'
- *      400:
- *        description: Bad request, validation errors
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.post("/", [
-    check("code").isString().withMessage("Employee code must be a string"),
-    check("firstName").isString().withMessage("First name must be a string"),
-    check("lastName").isString().withMessage("Last name must be a string"),
-    check("position").isString().withMessage("Position must be a string"),
-    check("firstName").isString().withMessage("First name must be a string"),
-    check("startDate").isISO8601().toDate().withMessage("Invalid start date"),
-  ],
+  check("code").isString().withMessage("Employee code must be a string"),
+  check("firstName").isString().withMessage("First name must be a string"),
+  check("lastName").isString().withMessage("Last name must be a string"),
+  check("position").isString().withMessage("Position must be a string"),
+  check("firstName").isString().withMessage("First name must be a string"),
+  check("startDate").isISO8601().toDate().withMessage("Invalid start date"),
+],
   verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array() })
     }
     try {
@@ -144,38 +119,6 @@ router.post("/", [
   }
 );
 
-/**
- * @openapi
- * /api/employees/history/{code}/{index}:
- *  put:
- *    tags:
- *      - Employee
- *    summary: Remove an asset history entry for an employee by code and index
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Employee code
- *      - in: path
- *        name: index
- *        required: true
- *        schema:
- *          type: integer
- *        description: Index of the asset history entry to remove
- *    responses:
- *      200:
- *        description: Asset history entry removed successfully
- *      400:
- *        description: Bad request, validation errors
- *      404:
- *        description: Employee not found or index out of range
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.put("/history/:code/:index", verifyToken, async (req: Request, res: Response) => {
   try {
     const { code, index } = req.params;
@@ -210,81 +153,45 @@ router.put("/history/:code/:index", verifyToken, async (req: Request, res: Respo
   }
 });
 
-/**
- * @openapi
- * /api/employees/history/{code}:
- *  put:
- *    tags:
- *      - Employee
- *    summary: Update an existing employee
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Employee code
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/EmployeeType'
- *    responses:
- *      200:
- *        description: Employee updated successfully
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/EmployeeType'
- *      400:
- *        description: Bad request, validation errors
- *      404:
- *        description: Employee not found
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.put("/history/:code",
   verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array() })
     }
     try {
-        const token = req.cookies.auth_token;
-        const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+      const token = req.cookies.auth_token;
+      const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
 
-        if (decodedToken.role !== "ADMIN") {
-          return res.status(403).json({ message: "Only users with admin role can perform this action" });
-        }
+      if (decodedToken.role !== "ADMIN") {
+        return res.status(403).json({ message: "Only users with admin role can perform this action" });
+      }
 
-        const code: string = req.params.code;
-        const data: any = req.body;
+      const code: string = req.params.code;
+      const data: any = req.body;
 
-        const existingEmployee = await Employee.findOne({ code });
+      const existingEmployee = await Employee.findOne({ code });
 
-        if (!existingEmployee) {
-          return res.status(404).json({ message: 'Employee not found' });
-        }
+      if (!existingEmployee) {
+        return res.status(404).json({ message: 'Employee not found' });
+      }
 
-        const assetsHistory = existingEmployee.assetsHistory;
+      const assetsHistory = existingEmployee.assetsHistory;
 
-        assetsHistory.push({
-          deploymentDate: data.recoveryDate,
-          assetCode: data.assetCode,
-          recoveryDate: data.recoveryDate,
-        });
+      assetsHistory.push({
+        deploymentDate: data.recoveryDate,
+        assetCode: data.assetCode,
+        recoveryDate: data.recoveryDate,
+      });
 
-        data.assetsHistory = assetsHistory;
+      data.assetsHistory = assetsHistory;
 
-        let updatedEmployee;
-        await Employee.updateOne({ code: code }, data);
-        updatedEmployee = await Employee.findOne({ code });      
-        
-        res.status(200).json(updatedEmployee);
+      let updatedEmployee;
+      await Employee.updateOne({ code: code }, data);
+      updatedEmployee = await Employee.findOne({ code });
+
+      res.status(200).json(updatedEmployee);
     } catch (error) {
       console.error('Error updating employee:', error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -293,85 +200,91 @@ router.put("/history/:code",
 );
 
 
-/**
- * @openapi
- * /api/employees/{code}:
- *  put:
- *    tags:
- *      - Employee
- *    summary: Update an existing employee
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Employee code
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/EmployeeType'
- *    responses:
- *      200:
- *        description: Employee updated successfully
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/EmployeeType'
- *      400:
- *        description: Bad request, validation errors
- *      404:
- *        description: Employee not found
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.put("/:code", [
-    check("code").isString().withMessage("Employee code must be a string"),
-    check("firstName").isString().withMessage("First name must be a string"),
-    check("lastName").isString().withMessage("Last name must be a string"),
-    check("position").isString().withMessage("Position must be a string"),
-    check("firstName").isString().withMessage("First name must be a string"),
-    check("startDate").isISO8601().toDate().withMessage("Invalid start date"),
-  ],
+  check("code").isString().withMessage("Employee code must be a string"),
+  check("firstName").isString().withMessage("First name must be a string"),
+  check("lastName").isString().withMessage("Last name must be a string"),
+  check("position").isString().withMessage("Position must be a string"),
+  check("firstName").isString().withMessage("First name must be a string"),
+  check("startDate").isISO8601().toDate().withMessage("Invalid start date"),
+],
   verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array() })
     }
     try {
-        const token = req.cookies.auth_token;
-        const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+      const token = req.cookies.auth_token;
+      const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
 
-        if (decodedToken.role !== "ADMIN") {
-          return res.status(403).json({ message: "Only users with admin role can perform this action" });
-        }
+      if (decodedToken.role !== "ADMIN") {
+        return res.status(403).json({ message: "Only users with admin role can perform this action" });
+      }
 
-        const code: string = req.params.code;
-        const data: any = req.body;
+      const code: string = req.params.code;
+      const data: any = req.body;
 
-        const existingEmployeeCode = await Employee.findOne({ code: data.code });
-        if (existingEmployeeCode && existingEmployeeCode._id.toString() !== data._id) {
-          return res.status(400).json({ message: "Employee code already exists" });
-        }
-        delete data._id;
+      const existingEmployeeCode = await Employee.findOne({ code: data.code });
+      if (existingEmployeeCode && existingEmployeeCode._id.toString() !== data._id) {
+        return res.status(400).json({ message: "Employee code already exists" });
+      }
+      delete data._id;
 
-        const existingEmployee = await Employee.findOne({ code });
+      const existingEmployee = await Employee.findOne({ code });
 
-        if (!existingEmployee) {
-          return res.status(404).json({ message: 'Employee not found' });
-        }
+      if (!existingEmployee) {
+        return res.status(404).json({ message: 'Employee not found' });
+      }
 
-        let updatedEmployee;
-        data.isRegistered = true;
-        await Employee.updateOne({ code: code }, data);
-        updatedEmployee = await Employee.findOne({ code });
+      let updatedEmployee;
+      data.isRegistered = true;
+      await Employee.updateOne({ code: code }, data);
+      updatedEmployee = await Employee.findOne({ code });
+
+      if (code !== data?.code) {
+        const findDeploymentHistory: any = await Asset.aggregate().match({
+          $or: [
+            {
+              deploymentHistory: {
+                $exists: true,
+                $not: {
+                  $size: 0
+                },
+                $elemMatch: {
+                  assignee: code
+                }
+              }
+            },
+            {
+              assignee: code
+            },
+            {
+              recoveredFrom: code
+            }
+          ]
+        })
         
-        res.status(200).json(updatedEmployee);
+        if (findDeploymentHistory.length > 0) {
+          findDeploymentHistory.forEach(async (history: any) => {
+            let assetData: any = {}
+            let newData: any[] = [];
+  
+            history.deploymentHistory.forEach((deployed: any) => {
+              if (deployed.assignee === code) deployed.assignee = data.code
+              newData.push(deployed)
+            })
+
+            assetData['deploymentHistory'] = newData;
+            if (history['assignee'] === code) assetData['assignee'] = data.code
+            if (history['recoveredFrom'] === code) assetData['recoveredFrom'] = data.code
+  
+            await Hardware.updateOne({ _id: history['_id'] }, assetData)
+          })
+        }
+      }
+
+      res.status(200).json(updatedEmployee);
     } catch (error) {
       console.error('Error updating employee:', error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -379,32 +292,6 @@ router.put("/:code", [
   }
 );
 
-/**
- * @openapi
- * /api/employees/{code}:
- *  delete:
- *    tags:
- *      - Employee
- *    summary: Delete an employee by code
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Employee code
- *    responses:
- *      200:
- *        description: Employee deleted successfully
- *      403:
- *        description: Only users with admin role can perform this action
- *      404:
- *        description: Employee not found
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.delete("/:code", verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;

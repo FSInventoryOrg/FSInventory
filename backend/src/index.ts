@@ -19,7 +19,7 @@ import logger from './utils/logger';
 import swaggerDocs from './utils/swagger';
 import { startChangeStream } from './utils/change-stream';
 import path from 'path';
-import { auditAssets, rotateLogs } from './utils/common';
+import { auditAssets, convertStatusToStorage, rotateLogs } from './utils/common';
 
 const DEFAULT_PORT = 3000;
 const port = Number(process.env.PORT) || DEFAULT_PORT;
@@ -76,8 +76,9 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 const onStartupJobs = async() => {
-  await auditAssets();
   rotateLogs()
+  await auditAssets();
+  await convertStatusToStorage()
 }
 
 onStartupJobs();

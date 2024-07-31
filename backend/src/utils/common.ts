@@ -10,6 +10,7 @@ import OTPTransaction from "../models/otptransactions.schema";
 import bcrypt from 'bcryptjs'
 import Option from "../models/options.schema";
 import { MongoClient } from "mongodb";
+import Hardware from "../models/hardware.schema";
 
 const directory = path.join(path.resolve(), '../');
 
@@ -268,4 +269,10 @@ export const rotateLogs = async() => {
     
     console.log('System logs has been rotated');
     setTimeout(() => { rotateLogs() }, 3600000)
+}
+
+export const convertStatusToStorage = async() => {
+    const statusToChange = ['ITS Storage']
+
+    await Hardware.updateMany({status: { $in: statusToChange}}, {status: 'IT Storage'})
 }
