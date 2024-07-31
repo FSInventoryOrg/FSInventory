@@ -133,3 +133,13 @@
   -ms-overflow-style: none; 
   scrollbar-width: none; 
 }
+
+/* Added css to fix select component causing a shift in layout */
+
+body[data-scroll-locked]{
+  min-width: 100%;
+}
+
+html {
+  overflow-x: hidden;
+} 
