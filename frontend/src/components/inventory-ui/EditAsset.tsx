@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   FormControl,
   FormDescription,
@@ -99,6 +99,21 @@ const EditAsset = ({ assetData, onClose }: EditAssetProps) => {
     },
   });
 
+const { isSubmitting, errors} = form.formState
+
+const hasRequiredFields = () => {
+  if (!errors) return false
+  return Object.values(errors).some((error)=>error.message?.includes('required'))
+}
+
+useEffect(()=> {
+  if (isSubmitting && errors) {
+    if (hasRequiredFields()) showToast({message: "Required fields are missing.", type:"ERROR"})
+  }
+}, [isSubmitting, errors ])
+
+const triggerValidation = () => form?.trigger()
+
 const onSubmit = (data: z.infer<typeof AssetSchema>) => {
     // Check each field and set it to undefined if it's null
     if (data.recoveryDate === null) {
@@ -155,7 +170,7 @@ const onSubmit = (data: z.infer<typeof AssetSchema>) => {
               </TabsContent>
             </div>     
           </Tabs>            
-          <Button type="submit" disabled={isPending} className="gap-2">
+          <Button type="submit" disabled={isPending} className="gap-2" onClick={triggerValidation}>
             {isPending ? <Spinner size={18}/> : null }
             Save Asset
           </Button>
