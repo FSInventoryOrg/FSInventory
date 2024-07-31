@@ -1,8 +1,8 @@
 import * as imsService from '@/ims-service'
 import { Defaults } from "@/types/options"
-import SettingsForm from "@/components/inventory-ui/SettingsForm"
 import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@/components/Spinner';
+import InventorySettingsForm from './InventorySettingsForm';
 
 const InventorySettings = () => {
 
@@ -18,9 +18,9 @@ const InventorySettings = () => {
   }
 
   return (
-    <section id="edit inventory" className="container mx-auto w-full max-w-4xl py-6 px-6" >
-      <SettingsForm defaults={defaults} />
-    </section>
+    <div className="md:w-5/6 flex flex-col max-w-4xl" >
+      <InventorySettingsForm defaults={defaults} />
+    </div>
   )
 }
 

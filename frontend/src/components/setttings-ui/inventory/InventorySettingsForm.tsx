@@ -3,27 +3,20 @@ import { InventorySettingsSchema } from "@/schemas/InventorySettingsSchema"
 import * as imsService from '@/ims-service'
 import { useAppContext } from '@/hooks/useAppContext'
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Spinner } from "@/components/Spinner"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import DefaultOptionsForm from "@/components/inventory-ui/DefaultOptionsForm"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { SlashIcon } from "lucide-react"
 import { Defaults } from "@/types/options"
-import VisibleColumnsForm from "./VisibleColumnsForms"
-import SelectOptionsForm from "./SelectOptionsForm"
+import VisibleColumnsForm from "../../inventory-ui/VisibleColumnsForms"
+import SelectOptionsForm from "../../inventory-ui/SelectOptionsForm"
 
-const SettingsForm = ({ defaults }: { defaults: Defaults }) => {
+const InventorySettingsForm = ({ defaults }: { defaults: Defaults }) => {
   const { showToast } = useAppContext();
+  const queryClient = useQueryClient();
   const [selectedTags, setSelectedTags] = React.useState<string[]>(['']);
 
   const form = useForm<z.infer<typeof InventorySettingsSchema>>({
@@ -42,9 +35,7 @@ const SettingsForm = ({ defaults }: { defaults: Defaults }) => {
     mutationFn: imsService.updateOptionDefaults,
     onSuccess: async () => {
       showToast({ message: "Inventory settings and preferences saved!", type: "SUCCESS" });
-      setTimeout(() => {
-        window.location.href = '/inventory';
-      }, 500)
+      queryClient.invalidateQueries({queryKey: ['fetchOptionValues', 'defaults']})
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
@@ -69,23 +60,10 @@ const SettingsForm = ({ defaults }: { defaults: Defaults }) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full flex flex-col">
-        <Breadcrumb className="pb-4">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/inventory">Inventory</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator>
-              <SlashIcon />
-            </BreadcrumbSeparator>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/inventory/settings">Settings & Preferences</BreadcrumbLink>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
         <DefaultOptionsForm />
         <VisibleColumnsForm onTagSelect={setSelectedTags} />
         <SelectOptionsForm />
-        <Button type="submit" disabled={isPending} className="gap-2 w-fit self-end">
+        <Button type="submit" disabled={isPending} className="gap-2 w-fit md:w-1/6 self-end">
           {isPending ? <Spinner size={18}/> : null }
           Save changes
         </Button>
@@ -94,4 +72,4 @@ const SettingsForm = ({ defaults }: { defaults: Defaults }) => {
   )
 }
 
-export default SettingsForm;
+export default InventorySettingsForm;

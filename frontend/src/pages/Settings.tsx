@@ -3,6 +3,7 @@ import SidebarNav from '@/components/setttings-ui/SidebarNav';
 import AssetIndexControl from '@/components/setttings-ui/AssetIndexControl';
 import NotificationsControl from '@/components/setttings-ui/NotificationsControl';
 import { Separator } from '@/components/ui/separator';
+import InventorySettings from '../components/setttings-ui/inventory/InventorySettings';
 
 const Settings = () => {
   const settingsNavItems = [
@@ -14,6 +15,9 @@ const Settings = () => {
       title: 'Notifications',
       href: '/settings/notifications',
     },
+    { title: 'Inventory',
+      href: '/settings/inventory'
+    }
   ];
 
   return (
@@ -28,7 +32,7 @@ const Settings = () => {
         </p>
       </div>
       <Separator className="my-6" />
-      <div className="flex flex-col space-y-2 gap-6 lg:flex-row lg:space-y-0">
+      <div className="flex flex-col space-y-2 gap-8 lg:flex-row lg:space-y-0">
         <aside className="h-100 mx-5 md:w-1/4">
           <SidebarNav items={settingsNavItems} />
         </aside>
@@ -37,6 +41,7 @@ const Settings = () => {
             <Route path="/" element={<Navigate to="assetcontrol" />} />
             <Route path="/assetcontrol" element={<AssetIndexControl />} />
             <Route path="/notifications" element={<NotificationsControl />} />
+            <Route path='/inventory' element={<InventorySettings/>}/>
           </Routes>
         </div>
       </div>
