@@ -3,11 +3,11 @@ import { z } from 'zod';
 export const AssetSchema = z.object({
   type: z.enum(['Hardware', 'Software']),
   code: z.string().trim().optional(),
-  category: z.string().trim().min(1, 'Select an asset category'),
+  category: z.string().trim().min(1, 'Asset category is required'),
   brand: z.string().trim().optional(),
   modelName: z.string().trim().optional(),
   modelNo: z.string().trim().optional(),
-  serialNo: z.string().trim().optional(),
+  serialNo: z.string().trim().min(1, 'Serial number is required'),
   processor: z.string().trim().optional(),
   memory: z.string().trim().optional(),
   storage: z.string().trim().optional(),
