@@ -39,7 +39,7 @@ const DefaultOptionsForm = () => {
   });
 
   return (
-    <div className='w-full'>
+    <div className='w-full flex flex-col'>
       <div className='pb-2'>
         <h1 className='text-xl font-semibold'>Default values</h1>
         <h3 className='text-accent-foreground'>Select default values for asset properties with options.</h3>
@@ -50,7 +50,7 @@ const DefaultOptionsForm = () => {
         render={({ field }) => (
           <FormItem className='pb-2'>
             <FormLabel className='font-medium'>Status</FormLabel>
-            <div className='flex w-2/3 gap-1'>
+            <div className='flex md:w-2/3 gap-1'>
               {!(isStatusDataLoading || isCategoryDataLoading || isEquipmentTypeDataLoading) ?
                 <Select disabled={isStatusDataLoading} onValueChange={field.onChange} defaultValue={field.value} >
                   <FormControl>
@@ -83,7 +83,7 @@ const DefaultOptionsForm = () => {
         render={({ field }) => (
           <FormItem className="pb-2">
             <FormLabel className="font-medium">Category</FormLabel>   
-            <div className="flex w-2/3 gap-1">
+            <div className="flex md:w-2/3 gap-1">
               {!(isStatusDataLoading || isCategoryDataLoading || isEquipmentTypeDataLoading) ?
                 <Select disabled={isCategoryDataLoading} onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
@@ -116,7 +116,7 @@ const DefaultOptionsForm = () => {
         render={({ field }) => (
           <FormItem className="pb-2">
             <FormLabel className="font-medium">Equipment type</FormLabel>   
-            <div className="flex w-2/3 gap-1">
+            <div className="flex md:w-2/3 gap-1">
               {!(isStatusDataLoading || isCategoryDataLoading || isEquipmentTypeDataLoading) ?
                 <Select disabled={isEquipmentTypeDataLoading} onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
@@ -149,7 +149,7 @@ const DefaultOptionsForm = () => {
         render={({ field }) => (
           <FormItem className="pb-2">
             <FormLabel className="font-medium">Status for deployable assets</FormLabel>   
-            <div className="flex w-2/3 gap-1">
+            <div className="flex md:w-2/3 gap-1">
               {!(isStatusDataLoading || isCategoryDataLoading || isEquipmentTypeDataLoading) ?
               <Select disabled={isStatusDataLoading} onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
@@ -185,7 +185,7 @@ const DefaultOptionsForm = () => {
         render={({ field }) => (
           <FormItem className="pb-2">
             <FormLabel className="font-medium">Status for retrievable assets</FormLabel>   
-            <div className="flex w-2/3 gap-1">
+            <div className="flex md:w-2/3 gap-1">
               {!(isStatusDataLoading || isCategoryDataLoading || isEquipmentTypeDataLoading) ?
                 <Select disabled={isStatusDataLoading} onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
