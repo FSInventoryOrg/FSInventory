@@ -70,6 +70,7 @@ const EditAssetCounter = ({
       _id: string | undefined;
     } = {
       ...data,
+      prefixCode: data.prefixCode?.toUpperCase(),
       _id: assetCounter._id,
     };
 
@@ -118,6 +119,7 @@ const EditAssetCounter = ({
                     placeholder="FS-XYZ"
                     autoComplete="off"
                     type="input"
+                    className="uppercase"
                     {...field}
                   />
                 </FormControl>
