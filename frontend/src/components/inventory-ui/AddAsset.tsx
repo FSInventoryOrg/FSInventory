@@ -75,6 +75,8 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
     }
   });
 
+  const { isSubmitting, errors} = form.formState
+
   const handleTabChange = (newValue: "Hardware" | "Software") => {
     setTabValue(newValue);
   };
@@ -94,6 +96,19 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
       showToast({ message: error.message, type: "ERROR" });
     },
   });
+
+  const hasRequiredFields = () => {
+    if (!errors) return false
+    return Object.values(errors).some((error)=>error.message?.includes('required'))
+  }
+
+  useEffect(()=> {
+    if (isSubmitting && errors) {
+      if (hasRequiredFields()) showToast({message: "Required fields are missing.", type:"ERROR"})
+    }
+  }, [isSubmitting, errors ])
+
+  const triggerValidation = () => form?.trigger()
 
   const onSubmit = (data: z.infer<typeof AssetSchema>) => {
     const assetData: AssetFormData = {
@@ -147,7 +162,7 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
                     </TabsContent>
                   </div>     
                 </Tabs>            
-                <Button type="submit" disabled={isPending} className="gap-2">
+                <Button type="submit" disabled={isPending} className="gap-2" onClick={triggerValidation}>
                   {isPending ? <Spinner size={18}/> : null }
                   Add Asset
                 </Button>
