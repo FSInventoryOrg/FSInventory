@@ -297,7 +297,7 @@ export function InventoryTable<TData, TValue>({
                   variant="outline"
                   size="icon"
                 >
-                  <Link to="/inventory/settings">
+                  <Link to="/settings/inventory">
                     <span className="sr-only">Settings & preferences</span>
                     <SlidersHorizontalIcon className="h-4 w-4" />
                   </Link>
