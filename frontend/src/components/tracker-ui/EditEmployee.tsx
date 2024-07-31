@@ -92,7 +92,7 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
-    }
+    },
   });
 
   const onSubmit = (data: z.infer<typeof EmployeeSchema>) => {
@@ -106,9 +106,14 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
 
   useEffect(() => {
     if (open) {
-      form.reset();
+      form.reset({...employeeData, 
+        startDate: employeeData.startDate 
+          ? new Date(employeeData.startDate) 
+          : undefined
+      });
     }
-  }, [open, form])
+  }, [open, form, employeeData])
+
 
   const [isMD, setIsMD] = useState(false);
   useEffect(() => {
