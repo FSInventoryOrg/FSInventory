@@ -702,7 +702,7 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
           </div>
           <div
             id="hardware asset distribution"
-            className="w-[35%] bg-muted rounded-lg p-3 sm:p-6 hidden xl:flex flex-col gap-2 drop-shadow z-50"
+            className="w-[35%] bg-muted rounded-lg p-3 sm:p-6 hidden xl:flex flex-col gap-2 drop-shadow"
           >
             <div>
               <h2 className="font-medium text-muted-foreground text-sm">
