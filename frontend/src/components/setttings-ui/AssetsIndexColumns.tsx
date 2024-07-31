@@ -58,6 +58,16 @@ export const AssetIndexColumns: ColumnDef<AssetCounterType>[] = [
     cell: ({ row }) => <div>{row.getValue("threshold")}</div>,
   },
   {
+    accessorKey: "totalCount",
+    header: "Remaining",
+    cell: ({ row }) => <div>{row.getValue("totalCount")}</div>,
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => <div>{row.getValue("status")}</div>,
+  },
+  {
     accessorKey: "counter",
     header: "Index Count",
     cell: ({ row }) => <div>{row.getValue("counter")}</div>,

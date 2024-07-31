@@ -145,7 +145,7 @@ export const setGitlabCreds = async(user: string, token: string) => {
 export const auditAssets = async() => {
     const assetIndex = await AssetCounter.find({});
     const adminUsers = await User.find({ role: 'ADMIN'});
-    const optionsTrack: any = await Option.find({});
+    const optionsTrack: any = await Option.findOne({});
 
     let tracks = [];
 
@@ -153,7 +153,7 @@ export const auditAssets = async() => {
 
     const assetStatueses = tracks.length > 0 ? tracks : ["Shelved", "IT Storage", "ITS Storage", ""];
     const categories = assetIndex.map(f => { return f['category']}).filter(f => { return f})
-
+    
     if (!categories) return;
 
     const assets = await Asset.aggregate().match({
@@ -275,4 +275,15 @@ export const convertStatusToStorage = async() => {
     const statusToChange = ['ITS Storage']
 
     await Hardware.updateMany({status: { $in: statusToChange}}, {status: 'IT Storage'})
+}
+
+export const setDefaults = async() => {
+    const optionStatus = ['IT Storage', 'Shelved'];
+    const options: any = await Option.findOne({});
+    const updateStatus = options['status'].reduce((accum: any[], value: any, index: number) => {
+        if(optionStatus.includes(value.value)) value.tracked = true;
+        accum.push(value)
+        return accum;
+    }, [])
+    await Option.updateOne({_id: options['_id']}, {status: updateStatus})
 }
