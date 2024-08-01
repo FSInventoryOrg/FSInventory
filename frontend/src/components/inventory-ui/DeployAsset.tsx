@@ -227,10 +227,14 @@ export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, Sugges
     
     const handleSuggestionClick = (option: EmployeeType) => {
       setFilteredOptions([]);
-      setShowSuggestions(false);
       setSelectedIndex(-1);
       // Set the form value to the employee code
       field.onChange(option.code);
+      setTimeout(() => {
+        if(showSuggestions) {
+          setShowSuggestions(false);
+        }
+      }, 500)
     };
     
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -277,8 +281,10 @@ export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, Sugges
 
     const handleInputBlur = () => {
       setTimeout(() => {
-        setShowSuggestions(false);
-      }, 100);
+        if(showSuggestions) {
+          setShowSuggestions(false);
+        }
+      }, 750);
     };
 
     return (
