@@ -143,9 +143,9 @@ const EditAssetCounter = ({
                     type="input"
                     className="[&::-webkit-inner-spin-button]:appearance-none"
                     {...field}
-                    onChange={(event) => {
-                      field.onChange(event.target.value);
-                    }}
+                    onChange={(event)=> {
+                      const value = (event.target.value ?? '0').replace('-','')
+                      field.onChange(value)}}
                   />
                 </FormControl>
                 <FormMessage />
@@ -164,6 +164,9 @@ const EditAssetCounter = ({
                     type="input"
                     className="[&::-webkit-inner-spin-button]:appearance-none"
                     {...field}
+                    onChange={(event)=> {
+                      const value = (event.target.value ?? '0').replace('-','')
+                      field.onChange(value)}}
                   />
                 </FormControl>
                 <FormMessage />
