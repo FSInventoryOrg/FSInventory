@@ -26,26 +26,34 @@ const Dashboard = () => {
     queryFn: () => imsService.fetchAllAssets('Hardware'),
   });
   // const { data: softwareData } = useQuery({ queryKey: ['fetchAllAssets', 'Software'], queryFn: () => imsService.fetchAllAssets('Software') })
-  const { toPDF, targetRef } = usePDF({
-    filename: 'IMS_Dashboard_Report.pdf',
-    method: 'save',
-    page: {
-      margin: Margin.SMALL,
-    },
-    canvas: {
-      mimeType: 'image/png',
-      qualityRatio: 1,
-    },
-    overrides: {
-      pdf: {
-        compress: true,
-      },
-    },
-  });
+  const { toPDF, targetRef } = usePDF();
 
   const handleDownloadReport = async () => {
     setIsDownloading(true);
-    await toPDF();
+
+    const currentDate = new Intl.DateTimeFormat('en-PH', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+
+    await toPDF({
+      filename: `IMS_Dashboard_Report-${currentDate}.pdf`,
+      method: 'save',
+      page: {
+        margin: Margin.SMALL,
+      },
+      canvas: {
+        mimeType: 'image/png',
+        qualityRatio: 1,
+      },
+      overrides: {
+        pdf: {
+          compress: true,
+        },
+      },
+    });
+
     setIsDownloading(false);
   };
 
