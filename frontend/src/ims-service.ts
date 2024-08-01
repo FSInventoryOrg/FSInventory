@@ -417,8 +417,9 @@ export const updateEmployee = async ({ code, updatedEmployee }: { code: string, 
   return true;
 };
 
-export const fetchAllEmployees = async () => {
-  const response = await fetch(`${API_BASE_URL}/api/employees`, {
+export const fetchAllEmployees = async (includeUnregistered?: string) => {
+  const APPEND_URL = !includeUnregistered ? '' : '/includeUnregistered'
+  const response = await fetch(`${API_BASE_URL}/api/employees${APPEND_URL}`, {
     credentials: 'include',
   });
 

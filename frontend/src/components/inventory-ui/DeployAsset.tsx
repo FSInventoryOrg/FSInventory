@@ -201,13 +201,14 @@ interface SuggestiveInputProps extends InputProps {
   placeholder?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   field?: any;
+  includeUnregistered?: string
 }
 
 export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, SuggestiveInputProps>(
-  ({ placeholder, field, className, autoComplete, type }, ref) => {
+  ({ placeholder, field, className, autoComplete, type, includeUnregistered }, ref) => {
     const { data: employees } = useQuery<EmployeeType[]>({ 
-      queryKey: ['fetchAllEmployees'], 
-      queryFn: () => imsService.fetchAllEmployees(),
+      queryKey: [includeUnregistered ? 'fetchAllEmployeesIncludeUnregistered' : 'fetchAllEmployees'], 
+      queryFn: () => imsService.fetchAllEmployees(includeUnregistered),
     });
 
     const [filteredOptions, setFilteredOptions] = React.useState<EmployeeType[]>([]);
@@ -217,7 +218,7 @@ export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, Sugges
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const searchTerm = event.target.value.toLowerCase().trim();
       const filtered = employees?.filter(employee =>
-        `${employee.firstName} ${employee.lastName}`.toLowerCase().includes(searchTerm)
+        `${employee.firstName} ${employee.lastName}`.toLowerCase().includes(searchTerm) || `${employee.code}`.toLowerCase().includes(searchTerm)
       ) || [];
       setFilteredOptions(filtered);
       setShowSuggestions(filtered.length > 0);
@@ -312,8 +313,11 @@ export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, Sugges
                 onClick={() => handleSuggestionClick(option)}
                 cursor-pointer
               >
-                <span className="px-3 py-1.5 rounded-md text-start bg-muted font-semibold text-sm text-muted-foreground cursor-pointer">{`${option.code}`}</span>
-                <span className="text-start col-span-2 cursor-pointer">{`${option.firstName} ${option.lastName}`}</span>
+                {option?.state === 'UNREGISTERED' ? (
+                  <><span className="px-3 py-1.5 rounded-md text-start bg-muted font-semibold text-muted-foreground cursor-pointer text-destructive text-xs tracking-tight">UNREGISTERED</span><span className="text-start col-span-2 cursor-pointer">{`${option.code}`}</span></>
+                ) : (
+                  <><span className="px-3 py-1.5 rounded-md text-start bg-muted font-semibold text-sm text-muted-foreground cursor-pointer">{`${option.code}`}</span><span className="text-start col-span-2 cursor-pointer">{`${option.firstName} ${option.lastName}`}</span></>
+                )}
               </div>
             ))}
           </div>

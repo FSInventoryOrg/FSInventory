@@ -19,6 +19,45 @@ router.get("/", async (req: Request, res: Response) => {
   }
 });
 
+router.get("/includeUnregistered", async (req: Request, res: Response) => {
+  try {
+    const employees: EmployeeType[] = await Employee.find();
+    const assetAssigneeUsers: string[] = await Asset.distinct('assignee');
+    const assetRecoveredUsers: string[] = await Asset.distinct('recoveredFrom');
+    const assetUsers = assetAssigneeUsers.concat(assetRecoveredUsers).sort().reduce((accum: any[], value: any, index: number) => {
+      value = value ? value.trim() : '';
+
+      if (value) {
+        const findIndex = accum.findIndex(f => f['code'] === value)
+        if (findIndex === -1) {
+          const findEmployeeIndex = employees.findIndex(f => {
+            let name = `${f['firstName']}`;
+            if(f['middleName']) name += ` ${f['middleName']}`
+            name += ` ${f['lastName']}`;
+
+            return f['code'] === value || name === value
+          });
+
+          if (findEmployeeIndex === -1) accum.push({
+            code: value,
+            state: 'UNREGISTERED',
+            firstName: '',
+            lastName: ''
+          })
+        }
+      }
+
+      return accum;
+    }, [])
+
+    const newEmployees = employees.concat(assetUsers)
+    res.status(200).json(newEmployees);
+  } catch (error) {
+    console.error('Error fetching employees:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 router.get("/:code", async (req: Request, res: Response) => {
   const { code } = req.params;
@@ -264,12 +303,12 @@ router.put("/:code", [
             }
           ]
         })
-        
+
         if (findDeploymentHistory.length > 0) {
           findDeploymentHistory.forEach(async (history: any) => {
             let assetData: any = {}
             let newData: any[] = [];
-  
+
             history.deploymentHistory.forEach((deployed: any) => {
               if (deployed.assignee === code) deployed.assignee = data.code
               newData.push(deployed)
@@ -278,7 +317,7 @@ router.put("/:code", [
             assetData['deploymentHistory'] = newData;
             if (history['assignee'] === code) assetData['assignee'] = data.code
             if (history['recoveredFrom'] === code) assetData['recoveredFrom'] = data.code
-  
+
             await Hardware.updateOne({ _id: history['_id'] }, assetData)
           })
         }

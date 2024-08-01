@@ -16,4 +16,5 @@ export interface EmployeeType {
   isActive: boolean;
   isRegistered: boolean;
   assetsHistory?: AssetsHistory[];
+  state?: string
 }

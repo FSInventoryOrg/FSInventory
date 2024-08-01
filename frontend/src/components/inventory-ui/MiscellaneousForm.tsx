@@ -186,7 +186,7 @@ const MiscellaneousForm = () => {
           render={({ field }) => (
             <FormItem className='w-full'>
               <FormControl>
-                <EmployeeSuggestiveInput property='recoveredFrom' placeholder="Recovered from" autoComplete='off' type='input' field={field} />
+                <EmployeeSuggestiveInput property='recoveredFrom' placeholder="Recovered from" autoComplete='off' type='input' field={field} includeUnregistered='true' />
               </FormControl>
               <FormMessage />
             </FormItem>
