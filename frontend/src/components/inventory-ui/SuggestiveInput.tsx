@@ -35,9 +35,13 @@ const SuggestiveInput = React.forwardRef<HTMLInputElement, SuggestiveInputProps>
 
     const handleSuggestionClick = (option: string) => {
       setFilteredOptions([]);
-      setShowSuggestions(false); // Hide suggestions when clicked
       setSelectedIndex(-1); // Reset selected index when suggestion is clicked
       field.onChange(option);
+      setTimeout(() => {
+        if(showSuggestions) {
+          setShowSuggestions(false); // Hide suggestions when clicked
+        }
+      }, 500);
     };
 
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -84,8 +88,10 @@ const SuggestiveInput = React.forwardRef<HTMLInputElement, SuggestiveInputProps>
 
     const handleInputBlur = () => {
       setTimeout(() => {
-        setShowSuggestions(false); 
-      }, 100);
+        if(showSuggestions) {
+          setShowSuggestions(false);
+        }
+      }, 750);
     };
 
     return (
