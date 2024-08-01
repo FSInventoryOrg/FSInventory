@@ -304,18 +304,17 @@ export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, Sugges
         {showSuggestions && filteredOptions.length > 0 && (
           <div className='max-h-[200px] overflow-y-scroll absolute top-full left-0 bg-popover border border-border w-full z-50 rounded-lg my-1 p-1'>
             {filteredOptions.map((option, index) => (
-              <Button 
+              <div 
                 key={index} 
-                type='button'
-                variant='ghost'
                 className={cn('p-1 w-full justify-start gap-2 grid-cols-3 grid', {
                   'bg-accent': index === selectedIndex,
                 })}
                 onClick={() => handleSuggestionClick(option)}
+                cursor-pointer
               >
-                <span className="px-3 py-1.5 rounded-md text-start bg-muted font-semibold text-sm text-muted-foreground">{`${option.code}`}</span>
-                <span className="text-start col-span-2">{`${option.firstName} ${option.lastName}`}</span>
-              </Button>
+                <span className="px-3 py-1.5 rounded-md text-start bg-muted font-semibold text-sm text-muted-foreground cursor-pointer">{`${option.code}`}</span>
+                <span className="text-start col-span-2 cursor-pointer">{`${option.firstName} ${option.lastName}`}</span>
+              </div>
             ))}
           </div>
         )}
