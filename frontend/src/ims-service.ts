@@ -541,7 +541,7 @@ export const postAssetCounter = async (data: AssetCounterFormData) => {
   });
   if (!response.ok) {
     const responseBody = await response.json();
-    throw new Error(responseBody.error);
+    throw new Error(responseBody.message);
   }
 
   return response.json();

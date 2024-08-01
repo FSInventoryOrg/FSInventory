@@ -35,7 +35,11 @@ const EditAssetCounter = ({
 }: EditAssetCounterProps) => {
   const form = useForm<z.infer<typeof AssetCounterSchema>>({
     resolver: zodResolver(AssetCounterSchema),
-    defaultValues: assetCounter,
+    defaultValues: {
+    ...assetCounter,
+    threshold: assetCounter.threshold ?? 1,
+    counter: assetCounter.counter ?? 0,
+  },
     mode: "onChange",
   });
   const queryClient = useQueryClient();
@@ -139,9 +143,9 @@ const EditAssetCounter = ({
                     type="input"
                     className="[&::-webkit-inner-spin-button]:appearance-none"
                     {...field}
-                    onChange={(event) => {
-                      field.onChange(event.target.value);
-                    }}
+                    onChange={(event)=> {
+                      const value = (event.target.value ?? '0').replace('-','')
+                      field.onChange(value)}}
                   />
                 </FormControl>
                 <FormMessage />
@@ -160,6 +164,9 @@ const EditAssetCounter = ({
                     type="input"
                     className="[&::-webkit-inner-spin-button]:appearance-none"
                     {...field}
+                    onChange={(event)=> {
+                      const value = (event.target.value ?? '0').replace('-','')
+                      field.onChange(value)}}
                   />
                 </FormControl>
                 <FormMessage />
