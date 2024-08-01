@@ -35,7 +35,11 @@ const EditAssetCounter = ({
 }: EditAssetCounterProps) => {
   const form = useForm<z.infer<typeof AssetCounterSchema>>({
     resolver: zodResolver(AssetCounterSchema),
-    defaultValues: assetCounter,
+    defaultValues: {
+    ...assetCounter,
+    threshold: assetCounter.threshold ?? 1,
+    counter: assetCounter.counter ?? 0,
+  },
     mode: "onChange",
   });
   const queryClient = useQueryClient();
