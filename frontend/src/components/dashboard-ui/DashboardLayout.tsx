@@ -410,13 +410,12 @@ const DashboardLayout = ({ assetData, hardwareData }: DashboardLayoutProps) => {
           (employee: EmployeeType) => employee.isActive
         ).length || 0;
 
+      const mappedEmpCode = registeredEmployees?.map((f: any) => f['code'])
       const unregisteredEmployeeCount =
-        assignees?.filter(
-          (assignee) =>
-            !registeredEmployees?.some(
-              (employee: EmployeeType) => employee.name === assignee
-            )
-        )?.length || 0;
+        assignees?.reduce((accum: any[], assignee: any) => {
+          if(!mappedEmpCode?.includes(assignee)) accum.push(assignee)
+          return accum
+        }, [])?.length || 0;
 
       setCategoryCount(categoryCount);
       setStatusCount(statusCount);
