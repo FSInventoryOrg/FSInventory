@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
 export const InventorySettingsSchema = z.object({
-  status: z.string().optional(),
-  category: z.string().optional(),
-  equipmentType: z.string().optional(),
-  deployableStatus: z.string().optional(),
-  retrievableStatus: z.string().optional(),
-  inventoryColumns: z.array(z.string()).optional(),
+  status: z.string().trim().optional(),
+  category: z.string().trim().optional(),
+  equipmentType: z.string().trim().optional(),
+  deployableStatus: z.string().trim().optional(),
+  retrievableStatus: z.string().trim().optional(),
+  inventoryColumns: z.array(z.string().trim()).optional(),
 });
 
 export type InventorySettingsFormData = z.infer<typeof InventorySettingsSchema>;

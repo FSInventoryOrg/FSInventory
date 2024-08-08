@@ -11,7 +11,10 @@ import Dashboard from "./pages/Dashboard";
 import Inventory from "./pages/Inventory";
 import Loading from "./pages/Loading";
 import Tracker from "./pages/Tracker";
-import InventoryEdit from "./pages/InventorySettings";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const App = () => {
   const { isLoggedIn, isLoading } = useAppContext();
@@ -28,13 +31,15 @@ const App = () => {
                 <>
                   <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
                   <Route path="/inventory" element={<Layout><Inventory /></Layout>} />
-                  <Route path="/inventory/settings" element={<Layout><InventoryEdit /></Layout>} />
                   <Route path="/tracker" element={<Layout><Tracker /></Layout>} />
                   <Route path="/tracker/:employeeCode" element={<Layout><Tracker /></Layout>} />
-                  {/* <Route path="/metrics" element={<Layout><Metrics /></Layout>} />
-                  <Route path="/requests" element={<Layout>Requests</Layout>} /> */}
+                  <Route path="/profile" element={<Layout><Profile/></Layout>}/>
+                  <Route path="/settings/*" element={<Layout><Settings /></Layout>}/>
+                  {/* <Route path="/requests" element={<Layout>Requests</Layout>} /> */}
                 </>
               )}
+              <Route path="/forgot-password" element={<ForgotPassword/>}/>
+              <Route path="/reset-password" element={<ResetPassword/>}/>
               <Route path="*" element={<Navigate to="/" />} />
             </>
           )}

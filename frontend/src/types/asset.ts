@@ -43,3 +43,13 @@ export interface SoftwareType extends AssetType {
   license: string;
   version: string;
 }
+
+export type AssetCounterType = {
+  _id?: string;
+  category: string;
+  prefixCode: string;
+  threshold: number;
+  counter: number;
+  type: "Hardware" | "Software";
+};
+

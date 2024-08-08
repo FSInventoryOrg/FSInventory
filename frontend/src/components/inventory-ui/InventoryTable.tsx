@@ -14,7 +14,7 @@ import {
   FilterFn,
   useReactTable,
   PaginationState,
-} from "@tanstack/react-table"
+} from '@tanstack/react-table';
 import {
   Table,
   TableBody,
@@ -22,38 +22,37 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from '@/components/ui/table';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { ScrollArea, ScrollBar } from "../ui/scroll-area"
-import { Input } from "@/components/ui/input"
-import { InventoryPagination } from "./InventoryPagination"
-import AddAsset from "./AddAsset"
-import { FilterIcon, SearchIcon, SlidersHorizontalIcon } from "lucide-react"
-import {
-  RankingInfo,
-  rankItem,
-} from '@tanstack/match-sorter-utils'
-import { ColumnVisibility } from "./ColumnVisibility"
-import Empty from "../graphics/Empty"
-import { TagOption } from "./Options"
-import { useQuery } from '@tanstack/react-query'
-import * as imsService from '@/ims-service'
-import { Button } from "../ui/button"
-import { PROPERTIES } from "@/lib/data"
-import { Link } from "react-router-dom"
-import { Defaults } from "@/types/options"
+} from '@/components/ui/tooltip';
+import { ScrollArea, ScrollBar } from '../ui/scroll-area';
+import { Input } from '@/components/ui/input';
+import { DataTablePagination } from '@/components/DataTablePagination';
+import AddAsset from './AddAsset';
+import { FilterIcon, SearchIcon, SlidersHorizontalIcon } from 'lucide-react';
+import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
+import { ColumnVisibility } from './ColumnVisibility';
+import Empty from '../graphics/Empty';
+import { TagOption } from './Options';
+import { useQuery } from '@tanstack/react-query';
+import * as imsService from '@/ims-service';
+import { Button } from '../ui/button';
+import { PROPERTIES } from '@/lib/data';
+import { Link } from 'react-router-dom';
+import { Defaults } from '@/types/options';
+import { Download } from '@phosphor-icons/react';
+import { exportToExcel } from '@/lib/utils';
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
-    fuzzy: FilterFn<unknown>
+    fuzzy: FilterFn<unknown>;
   }
   interface FilterMeta {
-    itemRank: RankingInfo
+    itemRank: RankingInfo;
   }
 }
 
@@ -68,17 +67,17 @@ interface InventoryTableProps<TData, TValue> {
 }
 
 // const DEFAULT_HIDDEN_COLUMNS = [
-//   'category', 
-//   'processor', 
-//   'memory', 
-//   'storage', 
-//   'assignee', 
-//   'serviceInYears', 
-//   'supplierVendor', 
-//   'pezaForm8105', 
-//   'pezaForm8106', 
-//   'isRGE', 
-//   'equipmentType', 
+//   'category',
+//   'processor',
+//   'memory',
+//   'storage',
+//   'assignee',
+//   'serviceInYears',
+//   'supplierVendor',
+//   'pezaForm8105',
+//   'pezaForm8106',
+//   'isRGE',
+//   'equipmentType',
 //   'remarks',
 //   'deploymentDate',
 //   'recoveredFrom',
@@ -88,12 +87,12 @@ interface InventoryTableProps<TData, TValue> {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  const itemRank = rankItem(row.getValue(columnId), value)
+  const itemRank = rankItem(row.getValue(columnId), value);
   addMeta({
     itemRank,
-  })
-  return itemRank.passed
-}
+  });
+  return itemRank.passed;
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const exactFilter: FilterFn<any> = (row, columnId, value) => {
@@ -101,7 +100,7 @@ const exactFilter: FilterFn<any> = (row, columnId, value) => {
   const searchTerm = value?.toString().toLowerCase() || '';
   const isMatch = cellValue.startsWith(searchTerm);
 
-  return isMatch; 
+  return isMatch;
 };
 
 export function InventoryTable<TData, TValue>({
@@ -113,67 +112,78 @@ export function InventoryTable<TData, TValue>({
   isFiltersVisible,
   selectedCategory,
 }: InventoryTableProps<TData, TValue>) {
-
   const [isXL, setIsXL] = React.useState(false);
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [globalFilter, setGlobalFilter] = React.useState('')
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [globalFilter, setGlobalFilter] = React.useState('');
   const [pagination] = React.useState<PaginationState>({
-    pageIndex: 0, 
-    pageSize: 20, 
-  });  
+    pageIndex: 0,
+    pageSize: 20,
+  });
+  const [isDownloading, setIsDownloading] = React.useState(false);
 
-  const { data: optionValues } = useQuery<TagOption[]>({ 
-    queryKey: ['fetchOptionValues', 'category'], 
+  const { data: optionValues } = useQuery<TagOption[]>({
+    queryKey: ['fetchOptionValues', 'category'],
     queryFn: () => imsService.fetchOptionValues('category'),
     enabled: !!selectedCategory,
-  })
-  
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(
-    // Initialize column visibility state
-    DEFAULT_HIDDEN_COLUMNS.reduce((acc, column) => {
-      acc[column] = false; // Set all default columns to visible
-      return acc;
-    }, {} as VisibilityState)
-  );
-  
+  });
+
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>(
+      // Initialize column visibility state
+      DEFAULT_HIDDEN_COLUMNS.reduce((acc, column) => {
+        acc[column] = false; // Set all default columns to visible
+        return acc;
+      }, {} as VisibilityState)
+    );
+
   React.useEffect(() => {
     if (!selectedCategory || !optionValues || optionValues.length === 0) {
       // Scenario 1: Default
-      setColumnVisibility(prevVisibility => ({
+      setColumnVisibility((prevVisibility) => ({
         ...prevVisibility,
         ...PROPERTIES.reduce((acc, column) => {
           acc[column.id] = !DEFAULT_HIDDEN_COLUMNS.includes(column.id); // Set visibility based on properties
           return acc;
-        }, {} as VisibilityState)
+        }, {} as VisibilityState),
       }));
     } else {
-      const categoryOption = optionValues.find(option => option.value === selectedCategory);
-      if (!categoryOption || !categoryOption.properties || categoryOption.properties.length === 0) {
+      const categoryOption = optionValues.find(
+        (option) => option.value === selectedCategory
+      );
+      if (
+        !categoryOption ||
+        !categoryOption.properties ||
+        categoryOption.properties.length === 0
+      ) {
         // Scenario 2: Category option is not available or has no properties
-        setColumnVisibility(prevVisibility => ({
+        setColumnVisibility((prevVisibility) => ({
           ...prevVisibility,
           ...PROPERTIES.reduce((acc, column) => {
             acc[column.id] = !DEFAULT_HIDDEN_COLUMNS.includes(column.id); // Set visibility based on properties
             return acc;
-          }, {} as VisibilityState)
+          }, {} as VisibilityState),
         }));
       } else {
         // Scenario 3: Category option is available and has properties
-        const properties: string[] = categoryOption.properties.map(tag => tag);
+        const properties: string[] = categoryOption.properties.map(
+          (tag) => tag
+        );
         // Set visibility based on properties
-        setColumnVisibility(prevVisibility => ({
+        setColumnVisibility((prevVisibility) => ({
           ...prevVisibility,
           ...PROPERTIES.reduce((acc, column) => {
             acc[column.id] = properties.includes(column.id); // Set visibility based on properties
             return acc;
-          }, {} as VisibilityState)
+          }, {} as VisibilityState),
         }));
       }
     }
   }, [selectedCategory, optionValues, DEFAULT_HIDDEN_COLUMNS]);
 
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data,
@@ -199,13 +209,13 @@ export function InventoryTable<TData, TValue>({
       rowSelection,
     },
     initialState: {
-      pagination
-    }
-  })
+      pagination,
+    },
+  });
 
   React.useEffect(() => {
     const checkScreenSize = () => {
-      setIsXL(window.innerWidth >= 1280); 
+      setIsXL(window.innerWidth >= 1280);
     };
 
     checkScreenSize();
@@ -215,9 +225,19 @@ export function InventoryTable<TData, TValue>({
       window.removeEventListener('resize', checkScreenSize);
     };
   }, []);
-  
+
+  const handleDownloadReport = async () => {
+    setIsDownloading(true);
+    const columnVisibility = table.getState()?.columnVisibility;
+    const columns = Object.keys(columnVisibility).filter(
+      (key) => columnVisibility[key] === true
+    );
+    await exportToExcel(columns, data, 'Inventory_Report');
+    setIsDownloading(false);
+  };
+
   return (
-    <div className="w-full flex flex-col h-full" >
+    <div className="w-full flex flex-col h-full">
       <div className="w-full flex items-center justify-between pb-3 xl:pb-4 gap-2">
         <div className="flex gap-2 w-full">
           {!isFiltersVisible && (
@@ -225,25 +245,25 @@ export function InventoryTable<TData, TValue>({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    className='h-8 w-8 min-w-8 p-0 bg-inherit'
-                    variant='outline'
-                    size='icon'
+                    className="h-8 w-8 min-w-8 p-0 bg-inherit"
+                    variant="outline"
+                    size="icon"
                     onClick={() => {
                       onToggleFilters(!isFiltersVisible);
                     }}
                   >
                     <span className="sr-only">Toggle visible columns</span>
-                    <FilterIcon className='h-4 w-4' />
+                    <FilterIcon className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className='text-xs'>Show filter settings</p>
+                  <p className="text-xs">Show filter settings</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
           <div className="flex items-center w-full">
-            <SearchIcon className="absolute translate-x-3 h-4 w-4"/>
+            <SearchIcon className="absolute translate-x-3 h-4 w-4" />
             <Input
               placeholder="Search asset..."
               value={globalFilter ?? ''}
@@ -257,19 +277,38 @@ export function InventoryTable<TData, TValue>({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  asChild
-                  className='h-8 w-8 min-w-8 p-0'
-                  variant='outline'
-                  size='icon'
+                  className="h-8 w-8 min-w-8 p-0"
+                  variant="outline"
+                  size="icon"
+                  onClick={handleDownloadReport}
+                  disabled={isDownloading}
                 >
-                  <Link to="/inventory/settings">
+                  <>
+                    <span className="sr-only">Export Data</span>
+                    <Download className="h-4 w-4" />
+                  </>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">Export Data</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  asChild
+                  className="h-8 w-8 min-w-8 p-0"
+                  variant="outline"
+                  size="icon"
+                >
+                  <Link to="/settings/inventory">
                     <span className="sr-only">Settings & preferences</span>
-                    <SlidersHorizontalIcon className='h-4 w-4'/>
+                    <SlidersHorizontalIcon className="h-4 w-4" />
                   </Link>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p className='text-xs'>Settings & preferences</p>
+                <p className="text-xs">Settings & preferences</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -277,7 +316,10 @@ export function InventoryTable<TData, TValue>({
           {defaultOptions && <AddAsset defaultValues={defaultOptions} />}
         </div>
       </div>
-      <ScrollArea className="rounded-md border h-full" style={isXL ? { maxHeight: '' } : {}}>
+      <ScrollArea
+        className="rounded-md border h-full"
+        style={isXL ? { maxHeight: '' } : {}}
+      >
         <Table className="text-xs relative">
           <TableHeader className="sticky top-0 bg-accent z-10 border-b">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -292,7 +334,7 @@ export function InventoryTable<TData, TValue>({
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -302,11 +344,14 @@ export function InventoryTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -314,9 +359,11 @@ export function InventoryTable<TData, TValue>({
             ) : (
               <TableRow className="hover:bg-background">
                 <TableCell colSpan={columns.length}>
-                  <div className='h-max flex flex-col items-center justify-center'>
+                  <div className="h-max flex flex-col items-center justify-center">
                     <Empty height={200} width={300} />
-                    <span className="text-muted-foreground">No results found</span>
+                    <span className="text-muted-foreground">
+                      No results found
+                    </span>
                   </div>
                 </TableCell>
               </TableRow>
@@ -325,7 +372,7 @@ export function InventoryTable<TData, TValue>({
         </Table>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
-      <InventoryPagination table={table}/>
+      <DataTablePagination table={table} />
     </div>
-  )
+  );
 }

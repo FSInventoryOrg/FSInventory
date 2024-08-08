@@ -50,10 +50,13 @@ const ActionCell: React.FC<CellProps> = ({ row }) => {
   const handleDeleteAsset = async () => {
     await imsService.deleteAssetByCode(asset.code);
     queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
-    queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
+    queryClient.invalidateQueries({
+      queryKey: ['fetchAllAssetsByStatusAndCategory'],
+    });
+    queryClient.invalidateQueries({ queryKey: ['notifications'] });
     setTimeout(() => {
       setIsDeleteDialogOpen(false);
-    }, 100)
+    }, 100);
   };
 
   const handleClose = (close: boolean) => {

@@ -3,6 +3,7 @@ import Option, { OptionsType, StatusOptions, CategoryOptions } from '../models/o
 import { check, validationResult } from 'express-validator';
 import verifyToken from '../middleware/auth';
 import jwt from "jsonwebtoken";
+import { auditAssets } from '../utils/common';
 
 const router = express.Router();
 
@@ -74,11 +75,15 @@ router.post('/:property', [
         option = new Option({});
       }
 
+      let isStatusIncluded = false;
+
       // Convert value to object if property is "status" or "category" and value is a string
       if (property === 'status' || property === 'category') {
         if (typeof value === 'string') {
           value = { value };
         }
+
+        if(property === 'status') isStatusIncluded = true
       }
 
       const propertyValues = option.get(property) || [];
@@ -99,6 +104,8 @@ router.post('/:property', [
       option.set(property, [...propertyValues, value]);
       
       await option.save();
+
+      if(isStatusIncluded) await auditAssets();
 
       res.status(200).json(option);
     } catch (error) {
@@ -265,6 +272,8 @@ router.put('/:property', [
       let { value } = req.body;
       const updateIndex = Number(req.query.index); // Get the index from the query string
 
+      let isStatusIncluded = false;
+
       let option = await Option.findOne();
       if (!option) {
         return res.status(404).json({ message: 'Options not found' });
@@ -283,6 +292,8 @@ router.put('/:property', [
         if (typeof value === 'string') {
           value = { value };
         }
+
+        if(property === 'status') isStatusIncluded = true
       }
 
       const propertyValues = option.get(property) || [];
@@ -295,6 +306,8 @@ router.put('/:property', [
       option.get(property)[updateIndex] = value;
 
       await option.save();
+
+      if(isStatusIncluded) await auditAssets();
 
       res.status(200).json({ message: 'Option updated successfully' });
     } catch (error) {
@@ -361,6 +374,8 @@ router.delete('/:property', verifyToken, async (req: Request, res: Response) => 
     const { property } = req.params;
     const { value } = req.body;
 
+    let isStatusIncluded = false;
+
     // Check if the options document exists
     let option = await Option.findOne();
     if (!option) {
@@ -383,6 +398,7 @@ router.delete('/:property', verifyToken, async (req: Request, res: Response) => 
 
       const updatedProperty = propertyValue.filter(option => option.value !== value);
       option.set(property, updatedProperty);
+      if(property === 'status') isStatusIncluded = true
     } else {
       const propertyValue: string[] = option.get(property);
       if (!propertyValue.includes(value)) {
@@ -393,6 +409,8 @@ router.delete('/:property', verifyToken, async (req: Request, res: Response) => 
     }
 
     await option.save();
+
+    if(isStatusIncluded) await auditAssets();
 
     res.status(200).json({ message: `Value '${value}' removed from option '${property}' successfully` });
   } catch (error) {
