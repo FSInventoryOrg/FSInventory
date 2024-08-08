@@ -419,39 +419,6 @@ router.delete('/:property', verifyToken, async (req: Request, res: Response) => 
   }
 });
 
-/**
- * @openapi
- * /api/options/{property}:
- *  get:
- *    tags:
- *      - Options
- *    summary: Get the values of a property in options
- *    parameters:
- *      - in: path
- *        name: property
- *        required: true
- *        schema:
- *          type: string
- *        description: Property to get the values of
- *    responses:
- *      200:
- *        description: Property values retrieved successfully
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                value:
- *                  type: array
- *                  items:
- *                    type: string
- *      404:
- *        description: Options not found or property not found in options
- *      500:
- *        description: Internal server error
- *    security:
- *      - bearerAuth: []
- */
 router.get('/:property', async (req: Request, res: Response) => {
   try {
     const { property } = req.params;
@@ -472,25 +439,6 @@ router.get('/:property', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /api/options:
- *  get:
- *    tags:
- *      - Options
- *    summary: Get all options
- *    responses:
- *      200:
- *        description: Options retrieved successfully
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/Option'
- *      500:
- *        description: Internal server error
- */
 router.get('/', async (req: Request, res: Response) => {
   try {
     // Retrieve all options documents
