@@ -109,7 +109,7 @@ const MiscellaneousForm = () => {
       <FormLabel className='text-md text-secondary-foreground'>Deployment details</FormLabel>
       <div className='mt-2 mb-4'>
         <WarningAlert warningMessage="
-          We recommend using the deploy and retrieve functions to update the deployment information. Leave these fields empty unless absolutely necessary.
+          We recommend using the deploy and recover functions to update the deployment information. Leave these fields empty unless absolutely necessary.
         " />
       </div>
       <div className='flex flex-col sm:flex-row gap-2 w-full'>

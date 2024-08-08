@@ -358,7 +358,7 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
               <AlertDialogTitle>Cannot remove this employee</AlertDialogTitle>
               <AlertDialogDescription>
                 There are {employeeAssets?.length || 0} assets deployed to{' '}
-                {employee.firstName + ' ' + employee.lastName}. Retrieve these
+                {employee.firstName + ' ' + employee.lastName}. Recover these
                 assets and try again.
               </AlertDialogDescription>
             </AlertDialogHeader>
