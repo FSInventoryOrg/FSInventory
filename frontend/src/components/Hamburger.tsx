@@ -1,4 +1,4 @@
-import { BarChartIcon, ClipboardListIcon, FlagIcon, GaugeCircleIcon, MenuIcon, TargetIcon } from "lucide-react";
+import { ClipboardListIcon, FlagIcon, GaugeCircleIcon, MenuIcon, TargetIcon } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -88,12 +88,6 @@ const Hamburger = () => {
             <Link to="/tracker" className="w-full flex gap-4 text-xl justify-start px-3 py-3 items-center hover:bg-accent hover:text-accent-foreground rounded-md font-medium" reloadDocument>
               <TargetIcon size={24} className={location.pathname === '/tracker' ? "text-primary" : ""} />
               <span>Tracker</span>            
-            </Link>
-          </SheetPrimitive.Close>
-          <SheetPrimitive.Close className="w-full" tabIndex={-1}>
-            <Link to="/metrics" className="w-full flex gap-4 text-xl justify-start px-3 py-3 items-center hover:bg-accent hover:text-accent-foreground rounded-md font-medium" reloadDocument>
-              <BarChartIcon size={24} className={location.pathname === '/metrics' ? "text-primary" : ""} />
-              <span>Metrics</span>            
             </Link>
           </SheetPrimitive.Close>
           <SheetPrimitive.Close className="w-full" tabIndex={-1}>

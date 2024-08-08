@@ -4,6 +4,9 @@ import { AssetFormData as RetrieveAssetFormData } from "./schemas/RetrieveAssetS
 import { EmployeeFormData } from "./schemas/AddEmployeeSchema";
 import { AssetsHistory } from "./types/employee";
 import { Defaults } from "./types/options";
+import { UserData } from "./schemas/UserSchema";
+import { UploadImage } from "./types/user";
+import { AssetCounterFormData } from "./schemas/AssetCounterSchema";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -146,6 +149,19 @@ export const fetchAllAssetsByStatusAndCategory = async (type: string, status: st
   return response.json();
 }
 
+export const fetchAssetsByFilter = async (filter: {[key: string]: string}) => {
+  const queryString = new URLSearchParams(filter).toString();
+  const response = await fetch(`${API_BASE_URL}/api/assets?${queryString}`, {
+    credentials: 'include',
+  });
+
+  if(!response.ok) {
+    throw new Error("Error fetching assets");
+  }
+
+  return response.json();
+}
+
 export const fetchAssetByCode = async (code: string) => {
   const response = await fetch(`${API_BASE_URL}/api/assets/${code}`, {
     credentials: 'include',
@@ -159,7 +175,7 @@ export const fetchAssetByCode = async (code: string) => {
 }
 
 export const fetchAssetCount = async (property: string, value: string) => {
-  const response = await fetch(`${API_BASE_URL}/api/assets/count/${property}/${value}`, {
+  const response = await fetch(`${API_BASE_URL}/api/assets/count/${property}/${encodeURIComponent(value)}`, {
     credentials: 'include',
   });
 
@@ -267,15 +283,15 @@ export const updateOptionDefaults = async (defaults: Defaults) => {
 
 export const updateOptionValue = async ({ property, value, index }: { property: string, value: string | object, index?: number }) => {
   const url = `${API_BASE_URL}/api/options/${property}`;
-  const queryString = index !== undefined ? `?index=${index}` : ''; 
+  const queryString = index !== undefined ? `?index=${index}` : '';
 
   const response = await fetch(url + queryString, {
     method: 'PUT',
-    credentials: 'include', 
+    credentials: 'include',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ value })
+    body: JSON.stringify({ value }),
   });
 
   if (!response.ok) {
@@ -401,8 +417,9 @@ export const updateEmployee = async ({ code, updatedEmployee }: { code: string, 
   return true;
 };
 
-export const fetchAllEmployees = async () => {
-  const response = await fetch(`${API_BASE_URL}/api/employees`, {
+export const fetchAllEmployees = async (includeUnregistered?: string) => {
+  const APPEND_URL = !includeUnregistered ? '' : '/includeUnregistered'
+  const response = await fetch(`${API_BASE_URL}/api/employees${APPEND_URL}`, {
     credentials: 'include',
   });
 
@@ -449,4 +466,164 @@ export const deleteEmployeeByCode = async (code: string) => {
   }
 
   return true;
+};
+
+
+/* USER PROFILE */
+export const fetchUserData = async ()=> {
+  const response = await fetch(`${API_BASE_URL}/api/users`, {
+    credentials: 'include',
+  })
+
+  if(!response.ok) {
+    throw new Error("Error fetching user");
+  }
+
+  return response.json();
+}
+
+export const updateUserData = async (user: UserData) => {
+  const response = await fetch(`${API_BASE_URL}/api/users/`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(user)
+    });
+
+    if (!response.ok) {
+      const responseBody = await response.json();
+      throw new Error(responseBody.message ||'Failed to update profile');
+    }
+    return true;
+        
+}
+
+export const uploadUserPicture = async (form: UploadImage) => {
+  const response = await fetch(`${API_BASE_URL}/api/upload/user`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(form)
+  });
+
+  const responseBody = await response.json();
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+
+  return responseBody;
+
+}
+
+// Asset counters
+export const fetchAssetCounters = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/assetcounter`, {
+    credentials: 'include',
+  })
+
+  if(!response.ok) {
+    throw new Error("Error fetching user");
+  }
+
+  return response.json();
+}
+export const postAssetCounter = async (data: AssetCounterFormData) => {
+  const response = await fetch(`${API_BASE_URL}/api/assetcounter/`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message);
+  }
+
+  return response.json();
+}
+export const updateAssetCounter = async ({ prefixCode, updatedAssetCounter }: { prefixCode: string, 
+  updatedAssetCounter: AssetCounterFormData & { _id?: string }}) => {
+  if (!updatedAssetCounter._id) {
+    return postAssetCounter(updatedAssetCounter);
+  } 
+
+  const response = await fetch(`${API_BASE_URL}/api/assetcounter/${prefixCode}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(updatedAssetCounter)
+    });
+
+    if (!response.ok) {
+      const responseBody = await response.json();
+      throw new Error(responseBody.message ||'Failed to update asset counter');
+    }
+    return true;    
+}
+
+export const fetchNotifications = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/notification`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Error fetching notifications');
+  }
+
+  return response.json();
+};
+
+export const markNotificationAsRead = async (notificationId: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/notification`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify([notificationId]),
+  });
+
+  if (!response.ok) {
+    throw new Error('Error marking notification as read');
+  }
+
+  return true;
+};
+
+export const oauthLogin = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/oauthLogin`);
+
+  if (!response.ok) {
+    throw new Error('Error signing in to OAuth provider');
+  }
+
+  const responseBody = await response.json();
+
+  window.location.href = responseBody['url']
+};
+
+export const verifyOAuthCode = async (code: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/verifyOAuthCode`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({code: code})
+  });
+
+  if (!response.ok) {
+    throw new Error('Error verifying the OAuth code');
+  }
+
+  const responseBody = await response.json();
+
+  return responseBody;
 };

@@ -8,15 +8,8 @@ import {
   DialogClose,
 } from "@/components/ui/dialog"
 import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  Form,
+  Form
 } from "@/components/ui/form"
-import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -82,6 +75,8 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
     }
   });
 
+  const { isSubmitting, errors} = form.formState
+
   const handleTabChange = (newValue: "Hardware" | "Software") => {
     setTabValue(newValue);
   };
@@ -92,14 +87,28 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
       showToast({ message: "New asset added successfully!", type: "SUCCESS" });
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
       setTimeout(() => {
         setOpen(false);
-      }, 100)
+      }, 100);
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
-    }
+    },
   });
+
+  const hasRequiredFields = () => {
+    if (!errors) return false
+    return Object.values(errors).some((error)=>error.message?.includes('required'))
+  }
+
+  useEffect(()=> {
+    if (isSubmitting && errors) {
+      if (hasRequiredFields()) showToast({message: "Required fields are missing.", type:"ERROR"})
+    }
+  }, [isSubmitting, errors ])
+
+  const triggerValidation = () => form?.trigger()
 
   const onSubmit = (data: z.infer<typeof AssetSchema>) => {
     const assetData: AssetFormData = {
@@ -138,22 +147,6 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
           <div className="pt-4">
             <Form {...form}>
               <form className="flex flex-col w-full gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-                <FormField
-                  control={form.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItem className='w-1/2'>
-                      <FormLabel className='text-md text-secondary-foreground'>Asset Code</FormLabel>
-                      <FormControl>
-                        <Input placeholder="FS-XYZ-A" autoComplete="off" type="input" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        This the company asset code.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <Tabs defaultValue="Hardware" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="Hardware" onClick={() => handleTabChange("Hardware")}>Hardware</TabsTrigger>
@@ -169,7 +162,7 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
                     </TabsContent>
                   </div>     
                 </Tabs>            
-                <Button type="submit" disabled={isPending} className="gap-2">
+                <Button type="submit" disabled={isPending} className="gap-2" onClick={triggerValidation}>
                   {isPending ? <Spinner size={18}/> : null }
                   Add Asset
                 </Button>

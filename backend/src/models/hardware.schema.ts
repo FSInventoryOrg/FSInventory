@@ -149,7 +149,7 @@ const hardwareSchema: Schema<HardwareType> = new Schema<HardwareType>({
   client: { type: String, required: false },
   deploymentHistory: { 
     type: [{
-      deploymentDate: { type: Date, required: true },
+      deploymentDate: { type: Date, required: false },
       recoveryDate: { type: Date, required: false},
       assignee: { type: String, required: true },
     }],

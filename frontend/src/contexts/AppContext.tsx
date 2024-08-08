@@ -27,6 +27,7 @@ export const AppContextProvider = ({ children } : { children: React.ReactNode })
         toast({
           title: toastMessage.type,
           description: toastMessage.message,
+          variant: toastMessage.type === "ERROR" ? "destructive": undefined
         })
       },
       isLoggedIn: (!isError && !isLoading),

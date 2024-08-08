@@ -17,7 +17,10 @@ const alertVariants = cva(
           "border-none text-warning [&>svg]:text-warning bg-warning/10",
         warningOutline:
           "border-warning/50 text-warning dark:border-warning [&>svg]:text-warning",
-      },
+        success: 
+          "border-primary bg-primary/10 text-primary"
+
+        },
 
     },
     defaultVariants: {

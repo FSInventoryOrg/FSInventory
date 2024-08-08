@@ -1,88 +1,77 @@
 import express, { Request, Response } from 'express';
 import Hardware, { DeploymentHistory, HardwareType } from '../models/hardware.schema';
-import Software, { SoftwareType } from '../models/software.schema'; 
+import Software, { SoftwareType } from '../models/software.schema';
 import Asset, { AssetType } from '../models/asset.schema';
 import { check, validationResult } from 'express-validator'
 import verifyToken from '../middleware/auth';
 import jwt from "jsonwebtoken";
 import User from '../models/user.schema';
+import { getCodeAndIncrement } from '../utils/asset-counter';
+import { auditAssets } from '../utils/common';
 
 const router = express.Router();
 
-/**
- * @openapi
- * /api/assets:
- *  post:
- *    tags:
- *      - Asset
- *    summary: Creates a new asset
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema: 
- *            $ref: '#/components/schemas/Hardware'
- *    responses:
- *      201:
- *        description: Asset created successfully
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Hardware'
- *      400:
- *        description: Invalid request body or asset code already exists
- *      403:
- *        description: Only users with admin role can perform this action
- *      500:
- *        description: Internal server error
- *    security:
- *      - bearerAuth: []
- */
-router.post('/', [ 
-    check("type").exists().withMessage("Asset type is required").isIn(['Hardware', 'Software']).withMessage("Invalid asset type"),
-    check("brand").optional().isString().withMessage("Brand must be a string"),
-    check("modelName").optional().isString().withMessage("Model name must be a string"),
-    check("modelNo").optional().isString().withMessage("Model number must be a string"),
-    check("serialNo").optional().isString().withMessage("Serial number must be a string"),
-    // Additional checks for hardware-specific properties 
-    check("status", "Asset status is required").custom((value, { req }) => {
-        if (req.body.type === 'Hardware') {
-            return !!value;
-        }
-        return true; 
-    }),
-    check("category", "Asset category is required").custom((value, { req }) => {
-      if (req.body.type === 'Hardware') {
-          return !!value;
-      }
-      return true; 
+const checkSerialNo = async (serialNum: string, assetID?: string) => {
+  const recordSerial = await Asset.aggregate().match({
+    $expr: {
+      $and: [
+        { $eq: ['$serialNo', serialNum]}
+      ]
+    }
+  })
+
+  if (recordSerial.length > 1) return 'Multiple Serial Number Entity Found';
+  else if (recordSerial.length === 1) {
+    if (recordSerial[0]['_id'].toString() === assetID) return 'SUCCESS'
+    else return 'Serial Number Already Exists'
+  } else return 'SUCCESS'
+}
+
+router.post('/', [
+  check("type").exists().withMessage("Asset type is required").isIn(['Hardware', 'Software']).withMessage("Invalid asset type"),
+  check("brand").optional().isString().withMessage("Brand must be a string"),
+  check("modelName").optional().isString().withMessage("Model name must be a string"),
+  check("modelNo").optional().isString().withMessage("Model number must be a string"),
+  check("serialNo").optional().isString().withMessage("Serial number must be a string"),
+  // Additional checks for hardware-specific properties 
+  check("status", "Asset status is required").custom((value, { req }) => {
+    if (req.body.type === 'Hardware') {
+      return !!value;
+    }
+    return true;
   }),
-    check("processor").optional().isString().withMessage("Processor must be a string"),
-    check("memory").optional().isString().withMessage("Memory must be a string"),
-    check("storage").optional().isString().withMessage("Storage must be a string"),
-    check("assignee").optional().isString().withMessage("Assignee must be a string"),
-    check("purchaseDate").optional().isISO8601().toDate().withMessage("Invalid purchase date"),
-    check("supplierVendor").optional().isString().withMessage("Supplier vendor must be a string"),
-    check("pezaForm8105").optional().isString().withMessage("PEZA form 8105 must be a string"),
-    check("pezaForm8106").optional().isString().withMessage("PEZA form 8106 must be a string"),
-    check("isRGE").optional().isBoolean().withMessage("isRGE must be a boolean"),
-    check("equipmentType", "Equipment type is required").custom((value, { req }) => {
-      if (req.body.type === 'Hardware') {
-          return !!value;
-      }
-      return true; 
-    }),
-    check("remarks").optional().isString().withMessage("Remarks must be a string"),
-    check("deploymentDate").optional().isISO8601().toDate().withMessage("Invalid deployment date"),
-    check("recoveredFrom").optional().isString().withMessage("Recovered from must be a string"),
-    check("recoveryDate").optional().isISO8601().toDate().withMessage("Invalid recovery date"),
-    // Additional checks for software-specific properties
-    check("license").optional().isString().withMessage("License must be a string"),
-    check("version").optional().isString().withMessage("Version must be a string"),
-  ],
+  check("category", "Asset category is required").custom((value, { req }) => {
+    if (req.body.type === 'Hardware') {
+      return !!value;
+    }
+    return true;
+  }),
+  check("processor").optional().isString().withMessage("Processor must be a string"),
+  check("memory").optional().isString().withMessage("Memory must be a string"),
+  check("storage").optional().isString().withMessage("Storage must be a string"),
+  check("assignee").optional().isString().withMessage("Assignee must be a string"),
+  check("purchaseDate").optional().isISO8601().toDate().withMessage("Invalid purchase date"),
+  check("supplierVendor").optional().isString().withMessage("Supplier vendor must be a string"),
+  check("pezaForm8105").optional().isString().withMessage("PEZA form 8105 must be a string"),
+  check("pezaForm8106").optional().isString().withMessage("PEZA form 8106 must be a string"),
+  check("isRGE").optional().isBoolean().withMessage("isRGE must be a boolean"),
+  check("equipmentType", "Equipment type is required").custom((value, { req }) => {
+    if (req.body.type === 'Hardware') {
+      return !!value;
+    }
+    return true;
+  }),
+  check("remarks").optional().isString().withMessage("Remarks must be a string"),
+  check("deploymentDate").optional().isISO8601().toDate().withMessage("Invalid deployment date"),
+  check("recoveredFrom").optional().isString().withMessage("Recovered from must be a string"),
+  check("recoveryDate").optional().isISO8601().toDate().withMessage("Invalid recovery date"),
+  // Additional checks for software-specific properties
+  check("license").optional().isString().withMessage("License must be a string"),
+  check("version").optional().isString().withMessage("Version must be a string"),
+],
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array() })
     }
     try {
@@ -93,10 +82,10 @@ router.post('/', [
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
       }
       const currentUser = await User.findOne({ _id: decodedToken.userId });
-    
+
       const data: any = req.body;
       const currentDate = new Date();
-    
+
       data.created = currentDate;
       data.updated = currentDate;
 
@@ -111,11 +100,45 @@ router.post('/', [
           return res.status(400).json({ message: "Asset code already exists" });
         }
 
+        if (data['assignee']) {
+          data['status'] = 'Deployed';
+          data['deploymentHistory'] = [
+            {
+              assignee: data['assignee'],
+              deploymentDate: data['deploymentDate'] ? data['deploymentDate'] : new Date()
+            }
+          ]
+        } else if(data['status'] === 'Deployed' && !data['assignee']) data['status'] = 'IT Storage'
+
+        if (data['recoveredFrom']) {
+          const recovery = {
+            assignee: data['recoveredFrom'],
+            recoveryDate: data['recoveryDate'] ? data['recoveryDate'] : new Date()
+          }
+          if (!Array.isArray(data['deploymentHistory'])) data['deploymentHistory'] = [recovery]
+          else {
+            const findIndex = data['deploymentHistory'].findIndex((f: any) => { return f['assignee'] === data['recoveredFrom']})
+
+            if(findIndex > -1) data['deploymentHistory'][findIndex] = {...data['deploymentHistory'][findIndex], ...recovery}
+            else data['deploymentHistory'].push(recovery)
+          }
+        }
+
+        if (!data['serialNo']) return res.status(422).json({ message: 'Serial Number is required' });
+        if (!data['category']) return res.status(422).json({ message: 'Category is required' });
+
+        const checkSerial = await checkSerialNo(data['serialNo']);
+        if (checkSerial !== 'SUCCESS') return res.status(422).json({ message: checkSerial });
+
+        data['code'] = await getCodeAndIncrement(data['category'], data['type']);
+        if (!data['code']) return res.status(422).json({ message: `Need to configure the index of ${data['type']} - ${data['category']}` });
+
         const newAsset = new Hardware(data);
         await newAsset.save();
+        await auditAssets();
 
         return res.status(201).json(newAsset);
-      } else { 
+      } else {
         const existingAsset = await Software.findOne({ code: data.code });
         if (existingAsset) {
           return res.status(400).json({ message: "Asset code already exists" });
@@ -133,45 +156,9 @@ router.post('/', [
   }
 );
 
-/**
- * @openapi
- * /api/assets/deploy/{code}:
- *  put:
- *    tags:
- *      - Asset
- *    summary: Update deployment properties of asset via its code
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Asset code
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/AssetUpdate'
- *    responses:
- *      200:
- *        description: Updated assets
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/Hardware'
- *      404:
- *        description: Asset code mismatch or asset is already deployed
- *      500:
- *        description: Internal server error
- *    security:
- *      - bearerAuth: []
- */
 router.put('/deploy/:code', [
-    check('assignee').optional().isString().withMessage('Assignee must be a string'),
-  ], 
+  check('assignee').optional().isString().withMessage('Assignee must be a string'),
+],
   verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -188,8 +175,6 @@ router.put('/deploy/:code', [
 
       const code: string = req.params.code;
       const data: any = req.body;
-      console.log(data.code)
-      console.log(code)
 
       if (data.code !== code) {
         return res.status(400).json({ message: 'Asset code mismatch' });
@@ -221,7 +206,9 @@ router.put('/deploy/:code', [
       let updatedAsset;
       await Hardware.updateOne({ code: data.code }, data);
       updatedAsset = await Hardware.findOne({ code });
-      
+
+      await auditAssets();
+
       res.status(200).json(updatedAsset);
     } catch (error) {
       console.error('Error updating assets:', error);
@@ -230,45 +217,9 @@ router.put('/deploy/:code', [
   }
 );
 
-/**
- * @openapi
- * /api/assets/retrieve/{code}:
- *  put:
- *    tags:
- *      - Asset
- *    summary: Update recovery properties of asset via its code
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Asset code
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/AssetUpdate'
- *    responses:
- *      200:
- *        description: Updated assets
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/Hardware'
- *      404:
- *        description: Asset code mismatch or asset is not yet deployed
- *      500:
- *        description: Internal server error
- *    security:
- *      - bearerAuth: []
- */
 router.put('/retrieve/:code', [
-    check('recoveredFrom').optional().isString().withMessage('Recovered From must be a string'),
-  ], 
+  check('recoveredFrom').optional().isString().withMessage('Recovered From must be a string'),
+],
   verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -312,24 +263,25 @@ router.put('/retrieve/:code', [
       const deploymentHistory = existingAsset.deploymentHistory;
 
       if (deploymentHistory.length > 0) {
-          const lastDeploymentRecordIndex = deploymentHistory.length - 1;
-          const lastDeploymentRecord = deploymentHistory[lastDeploymentRecordIndex];
-      
-          lastDeploymentRecord.recoveryDate = data.recoveryDate;
+        const lastDeploymentRecordIndex = deploymentHistory.length - 1;
+        const lastDeploymentRecord = deploymentHistory[lastDeploymentRecordIndex];
+
+        lastDeploymentRecord.recoveryDate = data.recoveryDate;
       } else {
-          deploymentHistory.push({
-              deploymentDate: data.recoveryDate,
-              assignee: data.recoveredFrom,
-              recoveryDate: data.recoveryDate,
-          });
+        deploymentHistory.push({
+          deploymentDate: data.recoveryDate,
+          assignee: data.recoveredFrom,
+          recoveryDate: data.recoveryDate,
+        });
       }
-      
+
       data.deploymentHistory = deploymentHistory;
-      
+
       let updatedAsset;
       await Hardware.updateOne({ code: data.code }, data);
-      updatedAsset = await Hardware.findOne({ code });      
-      
+      updatedAsset = await Hardware.findOne({ code });
+
+      await auditAssets();
       res.status(200).json(updatedAsset);
     } catch (error) {
       console.error('Error updating assets:', error);
@@ -338,53 +290,6 @@ router.put('/retrieve/:code', [
   }
 );
 
-/**
- * @openapi
- * /api/assets/history/{code}/{index}:
- *  put:
- *    tags:
- *      - Asset
- *    summary: Remove the deployment history entry for a hardware asset by asset code and index
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Code of the hardware asset
- *      - in: path
- *        name: index
- *        required: true
- *        schema:
- *          type: integer
- *        description: Index of the deployment history entry to remove
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              deploymentDate:
- *                type: string
- *                format: date-time
- *              recoveryDate:
- *                type: string
- *                format: date-time
- *              assignee:
- *                type: string
- *    responses:
- *      200:
- *        description: Deployment history entry updated successfully
- *      400:
- *        description: Bad request, validation errors
- *      404:
- *        description: Hardware asset not found or index out of range
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.put("/history/:code/:index", verifyToken, async (req: Request, res: Response) => {
   try {
     const { code, index } = req.params;
@@ -411,6 +316,7 @@ router.put("/history/:code/:index", verifyToken, async (req: Request, res: Respo
 
     // Save hardware asset with updated deployment history
     await hardwareAsset.save();
+    await auditAssets();
 
     res.status(200).json({ message: "Deployment history entry removed successfully" });
   } catch (error) {
@@ -419,91 +325,52 @@ router.put("/history/:code/:index", verifyToken, async (req: Request, res: Respo
   }
 });
 
-
-/**
- * @openapi
- * /api/assets/{code}:
- *  put:
- *    tags:
- *      - Asset
- *    summary: Update an asset by its code
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Asset code
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/Hardware'
- *    responses:
- *      200:
- *        description: Asset updated successfully
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Hardware'
- *      400:
- *        description: Invalid request body or asset code already exists
- *      403:
- *        description: Only users with admin role can perform this action
- *      404:
- *        description: Asset not found
- *      500:
- *        description: Internal server error
- *    security:
- *      - bearerAuth: []
- */
 router.put('/:code', [
-    check("type").exists().withMessage("Asset type is required").isIn(['Hardware', 'Software']).withMessage("Invalid asset type"),
-    check("brand").optional().isString().withMessage("Brand must be a string"),
-    check("modelName").optional().isString().withMessage("Model name must be a string"),
-    check("modelNo").optional().isString().withMessage("Model number must be a string"),
-    check("serialNo").optional().isString().withMessage("Serial number must be a string"),
-    // Additional checks for hardware-specific properties 
-    check("status", "Asset status is required").custom((value, { req }) => {
-        if (req.body.type === 'Hardware') {
-            return !!value;
-        }
-        return true; 
-    }),
-    check("category", "Asset category is required").custom((value, { req }) => {
-      if (req.body.type === 'Hardware') {
-          return !!value;
-      }
-      return true; 
+  check("type").exists().withMessage("Asset type is required").isIn(['Hardware', 'Software']).withMessage("Invalid asset type"),
+  check("brand").optional().isString().withMessage("Brand must be a string"),
+  check("modelName").optional().isString().withMessage("Model name must be a string"),
+  check("modelNo").optional().isString().withMessage("Model number must be a string"),
+  check("serialNo").optional().isString().withMessage("Serial number must be a string"),
+  // Additional checks for hardware-specific properties 
+  check("status", "Asset status is required").custom((value, { req }) => {
+    if (req.body.type === 'Hardware') {
+      return !!value;
+    }
+    return true;
   }),
-    check("processor").optional().isString().withMessage("Processor must be a string"),
-    check("memory").optional().isString().withMessage("Memory must be a string"),
-    check("storage").optional().isString().withMessage("Storage must be a string"),
-    check("assignee").optional().isString().withMessage("Assignee must be a string"),
-    check("purchaseDate").optional().isISO8601().toDate().withMessage("Invalid purchase date"),
-    check("supplierVendor").optional().isString().withMessage("Supplier vendor must be a string"),
-    check("pezaForm8105").optional().isString().withMessage("PEZA form 8105 must be a string"),
-    check("pezaForm8106").optional().isString().withMessage("PEZA form 8106 must be a string"),
-    check("isRGE").optional().isBoolean().withMessage("isRGE must be a boolean"),
-    check("equipmentType", "Equipment type is required").custom((value, { req }) => {
-      if (req.body.type === 'Hardware') {
-          return !!value;
-      }
-      return true; 
-    }),
-    check("remarks").optional().isString().withMessage("Remarks must be a string"),
-    check("deploymentDate").optional().isISO8601().toDate().withMessage("Invalid deployment date"),
-    check("recoveredFrom").optional().isString().withMessage("Recovered from must be a string"),
-    check("recoveryDate").optional().isISO8601().toDate().withMessage("Invalid recovery date"),
-    // Additional checks for software-specific properties
-    check("license").optional().isString().withMessage("License must be a string"),
-    check("version").optional().isString().withMessage("Version must be a string"),
-  ],
+  check("category", "Asset category is required").custom((value, { req }) => {
+    if (req.body.type === 'Hardware') {
+      return !!value;
+    }
+    return true;
+  }),
+  check("processor").optional().isString().withMessage("Processor must be a string"),
+  check("memory").optional().isString().withMessage("Memory must be a string"),
+  check("storage").optional().isString().withMessage("Storage must be a string"),
+  check("assignee").optional().isString().withMessage("Assignee must be a string"),
+  check("purchaseDate").optional().isISO8601().toDate().withMessage("Invalid purchase date"),
+  check("supplierVendor").optional().isString().withMessage("Supplier vendor must be a string"),
+  check("pezaForm8105").optional().isString().withMessage("PEZA form 8105 must be a string"),
+  check("pezaForm8106").optional().isString().withMessage("PEZA form 8106 must be a string"),
+  check("isRGE").optional().isBoolean().withMessage("isRGE must be a boolean"),
+  check("equipmentType", "Equipment type is required").custom((value, { req }) => {
+    if (req.body.type === 'Hardware') {
+      return !!value;
+    }
+    return true;
+  }),
+  check("remarks").optional().isString().withMessage("Remarks must be a string"),
+  check("deploymentDate").optional().isISO8601().toDate().withMessage("Invalid deployment date"),
+  check("recoveredFrom").optional().isString().withMessage("Recovered from must be a string"),
+  check("recoveryDate").optional().isISO8601().toDate().withMessage("Invalid recovery date"),
+  // Additional checks for software-specific properties
+  check("license").optional().isString().withMessage("License must be a string"),
+  check("version").optional().isString().withMessage("Version must be a string"),
+],
   verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array() })
     }
     try {
@@ -517,13 +384,19 @@ router.put('/:code', [
       const code: string = req.params.code;
       const data: any = req.body;
 
-      const existingAssetCode = await Asset.findOne({ code: data.code });
+      const existingAssetCode: any = await Asset.findOne({ code: data.code });
       if (existingAssetCode && existingAssetCode._id.toString() !== data._id) {
         return res.status(400).json({ message: "Asset code already exists" });
       }
+
+      if (data['serialNo']) {
+        const checkSerial = await checkSerialNo(data['serialNo'], existingAssetCode._id.toString());
+        if (checkSerial !== 'SUCCESS') return res.status(422).json({ message: checkSerial });
+      }
+
       delete data._id;
 
-      const existingAsset = await Asset.findOne({ code });
+      const existingAsset: any = await Asset.findOne({ code });
 
       if (!existingAsset) {
         return res.status(404).json({ message: 'Asset not found' });
@@ -535,8 +408,57 @@ router.put('/:code', [
         data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
       }
 
+      delete data['code'];
+
       let updatedAsset;
       if (data.type === 'Hardware') {
+        let depHist = existingAsset['deploymentHistory']
+        if (!Array.isArray(depHist)) depHist = [];
+        else depHist = depHist.reverse();
+
+        const recoveryProcess = () => {
+          if(existingAsset['assignee']) {
+            const findIndex = depHist.findIndex((f: any) => { return f['assignee'] === existingAsset['assignee'] })
+            const recovery = {
+              assignee: existingAsset['assignee'],
+              recoveryDate: data['recoveryDate'] ? data['recoveryDate'] : new Date()
+            }
+            if (findIndex > -1) depHist[findIndex] = { ...depHist[findIndex], ...recovery }
+            else depHist.unshift(recovery)
+          }
+        }
+
+        if(data['assignee']) {
+          data['status'] = "Deployed";
+          if(data['assignee'] !== existingAsset['assignee']) {
+            recoveryProcess();
+            const deploy = {
+              assignee: data['assignee'],
+              deploymentDate: data['deploymentDate'] ? data['deploymentDate'] : new Date()
+            }
+            depHist.unshift(deploy)
+          }
+        } else if(data['status'] === 'Deployed' && !data['assignee']) {
+          data['status'] = "IT Storage";
+          if(data['assignee'] !== existingAsset['assignee']) recoveryProcess()
+        }
+
+        if(data['recoveredFrom']) {
+          if(data['recoveredFrom'] !== existingAsset['recoveredFrom']) {
+            const findIndex = depHist.findIndex((f: any) => { return f['assignee'] === data['recoveredFrom'] })
+            const recovery = {
+              assignee: data['recoveredFrom'],
+              recoveryDate: data['recoveryDate'] ? data['recoveryDate'] : new Date()
+            }
+            if (findIndex > -1) depHist[findIndex] = { ...depHist[findIndex], ...recovery }
+            else depHist.unshift(recovery)
+          }
+        }
+
+        depHist = depHist.reverse();
+
+        if(depHist.length > 0) data['deploymentHistory'] = depHist
+        
         // Remove undefined date properties and set them to null
         data.deploymentDate ??= null;
         data.purchaseDate ??= null;
@@ -544,10 +466,12 @@ router.put('/:code', [
 
         // Update the asset
         updatedAsset = await Hardware.findOneAndUpdate({ code: code }, data, { new: true });
+
+        await auditAssets();
       } else {
         updatedAsset = await Software.findOneAndUpdate({ code: code }, data, { new: true });
       }
-      
+
       res.status(200).json(updatedAsset);
     } catch (error) {
       console.error('Error updating asset:', error);
@@ -556,55 +480,14 @@ router.put('/:code', [
   }
 );
 
-/**
- * @openapi
- * /api/assets:
- *  get:
- *    tags:
- *      - Asset
- *    summary: Get all assets
- *    parameters:
- *      - in: query
- *        name: type
- *        schema:
- *          type: string
- *        description: Filter assets by type (e.g. Hardware, Software)
- *      - in: query
- *        name: status
- *        schema:
- *          type: string
- *        description: Filter assets by status (e.g. Deployed, Damaged, IT Storage, etc.)
- *      - in: query
- *        name: category
- *        schema:
- *          type: string
- *        description: Filter assets by category (e.g. Laptop, Mobile, Keyboard, Mouse, etc.)
- *    responses:
- *      200:
- *        description: A list of assets
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/Hardware'
- */
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const { type, status, category } = req.query;
-    let query: any = {}; 
+    const { type, status, category, processor, memory, storage } = req.query;
+    const allowedFilter = { type, status, category, processor, memory, storage };
 
-    if (type) {
-      query.type = type; 
-    }
-
-    if (status) {
-      query.status = status; 
-    }
-
-    if (category) {
-      query.category = category;
-    }
+    let query = Object.fromEntries(
+      Object.entries(allowedFilter).filter(([_, v]) => v !== undefined && v !== null && v !== '')
+    );
 
     let assets;
 
@@ -622,41 +505,6 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /api/assets/count/{property}/{value}:
- *  get:
- *    tags:
- *      - Asset
- *    summary: Get total number of assets with a specific property value
- *    parameters:
- *      - in: path
- *        name: property
- *        required: false
- *        schema:
- *          type: string
- *        description: Asset property to filter by
- *      - in: path
- *        name: value
- *        required: false
- *        schema:
- *          type: string
- *        description: Value of the property to filter by
- *    responses:
- *      200:
- *        description: Successful response
- *        content:
- *          application/json:
- *            schema:
- *              type: number
- *              description: Total number of assets with the specified property value
- *              example:
- *                10
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.get('/count/:property?/:value?', async (req: Request, res: Response) => {
   try {
     const { property, value } = req.params;
@@ -676,50 +524,10 @@ router.get('/count/:property?/:value?', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /api/assets/uniqueValues/{property}:
- *  get:
- *    tags:
- *      - Asset
- *    summary: Get array of unique values for an asset's property
- *    parameters:
- *      - in: path
- *        name: property
- *        required: true
- *        schema:
- *          type: string
- *        description: Asset property to parse unique values from
- *    responses:
- *      200:
- *        description: Successful response
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                type: string
- *              example:
- *                - Laptop
- *                - Headset
- *                - Monitors
- *                - Mouse
- *                - Connectors/Adapters
- *                - Desktop
- *                - Keyboard
- *                - Others
- *                - Mobile
- *      404:
- *        description: Asset not found
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.get('/uniqueValues/:property', async (req: Request, res: Response) => {
   try {
     const { property } = req.params;
-    let query: any = {}; 
+    let query: any = {};
 
     let aggregationPipeline: any[] = [];
 
@@ -761,39 +569,12 @@ router.get('/uniqueValues/:property', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /api/assets/{property}/{value}:
- *  get:
- *    tags:
- *      - Asset
- *    summary: Get all assets via a specific property
- *    parameters:
- *      - in: params
- *        name: property
- *        schema:
- *          type: string
- *        description: Property to filter assets by
- *      - in: params
- *        name: value
- *        schema:
- *          type: string
- *        description: Value of property to filter assets by
- *    responses:
- *      200:
- *        description: A list of assets
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/Hardware'
- */
 router.get('/:property/:value', async (req: Request, res: Response) => {
   try {
     const { property, value } = req.params;
     let query: any = {};
-    query[property as string] = value
+
+    query[property as string] = value ? value.trim() : ""
 
     let assets;
 
@@ -811,70 +592,28 @@ router.get('/:property/:value', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /api/assets/{property}/{value}:
- *  put:
- *    tags:
- *      - Asset
- *    summary: Update all assets with a specific property-value pair
- *    parameters:
- *      - in: path
- *        name: property
- *        required: true
- *        schema:
- *          type: string
- *        description: Property to filter assets by
- *      - in: path
- *        name: value
- *        required: true
- *        schema:
- *          type: string
- *        description: Value of property to filter assets by
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/AssetUpdate'
- *    responses:
- *      200:
- *        description: Updated assets
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/Hardware'
- *      404:
- *        description: No assets found with the specified property-value pair
- *      500:
- *        description: Internal server error
- *    security:
- *      - bearerAuth: []
- */
 router.put('/:property/:value', [
-    check('category').optional().isString().withMessage('Category must be a string'),
-    check('processor').optional().isString().withMessage('Processor must be a string'),
-    check('memory').optional().isString().withMessage('Memory must be a string'),
-    check('storage').optional().isString().withMessage('Storage must be a string'),
-    check('status').optional().isString().withMessage('Status must be a string'),
-    check('assignee').optional().isString().withMessage('Assignee must be a string'),
-    check('purchaseDate').optional().isISO8601().toDate().withMessage('Invalid purchase date'),
-    check('supplierVendor').optional().isString().withMessage('Supplier vendor must be a string'),
-    check('pezaForm8105').optional().isString().withMessage('PEZA form 8105 must be a string'),
-    check('pezaForm8106').optional().isString().withMessage('PEZA form 8106 must be a string'),
-    check('isRGE').optional().isBoolean().withMessage('isRGE must be a boolean'),
-    check('equipmentType').optional().isString().withMessage('Equipment type must be a string'),
-    check('remarks').optional().isString().withMessage('Remarks must be a string'),
-    check('deploymentDate').optional().isISO8601().toDate().withMessage('Invalid deployment date'),
-    check('recoveredFrom').optional().isString().withMessage('Recovered from must be a string'),
-    check('recoveryDate').optional().isISO8601().toDate().withMessage('Invalid recovery date'),
-  ], 
+  check('category').optional().isString().withMessage('Category must be a string'),
+  check('processor').optional().isString().withMessage('Processor must be a string'),
+  check('memory').optional().isString().withMessage('Memory must be a string'),
+  check('storage').optional().isString().withMessage('Storage must be a string'),
+  check('status').optional().isString().withMessage('Status must be a string'),
+  check('assignee').optional().isString().withMessage('Assignee must be a string'),
+  check('purchaseDate').optional().isISO8601().toDate().withMessage('Invalid purchase date'),
+  check('supplierVendor').optional().isString().withMessage('Supplier vendor must be a string'),
+  check('pezaForm8105').optional().isString().withMessage('PEZA form 8105 must be a string'),
+  check('pezaForm8106').optional().isString().withMessage('PEZA form 8106 must be a string'),
+  check('isRGE').optional().isBoolean().withMessage('isRGE must be a boolean'),
+  check('equipmentType').optional().isString().withMessage('Equipment type must be a string'),
+  check('remarks').optional().isString().withMessage('Remarks must be a string'),
+  check('deploymentDate').optional().isISO8601().toDate().withMessage('Invalid deployment date'),
+  check('recoveredFrom').optional().isString().withMessage('Recovered from must be a string'),
+  check('recoveryDate').optional().isISO8601().toDate().withMessage('Invalid recovery date'),
+],
   verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array() })
     }
     try {
@@ -902,7 +641,10 @@ router.put('/:property/:value', [
         return res.status(404).json({ message: `No assets found with { ${property} : ${value} }` });
       }
 
+      if (updateData['code']) delete updateData['code'];
+
       await Hardware.updateMany({ [property]: value }, updateData);
+      await auditAssets();
       res.status(200).json({ message: 'Assets updated successfully' });
     } catch (error) {
       console.error('Error updating assets:', error);
@@ -911,32 +653,6 @@ router.put('/:property/:value', [
   }
 );
 
-/**
- * @openapi
- * /api/assets/{code}:
- *  get:
- *    tags:
- *      - Asset
- *    summary: Get an asset by its code
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Asset code
- *    responses:
- *      200:
- *        description: Successful response
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Hardware'
- *      404:
- *        description: Asset not found
- *      500:
- *        description: Internal server error
- */
 router.get('/:code', async (req: Request, res: Response) => {
   try {
     const code: string = req.params.code;
@@ -954,40 +670,6 @@ router.get('/:code', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /api/assets/{property}/{value}:
- *  delete:
- *    tags:
- *      - Asset
- *    summary: Delete assets via a specific property
- *    parameters:
- *      - in: path
- *        name: property
- *        schema:
- *          type: string
- *        description: Property to filter assets by
- *      - in: path
- *        name: value
- *        schema:
- *          type: string
- *        description: Value of property to filter assets by
- *    responses:
- *      200:
- *        description: Successful response
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  description: Success message
- *      404:
- *        description: No assets found
- *      500:
- *        description: Internal server error
- */
 router.delete('/:property/:value', verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
@@ -1007,6 +689,7 @@ router.delete('/:property/:value', verifyToken, async (req: Request, res: Respon
       return res.status(404).json({ message: 'No assets found' });
     }
 
+    await auditAssets();
     res.status(200).json({ message: 'Assets deleted successfully' });
   } catch (error) {
     console.error('Error deleting assets:', error);
@@ -1014,32 +697,6 @@ router.delete('/:property/:value', verifyToken, async (req: Request, res: Respon
   }
 });
 
-/**
- * @openapi
- * /api/assets/{code}:
- *  delete:
- *    tags:
- *      - Asset
- *    summary: Delete an asset by its code
- *    parameters:
- *      - in: path
- *        name: code
- *        required: true
- *        schema:
- *          type: string
- *        description: Asset code
- *    responses:
- *      200:
- *        description: Asset deleted successfully
- *      403:
- *        description: Only users with admin role can perform this action
- *      404:
- *        description: Asset not found
- *      500:
- *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
- */
 router.delete('/:code', verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
@@ -1057,7 +714,7 @@ router.delete('/:code', verifyToken, async (req: Request, res: Response) => {
     }
 
     await Asset.deleteOne({ code });
-
+    await auditAssets();
     res.status(200).json({ message: 'Asset deleted successfully' });
   } catch (error) {
     console.error('Error deleting asset:', error);

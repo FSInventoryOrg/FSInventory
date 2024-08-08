@@ -34,19 +34,22 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
   const { mutate: updateEmployee, isPending: updatingEmployee } = useMutation({
     mutationFn: imsService.updateEmployeeAssetHistory,
     onSuccess: async () => {
-      showToast({ message: "Asset retrieved successfully!", type: "SUCCESS" });
-      queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
-      queryClient.invalidateQueries({ queryKey: ["fetchAssetsByProperty"] })
-      queryClient.invalidateQueries({ queryKey: ["fetchAllAssetsByStatusAndCategory"] })
-      queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
-      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
+      showToast({ message: 'Asset retrieved successfully!', type: 'SUCCESS' });
+      queryClient.invalidateQueries({ queryKey: ['fetchAllAssets'] });
+      queryClient.invalidateQueries({ queryKey: ['fetchAssetsByProperty'] });
+      queryClient.invalidateQueries({
+        queryKey: ['fetchAllAssetsByStatusAndCategory'],
+      });
+      queryClient.invalidateQueries({ queryKey: ['fetchEmployees'] });
+      queryClient.invalidateQueries({ queryKey: ['fetchEmployeeByCode'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
       setTimeout(() => {
         setOpen(false);
-      }, 100)
+      }, 100);
     },
     onError: (error: Error) => {
-      showToast({ message: error.message, type: "ERROR" });
-    }
+      showToast({ message: error.message, type: 'ERROR' });
+    },
   });
 
   const { mutate: retrieveAsset, isPending: retrievalPending } = useMutation({
@@ -63,6 +66,11 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
           updateEmployee({ code: assetData.assignee, assetHistory: assetHistory })
         } else {
           showToast({ message: "Asset retrieved successfully!", type: "SUCCESS" });
+          queryClient.invalidateQueries({ queryKey: ['fetchAllAssets', 'Hardware'] });
+          queryClient.invalidateQueries({
+            queryKey: ['fetchAllAssetsByStatusAndCategory'],
+          });
+          queryClient.invalidateQueries({ queryKey: ['notifications'] });
           setTimeout(() => {
             setOpen(false)
           }, 100)
@@ -78,10 +86,9 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
     const retrievedAsset = {
       _id: assetData._id,
       code: assetData.code,
-      recoveryDate: new Date,
+      recoveryDate: new Date(),
       recoveredFrom: assetData.assignee,
-    }
-    console.log(retrievedAsset)
+    };
     retrieveAsset({ code: assetData.code, retrievedAsset: retrievedAsset });
   }
 

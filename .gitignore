@@ -34,7 +34,8 @@ node_modules/
 .idea/
 
 # Compiled output
-/dist/
+/frontend/dist/
+/backend/public/
 /build/
 
 # Environment variables

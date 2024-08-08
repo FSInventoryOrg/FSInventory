@@ -37,6 +37,7 @@ import { Separator } from "../ui/separator";
 import { UserIcon } from "../icons/UserIcon";
 import { Checkbox } from "../ui/checkbox";
 import { EmployeeType } from "@/types/employee";
+import { useNavigate } from "react-router-dom";
 
 interface EditEmployeeProps {
   employeeData: EmployeeType;
@@ -47,6 +48,7 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
   const [open, setOpen] = useState(false); 
   const [newEmployeeCode, setNewEmployeeCode] = useState('');
   const { showToast } = useAppContext();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof EmployeeSchema>>({
     resolver: zodResolver(EmployeeSchema),
@@ -61,30 +63,15 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
     }
   });
 
-  const { mutate: updateAssetsByProperty, isPending: isAssetEditPending } = useMutation({
-    mutationFn: imsService.updateAssetsByProperty,
-  });
-
   const { mutate, isPending: isEditEmployeePending } = useMutation({
     mutationFn: imsService.updateEmployee,
     onSuccess: async () => {
       showToast({ message: "Employee updated successfully!", type: "SUCCESS" });
 
-      updateAssetsByProperty({
-        property: 'assignee',
-        value: employeeData.code,
-        newValue: newEmployeeCode,
-      });
-
-      updateAssetsByProperty({
-        property: 'recoveredFrom',
-        value: employeeData.code,
-        newValue: newEmployeeCode,
-      });
-
       queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
       queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
-      window.location.replace(`/tracker/${newEmployeeCode}`)
+      
+      navigate(`/tracker/${newEmployeeCode}`)
 
       setTimeout(() => {
         setOpen(false);
@@ -92,7 +79,7 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
-    }
+    },
   });
 
   const onSubmit = (data: z.infer<typeof EmployeeSchema>) => {
@@ -106,9 +93,14 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
 
   useEffect(() => {
     if (open) {
-      form.reset();
+      form.reset({...employeeData, 
+        startDate: employeeData.startDate 
+          ? new Date(employeeData.startDate) 
+          : undefined
+      });
     }
-  }, [open, form])
+  }, [open, form, employeeData])
+
 
   const [isMD, setIsMD] = useState(false);
   useEffect(() => {
@@ -295,8 +287,8 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" disabled={(isEditEmployeePending || isAssetEditPending)} className="gap-2">
-                    {(isEditEmployeePending || isAssetEditPending) ? <Spinner size={18}/> : null }
+                  <Button type="submit" disabled={isEditEmployeePending} className="gap-2">
+                    {isEditEmployeePending ? <Spinner size={18}/> : null }
                     Save Employee
                     <ArrowRightIcon />
                   </Button>
