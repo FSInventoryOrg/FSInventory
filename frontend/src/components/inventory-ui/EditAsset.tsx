@@ -120,6 +120,11 @@ useEffect(()=> {
 const triggerValidation = () => form?.trigger()
 
 const onSubmit = (data: z.infer<typeof AssetSchema>) => {
+
+    if (data.status !== defaultValues?.retrievableStatus) {
+      data.assignee = '';
+      data.deploymentDate = undefined;
+    }
     // Check each field and set it to undefined if it's null
     if (data.recoveryDate === null) {
       data.recoveryDate = undefined;
@@ -130,6 +135,7 @@ const onSubmit = (data: z.infer<typeof AssetSchema>) => {
     if (data.deploymentDate === null) {
       data.deploymentDate = undefined;
     }
+    
   
     const updatedAsset: AssetFormData & { _id: string } = {
       ...data,
