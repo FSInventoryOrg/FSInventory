@@ -94,13 +94,23 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed;
 };
 
+const searchColumns: any[] = ["code", "serialNo", "assignee", "_addonData_assignee"]
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const exactFilter: FilterFn<any> = (row, columnId, value) => {
-  const cellValue = row.getValue(columnId)?.toString().toLowerCase() || '';
-  const searchTerm = value?.toString().toLowerCase() || '';
-  const isMatch = cellValue.startsWith(searchTerm);
+const exactFilter: FilterFn<any> = (row, _columnId, value) => {
+  const objectValue: string = searchColumns.reduce((accum: any, element: any) => {
+    accum += ` ${row.getValue(element)?.toString().toLowerCase() || ''}`;
 
-  return isMatch;
+    return accum
+  }, "");
+
+  const searchTerm: string = value?.toString().toLowerCase() || '';
+  let isFound: boolean = true;
+
+  searchTerm.split(' ').filter(f => f).forEach((element: string) => {
+    if (isFound) isFound = objectValue.includes(element)
+  })
+
+  return isFound;
 };
 
 export function InventoryTable<TData, TValue>({
