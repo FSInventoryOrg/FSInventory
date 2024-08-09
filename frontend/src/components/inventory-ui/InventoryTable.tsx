@@ -237,11 +237,11 @@ export function InventoryTable<TData, TValue>({
       .headers.filter((header) => visibleColumns.includes(header.id))
       .map((header) => header.id);
 
-    const withServiceInYears = data.map((asset) => {
+    const withServiceInYears = data.map((asset: any) => {
       let serviceInYears = null;
-      if (asset.purchaseDate !== null) {
+      if (asset?.purchaseDate !== null) {
         const currentDate = new Date();
-        const purchaseDate = new Date(asset.purchaseDate);
+        const purchaseDate = new Date(asset?.purchaseDate);
         serviceInYears = Math.round(
           (currentDate.getTime() - purchaseDate.getTime()) /
             (1000 * 60 * 60 * 24 * 365)
