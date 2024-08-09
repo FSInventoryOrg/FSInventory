@@ -32,7 +32,8 @@ import * as imsService from '@/ims-service'
 import AssetDetails from './AssetDetails';
 import EditAsset from './EditAsset';
 import TrashCan from '../graphics/TrashCan';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Defaults } from '@/types/options';
 
 interface CellProps {
   row: {
@@ -47,6 +48,10 @@ const ActionCell: React.FC<CellProps> = ({ row }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  const { data: defaultOptions } = useQuery<Defaults>({ 
+    queryKey: ['fetchOptionValues', 'defaults'], 
+    queryFn: () => imsService.fetchOptionValues('defaults'),
+  })
   const handleDeleteAsset = async () => {
     await imsService.deleteAssetByCode(asset.code);
     queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] })
@@ -135,7 +140,7 @@ const ActionCell: React.FC<CellProps> = ({ row }) => {
                 Update information fields for this existing asset via the form below. Asset code can be changed, but entering an existing code of a different asset is not permitted.
               </DialogDescription>
             </DialogHeader>
-            <EditAsset assetData={asset} onClose={handleClose} />
+            <EditAsset assetData={asset} onClose={handleClose} defaultValues={defaultOptions} />
             </div>
           </DialogContent>
         </Dialog>
