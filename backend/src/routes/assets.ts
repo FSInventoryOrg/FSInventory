@@ -1,13 +1,14 @@
 import express, { Request, Response } from 'express';
-import Hardware, { DeploymentHistory, HardwareType } from '../models/hardware.schema';
-import Software, { SoftwareType } from '../models/software.schema';
-import Asset, { AssetType } from '../models/asset.schema';
+import Hardware, { HardwareType } from '../models/hardware.schema';
+import Software from '../models/software.schema';
+import Asset from '../models/asset.schema';
 import { check, validationResult } from 'express-validator'
 import verifyToken from '../middleware/auth';
 import jwt from "jsonwebtoken";
 import User from '../models/user.schema';
 import { getCodeAndIncrement } from '../utils/asset-counter';
 import { auditAssets } from '../utils/common';
+import Employee from '../models/employee.schema';
 
 const router = express.Router();
 
@@ -489,13 +490,35 @@ router.get('/', async (req: Request, res: Response) => {
       Object.entries(allowedFilter).filter(([_, v]) => v !== undefined && v !== null && v !== '')
     );
 
-    let assets;
+    const employees: any = await Employee.aggregate().match({$expr: {}}).project({ idNum: '$code', name: { $concat: ['$firstName', ' ', '$lastName']}});
+    let assets: any[];
 
-    if (Object.keys(query).length === 0) {
-      assets = await Asset.find();
-    } else {
-      assets = await Asset.find(query);
-    }
+    assets = await Asset.aggregate().match({ $expr: query });
+
+    assets = assets.reduce((accum: any[], value: any) => {
+      const findAssignee = employees.find((f: any) =>  f['idNum'] === value['assignee']);
+      const findRecoveredFrom = employees.find((f: any) =>  f['idNum'] === value['recoveredFrom']);
+
+      if(findAssignee) value['_addonData_assignee'] = findAssignee['name']
+      else value['_addonData_assignee'] = value['assignee']
+
+      if(findRecoveredFrom) value['_addonData_recoveredFrom'] = findRecoveredFrom['name']
+      else value['_addonData_recoveredFrom'] = value['recoveredFrom']
+
+      if(Array.isArray(value?.deploymentHistory)) {
+        if(value.deploymentHistory.length > 0) {
+          value.deploymentHistory.forEach((el: any, index: number) => {
+            const findHistAssignee = employees.find((f: any) =>  f['idNum'] === el['assignee']);
+
+            if(findHistAssignee) value.deploymentHistory[index]['_addonData_assignee'] = findHistAssignee['name']
+            else value.deploymentHistory[index]['_addonData_assignee'] = el['assignee']
+          })
+        }
+      }
+      
+      accum.push(value)
+      return accum;
+    }, []);
 
     res.status(200).json(assets);
 
@@ -718,6 +741,29 @@ router.delete('/:code', verifyToken, async (req: Request, res: Response) => {
     res.status(200).json({ message: 'Asset deleted successfully' });
   } catch (error) {
     console.error('Error deleting asset:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.delete('/bulkDelete', verifyToken, async (req: Request, res: Response) => {
+  try {
+    const token = req.cookies.auth_token;
+    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+
+    if (decodedToken.role !== "ADMIN") {
+      return res.status(403).json({ message: "Only users with admin role can perform this action" });
+    }
+
+    const codesToDelete = req.body;
+
+    if(!Array.isArray(codesToDelete)) return res.status(422).json({ message: "Request body should be an array of Asset Item Codes" });
+    if(codesToDelete.length === 0) return res.status(422).json({ message: "Request body should not be an empty array" });
+
+    await Asset.deleteMany({ code: { $in: codesToDelete} });
+    await auditAssets();
+    res.status(200).json({ message: 'Assets deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting assets:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

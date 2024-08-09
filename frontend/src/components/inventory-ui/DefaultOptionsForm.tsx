@@ -297,7 +297,7 @@ const DefaultOptionsForm = () => {
             </div>
             <FormDescription>
               This status signifies assets that are deployed and can be
-              retrieved.
+              recovered.
             </FormDescription>
             <FormMessage />
           </FormItem>

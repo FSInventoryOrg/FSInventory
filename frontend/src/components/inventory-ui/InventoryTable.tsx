@@ -94,13 +94,23 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed;
 };
 
+const searchColumns: any[] = ["code", "serialNo", "assignee", "_addonData_assignee"]
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const exactFilter: FilterFn<any> = (row, columnId, value) => {
-  const cellValue = row.getValue(columnId)?.toString().toLowerCase() || '';
-  const searchTerm = value?.toString().toLowerCase() || '';
-  const isMatch = cellValue.startsWith(searchTerm);
+const exactFilter: FilterFn<any> = (row, _columnId, value) => {
+  const objectValue: string = searchColumns.reduce((accum: any, element: any) => {
+    accum += ` ${row.getValue(element)?.toString().toLowerCase() || ''}`;
 
-  return isMatch;
+    return accum
+  }, "");
+
+  const searchTerm: string = value?.toString().toLowerCase() || '';
+  let isFound: boolean = true;
+
+  searchTerm.split(' ').filter(f => f).forEach((element: string) => {
+    if (isFound) isFound = objectValue.includes(element)
+  })
+
+  return isFound;
 };
 
 export function InventoryTable<TData, TValue>({
@@ -229,10 +239,27 @@ export function InventoryTable<TData, TValue>({
   const handleDownloadReport = async () => {
     setIsDownloading(true);
     const columnVisibility = table.getState()?.columnVisibility;
-    const columns = Object.keys(columnVisibility).filter(
+    const visibleColumns = Object.keys(columnVisibility).filter(
       (key) => columnVisibility[key] === true
     );
-    await exportToExcel(columns, data, 'Inventory_Report');
+    const columns = table
+      .getHeaderGroups()[0]
+      .headers.filter((header) => visibleColumns.includes(header.id))
+      .map((header) => header.id);
+
+    const withServiceInYears = data.map((asset: any) => {
+      let serviceInYears = null;
+      if (asset?.purchaseDate !== null) {
+        const currentDate = new Date();
+        const purchaseDate = new Date(asset?.purchaseDate);
+        serviceInYears = Math.round(
+          (currentDate.getTime() - purchaseDate.getTime()) /
+            (1000 * 60 * 60 * 24 * 365)
+        );
+      }
+      return { ...asset, serviceInYears };
+    });
+    await exportToExcel(columns, withServiceInYears, 'Inventory_Report');
     setIsDownloading(false);
   };
 

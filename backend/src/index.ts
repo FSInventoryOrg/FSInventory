@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import cors from 'cors'
 import "dotenv/config";
 import mongoose from 'mongoose';
@@ -19,7 +19,8 @@ import logger from './utils/logger';
 import swaggerDocs from './utils/swagger';
 import { startChangeStream } from './utils/change-stream';
 import path from 'path';
-import { auditAssets, convertStatusToStorage, rotateLogs, setDefaults } from './utils/common';
+import { auditAssets } from './utils/common';
+import { convertStatusToStorage, convertStatusToUnaccounted, rotateLogs, setDefaults } from './system/jobs';
 
 const DEFAULT_PORT = 3000;
 const port = Number(process.env.PORT) || DEFAULT_PORT;
@@ -79,6 +80,7 @@ const onStartupJobs = async() => {
   rotateLogs()
   await setDefaults();
   await convertStatusToStorage()
+  await convertStatusToUnaccounted()
   await auditAssets();
 }
 

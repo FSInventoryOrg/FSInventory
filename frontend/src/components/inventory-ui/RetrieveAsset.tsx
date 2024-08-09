@@ -34,7 +34,7 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
   const { mutate: updateEmployee, isPending: updatingEmployee } = useMutation({
     mutationFn: imsService.updateEmployeeAssetHistory,
     onSuccess: async () => {
-      showToast({ message: 'Asset retrieved successfully!', type: 'SUCCESS' });
+      showToast({ message: 'Asset recovered successfully!', type: 'SUCCESS' });
       queryClient.invalidateQueries({ queryKey: ['fetchAllAssets'] });
       queryClient.invalidateQueries({ queryKey: ['fetchAssetsByProperty'] });
       queryClient.invalidateQueries({
@@ -65,7 +65,7 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
           }
           updateEmployee({ code: assetData.assignee, assetHistory: assetHistory })
         } else {
-          showToast({ message: "Asset retrieved successfully!", type: "SUCCESS" });
+          showToast({ message: "Asset recovered successfully!", type: "SUCCESS" });
           queryClient.invalidateQueries({ queryKey: ['fetchAllAssets', 'Hardware'] });
           queryClient.invalidateQueries({
             queryKey: ['fetchAllAssetsByStatusAndCategory'],
@@ -96,15 +96,15 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="w-[90px] justify-between h-8 px-2 gap-2 text-xs font-semibold" variant='secondary'>
-          Retrieve
+          Recover
           <ArrowFatLinesDown weight="fill" size={16} />
         </Button>
       </DialogTrigger>
       <DialogContent className="border-none">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Retrieve asset {assetData.code}?</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">Recover asset {assetData.code}?</DialogTitle>
           <DialogDescription className="">
-            Retrieving this asset from {assetData.assignee} will remove it from their deployed assets list and set the status of this asset to 'IT Storage'.
+            Recovering this asset from {assetData.assignee} will remove it from their deployed assets list and set the status of this asset to 'IT Storage'.
           </DialogDescription>
           <Retrieve />
         </DialogHeader>
@@ -118,7 +118,7 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
             }}
           >
             {(retrievalPending || updatingEmployee) ? <Spinner size={18}/> : null }
-            Yes, I want to retrieve it
+            Yes, I want to recover it
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -50,10 +50,8 @@ export function prependHostIfMissing(path?: string) {
 export function exportToExcel(columns: string[], data: any, fileName: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const filteredData = data.map((row: any) =>
-    Object.keys(row).reduce((accum: Record<string, string>, key: string) => {
-      if (columns.includes(key)) {
-        accum[key] = row[key];
-      }
+    columns.reduce((accum: Record<string, string>, key: string) => {
+      accum[key] = row[key];
       return accum;
     }, {})
   );

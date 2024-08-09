@@ -10,10 +10,14 @@
 - Install the docker application on your OS
 - Make sure to free up these ports in your host OS `3000` and `27020`
 - Open terminal or command prompt
-- Copy and paste the command `docker run -itd -p 3000:3000 -p 27020:27020 --name stockpilot naneydon/fsims:prod sh start.sh`
+- Copy and paste either of the command 
+- [x] `docker run -itd -p 3000:3000 -p 27020:27020 --name stockpilot naneydon/fsims:staging sh start.sh` for staging server
+- [x] `docker run -itd -p 3000:3000 -p 27020:27020 --name stockpilot naneydon/fsims:prod sh start.sh` for production server
 - Then wait until the repository is pulled. **Note** *initially the container will automatically run after the pull*
 - Wait for about 2 minutes to properly execute the startup script. **Note** *This will occur everytime you start the container*
-- To access the page go to `http://localhost:3000` or `http://<HOST_IP>:3000`
+- To access the page, open a browser and go to either of the following 
+- [x] `http://localhost:3000` for local access in server itself
+- [x] `http://<HOST_IP_OR_DOMAIN>:3000` for intranet or domain access
 - To access the mongodb via compass, use this `mongodb://fullscale:fullscale@localhost:27020/inventory?authSource=admin`
 
 ## Docker command and control scripts
