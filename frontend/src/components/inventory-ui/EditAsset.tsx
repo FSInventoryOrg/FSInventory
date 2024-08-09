@@ -15,7 +15,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as imsService from '@/ims-service'
 import { useAppContext } from '@/hooks/useAppContext'
 import { Spinner } from '../Spinner'
-import { AssetFormData, AssetSchema} from "@/schemas/AddAssetSchema";
+import { AssetFormData, AssetSchema, refineAssetSchema} from "@/schemas/AddAssetSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Tabs,
@@ -28,18 +28,22 @@ import GeneralInfoForm from "./GeneralInfoForm";
 import SystemSpecsForm from "./SystemSpecsForm";
 import MiscellaneousForm from "./MiscellaneousForm";
 import { AssetType, HardwareType, SoftwareType } from "@/types/asset";
+import { Defaults } from '@/types/options';
 
 interface EditAssetProps {
   assetData: AssetType | HardwareType | SoftwareType;
+  defaultValues?: Defaults;
   onClose: (close: boolean) => void;
 }
 
-const EditAsset = ({ assetData, onClose }: EditAssetProps) => {
+const EditAsset = ({ assetData, defaultValues, onClose }: EditAssetProps) => {
   const isHardware = assetData.type === 'Hardware';
   const isSoftware = assetData.type === 'Software';
 
+  const RetrievableAssetSchema = AssetSchema.superRefine(refineAssetSchema(defaultValues?.retrievableStatus))
+  
   const form = useForm<z.infer<typeof AssetSchema>>({
-    resolver: zodResolver(AssetSchema),
+    resolver: zodResolver(RetrievableAssetSchema),
     defaultValues: {
       code: assetData.code,
       type: assetData.type,
@@ -110,6 +114,7 @@ useEffect(()=> {
   if (isSubmitting && errors) {
     if (hasRequiredFields()) showToast({message: "Required fields are missing.", type:"ERROR"})
   }
+// eslint-disable-next-line react-hooks/exhaustive-deps
 }, [isSubmitting, errors ])
 
 const triggerValidation = () => form?.trigger()
@@ -164,7 +169,7 @@ const onSubmit = (data: z.infer<typeof AssetSchema>) => {
               <TabsContent tabIndex={-1} value="Hardware" className="pb-4 px-3">
                 <GeneralInfoForm />
                 <SystemSpecsForm />
-                <MiscellaneousForm />
+                <MiscellaneousForm defaults={defaultValues} mode="edit"/>
               </TabsContent>
               <TabsContent tabIndex={-1} value="Software">
               </TabsContent>
