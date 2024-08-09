@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
-import Hardware, { DeploymentHistory, HardwareType } from '../models/hardware.schema';
-import Software, { SoftwareType } from '../models/software.schema';
-import Asset, { AssetType } from '../models/asset.schema';
+import Hardware, { HardwareType } from '../models/hardware.schema';
+import Software from '../models/software.schema';
+import Asset from '../models/asset.schema';
 import { check, validationResult } from 'express-validator'
 import verifyToken from '../middleware/auth';
 import jwt from "jsonwebtoken";
@@ -718,6 +718,29 @@ router.delete('/:code', verifyToken, async (req: Request, res: Response) => {
     res.status(200).json({ message: 'Asset deleted successfully' });
   } catch (error) {
     console.error('Error deleting asset:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.delete('/bulkDelete', verifyToken, async (req: Request, res: Response) => {
+  try {
+    const token = req.cookies.auth_token;
+    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+
+    if (decodedToken.role !== "ADMIN") {
+      return res.status(403).json({ message: "Only users with admin role can perform this action" });
+    }
+
+    const codesToDelete = req.body;
+
+    if(!Array.isArray(codesToDelete)) return res.status(422).json({ message: "Request body should be an array of Asset Item Codes" });
+    if(codesToDelete.length === 0) return res.status(422).json({ message: "Request body should not be an empty array" });
+
+    await Asset.deleteMany({ code: { $in: codesToDelete} });
+    await auditAssets();
+    res.status(200).json({ message: 'Assets deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting assets:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
