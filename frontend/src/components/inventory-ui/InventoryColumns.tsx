@@ -103,7 +103,7 @@ export const InventoryColumns: ColumnDef<HardwareType>[] = [
     header: "From Client",
   },
   {
-    accessorKey: "assignee",
+    accessorKey: "_addonData_assignee",
     header: "Assignee",
   },
   {

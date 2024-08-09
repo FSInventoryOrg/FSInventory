@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import User from '../models/user.schema';
 import { getCodeAndIncrement } from '../utils/asset-counter';
 import { auditAssets } from '../utils/common';
+import Employee from '../models/employee.schema';
 
 const router = express.Router();
 
@@ -489,13 +490,35 @@ router.get('/', async (req: Request, res: Response) => {
       Object.entries(allowedFilter).filter(([_, v]) => v !== undefined && v !== null && v !== '')
     );
 
-    let assets;
+    const employees: any = await Employee.aggregate().match({$expr: {}}).project({ idNum: '$code', name: { $concat: ['$firstName', ' ', '$lastName']}});
+    let assets: any[];
 
-    if (Object.keys(query).length === 0) {
-      assets = await Asset.find();
-    } else {
-      assets = await Asset.find(query);
-    }
+    assets = await Asset.aggregate().match({ $expr: query });
+
+    assets = assets.reduce((accum: any[], value: any) => {
+      const findAssignee = employees.find((f: any) =>  f['idNum'] === value['assignee']);
+      const findRecoveredFrom = employees.find((f: any) =>  f['idNum'] === value['recoveredFrom']);
+
+      if(findAssignee) value['_addonData_assignee'] = findAssignee['name']
+      else value['_addonData_assignee'] = value['assignee']
+
+      if(findRecoveredFrom) value['_addonData_recoveredFrom'] = findRecoveredFrom['name']
+      else value['_addonData_recoveredFrom'] = value['recoveredFrom']
+
+      if(Array.isArray(value?.deploymentHistory)) {
+        if(value.deploymentHistory.length > 0) {
+          value.deploymentHistory.forEach((el: any, index: number) => {
+            const findHistAssignee = employees.find((f: any) =>  f['idNum'] === el['assignee']);
+
+            if(findHistAssignee) value.deploymentHistory[index]['_addonData_assignee'] = findHistAssignee['name']
+            else value.deploymentHistory[index]['_addonData_assignee'] = el['assignee']
+          })
+        }
+      }
+      
+      accum.push(value)
+      return accum;
+    }, []);
 
     res.status(200).json(assets);
 

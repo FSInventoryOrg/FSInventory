@@ -17,7 +17,7 @@ import * as imsService from '@/ims-service'
 import { useAppContext } from '@/hooks/useAppContext'
 import { Spinner } from '../Spinner'
 import { PlusIcon, XIcon } from "lucide-react"
-import { AssetFormData, AssetSchema} from "@/schemas/AddAssetSchema";
+import { AssetFormData, AssetSchema, refineAssetSchema} from "@/schemas/AddAssetSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import {
@@ -38,8 +38,10 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
   const { showToast } = useAppContext();
   const [tabValue, setTabValue] = useState<"Hardware" | "Software">("Hardware");
 
+  const RetrievableAssetSchema = AssetSchema.superRefine(refineAssetSchema(defaultValues?.retrievableStatus))
+
   const form = useForm<z.infer<typeof AssetSchema>>({
-    resolver: zodResolver(AssetSchema),
+    resolver: zodResolver(RetrievableAssetSchema),
     defaultValues: {
       code: '',
       type: 'Hardware',
@@ -106,6 +108,7 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
     if (isSubmitting && errors) {
       if (hasRequiredFields()) showToast({message: "Required fields are missing.", type:"ERROR"})
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitting, errors ])
 
   const triggerValidation = () => form?.trigger()
@@ -156,7 +159,7 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
                     <TabsContent tabIndex={-1} value="Hardware" className="pb-4 px-3">
                       <GeneralInfoForm />
                       <SystemSpecsForm />
-                      <MiscellaneousForm />
+                      <MiscellaneousForm defaults={defaultValues} mode='new'/>
                     </TabsContent>
                     <TabsContent value="Software">
                     </TabsContent>

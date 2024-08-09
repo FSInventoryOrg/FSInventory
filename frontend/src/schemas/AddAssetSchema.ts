@@ -30,3 +30,23 @@ export const AssetSchema = z.object({
 });
 
 export type AssetFormData = z.infer<typeof AssetSchema>;
+
+export const refineAssetSchema = (retrievableStatus?: string ) => {
+  return (arg: AssetFormData, ctx: z.RefinementCtx) => {
+    if (arg.status && arg.status === retrievableStatus) {
+      if (!arg.assignee?.trim()) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Assignee is required.",
+          path: ["assignee"]
+        });
+      }
+      if (!arg.deploymentDate) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Deployment date is required.",
+          path: ["deploymentDate"]
+        });
+      }
+    }}
+}
