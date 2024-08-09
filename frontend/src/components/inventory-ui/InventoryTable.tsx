@@ -229,10 +229,27 @@ export function InventoryTable<TData, TValue>({
   const handleDownloadReport = async () => {
     setIsDownloading(true);
     const columnVisibility = table.getState()?.columnVisibility;
-    const columns = Object.keys(columnVisibility).filter(
+    const visibleColumns = Object.keys(columnVisibility).filter(
       (key) => columnVisibility[key] === true
     );
-    await exportToExcel(columns, data, 'Inventory_Report');
+    const columns = table
+      .getHeaderGroups()[0]
+      .headers.filter((header) => visibleColumns.includes(header.id))
+      .map((header) => header.id);
+
+    const withServiceInYears = data.map((asset) => {
+      let serviceInYears = null;
+      if (asset.purchaseDate !== null) {
+        const currentDate = new Date();
+        const purchaseDate = new Date(asset.purchaseDate);
+        serviceInYears = Math.round(
+          (currentDate.getTime() - purchaseDate.getTime()) /
+            (1000 * 60 * 60 * 24 * 365)
+        );
+      }
+      return { ...asset, serviceInYears };
+    });
+    await exportToExcel(columns, withServiceInYears, 'Inventory_Report');
     setIsDownloading(false);
   };
 
