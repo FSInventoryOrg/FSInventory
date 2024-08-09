@@ -493,7 +493,7 @@ router.get('/', async (req: Request, res: Response) => {
     const employees: any = await Employee.aggregate().match({$expr: {}}).project({ idNum: '$code', name: { $concat: ['$firstName', ' ', '$lastName']}});
     let assets: any[];
 
-    assets = await Asset.aggregate().match({ $expr: query });
+    assets = await Asset.aggregate().match(query);
 
     assets = assets.reduce((accum: any[], value: any) => {
       const findAssignee = employees.find((f: any) =>  f['idNum'] === value['assignee']);
