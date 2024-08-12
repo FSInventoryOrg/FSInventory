@@ -1,6 +1,6 @@
 
 import { useState } from 'react'
-import { MoreHorizontal, CopyIcon, TrashIcon, EyeIcon, PenIcon, XIcon } from "lucide-react";
+import { MoreHorizontal, CopyIcon, TrashIcon, PenIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,7 +29,6 @@ import {
 } from "@/components/ui/dialog"
 import { HardwareType } from '@/types/asset';
 import * as imsService from '@/ims-service'
-import AssetDetails from './AssetDetails';
 import EditAsset from './EditAsset';
 import TrashCan from '../graphics/TrashCan';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -44,7 +43,6 @@ interface CellProps {
 const ActionCell: React.FC<CellProps> = ({ row }) => {
   const queryClient = useQueryClient()
   const asset = row.original;
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -95,13 +93,6 @@ const ActionCell: React.FC<CellProps> = ({ row }) => {
               Edit asset
               <PenIcon size={16} className="text-muted-foreground" />
             </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="flex justify-between items-center gap-2"
-              onClick={() => setIsViewDialogOpen(true)}
-              >
-              View details
-              <EyeIcon size={16} className="text-muted-foreground" />
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               className="flex justify-between items-center gap-2 text-destructive font-semibold focus:bg-destructive focus:text-destructive-foreground"
@@ -112,21 +103,6 @@ const ActionCell: React.FC<CellProps> = ({ row }) => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-          <DialogContent className='flex flex-col'>
-            <DialogHeader>
-              <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                <XIcon className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </DialogClose>
-              <DialogTitle>{asset.code}</DialogTitle>
-              <DialogDescription>
-                Detailed information on asset {asset.code}, including types, specifications, status, deployment details, current possession, etc.
-              </DialogDescription>
-            </DialogHeader>
-            <AssetDetails asset={asset} />
-          </DialogContent>
-        </Dialog>
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent tabIndex={-1} className="min-w-full overflow-y-auto h-full bg-transparent justify-center flex border-none px-0 py-0 sm:py-16">
             <div className="sm:max-w-[800px] bg-card h-fit p-3 sm:p-6 rounded-lg">

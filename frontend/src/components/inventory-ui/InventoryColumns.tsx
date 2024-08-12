@@ -9,6 +9,7 @@ import ActionCell from './InventoryAction';
 import StatusBadge from "./StatusBadge";
 import RetrieveAsset from "./RetrieveAsset";
 import DeployAsset from "./DeployAsset";
+import AssetCode from './AssetCode';
 
 export const InventoryColumns: ColumnDef<HardwareType>[] = [
   {
@@ -47,7 +48,7 @@ export const InventoryColumns: ColumnDef<HardwareType>[] = [
       )
     },
     cell: ({ row }) => (
-      <div className="w-fit overflow-hidden text-ellipsis whitespace-nowrap">{row.original.code}</div>
+      <AssetCode asset={row.original}/>
     ),
   },
   {
