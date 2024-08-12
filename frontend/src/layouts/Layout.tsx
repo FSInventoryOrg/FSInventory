@@ -47,7 +47,7 @@ const Layout = ({ children }: Props) => {
       <header className={`w-full justify-center flex fixed top-0 bg-background z-40 ${scrolled ? "drop-shadow-lg z-50" : "drop-shadow-none"}`}>
         <NavigationBar />
       </header>
-      <div className="flex flex-col sm:flex-row mt-[89px] w-full overflow-auto relative z-40" style={{ minHeight: 'calc(100vh - 89px)' }}>
+      <div className="flex flex-col sm:flex-row mt-[89px] w-full relative z-40" style={{ minHeight: 'calc(100vh - 89px)' }}>
         <main className="flex-1">{children}</main>
       </div>
       <Toaster />
