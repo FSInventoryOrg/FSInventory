@@ -1,7 +1,7 @@
 {
   "name": "stockpilot-frontend",
   "private": true,
-  "version": "0.12.0",
+  "version": "2.4.13",
   "type": "module",
   "scripts": {
     "dev": "vite",
