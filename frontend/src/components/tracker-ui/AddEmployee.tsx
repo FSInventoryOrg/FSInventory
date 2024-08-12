@@ -275,7 +275,7 @@ const AddEmployee = () => {
                                   onSelect={field.onChange}
                                   onDayClick={() => {setOpenCalendar(false)}}
                                   disabled={(date) =>
-                                    date > new Date() || date < new Date("1900-01-01")
+                                    date < new Date("1900-01-01")
                                   }
                                   initialFocus
                                 />
