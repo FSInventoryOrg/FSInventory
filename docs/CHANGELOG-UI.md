@@ -1,5 +1,8 @@
 # UI CHANGELOG
 
+### 2024-08-12 [v2.4.14](https://connect.zoho.com/portal/intranet/task/623367000000584071)
+- *Fix* - Remove Small settings button in Inventory page
+
 ### 2024-08-12 [v2.4.13](https://connect.zoho.com/portal/intranet/task/623367000000560167)
 - *New* - Bulk Delete for Items (frontend)
 
