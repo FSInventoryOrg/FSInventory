@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import * as React from "react"
+import * as React from 'react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -33,19 +33,20 @@ import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { DataTablePagination } from '@/components/DataTablePagination';
 import AddAsset from './AddAsset';
-import { FilterIcon, SearchIcon, SlidersHorizontalIcon } from 'lucide-react';
+import { FilterIcon, SearchIcon } from 'lucide-react';
 import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import { ColumnVisibility } from './ColumnVisibility';
 import Empty from '../graphics/Empty';
 import { TagOption } from './Options';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as imsService from '@/ims-service';
 import { Button } from '../ui/button';
 import { PROPERTIES } from '@/lib/data';
-import { Link } from 'react-router-dom';
 import { Defaults } from '@/types/options';
 import { Download } from '@phosphor-icons/react';
 import { exportToExcel } from '@/lib/utils';
+import BulkDelete from './BulkDelete';
+import { useAppContext } from '@/hooks/useAppContext';
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -122,6 +123,8 @@ export function InventoryTable<TData, TValue>({
   isFiltersVisible,
   selectedCategory,
 }: InventoryTableProps<TData, TValue>) {
+  const { showToast } = useAppContext();
+  const queryClient = useQueryClient()
   const [isXL, setIsXL] = React.useState(false);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -133,12 +136,34 @@ export function InventoryTable<TData, TValue>({
     pageSize: 20,
   });
   const [isDownloading, setIsDownloading] = React.useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
 
   const { data: optionValues } = useQuery<TagOption[]>({
     queryKey: ['fetchOptionValues', 'category'],
     queryFn: () => imsService.fetchOptionValues('category'),
     enabled: !!selectedCategory,
   });
+
+  const mutation = useMutation( {
+    mutationFn: imsService.bulkDeleteAssets,
+    onSuccess: async () => {
+      showToast({ message: 'Asset(s) deleted successfully!', type: 'SUCCESS'})
+      Promise.all(
+        [ 
+          queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] }),
+          queryClient.invalidateQueries({
+            queryKey: ['fetchAllAssetsByStatusAndCategory']})
+        ])
+      table.resetRowSelection();
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      setTimeout(() => {
+        setIsDeleteDialogOpen(false);
+      }, 100);
+    },
+    onError: (error: Error) => {
+      showToast({ message: error.message, type: "ERROR" });
+    }
+  })
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>(
@@ -263,6 +288,12 @@ export function InventoryTable<TData, TValue>({
     setIsDownloading(false);
   };
 
+  const handleBulkDelete = (assetIds: string[]) => {
+    mutation.mutate(assetIds)
+  };
+
+  const filteredSelectedRows = table?.getFilteredSelectedRowModel()
+
   return (
     <div className="w-full flex flex-col h-full">
       <div className="w-full flex items-center justify-between pb-3 xl:pb-4 gap-2">
@@ -320,26 +351,17 @@ export function InventoryTable<TData, TValue>({
                 <p className="text-xs">Export Data</p>
               </TooltipContent>
             </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  asChild
-                  className="h-8 w-8 min-w-8 p-0"
-                  variant="outline"
-                  size="icon"
-                >
-                  <Link to="/settings/inventory">
-                    <span className="sr-only">Settings & preferences</span>
-                    <SlidersHorizontalIcon className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-xs">Settings & preferences</p>
-              </TooltipContent>
-            </Tooltip>
           </TooltipProvider>
           <ColumnVisibility table={table} />
+          {filteredSelectedRows?.rows.length > 0 && (
+            <BulkDelete
+              open={isDeleteDialogOpen}
+              setOpen={setIsDeleteDialogOpen}
+              onDelete={handleBulkDelete} 
+              selectedAssets={filteredSelectedRows?.rows} 
+              isLoading={mutation.isPending}
+              />
+          )}
           {defaultOptions && <AddAsset defaultValues={defaultOptions} />}
         </div>
       </div>

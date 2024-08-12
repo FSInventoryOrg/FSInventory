@@ -627,3 +627,21 @@ export const verifyOAuthCode = async (code: string) => {
 
   return responseBody;
 };
+
+export const bulkDeleteAssets = async (assetCodes: string[]) => {
+  const response = await fetch(`${API_BASE_URL}/api/assets/bulkDelete`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: {
+      'Content-Type' : 'application/json'
+    },
+    body: JSON.stringify(assetCodes)
+  }) 
+
+ if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || 'Failed to delete assets')
+  }
+
+  return true;
+}
