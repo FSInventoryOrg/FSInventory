@@ -344,7 +344,9 @@ export function InventoryTable<TData, TValue>({
         </div>
       </div>
       <ScrollArea
-        className="rounded-md border h-full"
+        className={`rounded-md border h-full ${
+          isFiltersVisible ? 'xl:w-[calc(100vw-25rem)]' : 'w-full'
+        }`}
         style={isXL ? { maxHeight: '' } : {}}
       >
         <Table className="text-xs relative">
