@@ -1,5 +1,8 @@
 # UI CHANGELOG
 
+### 2024-08-12 [v0.11.0](https://connect.zoho.com/portal/intranet/task/623367000000561013)
+- *Fix* - Enable future dates for start date
+
 ### 2024-08-12 [v0.10.0](https://connect.zoho.com/portal/intranet/task/623367000000480155)
 - *Bug* - Adding 10+ columns in Inventory page will result to buttons (add asset, next page) being hidden
 
