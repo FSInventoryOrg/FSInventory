@@ -51,6 +51,7 @@ const ResetPassword = ({ onError, onSuccess }: ResetPasswordFormProps) => {
       onSuccess()
       showToast({ message: "You have logged in to the session.", type: "SUCCESS" });
       await queryClient.invalidateQueries({ queryKey: ["validateToken"]});
+      form.reset();
     },
     onError: async (error: Error) => {
       handleError(error.message);
