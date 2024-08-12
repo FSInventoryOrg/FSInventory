@@ -33,11 +33,7 @@ import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { DataTablePagination } from '@/components/DataTablePagination';
 import AddAsset from './AddAsset';
-import {
-  FilterIcon,
-  SearchIcon,
-  SlidersHorizontalIcon,
-} from 'lucide-react';
+import { FilterIcon, SearchIcon } from 'lucide-react';
 import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import { ColumnVisibility } from './ColumnVisibility';
 import Empty from '../graphics/Empty';
@@ -46,7 +42,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as imsService from '@/ims-service';
 import { Button } from '../ui/button';
 import { PROPERTIES } from '@/lib/data';
-import { Link } from 'react-router-dom';
 import { Defaults } from '@/types/options';
 import { Download } from '@phosphor-icons/react';
 import { exportToExcel } from '@/lib/utils';
@@ -354,24 +349,6 @@ export function InventoryTable<TData, TValue>({
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-xs">Export Data</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  asChild
-                  className="h-8 w-8 min-w-8 p-0"
-                  variant="outline"
-                  size="icon"
-                >
-                  <Link to="/settings/inventory">
-                    <span className="sr-only">Settings & preferences</span>
-                    <SlidersHorizontalIcon className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-xs">Settings & preferences</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
