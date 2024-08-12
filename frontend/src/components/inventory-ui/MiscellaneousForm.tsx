@@ -216,7 +216,7 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
                               setOpenDeploymentDate(false);
                             }}
                             disabled={(date) =>
-                              date > new Date() || date < new Date('1900-01-01')
+                              date < new Date('1900-01-01')
                             }
                             initialFocus
                           />
@@ -303,7 +303,7 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
                         setOpenRecoveryDate(false);
                       }}
                       disabled={(date) =>
-                        date > new Date() || date < new Date('1900-01-01')
+                        date < new Date('1900-01-01')
                       }
                       initialFocus
                     />

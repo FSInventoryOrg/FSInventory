@@ -745,7 +745,7 @@ router.delete('/:code', verifyToken, async (req: Request, res: Response) => {
   }
 });
 
-router.delete('/bulkDelete', verifyToken, async (req: Request, res: Response) => {
+router.patch('/bulkDelete', verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
     const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
