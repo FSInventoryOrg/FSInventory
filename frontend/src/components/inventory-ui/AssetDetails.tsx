@@ -98,9 +98,9 @@ const AssetDetails = ({ asset }: AssetDetailsProps) => {
   const otherInfo: Field[] = [
     { label: 'Equipment Type:', value: asset.equipmentType },
     { label: 'From Client:', value: asset.client },
-    { label: 'Assigned To:', value: asset.assignee },
+    { label: 'Assigned To:', value: asset._addonData_assignee || asset.assignee },
     { label: 'Deployment Date:', value: asset.deploymentDate ? new Date(asset.deploymentDate).toLocaleString() : '' },
-    { label: 'Recovered From:', value: asset.recoveredFrom },
+    { label: 'Recovered From:', value: asset._addonData_recoveredFrom || asset.recoveredFrom },
     { label: 'Date of Recovery:', value: asset.recoveryDate ? new Date(asset.recoveryDate).toLocaleString() : ''},
   ]
 
@@ -166,7 +166,7 @@ const AssetDetails = ({ asset }: AssetDetailsProps) => {
         <TabsContent value="history">
           {(asset.deploymentHistory.length !== 0) ? (
             <ScrollArea className='flex flex-col gap-4 h-[350px] pt-3'>
-              {asset.deploymentHistory.map((record, index) => {
+              {asset.deploymentHistory.map((record: any, index) => {
                 const deploymentDateObj = record.deploymentDate ? new Date(record.deploymentDate) : null;
                 const recoveryDateObj = record.recoveryDate ? new Date(record.recoveryDate) : null;
 
@@ -191,7 +191,7 @@ const AssetDetails = ({ asset }: AssetDetailsProps) => {
                       {/* Render assignee */}
                       <div className='flex gap-2 px-2'>
                         <div className='w-full flex gap-2 text-sm items-center font-bold uppercase'>
-                          {record.assignee}
+                          {record?._addonData_assignee || record.assignee}
                         </div>
                         <span className='w-fit'></span>
                       </div>

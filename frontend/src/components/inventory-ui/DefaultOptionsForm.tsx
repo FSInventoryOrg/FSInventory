@@ -254,7 +254,7 @@ const DefaultOptionsForm = () => {
         render={({ field }) => (
           <FormItem className="pb-2">
             <FormLabel className="font-medium">
-              Status for retrievable assets
+              Status for recoverable assets
             </FormLabel>
             <div className="flex md:w-2/3 gap-1">
               {!(
@@ -269,7 +269,7 @@ const DefaultOptionsForm = () => {
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select status for retrievable assets" />
+                      <SelectValue placeholder="Select status for recoverable assets" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>

@@ -19,6 +19,8 @@ export type DeploymentHistory = {
 }
 
 export interface HardwareType extends AssetType {
+  _addonData_assignee?: string;
+  _addonData_recoveredFrom?: string;
   category: string;
   processor: string;
   memory: string;

@@ -104,7 +104,7 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">Recover asset {assetData.code}?</DialogTitle>
           <DialogDescription className="">
-            Recovering this asset from {assetData.assignee} will remove it from their deployed assets list and set the status of this asset to 'IT Storage'.
+            Recovering this asset from {assetData?._addonData_assignee || assetData.assignee} will remove it from their deployed assets list and set the status of this asset to 'IT Storage'.
           </DialogDescription>
           <Retrieve />
         </DialogHeader>

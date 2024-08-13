@@ -142,7 +142,7 @@ const onSubmit = (data: z.infer<typeof AssetSchema>) => {
       _id: assetData._id,
       type: tabValue,
     }
-    console.log(updatedAsset)
+    // console.log(updatedAsset)
     mutate({ code: assetData.code, updatedAsset: updatedAsset });
   }
 
