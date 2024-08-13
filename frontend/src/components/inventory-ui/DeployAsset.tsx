@@ -288,6 +288,13 @@ export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, Sugges
       }, 750);
     };
 
+    const inputLabel = () => {
+      try {
+        const findName = employees?.find(f => f?.code === field?.value)
+        return findName ? `${findName?.firstName} ${findName?.lastName}` : field?.value
+      } catch (errLabel) { return field?.value || '' }
+    }
+
     return (
       <div className='relative w-full'>
         <Input
@@ -299,6 +306,11 @@ export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, Sugges
           onChangeCapture={handleInputChange}
           onKeyDown={handleKeyPress}
           onBlurCapture={handleInputBlur}
+          value={inputLabel()}
+        />
+        <Input
+          ref={ref}
+          type="hidden"
           value={filteredOptions.length > 0 ? `${filteredOptions[0].firstName} ${filteredOptions[0].lastName}` : field.value}
           {...field}
         />

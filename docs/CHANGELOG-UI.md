@@ -1,5 +1,9 @@
 # UI CHANGELOG
 
+### 2024-08-12 [v2.4.15](https://connect.zoho.com/portal/intranet/task/623367000000584121)
+- *New* - Change details displaying Employee ID to Employee full name instead
+- *Fix* - Change "Retrieve" word to "Recover" (already committed the changes but was overidden by some new pulls)
+
 ### 2024-08-12 [v2.4.14](https://connect.zoho.com/portal/intranet/task/623367000000584071)
 - *Fix* - Remove Small settings button in Inventory page
 
