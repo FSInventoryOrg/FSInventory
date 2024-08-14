@@ -250,14 +250,13 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0 h-[350px] z-10" align="end">
+                            <PopoverContent className="w-auto p-0 z-10" align="end">
                               <Calendar
                                 mode="single"
                                 onSelect={field.onChange}
                                 disabled={(date) =>
                                   date < new Date("1900-01-01")
                                 }
-                                initialFocus
                               />
                             </PopoverContent>
                           </Popover>

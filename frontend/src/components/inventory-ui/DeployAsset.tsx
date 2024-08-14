@@ -165,7 +165,7 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 h-[350px]" align="start">
+                      <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
                           onSelect={field.onChange}
@@ -173,7 +173,6 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
                           disabled={(date) =>
                             date < new Date("1900-01-01")
                           }
-                          initialFocus
                         />
                       </PopoverContent>
                     </Popover>
