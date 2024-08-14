@@ -1,6 +1,6 @@
 
 import { useState } from 'react'
-import { MoreHorizontal, CopyIcon, EyeIcon, XIcon } from "lucide-react";
+import { MoreHorizontal, CopyIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -51,13 +51,6 @@ const ActionCell: React.FC<CellProps> = ({ row }) => {
             >
               Copy code
               <CopyIcon size={16} className="text-muted-foreground" />
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="flex justify-between items-center gap-2"
-              onClick={() => setIsViewDialogOpen(true)}
-              >
-              View details
-              <EyeIcon size={16} className="text-muted-foreground" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

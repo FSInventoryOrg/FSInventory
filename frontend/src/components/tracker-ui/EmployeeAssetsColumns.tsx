@@ -8,6 +8,7 @@ import ActionCell from './EmployeeAssetsAction';
 import DeploymentDuration from "./DeploymentDuration";
 import RetrieveAsset from "../inventory-ui/RetrieveAsset";
 import DeployAsset from "../inventory-ui/DeployAsset";
+import AssetCode from '../inventory-ui/AssetCode';
 
 export const EmployeeAssetsColumns: ColumnDef<HardwareType>[] = [
   {
@@ -24,7 +25,7 @@ export const EmployeeAssetsColumns: ColumnDef<HardwareType>[] = [
       )
     },
     cell: ({ row }) => (
-      <div className="w-fit overflow-hidden text-ellipsis whitespace-nowrap">{row.original.code}</div>
+      <AssetCode asset={row.original}/>
     ),
   },
   {
