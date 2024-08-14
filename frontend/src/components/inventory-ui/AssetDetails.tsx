@@ -14,6 +14,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 interface AssetDetailsProps {
   asset: HardwareType;
+  onRetrieve?: () => void;
 }
 
 interface Field {
@@ -47,7 +48,7 @@ const renderSection = (title: string, fields: Field[], icon: React.ReactNode) =>
   </div>
 );
 
-const AssetDetails = ({ asset }: AssetDetailsProps) => {
+const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
 
   const queryClient = useQueryClient();
 
@@ -113,7 +114,7 @@ const AssetDetails = ({ asset }: AssetDetailsProps) => {
         <div className='text-sm w-fit bg-accent text-accent-foreground font-semibold border-border border rounded-full px-2.5 py-1 flex items-center gap-2'>
           <StatusBadge status={asset.status} />
         </div>
-        {asset.status === 'Deployed' && <RetrieveAsset assetData={asset} />}
+        {asset.status === 'Deployed' && <RetrieveAsset assetData={asset} onRetrieve={onRetrieve}/>}
         {asset.status === 'IT Storage' && <DeployAsset assetData={asset} />}
       </div>
       <div className='text-muted-foreground flex flex-col pt-2'>

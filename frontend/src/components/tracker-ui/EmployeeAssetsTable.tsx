@@ -9,11 +9,11 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
+  // getPaginationRowModel,
   getSortedRowModel,
   FilterFn,
   useReactTable,
-  PaginationState,
+  // PaginationState,
 } from "@tanstack/react-table"
 import {
   Table,
@@ -71,10 +71,10 @@ export function EmployeeAssetsTable<TData, TValue>({
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = React.useState('')
-  const [pagination] = React.useState<PaginationState>({
-    pageIndex: 0, 
-    pageSize: data.length, 
-  });  
+  // const [pagination] = React.useState<PaginationState>({
+  //   pageIndex: 0, 
+  //   pageSize: data.length,  NOTE: replace to another value
+  // });  
 
   
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -84,7 +84,9 @@ export function EmployeeAssetsTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // NOTE: disabled pagination since it is not used in this table and using variable  
+    // pageSize causes stale data in rendered table even when props.data is updated. 
+    // getPaginationRowModel: getPaginationRowModel(), 
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
@@ -103,9 +105,9 @@ export function EmployeeAssetsTable<TData, TValue>({
       columnVisibility,
       rowSelection,
     },
-    initialState: {
-      pagination
-    }
+    // initialState: {
+    //   pagination
+    // }
   })
 
   React.useEffect(() => {
@@ -146,7 +148,7 @@ export function EmployeeAssetsTable<TData, TValue>({
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
-                key={row.id}
+                key={row.original._id}
                 data-state={row.getIsSelected() && "selected"}
               >
                 {row.getVisibleCells().map((cell) => (

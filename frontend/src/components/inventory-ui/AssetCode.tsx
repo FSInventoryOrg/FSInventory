@@ -42,7 +42,7 @@ const AssetCode = ({ asset }: AssetCodeProps) => {
             specifications, status, deployment details, current possession, etc.
           </DialogDescription>
         </DialogHeader>
-        <AssetDetails asset={asset} />
+        <AssetDetails asset={asset} onRetrieve={()=>setIsViewDialogOpen(false)} />
       </DialogContent>
     </Dialog>
   );

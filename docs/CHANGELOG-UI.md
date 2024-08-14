@@ -1,4 +1,6 @@
 # UI CHANGELOG
+### 2024-08-14 [v2.4.18](https://connect.zoho.com/portal/intranet/task/623367000000579041)
+- *Fix* - Include view details from asset code in Tracker employee assets
 
 ### 2024-08-14 [v2.4.17](https://connect.zoho.com/portal/intranet/task/623367000000510432)
 - *Fix* - Need to manually press back button for previous Month and Year for Add new employee start date
