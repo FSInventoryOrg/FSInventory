@@ -1,4 +1,7 @@
 # UI CHANGELOG
+### 2024-08-14 [v2.4.19](https://gitlab.com/full-scale-internship/stockpilot/-/merge_requests/71)
+- *Fix* - Remove dot in a message
+
 ### 2024-08-14 [v2.4.18](https://connect.zoho.com/portal/intranet/task/623367000000579041)
 - *Fix* - Include view details from asset code in Tracker employee assets
 

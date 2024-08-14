@@ -37,14 +37,14 @@ export const refineAssetSchema = (retrievableStatus?: string ) => {
       if (!arg.assignee?.trim()) {
         ctx.addIssue({
           code: "custom",
-          message: "Assignee is required.",
+          message: "Assignee is required",
           path: ["assignee"]
         });
       }
       if (!arg.deploymentDate) {
         ctx.addIssue({
           code: "custom",
-          message: "Deployment date is required.",
+          message: "Deployment date is required",
           path: ["deploymentDate"]
         });
       }
