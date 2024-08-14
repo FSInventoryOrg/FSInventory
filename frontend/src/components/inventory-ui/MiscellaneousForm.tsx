@@ -206,7 +206,7 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent
-                          className='w-auto p-0 h-[350px]'
+                          className='w-auto p-0'
                           align='start'
                         >
                           <Calendar
@@ -218,7 +218,6 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
                             disabled={(date) =>
                               date < new Date('1900-01-01')
                             }
-                            initialFocus
                           />
                         </PopoverContent>
                       </Popover>
@@ -293,7 +292,7 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
                     </FormControl>
                   </PopoverTrigger>
                   <PopoverContent
-                    className='w-auto p-0 h-[350px]'
+                    className='w-auto p-0'
                     align='start'
                   >
                     <Calendar
@@ -305,7 +304,6 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
                       disabled={(date) =>
                         date < new Date('1900-01-01')
                       }
-                      initialFocus
                     />
                   </PopoverContent>
                 </Popover>

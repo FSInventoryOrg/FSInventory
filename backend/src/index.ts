@@ -20,7 +20,7 @@ import swaggerDocs from './utils/swagger';
 import { startChangeStream } from './utils/change-stream';
 import path from 'path';
 import { auditAssets } from './utils/common';
-import { convertStatusToStorage, convertStatusToUnaccounted, rotateLogs, setDefaults } from './system/jobs';
+import { convertStatusToStorage, convertStatusToUnaccounted, rotateLogs, setDefaults, softwareExpirationMonitoring } from './system/jobs';
 
 const DEFAULT_PORT = 3000;
 const port = Number(process.env.PORT) || DEFAULT_PORT;
@@ -82,6 +82,7 @@ const onStartupJobs = async() => {
   await convertStatusToStorage()
   await convertStatusToUnaccounted()
   await auditAssets();
+  softwareExpirationMonitoring()
 }
 
 onStartupJobs();

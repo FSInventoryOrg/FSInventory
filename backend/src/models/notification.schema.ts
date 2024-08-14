@@ -10,6 +10,9 @@ export interface NotificationType extends Document {
   message_html: string;
   target_users: any;
   seen_users: any;
+  countType?: "Remaining" | "Days";
+  table?: string;
+  query?: any
 }
 
 const notificationSchema: Schema<NotificationType> = new Schema<NotificationType>({
@@ -20,7 +23,10 @@ const notificationSchema: Schema<NotificationType> = new Schema<NotificationType
   message: { type: String, required: true },
   message_html: { type: String, required: false },
   target_users: { type: Array<String>, required: false },
-  seen_users: { type: Array<String>, required: false }
+  seen_users: { type: Array<String>, required: false },
+  countType: { type: String, enum: ["Remaining", "Days"], required: false },
+  table: { type: String, required: false },
+  query: { type: Object, required: false },
 });
 
 const Notification = mongoose.model<NotificationType>("Notification", notificationSchema);

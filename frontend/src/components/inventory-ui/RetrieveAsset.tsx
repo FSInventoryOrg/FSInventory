@@ -20,8 +20,9 @@ import { EmployeeType } from "@/types/employee";
 
 interface DeployAssetProps {
   assetData: HardwareType;
+  onRetrieve?: () => void;
 }
-const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
+const RetrieveAsset = ({ assetData, onRetrieve }: DeployAssetProps) => {
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false);
   const { showToast } = useAppContext();
@@ -71,6 +72,7 @@ const RetrieveAsset = ({ assetData }: DeployAssetProps) => {
             queryKey: ['fetchAllAssetsByStatusAndCategory'],
           });
           queryClient.invalidateQueries({ queryKey: ['notifications'] });
+          onRetrieve?.()
           setTimeout(() => {
             setOpen(false)
           }, 100)
