@@ -95,7 +95,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed;
 };
 
-const searchColumns: any[] = ["code", "serialNo", "assignee", "_addonData_assignee"]
+const searchColumns: any[] = ["code", "serialNo", "assignee"]
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const exactFilter: FilterFn<any> = (row, _columnId, value) => {
   const objectValue: string = searchColumns.reduce((accum: any, element: any) => {
