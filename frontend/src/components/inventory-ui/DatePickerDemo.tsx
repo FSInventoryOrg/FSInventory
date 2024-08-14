@@ -61,7 +61,6 @@ export function DatePickerDemo() {
             setErrorMessage("")
           }}
           defaultMonth={date}
-          initialFocus
         />
       </PopoverContent>
     </Popover>
