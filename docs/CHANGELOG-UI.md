@@ -1,5 +1,9 @@
 # UI CHANGELOG
-### 2024-08-14 [v2.4.19](https://gitlab.com/full-scale-internship/stockpilot/-/merge_requests/71)
+
+### 2024-08-14 [v2.4.20](https://connect.zoho.com/portal/intranet/task/623367000000597204)
+- *Fix* - Name for assignee in columns does not match in filter (Correcting the labels to Title Case format)
+
+### 2024-08-14 [v2.4.19](https://connect.zoho.com/portal/intranet/task/623367000000554031/623367000000594253)
 - *Fix* - Remove dot in a message
 
 ### 2024-08-14 [v2.4.18](https://connect.zoho.com/portal/intranet/task/623367000000579041)

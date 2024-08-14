@@ -104,7 +104,8 @@ export const InventoryColumns: ColumnDef<HardwareType>[] = [
     header: "From Client",
   },
   {
-    accessorKey: "_addonData_assignee",
+    accessorKey: "assignee",
+    accessorFn: row => row._addonData_assignee,
     header: "Assignee",
   },
   {
@@ -197,6 +198,7 @@ export const InventoryColumns: ColumnDef<HardwareType>[] = [
   },
   {
     accessorKey: "recoveredFrom",
+    accessorFn: row => row._addonData_recoveredFrom,
     header: "Recovered From",
   },
   {

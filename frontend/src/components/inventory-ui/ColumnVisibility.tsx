@@ -32,6 +32,13 @@ export function ColumnVisibility<TData>({
 }: InventoryFilterProps<TData>) {
 
     const [open, setOpen] = React.useState(false)
+
+    const getColumnLabels: any = (column: any) => {
+      let label = column?.columnDef?.header;
+
+      if(label instanceof Function) label = column?.id.match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g).map((x: any) => x.slice(0, 1).toUpperCase() + x.slice(1)).join(' ');
+      return label
+    }
     
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -65,7 +72,7 @@ export function ColumnVisibility<TData>({
                           (column) =>
                             typeof column.accessorFn !== "undefined" && column.getCanHide()
                         )
-                        .map((column) => {
+                        .map((column: any) => {
                           return (
                             <CommandItem
                                 key={column.id}
@@ -81,7 +88,7 @@ export function ColumnVisibility<TData>({
                                             "opacity-100" : "opacity-0"
                                     )}
                                 />
-                                {column.id}
+                                {getColumnLabels(column)}
                             </CommandItem>
                           )
                       })}
