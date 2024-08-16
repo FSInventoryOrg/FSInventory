@@ -20,7 +20,8 @@ import swaggerDocs from './utils/swagger';
 import { startChangeStream } from './utils/change-stream';
 import path from 'path';
 import { auditAssets } from './utils/common';
-import { convertStatusToStorage, convertStatusToUnaccounted, rotateLogs, setDefaults, softwareExpirationMonitoring } from './system/jobs';
+import { autoMail, convertStatusToStorage, convertStatusToUnaccounted, rotateLogs, setDefaults, softwareExpirationMonitoring } from './system/jobs';
+import autoMailRoutess from './system/automail';
 
 const DEFAULT_PORT = 3000;
 const port = Number(process.env.PORT) || DEFAULT_PORT;
@@ -64,6 +65,7 @@ app.use("/api/download", downloadRoutes)
 app.use("/api/download", downloadRoutes)
 app.use("/api/notification", notificationRoutes)
 app.use("/config", configRoutes)
+app.use("/autoMail", autoMailRoutess)
 
 // Catch-all route for unmatched URLs (place it here)
 if (process.env.NODE_ENV !== 'development') {
@@ -82,7 +84,9 @@ const onStartupJobs = async() => {
   await convertStatusToStorage()
   await convertStatusToUnaccounted()
   await auditAssets();
-  softwareExpirationMonitoring()
+  await autoMail();
+
+  softwareExpirationMonitoring();
 }
 
 onStartupJobs();
