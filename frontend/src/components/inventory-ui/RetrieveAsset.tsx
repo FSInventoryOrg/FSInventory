@@ -219,7 +219,7 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
                 {retrievalPending || updatingEmployee ? (
                   <Spinner size={18} />
                 ) : null}
-                Retrieve {assetData.code}
+                Recover {assetData.code}
               </Button>
             </SheetFooter>
           </form>
