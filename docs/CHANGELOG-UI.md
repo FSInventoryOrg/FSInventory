@@ -1,5 +1,14 @@
 # UI CHANGELOG
 
+### 2024-08-16 [v2.4.23](https://connect.zoho.com/portal/intranet/task/623367000000584055)
+- *New* - Enable Multiple status to be selected in Settings: retrievable/deployable status
+
+### 2024-08-16 [v2.4.22](https://connect.zoho.com/portal/intranet/task/623367000000510432)
+- *Fix* - Need to manually press back button for previous Month and Year for Add new employee start date
+
+### 2024-08-16 [v2.4.21](https://connect.zoho.com/portal/intranet/task/623367000000595253)
+- *Fix* - deploy-recover action in inventory page
+
 ### 2024-08-14 [v2.4.20](https://connect.zoho.com/portal/intranet/task/623367000000597204)
 - *Fix* - Name for assignee in columns does not match in filter (Correcting the labels to Title Case format)
 

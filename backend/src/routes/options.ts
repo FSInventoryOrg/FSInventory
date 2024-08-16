@@ -150,7 +150,7 @@ router.put('/defaults', [
     check("status").optional().isString(),
     check("category").optional().isString(),
     check("equipmentType").optional().isString(),
-    check("deployableStatus").optional().isString(),
+    check("deployableStatus").isArray(),
     check("retrievableStatus").optional().isString(),
     check("inventoryColumns").optional().isArray(),
   ],

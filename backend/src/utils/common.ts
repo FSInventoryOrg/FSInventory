@@ -9,10 +9,11 @@ import mongoose from "mongoose";
 import OTPTransaction from "../models/otptransactions.schema";
 import bcrypt from 'bcryptjs'
 import Option from "../models/options.schema";
+import excel from 'exceljs'
 
 const directory = path.join(path.resolve(), '../');
 
-export const saveFile = async (folder: string, filename: string, src: string) => {
+export const saveFile = async (folder: string, filename: string, src: any, fullDirectory?: boolean) => {
     const splitFolder = folder.split('/').filter(f => { return f });
 
     let tmpFolder = `${directory}`;
@@ -23,9 +24,12 @@ export const saveFile = async (folder: string, filename: string, src: string) =>
     })
 
     tmpFolder += `/${filename}`;
-    writeFileSync(tmpFolder, src, 'base64');
+    if(src instanceof String) writeFileSync(tmpFolder, `${src}`, 'base64');
+    else writeFileSync(tmpFolder, src);
 
-    return tmpFolder.replace(directory, '');
+    chmodSync(tmpFolder, 0o777)
+
+    return fullDirectory ? tmpFolder.replace(/\/\//g,'/') : tmpFolder.replace(directory, '');
 }
 
 export const getFile = async (filepath: string) => {
@@ -263,5 +267,102 @@ export const compareHash = async (hashed: string, unhashed: string) => {
 export const fetchExternalSource = async (url: string, headers: any) => {
     return await new Promise((resolve, reject) => {
         fetch(url, headers).then(response => response.json()).then(data => resolve(data)).catch(err => reject())
+    })
+}
+
+export const createExcelTable = async (source: any, reportTemplate: any) => {
+    return await new Promise((resolve, reject) => {
+        try {
+            const viewDetails = reportTemplate;
+
+            const filename: any = viewDetails['filename'];
+            const base_font: any = viewDetails['font'];
+            const base_fill: any = viewDetails['fill'];
+            const header_font: any = viewDetails['header_font'];
+            const header_fill: any = viewDetails['header_fill'];
+            const creator: any = viewDetails['creator'];
+            const columnDef: any = viewDetails['columnDef']
+
+            let Workbook = new excel.Workbook()
+            Workbook.title = filename;
+            Workbook.creator = `${creator}`;
+            Workbook.lastModifiedBy = `${creator}`;
+            Workbook.created = new Date();
+            Workbook.modified = new Date();
+            Workbook.lastPrinted = new Date();
+            Workbook.calcProperties.fullCalcOnLoad = true;
+            Workbook.addWorksheet(filename);
+
+            const Worksheet: any = Workbook.getWorksheet(filename);
+            Worksheet.views = [
+                {
+                    state: 'frozen',
+                    ySplit: 1
+                }
+            ]
+            Worksheet.autoFilter = {
+                from: {
+                    row: 1,
+                    column: 1
+                },
+                to: {
+                    row: 1,
+                    column: columnDef.length
+                }
+            }
+            Worksheet.columns = columnDef.map((f: any) => { return f['definition'] })
+
+            const orderHeader = columnDef.map((f: any) => { return f['definition'] }).map((f: any) => { return f['key'] });
+
+            source.forEach((data: any) => {
+                let values: any = [];
+
+                orderHeader.forEach((key: any) => { values.push(data[key] ? data[key] : '') })
+
+                Worksheet.addRow(values)
+            })
+
+            Worksheet.columns.forEach((col: any, colIndex: number) => {
+                const header = col.key
+
+                const settings: any = columnDef[colIndex]['settings']
+                const type = settings.type;
+                const format = settings.format;
+                const width = settings.width;
+                const fill = settings.fill;
+                const font = settings.font;
+
+                let maxColumnWidth = 10;
+
+                col.font = font ? font : base_font;
+                col.fill = fill ? fill : base_fill;
+
+                col.eachCell((cell: any, i: number) => {
+                    if (i === 1) {
+                        cell.font = header_font
+                        cell.fill = header_fill
+
+                        if (format) Worksheet.getColumn(header).numFmt = format
+                    } else {
+                        if (type === 'date' && cell.value) cell.value = new Date(cell.value)
+                        else if (type === 'number') cell.value = +cell.value
+                    }
+
+                    cell.style.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+
+                    if (!width) {
+                        if (cell.value) maxColumnWidth = cell.value.toString().length > maxColumnWidth ? cell.value.toString().length : maxColumnWidth
+                    } else maxColumnWidth = width
+                })
+
+                col.width = maxColumnWidth + 5;
+            })
+
+            Workbook.xlsx.writeBuffer().then((buffer: any) => {
+                resolve(buffer)
+            })
+        } catch (err) {
+            reject(null)
+        }
     })
 }

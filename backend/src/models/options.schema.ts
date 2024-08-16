@@ -15,7 +15,7 @@ export type Defaults = {
   status?: string;
   category?: string;
   equipmentType?: string;
-  deployableStatus?: string;
+  deployableStatus?: string[];
   retrievableStatus?: string;
   inventoryColumns?: string[];
 }
@@ -50,14 +50,17 @@ const optionsSchema: Schema<OptionsType> = new Schema<OptionsType>({
       status: { type: String, required: false }, 
       category: { type: String, required: false },
       equipmentType: { type: String, required: false },
-      deployableStatus: { type: String, required: false },
-      retrievableStatus: { type: String, required: false },
+      deployableStatus: { type: [String], required: true },
+      retrievableStatus: { type: String, required: true },
       inventoryColumns: { type: [String], required: false },
     }, 
   },
   adminLists: { type: [String], required: false}
 });
-
+// deployableStatus: { type: [String], required: true },
+//       retrievableStatus: { type: [String], required: true },
+// deployableStatus: { type: String, required: false },
+//       retrievableStatus: { type: String, required: false },
 const Option = mongoose.model<OptionsType>("Options", optionsSchema);
 
 export default Option;

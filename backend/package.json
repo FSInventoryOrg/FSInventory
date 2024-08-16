@@ -1,6 +1,6 @@
 {
   "name": "stockpilot-backend",
-  "version": "2.4.7",
+  "version": "2.4.9",
   "main": "./src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,10 +11,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "adm-zip": "^0.5.15",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
     "express": "^4.18.3",
     "express-validator": "^7.0.1",
     "jsonwebtoken": "^9.0.2",
