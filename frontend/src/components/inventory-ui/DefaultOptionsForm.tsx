@@ -19,6 +19,7 @@ import { ColorOption, TagOption } from "./Options";
 import * as imsService from '@/ims-service'
 import { useQuery } from "@tanstack/react-query";
 import { InventorySettingsFormData } from "@/schemas/InventorySettingsSchema";
+import StatusMultiSelect from './StatusMultiSelect';
 
 const DefaultOptionsForm = () => {
   const { control } = useFormContext<InventorySettingsFormData>();
@@ -195,56 +196,30 @@ const DefaultOptionsForm = () => {
       />
       <FormField
         control={control}
-        name="deployableStatus"
+        name='deployableStatus'
         render={({ field }) => (
-          <FormItem className="pb-2">
-            <FormLabel className="font-medium">
-              Status for deployable assets
+          <FormItem className='pb-2'>
+            <FormLabel className='font-medium'>
+              Statuses for deployable assets
             </FormLabel>
+            <FormControl>
             <div className="flex md:w-2/3 gap-1">
-              {!(
-                isStatusDataLoading ||
-                isCategoryDataLoading ||
-                isEquipmentTypeDataLoading
-              ) ? (
-                <Select
-                  disabled={isStatusDataLoading}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status for deployable assets" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem
-                      value={'-'}
-                      className="w-full text-accent-foreground"
-                    >
-                      -
-                    </SelectItem>
-                    {statusData &&
-                      statusData.map((status: ColorOption) => (
-                        <SelectItem
-                          key={status.value}
-                          value={status.value}
-                          className="w-full"
-                        >
-                          {status.value}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <div className="h-10 w-full border rounded-md" />
+              {statusData && (
+                <StatusMultiSelect
+                  type='deployable'
+                  options={statusData.filter(option=>option.value!=='Deployed')}
+                  selected={field.value}
+                  onChange={field.onChange}
+                  placeholder="Select statuses..."
+                />
               )}
-            </div>
+              </div>
+            </FormControl>
+            <FormMessage />
             <FormDescription>
-              This status signifies assets that are in storage and can be
+              These statuses signify assets that can be
               deployed.
             </FormDescription>
-            <FormMessage />
           </FormItem>
         )}
       />
@@ -263,7 +238,7 @@ const DefaultOptionsForm = () => {
                 isEquipmentTypeDataLoading
               ) ? (
                 <Select
-                  disabled={isStatusDataLoading}
+                  disabled
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >

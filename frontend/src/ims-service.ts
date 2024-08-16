@@ -336,6 +336,15 @@ export const fetchOptionValues = async (property: string) => {
       throw new Error(responseBody.message || `Failed to fetch ${property}`);
     }
 
+    if (property === 'defaults') {
+      if (responseBody.value) {
+        responseBody.value.retrievableStatus = 'Deployed'
+        if (!(responseBody.value.deployableStatus || []).includes('IT Storage')) {
+          responseBody.value.deployableStatus = [...(responseBody.value.deployableStatus || []), 'IT Storage']
+        }
+      }
+    }
+
     return responseBody.value;
   } catch (error) {
     console.error('Error fetching option value:', error);
