@@ -7,9 +7,8 @@ import { Button } from "@/components/ui/button";
 import { HardwareType } from "@/types/asset";
 import ActionCell from './InventoryAction';
 import StatusBadge from "./StatusBadge";
-import RetrieveAsset from "./RetrieveAsset";
-import DeployAsset from "./DeployAsset";
 import AssetCode from './AssetCode';
+import DeployRetrieveAsset from "./DeployRetrieveAsset";
 
 export const InventoryColumns: ColumnDef<HardwareType>[] = [
   {
@@ -226,15 +225,7 @@ export const InventoryColumns: ColumnDef<HardwareType>[] = [
   },
   {
     id: "deployment",
-    cell: ({ row }) => {
-      if (row.original.status === 'Deployed') {
-        return <RetrieveAsset assetData={row.original} />
-      } else if (row.original.status === 'IT Storage') {
-        return <DeployAsset assetData={row.original} />
-      } else {
-        return <></>
-      }
-    }
+    cell: ({row}) => <DeployRetrieveAsset assetData={row.original} />
   },
   {
     id: "actions",
