@@ -1,6 +1,9 @@
 # BACKEND CHANGELOG
 
-### 2024-08-14 [v2.4.8](https://connect.zoho.com/portal/intranet/task/623367000000584055)
+### 2024-08-16 [v2.4.9](https://connect.zoho.com/portal/intranet/task/623367000000597248)
+- *New* - Automated Email Report feature
+
+### 2024-08-16 [v2.4.8](https://connect.zoho.com/portal/intranet/task/623367000000584055)
 - *Fix* - Enable Multiple status to be selected in Settings: retrievable/deployable status ( changing the schema affected on this feature)
 
 ### 2024-08-14 [v2.4.7](https://connect.zoho.com/portal/intranet/task/623367000000570055)

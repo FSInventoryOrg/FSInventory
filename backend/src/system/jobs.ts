@@ -7,6 +7,7 @@ import User from "../models/user.schema";
 import Employee from "../models/employee.schema";
 import Software from "../models/software.schema";
 import { triggerNotif } from "../utils/common";
+import { renewAutoMailingActivation } from "./automail";
 
 export const rotateLogs = async () => {
     const conn = await MongoClient.connect(process.env.MONGODB_CONNECTION_STRING as string);
@@ -158,4 +159,8 @@ export const softwareExpirationMonitoring = async () => {
 
     console.log('Software Expiration Monitoring has been instantiated');
     setTimeout(() => { softwareExpirationMonitoring() }, repeatTime)
+}
+
+export const autoMail = async() => {
+    await renewAutoMailingActivation()
 }
