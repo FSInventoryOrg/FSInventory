@@ -4,8 +4,8 @@ export const InventorySettingsSchema = z.object({
   status: z.string().trim().optional(),
   category: z.string().trim().optional(),
   equipmentType: z.string().trim().optional(),
-  deployableStatus: z.string().trim().optional(),
-  retrievableStatus: z.string().trim().optional(),
+  deployableStatus: z.array(z.string()).min(1, 'Select at least 1 deployable status'),
+  retrievableStatus: z.string().trim(),
   inventoryColumns: z.array(z.string().trim()).optional(),
 });
 

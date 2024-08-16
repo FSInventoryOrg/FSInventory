@@ -17,7 +17,7 @@ const DeployRetrieveAsset = ({ assetData }: DeployRetrieveAssetProps) => {
   })
 
   if(isFetched) {
-    if(assetData.status === defaultOptions?.deployableStatus) {
+    if((defaultOptions?.deployableStatus||[]).includes(assetData.status)) {
       return <DeployAsset assetData={assetData} />
     } else if(assetData.status === defaultOptions?.retrievableStatus) {
       return <RetrieveAsset assetData={assetData} />

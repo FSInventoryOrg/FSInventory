@@ -25,8 +25,8 @@ const InventorySettingsForm = ({ defaults }: { defaults: Defaults }) => {
       status: defaults.status,
       category: defaults.category,
       equipmentType: defaults.equipmentType,
-      deployableStatus: defaults.deployableStatus,
-      retrievableStatus: defaults.retrievableStatus,
+      deployableStatus: defaults.deployableStatus ?? 'Deployed',
+      retrievableStatus: defaults.retrievableStatus ?? ['IT Storage'],
       inventoryColumns: defaults.inventoryColumns,
     }
   })
@@ -43,7 +43,7 @@ const InventorySettingsForm = ({ defaults }: { defaults: Defaults }) => {
   });
 
   const onSubmit = (data: z.infer<typeof InventorySettingsSchema>) => {
-    const settingsData: Record<string, string | string[] | undefined> = { 
+    const settingsData: any = { 
       ...data,
       inventoryColumns: selectedTags,
     };

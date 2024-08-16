@@ -281,7 +281,6 @@ router.put('/retrieve/:code', [
       if (existingAsset.status !== 'Deployed') {
         return res.status(400).json({ message: 'This asset is not deployed' });
       }
-      data.status = 'IT Storage'
 
       const currentUser = await User.findOne({ _id: decodedToken.userId });
       data.updated = new Date()

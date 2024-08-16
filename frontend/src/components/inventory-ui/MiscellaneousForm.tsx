@@ -42,10 +42,10 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
   defaults,
   mode = 'new',
 }) => {
-  const { control, getValues, unregister } = useFormContext<AssetFormData>();
+  const { control, watch, unregister } = useFormContext<AssetFormData>();
   const [openDeploymentDate, setOpenDeploymentDate] = useState(false);
   const [openRecoveryDate, setOpenRecoveryDate] = useState(false);
-  const status = getValues('status');
+  const status = watch('status');
   const isRetrievable = status && status === defaults?.retrievableStatus;
 
   useEffect(() => {

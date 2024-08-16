@@ -42,7 +42,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as imsService from '@/ims-service';
 import { Button } from '../ui/button';
 import { PROPERTIES } from '@/lib/data';
-import { Defaults } from '@/types/options';
 import { Download } from '@phosphor-icons/react';
 import { exportToExcel } from '@/lib/utils';
 import BulkDelete from './BulkDelete';
@@ -60,7 +59,7 @@ declare module '@tanstack/table-core' {
 interface InventoryTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  defaultOptions: Defaults;
+  defaultOptions: any;
   DEFAULT_HIDDEN_COLUMNS: string[];
   onToggleFilters: (visible: boolean) => void;
   isFiltersVisible: boolean;
