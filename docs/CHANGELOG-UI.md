@@ -1,4 +1,6 @@
 # UI CHANGELOG
+### 2024-08-20 [v2.5.1](https://connect.zoho.com/portal/intranet/task/623367000000601071)
+- *Fix* - Loading screen when signing up with Zoho
 
 ### 2024-08-20 [v2.5.0](https://connect.zoho.com/portal/intranet/task/623367000000510432)
 - *Fix* - Datepicker dropdown not doing anything after selecting different month/year
