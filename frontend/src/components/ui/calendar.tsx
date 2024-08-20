@@ -20,12 +20,12 @@ const CustomDropdown = (props: DropdownProps) => {
   );
 
   const handleValueChange = (value: string) => {
-    const handleChange = props.onChange?.name;
+    const label = props['aria-label']?.toLocaleLowerCase();
     const newMonth = new Date(currentMonth);
 
-    if (handleChange === 'handleMonthChange') {
+    if (label?.includes('month')) {
       newMonth.setMonth(Number(value));
-    } else if (handleChange === 'handleYearChange') {
+    } else if (label?.includes('year')) {
       newMonth.setFullYear(Number(value));
     }
     goToMonth(newMonth);
