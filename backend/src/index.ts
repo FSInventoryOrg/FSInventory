@@ -34,7 +34,6 @@ const db = mongoose.connection;
 
 db.on('connected', () => {
   logger.info('Connected to MongoDB');
-  setDBGlobal(db)
 });
 
 db.on('error', (err) => {
