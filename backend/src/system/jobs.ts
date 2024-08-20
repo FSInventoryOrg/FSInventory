@@ -20,7 +20,7 @@ export const rotateLogs = async () => {
 }
 
 export const convertStatusToStorage = async () => {
-    const statusToChange = ['ITS Storage']
+    const statusToChange = ['ITS Storage', 'Shelved']
 
     await Hardware.updateMany({ status: { $in: statusToChange } }, { status: 'IT Storage' })
 }

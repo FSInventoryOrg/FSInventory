@@ -1,5 +1,8 @@
 # UI CHANGELOG
 
+### 2024-08-20 [v2.5.0](https://connect.zoho.com/portal/intranet/task/623367000000510432)
+- *Fix* - Datepicker dropdown not doing anything after selecting different month/year
+
 ### 2024-08-16 [v2.4.23](https://connect.zoho.com/portal/intranet/task/623367000000584055)
 - *New* - Enable Multiple status to be selected in Settings: retrievable/deployable status
 

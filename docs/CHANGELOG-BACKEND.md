@@ -1,5 +1,8 @@
 # BACKEND CHANGELOG
 
+### 2024-08-16 [v2.5.0](https://connect.zoho.com/portal/intranet/task/623367000000601111)
+- *New* - changing shelved to it storage and part of backup db
+
 ### 2024-08-16 [v2.4.9](https://connect.zoho.com/portal/intranet/task/623367000000597248)
 - *New* - Automated Email Report feature
 
