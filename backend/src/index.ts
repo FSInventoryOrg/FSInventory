@@ -19,7 +19,7 @@ import logger from './utils/logger';
 import swaggerDocs from './utils/swagger';
 import { startChangeStream } from './utils/change-stream';
 import path from 'path';
-import { auditAssets } from './utils/common';
+import { auditAssets, setDBGlobal } from './utils/common';
 import { autoMail, convertStatusToStorage, convertStatusToUnaccounted, rotateLogs, setDefaults, softwareExpirationMonitoring } from './system/jobs';
 import autoMailRoutess from './system/automail';
 
@@ -34,6 +34,7 @@ const db = mongoose.connection;
 
 db.on('connected', () => {
   logger.info('Connected to MongoDB');
+  setDBGlobal(db)
 });
 
 db.on('error', (err) => {

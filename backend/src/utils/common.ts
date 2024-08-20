@@ -5,13 +5,17 @@ import AssetCounter from "../models/asset-counter.schema";
 import Asset from "../models/asset.schema";
 import Notification, { NotificationType } from "../models/notification.schema";
 import User from "../models/user.schema";
-import mongoose from "mongoose";
+import mongoose, { Connection } from "mongoose";
 import OTPTransaction from "../models/otptransactions.schema";
 import bcrypt from 'bcryptjs'
 import Option from "../models/options.schema";
 import excel from 'exceljs'
 
 const directory = path.join(path.resolve(), '../');
+
+let DBCONN: any;
+
+export const setDBGlobal = async (dbconn: Connection) => { DBCONN = dbconn }
 
 export const saveFile = async (folder: string, filename: string, src: any, fullDirectory?: boolean) => {
     const splitFolder = folder.split('/').filter(f => { return f });
@@ -54,7 +58,7 @@ export const setFSEnvironment = async (data: any) => {
     try {
         let tmp: any = readFileSync(location).toString().split('\n');
 
-        environment = tmp.reduce((accum: any, value: any, index: number) => {
+        environment = tmp.reduce((accum: any, value: any, _index: number) => {
             let splitVal = value.split('=');
 
             accum[splitVal[0].trim()] = splitVal[1].trim();
@@ -266,7 +270,7 @@ export const compareHash = async (hashed: string, unhashed: string) => {
 
 export const fetchExternalSource = async (url: string, headers: any) => {
     return await new Promise((resolve, reject) => {
-        fetch(url, headers).then(response => response.json()).then(data => resolve(data)).catch(err => reject())
+        fetch(url, headers).then(response => response.json()).then(data => resolve(data)).catch(_err => reject())
     })
 }
 
@@ -365,4 +369,15 @@ export const createExcelTable = async (source: any, reportTemplate: any) => {
             reject(null)
         }
     })
+}
+
+export const createBackup = async () => {
+    const connection = DBCONN.db
+    const collections = await connection.listCollections().toArray();
+
+    console.log(collections)
+}
+
+export const restoreBackup = async (_filepath: string) => {
+
 }
