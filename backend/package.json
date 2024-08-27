@@ -1,6 +1,6 @@
 {
   "name": "stockpilot-backend",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "main": "./src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -27,6 +27,7 @@
     "winston": "^3.12.0"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.5",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
