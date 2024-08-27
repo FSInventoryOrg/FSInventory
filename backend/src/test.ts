@@ -4,6 +4,7 @@ import Employee from "./models/employee.schema";
 import { AutoMailReportTemplate } from "./reports-template/auto-mail-report";
 import { createExcelTable, saveFile } from "./utils/common";
 import { sendMail } from "./system/mailer";
+import { extractDocuments } from "./system/backup";
 
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string);
 const db = mongoose.connection;
@@ -45,11 +46,12 @@ const activateAutoMailing = async () => {
     let excelTable = await createExcelTable(source, AutoMailReportTemplate)
 
     const filePath = await saveFile('/public/attachments', 'Assets.xlsx', excelTable, true);
+    const backupFile = await extractDocuments();
     await sendMail({
-        subject: 'Full Scale Stockpilot: Inventory Report (Date Generated Month-Day-Year)', 
+        subject: 'IMS Test', 
         htmlMessage: `Hi Reynand this is a test`, 
         recipient: ['rhnaney@gmail.com'],
-        attachments: [filePath]
+        attachments: [filePath, backupFile]
       })
       
     console.log('Done processsing')
