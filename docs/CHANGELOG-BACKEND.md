@@ -1,5 +1,9 @@
 # BACKEND CHANGELOG
 
+### 2024-08-27 [v2.5.2](https://connect.zoho.com/portal/intranet/task/623367000000590081)
+- *New* - Automated Email Report: Email content (html format only)
+- *New* - integration with excel and backup
+
 ### 2024-08-27 [v2.5.1](https://connect.zoho.com/portal/intranet/task/623367000000597034)
 - *New* - adding backup feature
 
