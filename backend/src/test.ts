@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
 import Asset from "./models/asset.schema";
 import Employee from "./models/employee.schema";
-import { AutoMailReportTemplate } from "./reports-template/auto-mail-report";
+import { AutoMailReportTemplate } from "./reports-template/mail/auto-mail-report";
 import { createExcelTable, saveFile } from "./utils/common";
 import { sendMail } from "./system/mailer";
 import { extractDocuments } from "./system/backup";
+import { inventoryReportHtml } from "./reports-template/mail/reports";
 
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string);
 const db = mongoose.connection;
@@ -47,9 +48,10 @@ const activateAutoMailing = async () => {
 
     const filePath = await saveFile('/public/attachments', 'Assets.xlsx', excelTable, true);
     const backupFile = await extractDocuments();
+    const htmlMessage = await inventoryReportHtml();
     await sendMail({
         subject: 'IMS Test', 
-        htmlMessage: `Hi Reynand this is a test`, 
+        htmlMessage: htmlMessage, 
         recipient: ['rhnaney@gmail.com'],
         attachments: [filePath, backupFile]
       })

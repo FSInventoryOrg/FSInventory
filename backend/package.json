@@ -1,6 +1,6 @@
 {
   "name": "stockpilot-backend",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "main": "./src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -19,6 +19,7 @@
     "exceljs": "^4.4.0",
     "express": "^4.18.3",
     "express-validator": "^7.0.1",
+    "handlebars": "^4.7.8",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.4.0",
     "mongoose": "^8.2.0",
