@@ -1,5 +1,4 @@
 import { exec } from "child_process";
-import { createReadStream } from "fs";
 
 var ACCESS_TOKEN = "";
 var ACCOUNTID = "";
@@ -62,35 +61,6 @@ const checkAccount = async() => {
     }
 }
 
-const updateAccount = async() => {
-    try {
-        return await new Promise((resolve, reject) => {
-            let urlToUsed = `https://mail.zoho.com/api/accounts/${ACCOUNTID}`;
-
-            fetch(urlToUsed, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Zoho-oauthtoken ${ACCESS_TOKEN}`
-                },
-                method: 'PUT',
-                body: JSON.stringify({
-                    "mode": 'displaynameemailupdate',
-                        "emailAddress": sender,
-                        "displayName": "FS IMS Mailer"
-                })
-            }).then(response => response.json()).then(async(data: any) => {
-                console.log(data)
-                resolve(true)
-            }).catch(async(err) => {
-                reject(false);
-            })
-        })
-    } catch(err) {
-        return false;
-    }
-}
-
 const generateToken = async() => {
     try {
         return await new Promise((resolve, reject) => {
@@ -140,7 +110,6 @@ export const sendMail = async (config: any) => {
     try{
         await checkToken();
         await checkAccount();
-        // return await updateAccount();
 
         if(!ACCESS_TOKEN) {
             console.log('Could not generate a new token')
@@ -184,7 +153,7 @@ export const sendMail = async (config: any) => {
                             else reject(null)
                         } catch(errorHandling) { reject(null)}
                     } else reject(null)
-                    resolve(true)
+                    
                 })
             })
         }

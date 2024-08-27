@@ -615,7 +615,7 @@ export const oauthLogin = async () => {
   }
 
   const responseBody = await response.json();
-
+  
   window.location.href = responseBody['url']
 };
 
@@ -625,6 +625,7 @@ export const verifyOAuthCode = async (code: string) => {
     headers: {
       'Content-Type': 'application/json'
     },
+    credentials: 'include',
     body: JSON.stringify({code: code})
   });
 

@@ -19,9 +19,10 @@ import logger from './utils/logger';
 import swaggerDocs from './utils/swagger';
 import { startChangeStream } from './utils/change-stream';
 import path from 'path';
-import { auditAssets, setDBGlobal } from './utils/common';
+import { auditAssets } from './utils/common';
 import { autoMail, convertStatusToStorage, convertStatusToUnaccounted, rotateLogs, setDefaults, softwareExpirationMonitoring } from './system/jobs';
 import autoMailRoutess from './system/automail';
+import { extractDocuments, listCollection } from './system/backup';
 
 const DEFAULT_PORT = 3000;
 const port = Number(process.env.PORT) || DEFAULT_PORT;
@@ -85,7 +86,8 @@ const onStartupJobs = async() => {
   await convertStatusToUnaccounted()
   await auditAssets();
   await autoMail();
-
+  await listCollection();
+  
   softwareExpirationMonitoring();
 }
 

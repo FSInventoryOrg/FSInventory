@@ -1,8 +1,6 @@
-
-
 const Loading = () => {
   return (
-    <div></div>
+    <div className='preloader'></div>
   )
 }
 
