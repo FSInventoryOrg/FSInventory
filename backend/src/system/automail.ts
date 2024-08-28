@@ -94,6 +94,12 @@ const nextRollComputatuion = (doc: AutoMailType, referenceDate?: Date) => {
         timeConstraint = new Date(timeConstraint.getTime() + weekDiff);
         timeConstraint = new Date(new Date(`${timeConstraint.toISOString().split('T')[0]}T${doc['time']}:00.000Z`).getTime() - 28800000)
         if (timeConstraint < dateNow) timeConstraint = new Date(timeConstraint.getTime() + 604800000)
+    } else if (doc['frequency'] === 'Bi-Weekly') {
+        let weekDiff = (doc['weekday'] - timeConstraint.getDay()) * 86400000;
+
+        timeConstraint = new Date(timeConstraint.getTime() + weekDiff);
+        timeConstraint = new Date(new Date(`${timeConstraint.toISOString().split('T')[0]}T${doc['time']}:00.000Z`).getTime() - 28800000)
+        if (timeConstraint < dateNow) timeConstraint = new Date(timeConstraint.getTime() + 1209600000)
     } else if (doc['frequency'] === 'Monthly') {
         let _y = timeConstraint.getFullYear();
         let _m = timeConstraint.getMonth() + 1;
@@ -129,7 +135,10 @@ export const renewAutoMailingActivation = async () => {
         console.log('Auto genereated report will roll out on', new Date(new Date(newData['nextRoll']).getTime() + 28800000).toLocaleString('en-PH'));
 
         activationTimeout = setTimeout(async () => {
+            const rollOut = new Date()
             await activateAutoMailing(newData);
+            await AutoMail.updateOne({ _id: idToUsed }, {lastRollOut: rollOut}, { upsert: true })
+            
             renewAutoMailingActivation();
         }, timeout)
     }
@@ -159,7 +168,9 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
             contact: doc['contact'],
         }
 
-        let existingSettings: any = await AutoMail.findOne({})
+        let existingSettings: any = await AutoMail.aggregate().match({});
+
+        existingSettings = existingSettings ? existingSettings[0] : null
 
         let idToUsed = existingSettings ? existingSettings._id : new mongoose.Types.ObjectId();
 
