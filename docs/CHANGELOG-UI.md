@@ -1,4 +1,14 @@
 # UI CHANGELOG
+
+### 2024-08-28 [v2.5.4](https://connect.zoho.com/portal/intranet/task/623367000000597079)
+- *New* - Settings: Recipient of email report
+
+### 2024-08-28 [v2.5.3](https://connect.zoho.com/portal/intranet/task/623367000000599090)
+- *New* - Settings: Contact person for email
+
+### 2024-08-28 [v2.5.2](https://connect.zoho.com/portal/intranet/task/623367000000595540)
+- *Fix* - Changing status in Edit Asset doesn't update the asset history
+
 ### 2024-08-20 [v2.5.1](https://connect.zoho.com/portal/intranet/task/623367000000601071)
 - *Fix* - Loading screen when signing up with Zoho
 

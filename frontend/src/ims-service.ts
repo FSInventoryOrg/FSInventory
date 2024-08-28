@@ -6,6 +6,7 @@ import { AssetsHistory } from "./types/employee";
 import { Defaults } from "./types/options";
 import { UserData } from "./schemas/UserSchema";
 import { UploadImage } from "./types/user";
+import { AutoMailType } from "@/types/automail";
 import { AssetCounterFormData } from "./schemas/AssetCounterSchema";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -655,3 +656,33 @@ export const bulkDeleteAssets = async (assetCodes: string[]) => {
 
   return true;
 }
+
+export const fetchAutoMailSettings = async () => {
+  const response = await fetch(`${API_BASE_URL}/autoMail`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Error fetching notifications');
+  }
+
+  return response.json();
+};
+
+export const postAutoMailSettings = async (data: AutoMailType) => {
+  const response = await fetch(`${API_BASE_URL}/autoMail`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message);
+  }
+
+  return response.json();
+};

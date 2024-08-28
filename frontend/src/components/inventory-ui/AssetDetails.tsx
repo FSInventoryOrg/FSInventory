@@ -171,7 +171,7 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
                 const deploymentDateObj = record.deploymentDate ? new Date(record.deploymentDate) : null;
                 const recoveryDateObj = record.recoveryDate ? new Date(record.recoveryDate) : null;
 
-                const diffInMs = recoveryDateObj ? recoveryDateObj.getTime() - (deploymentDateObj?.getTime() ?? 0) : null;
+                const diffInMs = recoveryDateObj && deploymentDateObj ? recoveryDateObj.getTime() - (deploymentDateObj?.getTime() ?? 0) : null;
 
                 // Calculate duration if recoveryDate is defined, otherwise set duration as null
                 const duration = diffInMs !== null ? calculateDuration(diffInMs) : null;
@@ -199,7 +199,7 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
                       {/* Render deployment and recovery dates */}
                       <div className='flex gap-2 px-2'>
                         <div className='w-full flex gap-2 text-xs text-accent-foreground'>
-                          <span>{deploymentDateObj ? deploymentDateObj.toDateString() : ''}</span>
+                          <span>{deploymentDateObj ? deploymentDateObj.toDateString() : 'null'}</span>
                           -
                           <span>{recoveryDateObj ? recoveryDateObj.toDateString() : 'Present'}</span> {/* Display "Present" if recoveryDate is undefined */}
                         </div>

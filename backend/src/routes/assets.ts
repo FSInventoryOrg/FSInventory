@@ -149,10 +149,7 @@ router.post('/', [
           }
           if (!Array.isArray(data['deploymentHistory'])) data['deploymentHistory'] = [recovery]
           else {
-            const findIndex = data['deploymentHistory'].findIndex((f: any) => { return f['assignee'] === data['recoveredFrom']})
-
-            if(findIndex > -1) data['deploymentHistory'][findIndex] = {...data['deploymentHistory'][findIndex], ...recovery}
-            else data['deploymentHistory'].push(recovery)
+             data['deploymentHistory'].push(recovery)
           }
         }
 
@@ -447,22 +444,30 @@ router.put('/:code', [
         if (!Array.isArray(depHist)) depHist = [];
         else depHist = depHist.reverse();
 
-        const recoveryProcess = () => {
-          if(existingAsset['assignee']) {
-            const findIndex = depHist.findIndex((f: any) => { return f['assignee'] === existingAsset['assignee'] })
+        const recoveryProcess = (assignee :string, recoveryDate?: Date, deploymentDate?: Date) => {
+          if(assignee) {
+            const findIndex = depHist.findIndex((f: any) => { return f['assignee'] === assignee })
             const recovery = {
-              assignee: existingAsset['assignee'],
-              recoveryDate: data['recoveryDate'] ? data['recoveryDate'] : new Date()
+              assignee,
+              recoveryDate: recoveryDate ?? new Date()
             }
-            if (findIndex > -1) depHist[findIndex] = { ...depHist[findIndex], ...recovery }
-            else depHist.unshift(recovery)
+            // Update recovery fields
+            data.recoveredFrom = recovery.assignee
+            data.recoveryDate = recovery.recoveryDate
+            
+            if (findIndex == 0) depHist[findIndex] = { ...depHist[findIndex].toObject(), ...recovery }
+            else {
+              depHist.unshift({...recovery,  deploymentDate: deploymentDate ?? null})
+            }
           }
         }
 
         if(data['assignee']) {
+          // If 'Assignee' is filled in, deploy the asset to assignee
           data['status'] = "Deployed";
           if(data['assignee'] !== existingAsset['assignee']) {
-            recoveryProcess();
+            // Recover asset from old assignee and deploy to new assignee
+            recoveryProcess(existingAsset['assignee'], new Date(), existingAsset['deploymentDate']);
             const deploy = {
               assignee: data['assignee'],
               deploymentDate: data['deploymentDate'] ? data['deploymentDate'] : new Date()
@@ -470,21 +475,25 @@ router.put('/:code', [
             depHist.unshift(deploy)
           }
         } else if(data['status'] === 'Deployed' && !data['assignee']) {
+          // Recover asset from current assignee if 'Assignee' field is left blank and status is 'Deployed'
           data['status'] = "IT Storage";
-          if(data['assignee'] !== existingAsset['assignee']) recoveryProcess()
-        }
-
-        if(data['recoveredFrom']) {
-          if(data['recoveredFrom'] !== existingAsset['recoveredFrom']) {
-            const findIndex = depHist.findIndex((f: any) => { return f['assignee'] === data['recoveredFrom'] })
-            const recovery = {
-              assignee: data['recoveredFrom'],
-              recoveryDate: data['recoveryDate'] ? data['recoveryDate'] : new Date()
-            }
-            if (findIndex > -1) depHist[findIndex] = { ...depHist[findIndex], ...recovery }
-            else depHist.unshift(recovery)
+          if(data['assignee'] !== existingAsset['assignee']) {
+            recoveryProcess(existingAsset['assignee'],  new Date(), existingAsset['deploymentDate'])
           }
         }
+
+        const recoveredFrom = data['recoveredFrom']
+        const recoveryDate = data['recoveryDate']
+        if (existingAsset['status'] === 'Deployed' && existingAsset['status'] !== data['status']) {
+          // Recover asset from current assignee if status is changed from 'Deployed'
+            recoveryProcess(existingAsset['assignee'], new Date(), existingAsset['deploymentDate']) 
+        }
+  
+        // If 'Recovered From' is filled in, recover asset from that assignee regardless of asset status
+        if(recoveredFrom && recoveredFrom !== existingAsset['recoveredFrom']) {
+          recoveryProcess(recoveredFrom, recoveryDate)
+        }
+        
 
         depHist = depHist.reverse();
 

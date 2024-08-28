@@ -20,7 +20,7 @@ import swaggerDocs from './utils/swagger';
 import { startChangeStream } from './utils/change-stream';
 import path from 'path';
 import { auditAssets } from './utils/common';
-import { autoMail, convertStatusToStorage, convertStatusToUnaccounted, rotateLogs, setDefaults, softwareExpirationMonitoring } from './system/jobs';
+import { autoMail, convertStatusToStorage, convertStatusToUnaccounted, removeStatus, rotateLogs, setDefaults, softwareExpirationMonitoring } from './system/jobs';
 import autoMailRoutess from './system/automail';
 import { extractDocuments, listCollection } from './system/backup';
 
@@ -81,6 +81,7 @@ if (process.env.NODE_ENV !== 'development') {
 
 const onStartupJobs = async() => {
   rotateLogs()
+  await removeStatus();
   await setDefaults();
   await convertStatusToStorage()
   await convertStatusToUnaccounted()
