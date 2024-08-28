@@ -124,18 +124,6 @@ export const sendMail = async (config: any) => {
             display_name: senderName
         }
 
-        if (config.attachments) {
-            let newAttachment: any = []
-
-            for (let i = 0; i < config.attachments.length; i++) {
-                const attachmentData = await sendAttachment(config.attachments[i]);
-
-                if (attachmentData) newAttachment.push(attachmentData)
-            }
-
-            if (newAttachment.length > 0) finalConfig['attachments'] = newAttachment
-        }
-
         const sendingMails = async (mailData: any) => {
             return await new Promise((resolve, reject) => {
                 let curlCMD = `curl -X POST https://mail.zoho.com/api/accounts/${ACCOUNTID}/messages`;
@@ -153,7 +141,6 @@ export const sendMail = async (config: any) => {
                             else reject(null)
                         } catch(errorHandling) { reject(null)}
                     } else reject(null)
-                    
                 })
             })
         }
@@ -167,7 +154,14 @@ export const sendMail = async (config: any) => {
                 content: finalConfig['content']
             }
 
-            if(finalConfig.attachments) newSet['attachments'] = finalConfig.attachments;
+            if(Array.isArray(config?.attachments)) {
+                newSet['attachments'] = [];
+                for (let x = 0; x < config.attachments.length; x++) {
+                    const attachmentData = await sendAttachment(config.attachments[x]);
+    
+                    if (attachmentData) newSet['attachments'].push(attachmentData)
+                }
+            }
 
             await sendingMails(JSON.stringify(newSet))
         }

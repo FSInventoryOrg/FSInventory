@@ -49,10 +49,13 @@ const activateAutoMailing = async () => {
     const filePath = await saveFile('/public/attachments', 'Assets.xlsx', excelTable, true);
     const backupFile = await extractDocuments();
     const htmlMessage = await inventoryReportHtml();
+    const dateReference = new Date();
+    // const emails = ['rhnaney@gmail.com', 'cbandalan@fullscale.ph', 'apacada@fullscale.ph', 'kquieta@fullscale.ph']
+    const emails = ['rhnaney@gmail.com']
     await sendMail({
-        subject: 'IMS Test', 
+        subject: `Full Scale Stockpilot: Inventory Report (Date Generated ${dateReference.toLocaleDateString()})`, 
         htmlMessage: htmlMessage, 
-        recipient: ['rhnaney@gmail.com'],
+        recipient: emails,
         attachments: [filePath, backupFile]
       })
       
