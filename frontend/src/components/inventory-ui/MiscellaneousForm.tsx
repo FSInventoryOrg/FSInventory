@@ -205,19 +205,14 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
                             <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent
-                          className='w-auto p-0'
-                          align='start'
-                        >
+                        <PopoverContent className='w-auto p-0' align='start'>
                           <Calendar
                             mode='single'
                             onSelect={field.onChange}
                             onDayClick={() => {
                               setOpenDeploymentDate(false);
                             }}
-                            disabled={(date) =>
-                              date < new Date('1900-01-01')
-                            }
+                            disabled={(date) => date < new Date('1900-01-01')}
                           />
                         </PopoverContent>
                       </Popover>
@@ -260,6 +255,7 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
                 />
               </FormControl>
               <FormMessage />
+              <FormDescription>Recovery date is required when 'Recovered From' field is filled in.</FormDescription>
             </FormItem>
           )}
         />
@@ -267,58 +263,57 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
           control={control}
           name='recoveryDate'
           render={({ field }) => (
-            <div className='flex items-center justify-center gap-0'>
+            <div className='flex  justify-center gap-0 '>
               <FormItem className='flex flex-col w-full sm:w-fit'>
-                <Popover
-                  open={openRecoveryDate}
-                  onOpenChange={setOpenRecoveryDate}
-                >
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={'outline'}
-                        className={cn(
-                          'w-full sm:w-[238px] pl-3 text-left font-normal rounded-r-none',
-                          !field.value && 'text-muted-foreground'
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, 'PPP')
-                        ) : (
-                          <span>Recovery date</span>
-                        )}
-                        <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className='w-auto p-0'
-                    align='start'
-                  >
-                    <Calendar
-                      mode='single'
-                      onSelect={field.onChange}
-                      onDayClick={() => {
-                        setOpenRecoveryDate(false);
+                <FormControl>
+                  <Box className='flex'>
+                    <Popover
+                      open={openRecoveryDate}
+                      onOpenChange={setOpenRecoveryDate}
+                    >
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={'outline'}
+                          className={cn(
+                            'w-full sm:w-[238px] pl-3 text-left font-normal rounded-r-none',
+                            !field.value && 'text-muted-foreground'
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, 'PPP')
+                          ) : (
+                            <span>Recovery date</span>
+                          )}
+                          <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className='w-auto p-0' align='start'>
+                        <Calendar
+                          mode='single'
+                          onSelect={field.onChange}
+                          onDayClick={() => {
+                            setOpenRecoveryDate(false);
+                          }}
+                          disabled={(date) => date < new Date('1900-01-01')}
+                        />
+                      </PopoverContent>
+                    </Popover>
+
+                    <Button
+                      className='rounded-l-none border-l-0 text-accent-foreground'
+                      type='button'
+                      variant='outline'
+                      size='icon'
+                      onClick={() => {
+                        field.onChange(null);
                       }}
-                      disabled={(date) =>
-                        date < new Date('1900-01-01')
-                      }
-                    />
-                  </PopoverContent>
-                </Popover>
+                    >
+                      <XIcon className='opacity-50' size={20} />
+                    </Button>
+                  </Box>
+                </FormControl>
+                <FormMessage />
               </FormItem>
-              <Button
-                className='rounded-l-none border-l-0 text-accent-foreground'
-                type='button'
-                variant='outline'
-                size='icon'
-                onClick={() => {
-                  field.onChange(null);
-                }}
-              >
-                <XIcon className='opacity-50' size={20} />
-              </Button>
             </div>
           )}
         />

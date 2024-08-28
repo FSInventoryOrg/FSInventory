@@ -33,6 +33,15 @@ export type AssetFormData = z.infer<typeof AssetSchema>;
 
 export const refineAssetSchema = (retrievableStatus?: string ) => {
   return (arg: AssetFormData, ctx: z.RefinementCtx) => {
+    if (arg.recoveredFrom?.trim()) {
+      if (!arg.recoveryDate) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Recovery date is required",
+          path: ["recoveryDate"]
+        })
+      }
+    }
     if (arg.status && arg.status === retrievableStatus) {
       if (!arg.assignee?.trim()) {
         ctx.addIssue({
