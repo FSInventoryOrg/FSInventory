@@ -1,5 +1,8 @@
 # BACKEND CHANGELOG
 
+### 2024-08-28 [v2.5.4](https://connect.zoho.com/portal/intranet/task/623367000000601111)
+- *Change* - Removing 'Shelved' status in the system
+
 ### 2024-08-28 [v2.5.3](https://connect.zoho.com/portal/intranet/task/623367000000599090)
 - *Change* - Adjusting the automail backend side for frontend usage
 
