@@ -4,6 +4,7 @@ import AssetIndexControl from '@/components/setttings-ui/AssetIndexControl';
 import NotificationsControl from '@/components/setttings-ui/NotificationsControl';
 import { Separator } from '@/components/ui/separator';
 import InventorySettings from '../components/setttings-ui/inventory/InventorySettings';
+import AutomatedReportSettings from '@/components/setttings-ui/automated-report/AutomatedReportSettings';
 
 const Settings = () => {
   const settingsNavItems = [
@@ -15,9 +16,14 @@ const Settings = () => {
       title: 'Notifications',
       href: '/settings/notifications',
     },
-    { title: 'Inventory',
-      href: '/settings/inventory'
-    }
+    {
+      title: 'Inventory',
+      href: '/settings/inventory',
+    },
+    {
+      title: 'Automated Report',
+      href: '/settings/automated-report',
+    },
   ];
 
   return (
@@ -41,7 +47,11 @@ const Settings = () => {
             <Route path="/" element={<Navigate to="assetcontrol" />} />
             <Route path="/assetcontrol" element={<AssetIndexControl />} />
             <Route path="/notifications" element={<NotificationsControl />} />
-            <Route path='/inventory' element={<InventorySettings/>}/>
+            <Route path="/inventory" element={<InventorySettings />} />
+            <Route
+              path="/automated-report"
+              element={<AutomatedReportSettings />}
+            />
           </Routes>
         </div>
       </div>

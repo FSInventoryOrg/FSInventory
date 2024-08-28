@@ -1,5 +1,8 @@
 # BACKEND CHANGELOG
 
+### 2024-08-28 [v2.5.3](https://connect.zoho.com/portal/intranet/task/623367000000599090)
+- *Change* - Adjusting the automail backend side for frontend usage
+
 ### 2024-08-27 [v2.5.2](https://connect.zoho.com/portal/intranet/task/623367000000590081)
 - *New* - Automated Email Report: Email content (html format only)
 - *New* - integration with excel and backup
