@@ -22,7 +22,7 @@ import path from 'path';
 import { auditAssets } from './utils/common';
 import { autoMail, convertStatusToStorage, convertStatusToUnaccounted, removeStatus, rotateLogs, setDefaults, softwareExpirationMonitoring } from './system/jobs';
 import autoMailRoutess from './system/automail';
-import { extractDocuments, listCollection } from './system/backup';
+import backupRoutes, { listCollection } from './system/backup';
 
 const DEFAULT_PORT = 3000;
 const port = Number(process.env.PORT) || DEFAULT_PORT;
@@ -67,6 +67,7 @@ app.use("/api/download", downloadRoutes)
 app.use("/api/notification", notificationRoutes)
 app.use("/config", configRoutes)
 app.use("/autoMail", autoMailRoutess)
+app.use("/backup", backupRoutes)
 
 // Catch-all route for unmatched URLs (place it here)
 if (process.env.NODE_ENV !== 'development') {

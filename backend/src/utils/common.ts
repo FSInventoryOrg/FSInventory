@@ -36,8 +36,8 @@ export const saveFile = async (folder: string, filename: string, src: any, fullD
     return fullDirectory ? tmpFolder.replace(/\/\//g,'/') : tmpFolder.replace(directory, '');
 }
 
-export const getFile = async (filepath: string) => {
-    const tmpFolder = `${directory}${filepath}`.replace(/\/\//g, '/');
+export const getFile = async (filepath: string, isFullPath?: boolean) => {
+    const tmpFolder = isFullPath ? filepath : `${directory}${filepath}`.replace(/\/\//g, '/');
 
     try {
         return readFileSync(tmpFolder)
