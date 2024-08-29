@@ -8,6 +8,7 @@ import Employee from "../models/employee.schema";
 import Software from "../models/software.schema";
 import { triggerNotif } from "../utils/common";
 import { renewAutoMailingActivation } from "./automail";
+import { getVersion } from "./version";
 
 export const rotateLogs = async () => {
     const conn = await MongoClient.connect(process.env.MONGODB_CONNECTION_STRING as string);
@@ -183,4 +184,11 @@ export const removeStatus = async() => {
 
         console.log(`Status [${statusToDelete.toString()}] has been removed`)
     }
+}
+
+export const getVersions = async() => {
+    const versions = await getVersion()
+
+    if(versions) console.log(versions);
+    else console.log('Could not display versions')
 }
