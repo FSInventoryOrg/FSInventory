@@ -686,3 +686,17 @@ export const postAutoMailSettings = async (data: AutoMailType) => {
 
   return response.json();
 };
+
+export const sendAutoMailNow = async () => {
+  const response = await fetch(`${API_BASE_URL}/autoMail/activateNow`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message);
+  }
+
+  return response.json();
+};

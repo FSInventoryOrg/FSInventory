@@ -21,17 +21,20 @@ const AutomatedReport = () => {
     );
   }
 
-  let defaultValues: AutoMailType = {
-    contact: '',
-    recipient: [],
+  const defaultValues: AutoMailType = {
+    contact: autoMailSettings?.contact || '',
+    recipient: autoMailSettings?.recipient || [],
+    frequency: autoMailSettings?.frequency || 'Weekly',
+    day: autoMailSettings?.day || 31,
+    weekday: autoMailSettings?.weekday ?? 6,
+    time: autoMailSettings?.time || '00:00',
+    nextRoll: autoMailSettings?.nextRoll
+      ? new Date(autoMailSettings.nextRoll)
+      : undefined,
+    lastRollOut: autoMailSettings?.lastRollOut
+      ? new Date(autoMailSettings.lastRollOut)
+      : undefined,
   };
-
-  if (autoMailSettings) {
-    defaultValues = {
-      contact: autoMailSettings?.contact || '',
-      recipient: autoMailSettings?.recipient || [],
-    };
-  }
 
   return (
     <div className="flex flex-col md:w-5/6 max-w-4xl">

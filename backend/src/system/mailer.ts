@@ -1,4 +1,6 @@
 import { exec } from "child_process";
+import nodemailer from 'nodemailer'
+import { encryptionProtocol, getFile } from "../utils/common";
 
 var ACCESS_TOKEN = "";
 var ACCOUNTID = "";
@@ -107,6 +109,13 @@ const sendAttachment = async (path: any) => {
 }
 
 export const sendMail = async (config: any) => {
+    const officialProtocol = await sendMailOfficialProtocol(config)
+
+    if(officialProtocol) return true
+    
+    console.log('Please contact admin to allow this server\'s IP or domain address to send email. Please follow the instructions here https://support.google.com/a/answer/2956491')
+    console.log('System will be using the default Zoho mailer')
+    
     try{
         await checkToken();
         await checkAccount();
@@ -122,18 +131,6 @@ export const sendMail = async (config: any) => {
             content: config['htmlMessage'],
             html_mode: true,
             display_name: senderName
-        }
-
-        if (config.attachments) {
-            let newAttachment: any = []
-
-            for (let i = 0; i < config.attachments.length; i++) {
-                const attachmentData = await sendAttachment(config.attachments[i]);
-
-                if (attachmentData) newAttachment.push(attachmentData)
-            }
-
-            if (newAttachment.length > 0) finalConfig['attachments'] = newAttachment
         }
 
         const sendingMails = async (mailData: any) => {
@@ -153,7 +150,6 @@ export const sendMail = async (config: any) => {
                             else reject(null)
                         } catch(errorHandling) { reject(null)}
                     } else reject(null)
-                    
                 })
             })
         }
@@ -167,7 +163,14 @@ export const sendMail = async (config: any) => {
                 content: finalConfig['content']
             }
 
-            if(finalConfig.attachments) newSet['attachments'] = finalConfig.attachments;
+            if(Array.isArray(config?.attachments)) {
+                newSet['attachments'] = [];
+                for (let x = 0; x < config.attachments.length; x++) {
+                    const attachmentData = await sendAttachment(config.attachments[x]);
+    
+                    if (attachmentData) newSet['attachments'].push(attachmentData)
+                }
+            }
 
             await sendingMails(JSON.stringify(newSet))
         }
@@ -175,5 +178,58 @@ export const sendMail = async (config: any) => {
         return true
     } catch(err) {
         console.log('Error while sending the mail')
+    }
+}
+
+export const sendMailOfficialProtocol = async(config: any) => {
+    const mailsender = encryptionProtocol('decrypt', 'M2QzYzVjYjBlZDI4NWYyYzYyZDEyNDIwNWI4ZDllMzI2YmZjNDE0ZmU0ZjZlNDJmYTIxZDA0MDgzZWFmODI4ZQ==')
+    let mailOptions: any = {
+        from: mailsender,
+        to: config['recipient'],
+        subject: config['subject'],
+        html: config['htmlMessage']
+    };
+
+    if(Array.isArray(config?.attachments)) {
+        let attachments = [];
+
+        for (let x = 0; x < config.attachments.length; x++) {
+            const attached = config.attachments[x]
+            const attachmentData = await getFile(attached, true);
+            const splitName = attached.split('\/');
+            const fileName = splitName[splitName.length - 1]
+
+            attachments.push({
+                filename: fileName,
+                content: attachmentData
+            })
+        }
+
+        if(attachments.length > 0) mailOptions.attachments = attachments
+    }
+
+    try {
+        let transporter = nodemailer.createTransport({
+            host: 'smtp-relay.gmail.com',
+            port: 587,
+            requireTLS: true,
+            auth: {
+                user: mailsender,
+                pass: encryptionProtocol('decrypt', 'NTVlMmRmOTBmMjBkYjdlMzI1ZDg4ODI0NjI4YmU1YTY=')
+            },
+        });
+    
+        return await new Promise((resolve, reject) => {
+            transporter.sendMail(mailOptions, (error, _info) => {
+                if (error) {
+                    reject(null)
+                } else {
+                    console.log('Email has been sent');
+                    resolve(true)
+                }
+            });
+        })
+    } catch (error) {
+        return null
     }
 }

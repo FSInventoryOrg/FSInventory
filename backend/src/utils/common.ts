@@ -9,7 +9,8 @@ import mongoose, { Connection } from "mongoose";
 import OTPTransaction from "../models/otptransactions.schema";
 import bcrypt from 'bcryptjs'
 import Option from "../models/options.schema";
-import excel from 'exceljs'
+import excel from 'exceljs';
+import crypto from 'crypto'
 
 const directory = path.join(path.resolve(), '../');
 
@@ -36,8 +37,8 @@ export const saveFile = async (folder: string, filename: string, src: any, fullD
     return fullDirectory ? tmpFolder.replace(/\/\//g,'/') : tmpFolder.replace(directory, '');
 }
 
-export const getFile = async (filepath: string) => {
-    const tmpFolder = `${directory}${filepath}`.replace(/\/\//g, '/');
+export const getFile = async (filepath: string, isFullPath?: boolean) => {
+    const tmpFolder = isFullPath ? filepath : `${directory}${filepath}`.replace(/\/\//g, '/');
 
     try {
         return readFileSync(tmpFolder)
@@ -378,6 +379,29 @@ export const createBackup = async () => {
     console.log(collections)
 }
 
-export const restoreBackup = async (_filepath: string) => {
+const prepareEncryptionHash = () => {
+    return {
+        key: crypto
+            .createHash('sha512')
+            .update(process.env.CATALYST_CS_PROJECT_ID as string)
+            .digest('hex')
+            .substring(0, 32),
+        encryptionIV: crypto
+            .createHash('sha512')
+            .update(process.env.CATALYST_SELF_CLIENT_SECRET as string)
+            .digest('hex')
+            .substring(0, 16)
+    }
+}
 
+export const encryptionProtocol = (method: 'encrypt' | 'decrypt', data: string) => {
+    const creds = prepareEncryptionHash();
+
+    if(method === 'encrypt') {
+        const cipher = crypto.createCipheriv('aes-256-cbc', creds.key, creds.encryptionIV)
+        return Buffer.from(cipher.update(data, 'utf8', 'hex') + cipher.final('hex')).toString('base64')
+    } else if(method === 'decrypt') {
+        const decipher = crypto.createDecipheriv('aes-256-cbc', creds.key, creds.encryptionIV)
+        return decipher.update(Buffer.from(data, 'base64').toString('utf8'), 'hex', 'utf8') + decipher.final('utf8')
+    }
 }

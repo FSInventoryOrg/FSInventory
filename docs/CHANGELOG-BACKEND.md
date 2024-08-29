@@ -1,5 +1,14 @@
 # BACKEND CHANGELOG
 
+### 2024-08-29 [v2.5.6](https://connect.zoho.com/portal/intranet/task/623367000000590081)
+- *Change* - update latest assets added table in automated email report
+
+### 2024-08-29 [v2.5.6](https://gitlab.com/full-scale-internship/stockpilot/-/commit/9ab62005be3ee96414616235fb39d70bb09a62a8)
+- *New* - updating mailing protocol to official mailer
+
+### 2024-08-29 [v2.5.5](https://connect.zoho.com/portal/intranet/task/623367000000615263)
+- *New* - Backend processing when loading system backup file
+
 ### 2024-08-28 [v2.5.4](https://connect.zoho.com/portal/intranet/task/623367000000601111)
 - *Change* - Removing 'Shelved' status in the system
 
