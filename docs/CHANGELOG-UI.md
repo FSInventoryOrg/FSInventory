@@ -1,5 +1,8 @@
 # UI CHANGELOG
 
+### 2024-08-29 [v2.5.5](https://connect.zoho.com/portal/intranet/task/623367000000597066)
+- *New* - Settings: Frequency of email can be changeable by Admin
+
 ### 2024-08-28 [v2.5.4](https://connect.zoho.com/portal/intranet/task/623367000000597079)
 - *New* - Settings: Recipient of email report
 
