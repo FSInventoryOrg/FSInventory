@@ -78,7 +78,7 @@ export const inventoryReportHtml = async (mailMeta?: any) => {
     hardwareAssets,
     latestAssets,
     assetCounters,
-    contact: mailMeta?.support || 'admin@fullscale.ph'
+    contact: mailMeta?.contact || 'admin@fullscale.ph',
   };
 
   const htmlMessage = template(data);
