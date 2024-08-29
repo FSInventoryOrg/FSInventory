@@ -2,6 +2,7 @@ import Handlebars from 'handlebars';
 import Asset from '../../models/asset.schema';
 import AssetCounter from '../../models/asset-counter.schema';
 import Option from '../../models/options.schema';
+import AutoMail from '../../models/automail.schema';
 import { getFile } from '../../utils/common';
 
 export const inventoryReportHtml = async (mailMeta?: any) => {
@@ -54,17 +55,29 @@ export const inventoryReportHtml = async (mailMeta?: any) => {
     hardwareAssets['Total per Status'][status] = sum;
   }
 
+  const autoMailSettings = await AutoMail.findOne();
+  let filter = {};
+  let limit = 5;
+  if (autoMailSettings?.lastRollOut) {
+    filter = {
+      created: {
+        $gt: new Date(autoMailSettings.lastRollOut),
+      },
+    };
+    limit = 0;
+  }
+
   // Get latest assets
-  const latestAssets = (await Asset.find().sort({ created: -1 }).limit(5)).map(
-    (asset) => {
-      const temp = asset.toObject();
-      return {
-        ...temp,
-        date: new Date(temp.created).toLocaleDateString(),
-        time: new Date(temp.created).toLocaleTimeString(),
-      };
-    }
-  );
+  const latestAssets = (
+    await Asset.find(filter).sort({ created: -1 }).limit(limit)
+  ).map((asset) => {
+    const temp = asset.toObject();
+    return {
+      ...temp,
+      date: new Date(temp.created).toLocaleDateString(),
+      time: new Date(temp.created).toLocaleTimeString(),
+    };
+  });
 
   const assetCounters = (
     await AssetCounter.find({
