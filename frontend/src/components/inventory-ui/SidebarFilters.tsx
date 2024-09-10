@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { FilterIcon, MonitorSmartphoneIcon, RefreshCcwIcon } from 'lucide-react'
+import { CodeIcon, FilterIcon, MonitorSmartphoneIcon, RefreshCcwIcon } from 'lucide-react'
 import { Button } from '../ui/button'
 import {
   Select,
@@ -145,10 +145,10 @@ const SidebarFilters = ({
                 Hardware
                 <MonitorSmartphoneIcon size={18} />
               </Button>
-              {/* <Button variant='outline' className='bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2'>
+              <Button variant='outline' className='bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2'>
                 Software
                 <CodeIcon size={18} />
-              </Button> */}
+              </Button>
             </div>
           </div>
           <div className='flex flex-col gap-2'>
