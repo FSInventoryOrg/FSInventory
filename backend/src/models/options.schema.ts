@@ -9,6 +9,7 @@ export type StatusOptions = {
 export type CategoryOptions = {
   value: string;
   properties?: string[];
+  type?: string;
 }
 
 export type Defaults = {
@@ -41,7 +42,8 @@ const optionsSchema: Schema<OptionsType> = new Schema<OptionsType>({
   category: { 
     type: [{
       value: { type: String, required: true },
-      properties: { type: [String], required: false}
+      properties: { type: [String], required: false},
+      type: { type: String, required: false}
     }],
     required: true },
   equipmentType: { type: [String], required: true },
