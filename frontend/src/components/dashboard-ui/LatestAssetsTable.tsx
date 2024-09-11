@@ -7,10 +7,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { HardwareType } from "@/types/asset";
+import { AssetType, SoftwareType } from "@/types/asset";
 
 interface LatestAssetsTableProps {
-  data: HardwareType[]
+  data: AssetType[]
 }
 
 const LatestAssetsTable = ({ data }: LatestAssetsTableProps) => {
@@ -34,7 +34,7 @@ const LatestAssetsTable = ({ data }: LatestAssetsTableProps) => {
             <TableRow key={asset._id}>
               <TableCell className="w-[100px] px-2 py-2.5">{asset.code}</TableCell>
               <TableCell className="hidden sm:table-cell py-2.5">{asset.category}</TableCell>
-              <TableCell className="hidden md:table-cell py-2.5 max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap">{asset.modelName}</TableCell>
+              <TableCell className="hidden md:table-cell py-2.5 max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap">{asset.modelName || (asset as SoftwareType).softwareName || ''}</TableCell>
               <TableCell className="py-2.5 max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap">{asset.createdBy}</TableCell>
               <TableCell className="py-2.5">{new Date(asset.created).toLocaleDateString()}</TableCell>
               <TableCell className="hidden sm:table-cell py-2.5">{new Date(asset.created).toLocaleTimeString()}</TableCell>
