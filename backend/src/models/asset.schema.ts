@@ -1,5 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+export type DeploymentHistory = {
+  deploymentDate: Date;
+  recoveryDate?: Date;
+  assignee: string;
+}
 export interface AssetType extends Document {
   _id: string;
   created: Date;
@@ -12,6 +17,14 @@ export interface AssetType extends Document {
   modelName: string;
   modelNo: string;
   serialNo: string;
+  category: string;
+  status: string;
+  remarks: string;
+  deploymentDate: Date;
+  recoveredFrom: string;
+  recoveryDate: Date;
+  assignee: string;
+  deploymentHistory: DeploymentHistory[];
 }
 
 /**
@@ -68,6 +81,19 @@ const assetSchema: Schema<AssetType> = new Schema<AssetType>({
   modelName: { type: String, required: false },
   modelNo: { type: String, required: false },
   serialNo: { type: String, required: false },
+  status: { type: String, required: true },
+  category: { type: String, required: true },
+  remarks: { type: String, required: false },
+  deploymentDate: { type: Date, required: false },
+  recoveredFrom: { type: String, required: false },
+  recoveryDate: { type: Date, required: false },
+  deploymentHistory: { 
+    type: [{
+      deploymentDate: { type: Date, required: false },
+      recoveryDate: { type: Date, required: false},
+      assignee: { type: String, required: true },
+    }],
+    required: false },
 });
 
 const Asset = mongoose.model<AssetType>("Asset", assetSchema);
