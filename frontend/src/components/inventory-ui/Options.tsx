@@ -226,7 +226,8 @@ const Options = ({
     } else {
       reset();
     }
-  }, [open, filterValue, optionValues, property]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, filterValue, optionValues, property, type]);
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>
