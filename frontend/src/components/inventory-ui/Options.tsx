@@ -1,28 +1,42 @@
-import React from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import * as imsService from '@/ims-service'
-import { useAppContext } from '@/hooks/useAppContext'
-import {
-  FormControl,
-} from "@/components/ui/form"
+import React from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import * as imsService from '@/ims-service';
+import { useAppContext } from '@/hooks/useAppContext';
+import { FormControl } from '@/components/ui/form';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from '@/components/ui/popover';
 import { ScrollArea } from '../ui/scroll-area';
+import { ChevronsUpDownIcon, PencilIcon, XIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ColorOption, OptionType, TagOption } from '@/types/options';
 import AddOption from './AddOption';
 import EditOption from './EditOption';
 
+
 interface OptionsProps {
   property: string;
-  colorSelect?: boolean
-  tagSelect?: boolean
+  colorSelect?: boolean;
+  tagSelect?: boolean;
   field: {
     value: string;
     onChange: (value: string) => void;
   };
+  className?: string;
   placeholder?: string;
+  type?: 'Hardware' | 'Software';
+}
+
+function isTypedOption(
+  object: ColorOption | TagOption | string
+): object is TagOption {
+  if (typeof object === 'string') return false;
+  return 'type' in object;
 }
 
 function capitalize(str: string): string {
@@ -30,12 +44,22 @@ function capitalize(str: string): string {
 }
 
 function format(str: string): string {
-  return str.split(/(?=[A-Z])/).map(part => part.toLowerCase()).join(' ');
+  return str
+    .split(/(?=[A-Z])/)
+    .map((part) => part.toLowerCase())
+    .join(' ');
 }
 
-const Options = ({ property, colorSelect=false, tagSelect=false, field, className }: OptionsProps) => {
-  const [open, setOpen] = React.useState(false)
-  const [openDeleteOptionDialog, setOpenDeleteOptionDialog] = React.useState(false)
+const Options = ({
+  property,
+  colorSelect = false,
+  tagSelect = false,
+  field,
+  className,
+  placeholder,
+  type,
+}: OptionsProps) => {
+  const [open, setOpen] = React.useState(false);
   const { showToast } = useAppContext();
   const [newOption, setNewOption] = React.useState<OptionType>({
     property: property,
@@ -48,7 +72,7 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
   const { data: optionValues } = useQuery<
     string[] | ColorOption[] | TagOption[]
   >({
-    queryKey: ['fetchOptionValues', property], 
+    queryKey: ['fetchOptionValues', property],
     queryFn: () => imsService.fetchOptionValues(property),
     enabled: open,
   });
@@ -68,40 +92,48 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
   const { mutate: addOptionValue, isPending: isAddPending } = useMutation({
     mutationFn: imsService.addOptionValue,
     onSuccess: async () => {
-      showToast({ message: `New ${property} added successfully!`, type: "SUCCESS" });
-      setOpen(false)
+      showToast({
+        message: `New ${property} added successfully!`,
+        type: 'SUCCESS',
+      });
+      setOpen(false);
       setTimeout(() => {
         setOpen(true);
       }, 100);
     },
     onError: (error: Error) => {
-      showToast({ message: error.message, type: "ERROR" });
-    }
+      showToast({ message: error.message, type: 'ERROR' });
+    },
   });
-  const { mutate: updateOptionValue, isPending: isOptionEditPending } = useMutation({
+  const { mutate: updateOptionValue, isPending: isOptionEditPending } =
+    useMutation({
       mutationFn: imsService.updateOptionValue,
       onSuccess: async () => {
-      showToast({ message: `${capitalize(format(property))} updated successfully!`, type: "SUCCESS" });
-      setOpen(false)
+        showToast({
+          message: `${capitalize(format(property))} updated successfully!`,
+          type: 'SUCCESS',
+        });
+        setOpen(false);
         setTimeout(() => {
           setOpen(true);
         }, 100);
       },
       onError: (error: Error) => {
-        showToast({ message: error.message, type: "ERROR" });
-    }
+        showToast({ message: error.message, type: 'ERROR' });
+      },
     });
 
-  const { mutate: updateAssetsByProperty, isPending: isAssetEditPending } = useMutation({
+  const { mutate: updateAssetsByProperty, isPending: isAssetEditPending } =
+    useMutation({
       mutationFn: imsService.updateAssetsByProperty,
     });
 
   const findIndexInOptions = (optionVal: string) => {
     if (!optionValues) return -1;
     return optionValues.findIndex((option) => {
-        if (typeof option === 'string') {
+      if (typeof option === 'string') {
         return option === optionVal;
-        } else if (typeof option === 'object' && option.value) {
+      } else if (typeof option === 'object' && option.value) {
         return option.value === optionVal;
       }
       return false; // Filter out undefined or other non-matching types
@@ -150,7 +182,10 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
           }
         }
         // Check if optionValues[indexOfValueToDelete] is an object with a 'value' property
-        else if (typeof valueToDelete === 'object' && 'value' in valueToDelete) {
+        else if (
+          typeof valueToDelete === 'object' &&
+          'value' in valueToDelete
+        ) {
           if (valueToDelete.value === field.value) {
             field.onChange('');
           }
@@ -171,50 +206,38 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
     }, 100);
     setNewOption({ property: property, value: '' });
   };
-
+  
   React.useEffect(() => {
     if (open) {
       setFilteredData(
-        (optionValues ? optionValues : [])
-          .filter(option => {
-            if (typeof option === 'string') {
-            return option.toLowerCase().includes(filterValue.toLowerCase());
-            } else if (typeof option === 'object' && option.value) {
-              return option.value.toLowerCase().includes(filterValue.toLowerCase());
-          }
-          return false; // Filter out undefined or other non-matching types
-        }) as ColorOption[] // Cast the filtered data to ColorOption[]
+        (optionValues ? optionValues : []).filter((option) => {
+          const optionVal = getOptionValue(option).toLowerCase();
+          const optionMatchesType =
+            isTypedOption(option) && option.type === type;
+
+          return (
+            optionVal.includes(filterValue.toLowerCase()) &&
+            (type ? optionMatchesType : true)
+          );
+        }) as ColorOption[]
       );
-      setIsCreating(false)
-      setIsEditing(false)
+      setIsCreating(false);
+      setIsEditing(false);
     } else {
-      setFilterValue('')
-      setTimeout(() => {
-        setFilteredData([]);
-      }, 100)
-      setNewOption({ property: property, value: '' })
+      reset();
     }
   }, [open, filterValue, optionValues, property]);
 
-  const getOptionValue = (option: { value: string }| ColorOption | TagOption| string) => {
-    if (typeof option === "string") {
-      return option;
-    } else if (typeof option === "object" && option.value) {
-      return option.value;
-    }
-    return ''
-  };
-
   return (
-    <Popover open={open} onOpenChange={setOpen} modal={true} >
+    <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger className={cn(className)} asChild>
         <FormControl>
           <Button
-            variant="outline"
-            role="combobox"
+            variant='outline'
+            role='combobox'
             className={cn(
-              "justify-between",
-              !field.value && "text-muted-foreground"
+              'justify-between',
+              !field.value && 'text-muted-foreground'
             )}
           >
             {field.value
@@ -222,27 +245,34 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
               : placeholder
               ? capitalize(placeholder)
               : `${capitalize(format(property))} of the asset`}
-            <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDownIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
           </Button>
         </FormControl>
       </PopoverTrigger>
       <PopoverContent className='-translate-y-2'>
         <div
-          className="cursor-pointer absolute right-3 top-3 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+          className='cursor-pointer absolute right-3 top-3 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground'
           onClick={() => {
-            setOpen(false)
+            setOpen(false);
           }}
         >
-          <XIcon className="h-4 w-4" />
-          <span className="sr-only">Close</span>
+          <XIcon className='h-4 w-4' />
+          <span className='sr-only'>Close</span>
         </div>
-        <div id='main panel' className={`flex flex-col gap-2 ${isCreating || isEditing ? 'hidden': ''}`}>
-          <h1 className='w-full text-center font-semibold text-sm'>{capitalize(format(property))}</h1>
+        <div
+          id='main panel'
+          className={`flex flex-col gap-2 ${
+            isCreating || isEditing ? 'hidden' : ''
+          }`}
+        >
+          <h1 className='w-full text-center font-semibold text-sm'>
+            {capitalize(format(property))}
+          </h1>
           <div className='flex items-center'>
             <Input
               value={field.value}
               type='input'
-              className='focus-visible:ring-0 focus-visible:ring-popover' 
+              className='focus-visible:ring-0 focus-visible:ring-popover'
               onChange={(e) => {
                 setFilterValue(e.target.value);
                 field.onChange(e.target.value); // Set the value of the field
@@ -250,65 +280,67 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  setOpen(!open)
+                  setOpen(!open);
                 }
               }}
-              placeholder="Search..."
+              placeholder='Search...'
             />
           </div>
-          <ScrollArea className="h-[225px] justify-center flex align-middle">
+          <ScrollArea className='h-[225px] justify-center flex align-middle'>
             {filteredData && filteredData.length > 0 ? (
               filteredData.map((value, index) => {
                 const optionValue: string = getOptionValue(value);
                 return (
-                  <div key={index} className="flex items-center gap-1 my-1.5">
+                  <div key={index} className='flex items-center gap-1 my-1.5'>
                     <Checkbox
-                      className="ml-1"
+                      className='ml-1'
                       checked={optionValue === field.value}
                       onClick={() =>
-                        field.onChange(field.value === optionValue ? "" : optionValue)
+                        field.onChange(
+                          field.value === optionValue ? '' : optionValue
+                        )
                       }
                       onKeyDown={(event) => {
-                        if (event.key === "Enter") {
-                          field.onChange(field.value === optionValue ? "" : optionValue);
+                        if (event.key === 'Enter') {
+                          field.onChange(
+                            field.value === optionValue ? '' : optionValue
+                          );
                         }
                       }}
                     />
 
                     <Button
                       className={`w-full justify-start focus-visible:ring-0 focus-visible:ring-popover focus-visible:bg-accent h-8 rounded-sm ml-1 ${
-                        colorSelect ? "text-white" : ""
+                        colorSelect ? 'text-white' : ''
                       }`}
                       style={
                         colorSelect
-                          ? {
-                              backgroundColor: value.color
-                                ? value.color
-                                : "#8d8d8d",
-                            }
+                          ? { backgroundColor: value.color ?? '#8d8d8d' }
                           : undefined
                       }
-                      variant={colorSelect ? undefined : "ghost"}
+                      variant={colorSelect ? undefined : 'ghost'}
                       value={optionValue} // Conditionally set the value prop
-                      type="button"
+                      type='button'
                       onClick={() => {
-                        field.onChange(field.value === optionValue ? "" : optionValue);
+                        field.onChange(
+                          field.value === optionValue ? '' : optionValue
+                        );
                       }}
                       onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        setOpen(!open)
+                        if (e.key === 'Enter') {
+                          setOpen(!open);
                         }
                       }}
                     >
-                      <span className="max-w-28 overflow-hidden text-ellipsis">
+                      <span className='max-w-28 overflow-hidden text-ellipsis'>
                         {optionValue}
                       </span>
                     </Button>
                     <Button
-                    className='mr-3 w-12 h-8'
-                    variant='ghost'
-                    type='button'
-                    size='icon'
+                      className='mr-3 w-12 h-8'
+                      variant='ghost'
+                      type='button'
+                      size='icon'
                       onClick={() => {
                         setIsEditing(!isEditing);
                         setNewOption({ property: property, value: value });
@@ -321,16 +353,18 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
                 );
               })
             ) : (
-              <div className='flex items-center justify-center gap-1 my-1.5'>No results.</div>
+              <div className='flex items-center justify-center gap-1 my-1.5'>
+                No results.
+              </div>
             )}
           </ScrollArea>
           <Button
-            className='h-8' 
-            variant='secondary' 
+            className='h-8'
+            variant='secondary'
             type='button'
             onClick={() => {
-              setIsCreating(!isCreating)
-              setNewOption({ property: property , value: '' })
+              setIsCreating(!isCreating);
+              setNewOption({ property: property, value: '' });
             }}
           >
             Create a new {format(property)}
@@ -375,7 +409,7 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
         )}
       </PopoverContent>
     </Popover>
-  )
-}
+  );
+};
 
 export default Options;
