@@ -23,6 +23,7 @@ const LatestAssetsTable = ({ data }: LatestAssetsTableProps) => {
           <TableRow>
             <TableHead className="w-[100px]">Code</TableHead>
             <TableHead className="hidden sm:table-cell">Category</TableHead>
+            <TableHead className="hidden md:table-cell">Serial Number</TableHead>
             <TableHead className="hidden md:table-cell">Model Name</TableHead>
             <TableHead className="">Added By</TableHead>
             <TableHead>Date</TableHead>
@@ -34,8 +35,9 @@ const LatestAssetsTable = ({ data }: LatestAssetsTableProps) => {
             <TableRow key={asset._id}>
               <TableCell className="w-[100px] px-2 py-2.5">{asset.code}</TableCell>
               <TableCell className="hidden sm:table-cell py-2.5">{asset.category}</TableCell>
-              <TableCell className="hidden md:table-cell py-2.5 max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap">{asset.modelName || (asset as SoftwareType).softwareName || ''}</TableCell>
-              <TableCell className="py-2.5 max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap">{asset.createdBy}</TableCell>
+              <TableCell className="hidden md:table-cell py-2.5 max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap">{asset.serialNo}</TableCell>
+              <TableCell className="hidden md:table-cell py-2.5 max-w-[250px] overflow-hidden">{asset.modelName || (asset as SoftwareType).softwareName || ''}</TableCell>
+              <TableCell className="py-2.5 max-w-[250px] overflow-hidden text-ellipsis">{asset.createdBy}</TableCell>
               <TableCell className="py-2.5">{new Date(asset.created).toLocaleDateString()}</TableCell>
               <TableCell className="hidden sm:table-cell py-2.5">{new Date(asset.created).toLocaleTimeString()}</TableCell>
             </TableRow>
