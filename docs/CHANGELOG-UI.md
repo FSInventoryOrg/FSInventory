@@ -1,5 +1,11 @@
 # UI CHANGELOG
 
+### 2024-09-12 [v2.6.1](https://connect.zoho.com/portal/intranet/task/623367000000281173)
+- *New* - Inventory page: Software Asset Type
+
+### 2024-09-10 [v2.6.0](https://connect.zoho.com/portal/intranet/task/623367000000670005)
+- *New* - Dashboard: added serial number on latest asset table
+
 ### 2024-08-29 [v2.5.5](https://connect.zoho.com/portal/intranet/task/623367000000597066)
 - *New* - Settings: Frequency of email can be changeable by Admin
 
