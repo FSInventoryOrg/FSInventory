@@ -22,7 +22,7 @@ interface OptionsProps {
     value: string;
     onChange: (value: string) => void;
   };
-  className?: string
+  placeholder?: string;
 }
 
 function capitalize(str: string): string {
@@ -219,6 +219,8 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
           >
             {field.value
               ? field.value
+              : placeholder
+              ? capitalize(placeholder)
               : `${capitalize(format(property))} of the asset`}
             <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
