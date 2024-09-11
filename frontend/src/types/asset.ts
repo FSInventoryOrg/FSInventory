@@ -45,6 +45,7 @@ export interface SoftwareType extends AssetType {
   license: string;
   licenseType: string;
   licenseCost: number;
+  licenseExpirationDate: Date;
   noOfLicense: number;
   version: string;
   softwareName: string;

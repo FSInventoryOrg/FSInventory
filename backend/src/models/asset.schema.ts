@@ -25,6 +25,7 @@ export interface AssetType extends Document {
   recoveryDate: Date;
   assignee: string;
   deploymentHistory: DeploymentHistory[];
+  purchaseDate: Date;
 }
 
 /**
@@ -87,6 +88,8 @@ const assetSchema: Schema<AssetType> = new Schema<AssetType>({
   deploymentDate: { type: Date, required: false },
   recoveredFrom: { type: String, required: false },
   recoveryDate: { type: Date, required: false },
+  purchaseDate: {type: Date, required: false},
+  assignee: {type: String, required: false},
   deploymentHistory: { 
     type: [{
       deploymentDate: { type: Date, required: false },
