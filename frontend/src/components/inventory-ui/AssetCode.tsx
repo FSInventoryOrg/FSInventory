@@ -11,10 +11,10 @@ import {
 } from '../ui/dialog';
 import { XIcon } from 'lucide-react';
 import AssetDetails from './AssetDetails';
-import { HardwareType } from '@/types/asset';
+import { HardwareType, SoftwareType } from '@/types/asset';
 
 interface AssetCodeProps {
-  asset:  HardwareType;
+  asset:  HardwareType & SoftwareType;
 }
 const AssetCode = ({ asset }: AssetCodeProps) => {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);

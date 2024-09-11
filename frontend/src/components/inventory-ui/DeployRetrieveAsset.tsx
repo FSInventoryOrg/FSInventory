@@ -2,12 +2,12 @@
 import { useQuery } from "@tanstack/react-query";
 import DeployAsset from "@/components/inventory-ui/DeployAsset";
 import RetrieveAsset from "@/components/inventory-ui/RetrieveAsset";
-import { HardwareType } from "@/types/asset";
+import { HardwareType, SoftwareType } from "@/types/asset";
 import { Defaults } from '@/types/options';
 import * as imsService from '@/ims-service'
 
 interface DeployRetrieveAssetProps {
-  assetData: HardwareType
+  assetData: HardwareType | SoftwareType
 }
 
 const DeployRetrieveAsset = ({ assetData }: DeployRetrieveAssetProps) => {
