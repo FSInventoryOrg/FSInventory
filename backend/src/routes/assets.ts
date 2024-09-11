@@ -197,7 +197,7 @@ router.put('/deploy/:code', [
         return res.status(400).json({ message: 'Asset code mismatch' });
       }
 
-      const existingAsset = await Hardware.findOne({ code });
+      const existingAsset = await Asset.findOne({ code });
       if (!existingAsset) {
         return res.status(404).json({ message: 'Asset not found' });
       }
@@ -221,8 +221,8 @@ router.put('/deploy/:code', [
       data.deploymentHistory = [...existingAsset.deploymentHistory, deploymentRecord];
 
       let updatedAsset;
-      await Hardware.updateOne({ code: data.code }, data);
-      updatedAsset = await Hardware.findOne({ code });
+      await Asset.updateOne({ code: data.code }, data);
+      updatedAsset = await Asset.findOne({ code });
 
       await auditAssets();
 
@@ -258,7 +258,7 @@ router.put('/retrieve/:code', [
         return res.status(400).json({ message: 'Asset code mismatch' });
       }
 
-      const existingAsset = await Hardware.findOne({ code });
+      const existingAsset = await Asset.findOne({ code });
       if (!existingAsset) {
         return res.status(404).json({ message: 'Asset not found' });
       }
@@ -294,8 +294,8 @@ router.put('/retrieve/:code', [
       data.deploymentHistory = deploymentHistory;
 
       let updatedAsset;
-      await Hardware.updateOne({ code: data.code }, data);
-      updatedAsset = await Hardware.findOne({ code });
+      await Asset.updateOne({ code: data.code }, data);
+      updatedAsset = await Asset.findOne({ code });
 
       await auditAssets();
       res.status(200).json(updatedAsset);
