@@ -17,7 +17,7 @@ import * as imsService from '@/ims-service'
 import { useAppContext } from '@/hooks/useAppContext'
 import { Spinner } from '../Spinner'
 import { PlusIcon, XIcon } from "lucide-react"
-import { AssetFormData, AssetSchema, refineAssetSchema} from "@/schemas/AddAssetSchema";
+import { AssetFormData, HardwareSchema, refineAssetSchema, SoftwareSchema} from "@/schemas/AddAssetSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import {
@@ -32,54 +32,79 @@ import SystemSpecsForm from "./SystemSpecsForm";
 import MiscellaneousForm from "./MiscellaneousForm";
 import { Defaults } from "@/types/options";
 
+type AssetType = "Hardware" | "Software"
+
 const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false); 
   const { showToast } = useAppContext();
-  const [tabValue, setTabValue] = useState<"Hardware" | "Software">("Hardware");
+  const [tabValue, setTabValue] = useState<AssetType>("Hardware");
 
-  const RetrievableAssetSchema = AssetSchema.superRefine(refineAssetSchema(defaultValues?.retrievableStatus))
+  const RetrievableAssetSchema = tabValue === 'Hardware'
+    ? HardwareSchema.superRefine(refineAssetSchema(defaultValues?.retrievableStatus)) 
+    : SoftwareSchema.superRefine(refineAssetSchema(defaultValues?.retrievableStatus))
 
-  const form = useForm<z.infer<typeof AssetSchema>>({
+  const defaultAssetValues = { code: '',
+    brand: '',
+    modelName: '',
+    modelNo: '',
+    serialNo: '',
+    remarks: '',
+    deploymentDate: undefined,
+    recoveredFrom: '',
+    recoveryDate: undefined,
+    assignee: '',
+    status: defaultValues.status}
+
+  const hardwareDefaultValues = {
+    ...defaultAssetValues,
+    category: defaultValues.category,
+    processor: '',
+    memory: '',
+    storage: '',
+    type: 'Hardware' as AssetType,
+    purchaseDate: undefined,
+    supplierVendor: '',
+    pezaForm8105: '',
+    pezaForm8106: '',
+    isRGE: false,
+    equipmentType: defaultValues.equipmentType,
+    client: '',
+  }
+  
+  const softwareDefaultValues = {
+    ...defaultAssetValues,
+    softwareName: '',
+    vendor: '',
+    licenseType: '',
+    purchaseDate: undefined,
+    licenseExpirationDate: new Date(),
+    type: undefined,
+    license: '',
+    version: '',
+    category: '',
+    noOfLicense: '1',
+    licenseCost: ''
+  }
+  const form = useForm<z.infer<typeof HardwareSchema>>({
     resolver: zodResolver(RetrievableAssetSchema),
     defaultValues: {
-      code: '',
-      type: 'Hardware',
-      brand: '',
-      modelName: '',
-      modelNo: '',
-      serialNo: '',
       /* Hardware */
-      ...((tabValue === 'Hardware') && {
-        category: defaultValues.category,
-        processor: '',
-        memory: '',
-        storage: '',
-        status: defaultValues.status,
-        assignee: '',
-        purchaseDate: undefined,
-        supplierVendor: '',
-        pezaForm8105: '',
-        pezaForm8106: '',
-        isRGE: false,
-        equipmentType: defaultValues.equipmentType,
-        remarks: '',
-        deploymentDate: undefined,
-        recoveredFrom: '',
-        recoveryDate: undefined,
-        client: '',
-      }),
+      ...((tabValue === 'Hardware') && hardwareDefaultValues),
       /* Software */
-      ...((tabValue === 'Hardware') && {
-        license: '',
-        version: '',
-      })
+      ...((tabValue === 'Software') && softwareDefaultValues)
     }
   });
 
   const { isSubmitting, errors} = form.formState
 
-  const handleTabChange = (newValue: "Hardware" | "Software") => {
+  const handleTabChange = (newValue: AssetType) => {
+    if (newValue === 'Hardware') {
+      form.reset(hardwareDefaultValues)
+    } else {
+      form.reset(softwareDefaultValues)
+    }
+    form.setValue('type', newValue)
     setTabValue(newValue);
   };
 
@@ -113,7 +138,7 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
 
   const triggerValidation = () => form?.trigger()
 
-  const onSubmit = (data: z.infer<typeof AssetSchema>) => {
+  const onSubmit = (data: z.infer<typeof HardwareSchema>) => {
     const assetData: AssetFormData = {
       ...data,
       type: tabValue,
@@ -153,7 +178,7 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
                 <Tabs defaultValue="Hardware" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="Hardware" onClick={() => handleTabChange("Hardware")}>Hardware</TabsTrigger>
-                    <TabsTrigger value="Software" onClick={() => handleTabChange("Software")} disabled>Software</TabsTrigger>
+                    <TabsTrigger value="Software" onClick={() => handleTabChange("Software")}>Software</TabsTrigger>
                   </TabsList>
                   <div className="">
                     <TabsContent tabIndex={-1} value="Hardware" className="pb-4 px-3">
@@ -161,7 +186,9 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
                       <SystemSpecsForm />
                       <MiscellaneousForm defaults={defaultValues} mode='new'/>
                     </TabsContent>
-                    <TabsContent value="Software">
+                    <TabsContent value="Software" className="pb-4 px-3">
+                      <GeneralInfoForm />
+                      <MiscellaneousForm defaults={defaultValues} mode='new'/>
                     </TabsContent>
                   </div>     
                 </Tabs>            

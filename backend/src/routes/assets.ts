@@ -126,58 +126,46 @@ router.post('/', [
         data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
       }
 
-      if (data.type === 'Hardware') {
-        const existingAsset = await Hardware.findOne({ code: data.code });
-        if (existingAsset) {
-          return res.status(400).json({ message: "Asset code already exists" });
-        }
-
-        if (data['assignee']) {
-          data['status'] = 'Deployed';
-          data['deploymentHistory'] = [
-            {
-              assignee: data['assignee'],
-              deploymentDate: data['deploymentDate'] ? data['deploymentDate'] : new Date()
-            }
-          ]
-        } else if(data['status'] === 'Deployed' && !data['assignee']) data['status'] = 'IT Storage'
-
-        if (data['recoveredFrom']) {
-          const recovery = {
-            assignee: data['recoveredFrom'],
-            recoveryDate: data['recoveryDate'] ? data['recoveryDate'] : new Date()
-          }
-          if (!Array.isArray(data['deploymentHistory'])) data['deploymentHistory'] = [recovery]
-          else {
-             data['deploymentHistory'].push(recovery)
-          }
-        }
-
-        if (!data['serialNo']) return res.status(422).json({ message: 'Serial Number is required' });
-        if (!data['category']) return res.status(422).json({ message: 'Category is required' });
-
-        const checkSerial = await checkSerialNo(data['serialNo']);
-        if (checkSerial !== 'SUCCESS') return res.status(422).json({ message: checkSerial });
-
-        data['code'] = await getCodeAndIncrement(data['category'], data['type']);
-        if (!data['code']) return res.status(422).json({ message: `Need to configure the index of ${data['type']} - ${data['category']}` });
-
-        const newAsset = new Hardware(data);
-        await newAsset.save();
-        await auditAssets();
-
-        return res.status(201).json(newAsset);
-      } else {
-        const existingAsset = await Software.findOne({ code: data.code });
-        if (existingAsset) {
-          return res.status(400).json({ message: "Asset code already exists" });
-        }
-
-        const newAsset = new Software(data);
-        await newAsset.save();
-
-        return res.status(201).json(newAsset);
+      const existingAsset = await Hardware.findOne({ code: data.code });
+      if (existingAsset) {
+        return res.status(400).json({ message: "Asset code already exists" });
       }
+
+      if (data['assignee']) {
+        data['status'] = 'Deployed';
+        data['deploymentHistory'] = [
+          {
+            assignee: data['assignee'],
+            deploymentDate: data['deploymentDate'] ? data['deploymentDate'] : new Date()
+          }
+        ]
+      } else if(data['status'] === 'Deployed' && !data['assignee']) data['status'] = 'IT Storage'
+
+      if (data['recoveredFrom']) {
+        const recovery = {
+          assignee: data['recoveredFrom'],
+          recoveryDate: data['recoveryDate'] ? data['recoveryDate'] : new Date()
+        }
+        if (!Array.isArray(data['deploymentHistory'])) data['deploymentHistory'] = [recovery]
+        else {
+            data['deploymentHistory'].push(recovery)
+        }
+      }
+
+      if (!data['serialNo']) return res.status(422).json({ message: 'Serial Number is required' });
+      if (!data['category']) return res.status(422).json({ message: 'Category is required' });
+
+      const checkSerial = await checkSerialNo(data['serialNo']);
+      if (checkSerial !== 'SUCCESS') return res.status(422).json({ message: checkSerial });
+
+      data['code'] = await getCodeAndIncrement(data['category'], data['type']);
+      if (!data['code']) return res.status(422).json({ message: `Need to configure the index of ${data['type']} - ${data['category']}` });
+
+      const newAsset =  data.type === 'Hardware' ? new Hardware(data) : new Software(data)
+      await newAsset.save();
+      await auditAssets();
+
+      return res.status(201).json(newAsset);
     } catch (error) {
       console.error('Error creating asset:', error);
       res.status(500).json({ error: 'Internal Server Error' });
