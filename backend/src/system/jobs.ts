@@ -33,9 +33,10 @@ export const convertStatusToUnaccounted = async () => {
 }
 
 export const setDefaults = async () => {
-    const optionStatus = ['IT Storage', 'Shelved'];
+    const optionStatus = ['IT Storage']; //'Shelved'
     const options: any = await Option.findOne({});
     const updateStatus = options['status'].reduce((accum: any[], value: any, index: number) => {
+        value.tracked = false;
         if (optionStatus.includes(value.value)) value.tracked = true;
         accum.push(value)
         return accum;
