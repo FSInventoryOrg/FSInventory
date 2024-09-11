@@ -15,8 +15,6 @@ interface LatestAssetsTableProps {
 
 const LatestAssetsTable = ({ data }: LatestAssetsTableProps) => {
   const latestAssets = [...data].reverse();
-
-  console.log(latestAssets);
   return (
     <div>
       <Table>
