@@ -21,7 +21,7 @@ import {
 import CountUp from 'react-countup';
 import * as imsService from '@/ims-service';
 import { useQuery } from '@tanstack/react-query';
-import { HardwareType } from '@/types/asset';
+import { HardwareType, SoftwareType } from '@/types/asset';
 import { Skeleton } from '../ui/skeleton';
 
 interface SidebarFiltersProps {
@@ -56,10 +56,11 @@ const SidebarFilters = ({
     totalAssets 
   }: SidebarFiltersProps) => {
 
-  const { data, isLoading } = useQuery({ queryKey: ['fetchAllAssets', 'Hardware'], queryFn: () => imsService.fetchAllAssets('Hardware') })
+  const { data, isLoading } = useQuery({ queryKey: ['fetchAllAssets', selectedType], queryFn: () => imsService.fetchAllAssets(selectedType) })
   const statusCounts: Record<string, number> = {};
   const categoriesCounts: Record<string, number> = {};
-  const categories = new Set<string>();
+  const softwareCategories = new Set<string>();
+  const hardwareCategories = new Set<string>();
   const processors = new Array<string>();
   const memories = new Array<string>();
   const storage = new Array<string>();
@@ -71,10 +72,11 @@ const SidebarFilters = ({
     const memorySet = new Set<string>();
     const storageSet = new Set<string>();
     
-    data.forEach((asset: HardwareType) => {      
+    data.forEach((asset: HardwareType & SoftwareType) => {      
       statusCounts[asset.status] = (statusCounts[asset.status] || 0) + 1;
 
-      categories.add(asset.category);
+      asset.type === 'Software' && softwareCategories.add(asset.category);
+      asset.type === 'Hardware' && hardwareCategories.add(asset.category);
       categoriesCounts[asset.category] = (categoriesCounts[asset.category] || 0) + 1;
       
       asset.processor && processorSet.add(asset.processor);
@@ -161,6 +163,7 @@ const SidebarFilters = ({
                 onClick={() => onTypeChange('Software')}
               >
                 Software
+                <CodeIcon size={18}/>
               </Button>
             </div>
           </div>
@@ -226,24 +229,28 @@ const SidebarFilters = ({
                     <SelectValue placeholder="All assets" />
                   </SelectTrigger>
                   <SelectContent>
+                    {selectedType !== 'Software' && (
                     <SelectGroup>
                       <SelectLabel>Hardware</SelectLabel>
                       <SelectItem value='all'>All</SelectItem>
-                      {[...categories].map((category: string) => (
+                      {[...hardwareCategories].map((category: string) => (
                         <SelectItem key={category} value={category} className='w-full'>
                             {category}
                         </SelectItem>
                       ))}
                     </SelectGroup>
-                    <SelectGroup>
-                      <SelectLabel>Software</SelectLabel>
-                      <SelectItem value='all'>All</SelectItem>
-                      {[...categories].map((category: string) => (
-                        <SelectItem key={category} value={category} className='w-full'>
-                            {category}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
+                    )}
+                    { selectedType !== 'Hardware' && (
+                       <SelectGroup>
+                       <SelectLabel>Software</SelectLabel>
+                       <SelectItem value='all'>All</SelectItem>
+                       {[...softwareCategories].map((category: string) => (
+                         <SelectItem key={category} value={category} className='w-full'>
+                             {category}
+                         </SelectItem>
+                       ))}
+                     </SelectGroup>
+                    )}
                   </SelectContent>
                 </Select>
               }
