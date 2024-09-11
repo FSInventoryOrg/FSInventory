@@ -64,6 +64,7 @@ router.post('/:property', [
       }
 
       const { property } = req.params;
+      const { type } = req.query;
       let { value } = req.body;
 
       if (value === '') {
@@ -80,7 +81,7 @@ router.post('/:property', [
       // Convert value to object if property is "status" or "category" and value is a string
       if (property === 'status' || property === 'category') {
         if (typeof value === 'string') {
-          value = { value };
+          value = { value, type };
         }
 
         if(property === 'status') isStatusIncluded = true

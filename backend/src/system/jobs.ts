@@ -10,6 +10,15 @@ import { triggerNotif } from "../utils/common";
 import { renewAutoMailingActivation } from "./automail";
 import { getVersion } from "./version";
 
+const LICENSE_TYPES: string[] = [
+    'Perpetual',
+    'Subscription',
+    'Single-User (Named User)',
+    'Multi-User (Site)',
+    'OEM',
+    'Open Source'
+  ]
+
 export const rotateLogs = async () => {
     const conn = await MongoClient.connect(process.env.MONGODB_CONNECTION_STRING as string);
     const db = conn.db('admin');
@@ -40,7 +49,17 @@ export const setDefaults = async () => {
         accum.push(value)
         return accum;
     }, [])
-    await Option.updateOne({ _id: options['_id'] }, { status: updateStatus })
+
+    const licenseType = options.licenseType?.length ? options.licenseType : LICENSE_TYPES;
+    
+    const updatedCategories = options['category'].reduce((accum: any[], category: any) => {
+        if (category?.type !=='Software') {
+            category.type = 'Hardware'
+        }
+        accum.push(category)
+        return accum
+    }, [])
+    await Option.updateOne({ _id: options['_id'] }, { status: updateStatus, category: updatedCategories, licenseType })
 
     const newCreds: any = {
         "created": "2024-08-02T12:05:49.192Z",

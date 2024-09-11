@@ -28,6 +28,7 @@ export interface OptionsType extends Document {
   equipmentType: string[];
   defaults: Defaults;
   adminLists?: string[];
+  licenseType: string[];
 }
 
 const optionsSchema: Schema<OptionsType> = new Schema<OptionsType>({
@@ -47,6 +48,7 @@ const optionsSchema: Schema<OptionsType> = new Schema<OptionsType>({
     }],
     required: true },
   equipmentType: { type: [String], required: true },
+  licenseType: { type: [String], required: false},
   defaults: {
     type: { 
       status: { type: String, required: false }, 

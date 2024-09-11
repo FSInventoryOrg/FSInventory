@@ -38,6 +38,7 @@ interface MiscellaneousFormProps {
   defaults?: Defaults;
   mode: 'edit' | 'new';
 }
+
 const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
   defaults,
   mode = 'new',
@@ -46,6 +47,7 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
   const [openDeploymentDate, setOpenDeploymentDate] = useState(false);
   const [openRecoveryDate, setOpenRecoveryDate] = useState(false);
   const status = watch('status');
+  const type = watch('type');
   const isRetrievable = status && status === defaults?.retrievableStatus;
 
   useEffect(() => {
@@ -63,89 +65,7 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
         </span>
         <div className='flex-grow border-t border-border border-[1px]'></div>
       </div>
-      <FormLabel className='text-md text-secondary-foreground'>
-        Legal information
-      </FormLabel>
-      <FormField
-        control={control}
-        name='client'
-        render={({ field }) => (
-          <FormItem className='w-full sm:w-2/3 mt-2'>
-            <FormControl>
-              <SuggestiveInput
-                property='client'
-                placeholder='Client'
-                autoComplete='off'
-                type='input'
-                field={field}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <div className='flex flex-col sm:flex-row gap-2 w-full'>
-        <FormField
-          control={control}
-          name='pezaForm8105'
-          render={({ field }) => (
-            <FormItem className='w-full sm:w-1/2'>
-              <FormControl>
-                <Input
-                  placeholder='PEZA Form 8105'
-                  autoComplete='off'
-                  type='input'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={control}
-          name='pezaForm8106'
-          render={({ field }) => (
-            <FormItem className='w-full sm:w-1/2'>
-              <FormControl>
-                <Input
-                  placeholder='PEZA Form 8106'
-                  autoComplete='off'
-                  type='input'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-      <FormField
-        control={control}
-        name='isRGE'
-        render={({ field }) => (
-          <FormItem className='w-full sm:w-2/3'>
-            <Select
-              onValueChange={(value) =>
-                field.onChange(value === 'true' ? true : false)
-              } // Convert string value to boolean
-              defaultValue={field.value ? field.value.toString() : ''} // Convert boolean value to string
-            >
-              <FormControl>
-                <SelectTrigger className='w-full text-start'>
-                  <SelectValue placeholder='Is RGE?' />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value='false'>NO</SelectItem>
-                <SelectItem value='true'>YES</SelectItem>
-              </SelectContent>
-            </Select>
-            <FormDescription>Default set to NO.</FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      {type === 'Hardware' && <LegalInfoForm />}
       <FormLabel className='text-md text-secondary-foreground'>
         Deployment details
       </FormLabel>
@@ -255,7 +175,10 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
                 />
               </FormControl>
               <FormMessage />
-              <FormDescription>Recovery date is required when 'Recovered From' field is filled in.</FormDescription>
+              <FormDescription>
+                Recovery date is required when 'Recovered From' field is filled
+                in.
+              </FormDescription>
             </FormItem>
           )}
         />
@@ -341,4 +264,94 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
   );
 };
 
+const LegalInfoForm: React.FC = () => {
+  const { control } = useFormContext<AssetFormData>();
+  return (
+    <>
+      <FormLabel className='text-md text-secondary-foreground'>
+        Legal information
+      </FormLabel>
+      <FormField
+        control={control}
+        name='client'
+        render={({ field }) => (
+          <FormItem className='w-full sm:w-2/3 mt-2'>
+            <FormControl>
+              <SuggestiveInput
+                property='client'
+                placeholder='Client'
+                autoComplete='off'
+                type='input'
+                field={field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <div className='flex flex-col sm:flex-row gap-2 w-full'>
+        <FormField
+          control={control}
+          name='pezaForm8105'
+          render={({ field }) => (
+            <FormItem className='w-full sm:w-1/2'>
+              <FormControl>
+                <Input
+                  placeholder='PEZA Form 8105'
+                  autoComplete='off'
+                  type='input'
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name='pezaForm8106'
+          render={({ field }) => (
+            <FormItem className='w-full sm:w-1/2'>
+              <FormControl>
+                <Input
+                  placeholder='PEZA Form 8106'
+                  autoComplete='off'
+                  type='input'
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+      <FormField
+        control={control}
+        name='isRGE'
+        render={({ field }) => (
+          <FormItem className='w-full sm:w-2/3'>
+            <Select
+              onValueChange={(value) =>
+                field.onChange(value === 'true' ? true : false)
+              } // Convert string value to boolean
+              defaultValue={field.value ? field.value.toString() : ''} // Convert boolean value to string
+            >
+              <FormControl>
+                <SelectTrigger className='w-full text-start'>
+                  <SelectValue placeholder='Is RGE?' />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value='false'>NO</SelectItem>
+                <SelectItem value='true'>YES</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormDescription>Default set to NO.</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </>
+  );
+};
 export default MiscellaneousForm;
