@@ -11,10 +11,15 @@ import { Defaults } from '@/types/options';
 import { PROPERTIES } from '@/lib/data';
 
 const Inventory = () => {
+  const [selectedType, setSelectedType] = React.useState<string>('');
   const [selectedStatus, setSelectedStatus] = React.useState<string>('');
   const [selectedCategory, setSelectedCategory] = React.useState<string>('');
   const [selectedSystemSpecs, setSelectedSystemSpecs] = React.useState<Record<string, string>>({ processor: '', memory: '', storage: '' });
   const [isFiltersVisible, setIsFiltersVisible] = React.useState<boolean>(true);
+
+  const handleTypeChange = (type: string) => {
+    setSelectedType(type);
+  }
 
   const handleFilterChange = (status: string) => {
     setSelectedStatus(status === 'all' ? '' : status);
@@ -41,9 +46,9 @@ const Inventory = () => {
   }
 
   const { data } = useQuery({ 
-    queryKey: ['fetchAllAssetsByStatusAndCategory', 'Hardware', selectedStatus, selectedCategory, selectedSystemSpecs], 
+    queryKey: ['fetchAllAssetsByStatusAndCategory', selectedType, selectedStatus, selectedCategory, selectedSystemSpecs], 
     queryFn: () => imsService.fetchAssetsByFilter({
-      type: 'Hardware',
+      type: selectedType,
       status: selectedStatus,
       category: selectedCategory,
       processor: selectedSystemSpecs.processor,
@@ -85,6 +90,7 @@ const Inventory = () => {
       {isFiltersVisible && (
         <aside className="order-first flex xl:w-80 z-50">
           <SidebarFilters
+            onTypeChange={handleTypeChange}
             onFilterChange={handleFilterChange}
             onCategoryChange={handleCategoryChange}
             onProcessorChange={handleProcessorChange}
@@ -92,6 +98,7 @@ const Inventory = () => {
             onStorageChange={handleStorageChange}
             onToggleFilters={handleToggleFilters} 
             isFiltersVisible={isFiltersVisible} 
+            selectedType={selectedType}
             selectedStatus={selectedStatus}
             selectedCategory={selectedCategory}
             selectedSystemSpecs={selectedSystemSpecs}

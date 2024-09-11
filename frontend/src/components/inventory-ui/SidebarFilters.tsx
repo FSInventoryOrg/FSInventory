@@ -25,20 +25,23 @@ import { HardwareType } from '@/types/asset';
 import { Skeleton } from '../ui/skeleton';
 
 interface SidebarFiltersProps {
+  onTypeChange: (type: string) => void;
   onFilterChange: (status: string) => void;
-  onCategoryChange: (status: string) => void;
+  onCategoryChange: (category: string) => void;
   onProcessorChange: (processor: string) => void;
   onMemoryChange: (memory: string) => void;
   onStorageChange: (storage: string) => void;
   onToggleFilters: (visible: boolean) => void;
   isFiltersVisible: boolean;
+  selectedType: string;
   selectedStatus: string;
   selectedCategory: string;
   selectedSystemSpecs: Record<string, string>;
   totalAssets: number;
 }
 
-const SidebarFilters = ({ 
+const SidebarFilters = ({
+    onTypeChange,
     onFilterChange, 
     onCategoryChange,
     onProcessorChange,
@@ -46,6 +49,7 @@ const SidebarFilters = ({
     onStorageChange,
     onToggleFilters, 
     isFiltersVisible, 
+    selectedType,
     selectedStatus, 
     selectedCategory, 
     selectedSystemSpecs,
@@ -139,15 +143,24 @@ const SidebarFilters = ({
             Filter Settings
           </h2>
           <div className='flex flex-col gap-2'>
-            <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Type</span>
+            <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>
+              Type
+            </span>
             <div className='flex gap-2 w-full md:w-fit xl:w-full'>
-              <Button variant='outline' className='bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2'>
+              <Button
+                variant='outline'
+                className={`bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2  ${selectedType === 'Hardware' ? 'border-primary' : ''}`}
+                onClick={() => onTypeChange('Hardware')}
+              >
                 Hardware
                 <MonitorSmartphoneIcon size={18} />
               </Button>
-              <Button variant='outline' className='bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2'>
+              <Button
+                variant='outline'
+                className={`bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2  ${selectedType === 'Software' ? 'border-primary' : ''}`}
+                onClick={() => onTypeChange('Software')}
+              >
                 Software
-                <CodeIcon size={18} />
               </Button>
             </div>
           </div>
@@ -215,6 +228,15 @@ const SidebarFilters = ({
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Hardware</SelectLabel>
+                      <SelectItem value='all'>All</SelectItem>
+                      {[...categories].map((category: string) => (
+                        <SelectItem key={category} value={category} className='w-full'>
+                            {category}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Software</SelectLabel>
                       <SelectItem value='all'>All</SelectItem>
                       {[...categories].map((category: string) => (
                         <SelectItem key={category} value={category} className='w-full'>
