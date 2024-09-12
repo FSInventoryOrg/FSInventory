@@ -229,12 +229,19 @@ const SoftwareDetailsForm: React.FC = () => {
           render={({ field }) => (
             <FormItem className='w-full sm:w-1/2'>
               <FormControl>
+                <Box className='relative'>
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                  <span>₱</span>
+                </div>
                 <Input
+                  className='pl-6'
                   placeholder='License cost'
                   autoComplete='off'
                   type='input'
                   {...field}
                 />
+           
+                </Box>
               </FormControl>
               <FormMessage />
             </FormItem>
