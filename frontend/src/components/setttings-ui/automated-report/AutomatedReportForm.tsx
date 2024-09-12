@@ -71,6 +71,7 @@ const AutomatedReportForm = ({
   const { mutate: sendNow, isPending: isSendPending } = useMutation({
     mutationFn: imsService.sendAutoMailNow,
     onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ['autoMailSettings'] });
       showToast({ message: 'Email report sent!', type: 'SUCCESS' });
     },
     onError: (error: Error) => {
@@ -156,7 +157,7 @@ const AutomatedReportForm = ({
                     {/* <SelectItem value="Daily">Daily</SelectItem> */}
                     <SelectItem value="Weekly">Weekly</SelectItem>
                     <SelectItem value="Bi-Weekly">Bi-Weekly</SelectItem>
-                    {/* <SelectItem value="Monthly">Monthly</SelectItem> */}
+                    <SelectItem value="Monthly">Monthly</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormDescription>
