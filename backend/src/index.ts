@@ -84,7 +84,7 @@ if (process.env.NODE_ENV !== 'development') {
 
 const onStartupJobs = async() => {
   await getVersions();
-  // rotateLogs()
+  rotateLogs()
   await removeStatus();
   await setDefaults();
   await convertStatusToStorage()

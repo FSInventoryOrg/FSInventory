@@ -6,7 +6,7 @@ import AutoMail from '../../models/automail.schema';
 import { getFile } from '../../utils/common';
 
 export const inventoryReportHtml = async (mailMeta?: any) => {
-  const templatePath = `backend/src/reports-template/mail/report.hbs`;
+  const templatePath = `src/reports-template/mail/report.hbs`;
   const templateContent = await getFile(templatePath);
   const template = Handlebars.compile(templateContent?.toString());
 
