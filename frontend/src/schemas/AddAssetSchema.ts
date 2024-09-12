@@ -80,15 +80,6 @@ export type AssetFormData3 = z.infer<typeof SoftwareSchema>;
 
 export const refineAssetSchema = (retrievableStatus?: string) => {
   return (arg: AssetFormData, ctx: z.RefinementCtx) => {
-    // if (arg.type === 'Software') {
-    //   if (!(arg as AssetFormData3).licenseCost) {
-    //     ctx.addIssue({
-    //       code: 'custom',
-    //       message: 'License cost is required',
-    //       path: ['licenseCost'],
-    //     });
-    //   }
-    // }
     if (arg.recoveredFrom?.trim()) {
       if (!arg.recoveryDate) {
         ctx.addIssue({
