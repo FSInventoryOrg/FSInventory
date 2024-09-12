@@ -1,8 +1,14 @@
 import mongoose from "mongoose";
-import { deleteFilesInDirectory, getFile, saveFile } from "../utils/common";
+import { deleteFilesInDirectory, getFile, getFilePath, saveFile, saveFileFromBase64 } from "../utils/common";
+const { ObjectId } = require('mongodb');
 import AdmZip from "adm-zip";
 import express, { Request, Response } from 'express';
+import { check, validationResult } from 'express-validator'
 import verifyToken, { verifyRole } from '../middleware/auth';
+
+// File
+import { writeFileSync, existsSync, mkdirSync } from 'fs';
+import path from "path";
 
 const router = express.Router();
 
@@ -10,18 +16,10 @@ let initiated: Boolean = false;
 var collections: any[] = [];
 const db = mongoose.connection
 
-// Delay for initiation
-const initiate = async () => {
-	return await new Promise((resolve, reject) => {
-		setTimeout(() => { initiated = true; resolve(true) }, 2000)
-	})
-}
 
 // Set list of documents
 export const listCollection = async () => {
-	if (!initiated) await initiate();
-	else return collections
-	collections = (await db.db.listCollections().toArray()).map((f: any) => f['name']);
+	return (await db.db.listCollections().toArray()).map((f: any) => f['name']);
 }
 
 // Extract documents
@@ -67,46 +65,18 @@ const unzipFile = async (src: string, target: string) => {
 	zip.extractAllTo(target, true)
 }
 
-// Verify upload
-const verifyUpload = async (req: Request) => {
-	const { src } = req.body;
-
-	// initialize data
-	let srcFormat = { data: "", base64: "" };
-
-	// validate if src exist on body
-	if (!src) return { code: 400, message: "Source file is needed and must be in base64 format i.e data:text/plain;base64,abcdef123456789" }
-
-	// extract upload data
-	try {
-		let tmp = src.split(';');
-		srcFormat['data'] = tmp[0].replace('data:', '');
-		srcFormat['base64'] = tmp[1].replace('base64,', '');
-	} catch (errorProcess) {
-		console.log(errorProcess);
-		return { code: 500, message: "Source file must be in base64 format i.e data:text/plain;base64,abcdef123456789" }
+// Convert text id to MongoDB Object Id
+const convertIdToObjectId = (doc: any) => {
+	if (doc._id && typeof doc._id === 'string') {
+		doc._id = new ObjectId(doc._id);
 	}
+	return doc;
+};
 
-	// validate file type
-	if (!srcFormat['data'].includes('application/zip')) return { code: 400, message: "Attachment should be a zip file" }
-
-	// save file to import folder
-	const path = await saveFile('/public/imports/archive', 'backup.zip', srcFormat['base64'], true)
-
-	// extract collections from zip file
-	const target = path.replace(`/archive/backup.zip`, '/collections');
-	await unzipFile(path, target);
-
-	return { code: 200, message: "success", path: target }
-}
 
 /**
- * Routes
- * - export
- * - import
- * - check
+ * Export system data into zip file
  */
-
 router.get('/export', verifyToken, verifyRole("ADMIN"), async (req: Request, res: Response) => {
 	try {
 		const initiateBackup: any = await extractDocuments()
@@ -122,115 +92,136 @@ router.get('/export', verifyToken, verifyRole("ADMIN"), async (req: Request, res
 	}
 });
 
-router.patch('/import', verifyToken, verifyRole("ADMIN"), async (req: Request, res: Response) => {
+/**
+ * Verify the backup data to be uploaded then save it on disk
+ */
+router.post('/verify', verifyToken, verifyRole("ADMIN"), async (req: Request, res: Response) => {
+	// Verify and upload file to the import directory
+	const { src } = req.body;
+	// validate if src exist on body
+	if (!src) return { code: 400, message: "Source file is needed and must be in base64 format i.e data:text/plain;base64,abcdef123456789" }
+	// initialize data
+	let srcFormat = { data: "", base64: "" };
+	// extract upload data
 	try {
-		const verifyUploadedFile = await verifyUpload(req);
-
-		console.log(verifyUploadedFile)
-		if (verifyUploadedFile['code'] !== 200) return res.status(verifyUploadedFile['code']).json(verifyUploadedFile['message'])
-		else {
-			const collectionList = await listCollection();
-
-			collectionList?.forEach(async (collection) => {
-				let backupDocuments: any
-				try {
-					const bkFile: any = await getFile(`${verifyUploadedFile['path']}/${collection}.json`, true)
-					backupDocuments = JSON.parse(bkFile.toString())
-
-					const fileLength = backupDocuments.length;
-					backupDocuments = backupDocuments.reduce((accum: any, value: any) => {
-						if (value?._id) {
-							value._id = {
-								'$oid': value._id
-							}
-
-							accum.push(value)
-						}
-						return accum
-					}, [])
-
-					if (fileLength !== backupDocuments.length) backupDocuments = null
-				} catch (errorFile) { }
-
-				if (Array.isArray(backupDocuments)) {
-					if (backupDocuments.length > 0) {
-						await db.dropCollection(collection);
-						const _tmpCollection = db.collection(collection);
-
-						await _tmpCollection.insertMany(backupDocuments)
-					}
-				}
-			})
-		}
-	} catch (error) {
-		console.log(error);
-		return res.status(500).json({ message: "Something went wrong" });
+		let tmp = src.split(';');
+		srcFormat['data'] = tmp[0].replace('data:', '');
+		srcFormat['base64'] = tmp[1].replace('base64,', '');
+	} catch (errorProcess) {
+		console.log(errorProcess);
+		return { code: 500, message: "Source file must be in base64 format i.e data:text/plain;base64,abcdef123456789" }
 	}
+	// validate file type
+	if (!srcFormat['data'].includes('application/zip')) return { code: 400, message: "Attachment should be a zip file" }
+	// Save file
+	const backupDir = await saveFileFromBase64('/public/import/archive', 'backup.zip', srcFormat['base64']);
+	// Extract directory
+	const extractDir = backupDir.replace("/archive/backup.zip", "/collections");
+	// extract collections from zip file
+	await unzipFile(backupDir, extractDir);
+	// Response
+	res.status(200).json({ message: "No collections found" });
 });
+
+/**
+ * Import into database the verified file
+ */
+router.post('/import', verifyToken, verifyRole("ADMIN"),
+	async (req: Request, res: Response) => {
+		try {
+			// Get import filepath
+			const verifiedUploadedDir = getFilePath("/public/backup/collections");
+			// Get list of collection name
+			const collectionList = await listCollection();
+			if (!collectionList || collectionList.length === 0) {
+				return res.status(404).json({ message: "No collections found" });
+			}
+			// Loop collection
+			for (const collection of collectionList) {
+				try {
+					const bkFile: any = await getFile(`${verifiedUploadedDir}/${collection}.json`, true)
+					const jsonData = JSON.parse(bkFile.toString());
+					const deserializedData = jsonData.map(convertIdToObjectId);
+					// Check if there is any data to import
+					if (deserializedData.length === 0) {
+						console.warn(`No data to import for collection ${collection}`);
+						continue;
+					}
+					// Delete then insert data
+					await db.collection(collection).deleteMany({});
+					await db.collection(collection).insertMany(deserializedData);
+				} catch (errorFile) {
+					console.error(`Error processing file for collection ${collection}:`, errorFile);
+				}
+			}
+			res.status(200).json({ message: "Success" });
+		} catch (error) {
+			console.log(error);
+			return res.status(500).json({ message: "Something went wrong" });
+		}
+	});
 
 router.patch('/check', verifyToken, async (req: Request, res: Response) => {
 	try {
-		const verifyUploadedFile = await verifyUpload(req);
+		// Get import filepath
+		const verifiedUploadedDir = getFilePath("/public/backup/collections");
 
-		if (verifyUploadedFile['code'] !== 200) return res.status(verifyUploadedFile['code']).json(verifyUploadedFile['message'])
-		else {
-			const collectionList = await listCollection();
-			let noIDs: any[] = [];
-			let noRecord: any[] = []
-			let errorParsing: any[] = [];
-			let currentMoreUpdated: boolean = false;
+		const collectionList = await listCollection();
+		let noIDs: any[] = [];
+		let noRecord: any[] = []
+		let errorParsing: any[] = [];
+		let currentMoreUpdated: boolean = false;
 
-			collectionList?.forEach(async (collection) => {
-				let backupDocuments: any
-				try {
-					const bkFile: any = await getFile(`${verifyUploadedFile['path']}/${collection}.json`, true)
-					backupDocuments = JSON.parse(bkFile.toString())
+		collectionList?.forEach(async (collection) => {
+			let backupDocuments: any
+			try {
+				const bkFile: any = await getFile(`${verifiedUploadedDir}/${collection}.json`, true)
+				backupDocuments = JSON.parse(bkFile.toString())
 
-					const fileLength = backupDocuments.length;
-					backupDocuments = backupDocuments.reduce((accum: any, value: any) => {
-						if (value?._id) {
-							value._id = {
-								'$oid': value._id
-							}
-
-							accum.push(value)
+				const fileLength = backupDocuments.length;
+				backupDocuments = backupDocuments.reduce((accum: any, value: any) => {
+					if (value?._id) {
+						value._id = {
+							'$oid': value._id
 						}
-						return accum
-					}, [])
 
-					if (fileLength !== backupDocuments.length) noIDs.push(collection)
+						accum.push(value)
+					}
+					return accum
+				}, [])
 
-					if (backupDocuments.length === 0) noRecord.push(collection)
-				} catch (errorFile) {
-					errorParsing.push(collection)
-				}
+				if (fileLength !== backupDocuments.length) noIDs.push(collection)
 
-				if (Array.isArray(backupDocuments) && collection === 'assets') {
-					if (backupDocuments.length > 0) {
-						backupDocuments = backupDocuments.sort((a, b) => b.updated.toString().localCompare(a.updated))
+				if (backupDocuments.length === 0) noRecord.push(collection)
+			} catch (errorFile) {
+				errorParsing.push(collection)
+			}
 
-						const _tmpCollection = db.collection(collection);
-						let lastupdate: any = await _tmpCollection.aggregate().match({}).sort({ updated: -1 }).limit(1).toArray()
+			if (Array.isArray(backupDocuments) && collection === 'assets') {
+				if (backupDocuments.length > 0) {
+					backupDocuments = backupDocuments.sort((a, b) => b.updated.toString().localCompare(a.updated))
 
-						if (lastupdate.length > 0) {
-							lastupdate = lastupdate[0]
+					const _tmpCollection = db.collection(collection);
+					let lastupdate: any = await _tmpCollection.aggregate().match({}).sort({ updated: -1 }).limit(1).toArray()
 
-							const backupLastEntry = new Date(backupDocuments[0].updated)
-							const currentLastEntry = new Date(lastupdate.updated)
+					if (lastupdate.length > 0) {
+						lastupdate = lastupdate[0]
 
-							if (currentLastEntry > backupLastEntry) currentMoreUpdated = true
-						}
+						const backupLastEntry = new Date(backupDocuments[0].updated)
+						const currentLastEntry = new Date(lastupdate.updated)
+
+						if (currentLastEntry > backupLastEntry) currentMoreUpdated = true
 					}
 				}
-			})
+			}
+		})
 
-			return res.status(200).json({
-				no_id_collection: noIDs,
-				no_record_collection: noRecord,
-				error_in_parsing: errorParsing,
-				currentIsUpdated: currentMoreUpdated
-			})
-		}
+		return res.status(200).json({
+			no_id_collection: noIDs,
+			no_record_collection: noRecord,
+			error_in_parsing: errorParsing,
+			currentIsUpdated: currentMoreUpdated
+		});
 	} catch (error) {
 		console.log(error);
 		return res.status(500).json({ message: "Something went wrong" });

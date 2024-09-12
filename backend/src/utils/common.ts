@@ -18,6 +18,7 @@ let DBCONN: any;
 
 export const setDBGlobal = async (dbconn: Connection) => { DBCONN = dbconn }
 
+// Save file
 export const saveFile = async (folder: string, filename: string, src: any, fullDirectory?: boolean) => {
 	const splitFolder = folder.split('/').filter(f => { return f });
 
@@ -35,6 +36,25 @@ export const saveFile = async (folder: string, filename: string, src: any, fullD
 	chmodSync(tmpFolder, 0o777)
 
 	return fullDirectory ? tmpFolder.replace(/\/\//g, '/') : tmpFolder.replace(directory, '');
+}
+
+// Save file from base64
+export const saveFileFromBase64 = async (folder: string, filename: string, base64Data: any) => {
+	const folderDir = `${directory}${folder}`;
+	// Ensure the directory exists
+	if (!existsSync(folderDir)) {
+		mkdirSync(folderDir, { recursive: true });
+	}
+	// Decode base64 string and save as ZIP file
+	const fileBuffer = Buffer.from(base64Data, 'base64');
+	const filePath = path.join(folderDir, filename);
+	// Save file
+	writeFileSync(filePath, fileBuffer);
+	return `${folderDir}/${filename}`;
+}
+
+export const getFilePath = (folder: string) => {
+	return `${directory}${folder}`;
 }
 
 export const getFile = async (filepath: string, isFullPath?: boolean) => {
