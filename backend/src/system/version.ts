@@ -5,8 +5,8 @@ import { getFile } from '../utils/common';
 const router = express.Router();
 
 export const getVersion = async() => {
-    const backend: any = await getFile('/package.json');
-    const frontend: any = await getFile('/../frontend/package.json');
+    const backend: any = await getFile('backend/package.json');
+    const frontend: any = await getFile('frontend/package.json');
 
     if(backend && frontend) {
         try {
