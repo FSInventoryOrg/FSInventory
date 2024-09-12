@@ -1,5 +1,8 @@
 # BACKEND CHANGELOG
 
+### 2024-09-12 [v2.5.8](https://connect.zoho.com/portal/intranet/task/623367000000597066)
+- *Fix* - Automated email reports sending email function and append update function for last email report sent date
+
 ### 2024-08-29 [v2.5.6](https://connect.zoho.com/portal/intranet/task/623367000000590081)
 - *Change* - update latest assets added table in automated email report
 
