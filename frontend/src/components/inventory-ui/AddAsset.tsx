@@ -78,7 +78,7 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
     vendor: '',
     licenseType: '',
     purchaseDate: undefined,
-    licenseExpirationDate: new Date(),
+    licenseExpirationDate: undefined,
     type: undefined,
     license: '',
     version: '',
