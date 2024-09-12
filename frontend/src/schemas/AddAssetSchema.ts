@@ -21,7 +21,9 @@ export const SoftwareSchema = AssetBaseSchema.extend({
   serialNo: z.string().trim().min(1, 'License Key/Serial number is required'),
   vendor: z.string().trim().min(1, 'Vendor is required'),
   licenseType: z.string().trim().min(1, 'License type is required'),
-  licenseExpirationDate: z.date(),
+  licenseExpirationDate: z.date({
+    required_error: 'License expiration date is required',
+  }),
   licenseCost: z
     .number({
       coerce: true,
@@ -30,7 +32,9 @@ export const SoftwareSchema = AssetBaseSchema.extend({
     .refine((arg) => !!arg, {
       message: 'License cost is required',
     }),
-  purchaseDate: z.date(),
+  purchaseDate: z.date({
+    required_error: 'Purchase date is required',
+  }),
   noOfLicense: z
     .number({
       coerce: true,
