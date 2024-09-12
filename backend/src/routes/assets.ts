@@ -126,7 +126,7 @@ router.post('/', [
         data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
       }
 
-      const existingAsset = await Hardware.findOne({ code: data.code });
+      const existingAsset = await Asset.findOne({ code: data.code });
       if (existingAsset) {
         return res.status(400).json({ message: "Asset code already exists" });
       }
@@ -492,7 +492,9 @@ router.put('/:code', [
       data.recoveryDate ??= null;
 
       // Update the asset
-      updatedAsset = await Asset.findOneAndUpdate({ code: code }, data, { new: true });
+      updatedAsset = data.type === 'Hardware' 
+        ? await Hardware.findOneAndUpdate({ code: code }, data, { new: true }) 
+        : await Software.findOneAndUpdate({ code: code }, data, { new: true }) 
 
       await auditAssets();
       
