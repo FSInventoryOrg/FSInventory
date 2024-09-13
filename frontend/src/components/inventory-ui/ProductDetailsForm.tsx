@@ -6,7 +6,7 @@ import {
   PopoverContent,
 } from '@radix-ui/react-popover';
 import { format } from 'date-fns';
-import { CalendarIcon, Calendar, XIcon } from 'lucide-react';
+import { CalendarIcon, XIcon } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 import {
   FormLabel,
@@ -19,6 +19,7 @@ import { Input } from '../ui/input';
 import SuggestiveInput from './SuggestiveInput';
 import { Button } from '../ui/button';
 import { useState } from 'react';
+import { Calendar } from '../ui/calendar';
 
 const ProductDetailsForm: React.FC = () => {
   const { control } = useFormContext<AssetFormData>();
