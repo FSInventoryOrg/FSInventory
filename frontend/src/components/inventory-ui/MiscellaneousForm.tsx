@@ -128,6 +128,7 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
                         <PopoverContent className='w-auto p-0' align='start'>
                           <Calendar
                             mode='single'
+                            selected={field.value ? new Date(field.value) : undefined}
                             onSelect={field.onChange}
                             onDayClick={() => {
                               setOpenDeploymentDate(false);
@@ -213,6 +214,7 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
                       <PopoverContent className='w-auto p-0' align='start'>
                         <Calendar
                           mode='single'
+                          selected={field.value ? new Date(field.value) : undefined}
                           onSelect={field.onChange}
                           onDayClick={() => {
                             setOpenRecoveryDate(false);
