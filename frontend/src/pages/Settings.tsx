@@ -5,6 +5,7 @@ import NotificationsControl from '@/components/setttings-ui/NotificationsControl
 import { Separator } from '@/components/ui/separator';
 import InventorySettings from '../components/setttings-ui/inventory/InventorySettings';
 import AutomatedReportSettings from '@/components/setttings-ui/automated-report/AutomatedReportSettings';
+import LoadBackupForm from '@/components/setttings-ui/load-backup/LoadBackupForm';
 
 const Settings = () => {
   const settingsNavItems = [
@@ -24,6 +25,10 @@ const Settings = () => {
       title: 'Automated Report',
       href: '/settings/automated-report',
     },
+    {
+      title: 'Load System Backup File',
+      href: '/settings/load-backup'
+    }
   ];
 
   return (
@@ -52,6 +57,7 @@ const Settings = () => {
               path="/automated-report"
               element={<AutomatedReportSettings />}
             />
+            <Route path="/load-backup" element={<LoadBackupForm />} />
           </Routes>
         </div>
       </div>
