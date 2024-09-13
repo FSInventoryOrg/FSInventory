@@ -26,7 +26,7 @@ const ProductDetailsForm: React.FC = () => {
   return (
     <>
       <FormLabel className='text-md text-secondary-foreground'>
-        Software details
+        Product details
       </FormLabel>
       <div className='flex flex-col sm:flex-row gap-2 w-full mt-2'>
         <FormField
