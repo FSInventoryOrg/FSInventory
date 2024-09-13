@@ -1,6 +1,6 @@
 import path from "path";
 import { execSync } from 'child_process';
-import { mkdirSync, existsSync, readFileSync, writeFileSync, chmodSync, copyFileSync, readdir, stat, unlink } from 'fs';
+import { mkdirSync, existsSync, readFileSync, writeFileSync, chmodSync, copyFileSync, readdir, stat, unlink, readdirSync, statSync } from 'fs';
 import AssetCounter from "../models/asset-counter.schema";
 import Asset from "../models/asset.schema";
 import Notification, { NotificationType } from "../models/notification.schema";
@@ -54,14 +54,21 @@ export const saveFileFromBase64 = async (folder: string, filename: string, base6
 }
 
 export const getFilePath = (folder: string) => {
-	return `${directory}${folder}`;
+	return path.join(directory, folder);
 }
 
 export const getFile = async (filepath: string, isFullPath?: boolean) => {
 	const tmpFolder = isFullPath ? filepath : `${directory}${filepath}`.replace(/\/\//g, '/');
-
 	try {
 		return readFileSync(tmpFolder)
+	} catch (err) {
+		return null
+	}
+}
+
+export const readFile = async (filepath: string) => {
+	try {
+		return readFileSync(filepath);
 	} catch (err) {
 		return null
 	}
@@ -98,6 +105,29 @@ export const deleteFilesInDirectory = (folder: string) => {
 		});
 	});
 }
+
+// Get first file on a directory filename
+export const getUploadFormat = (folder: string) => {
+	try {
+		const folderDir = `${directory}${folder}`;
+		// Read all files and directories in the specified folder
+		const files = readdirSync(folderDir)
+			.filter(file => statSync(path.join(folderDir, file)).isFile()); // Filter out directories
+
+		// Sort files (optional, to ensure consistent ordering)
+		files.sort();
+
+		// Return the filename of the first file if available
+		if (files.length > 0) {
+			return files[0];
+		} else {
+			return null;
+		}
+	} catch (error) {
+		console.error('Error reading directory:', error);
+		return null;
+	}
+};
 
 export const getParentDirectory = () => {
 	return path.join(directory, '../')
