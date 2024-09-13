@@ -11,12 +11,10 @@ import { renewAutoMailingActivation } from "./automail";
 import { getVersion } from "./version";
 
 const LICENSE_TYPES: string[] = [
-    'Perpetual',
     'Subscription',
     'Single-User (Named User)',
     'Multi-User (Site)',
     'OEM',
-    'Open Source'
   ]
 
 export const rotateLogs = async () => {
