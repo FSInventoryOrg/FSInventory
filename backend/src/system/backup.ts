@@ -3,16 +3,10 @@ import { deleteFilesInDirectory, getFile, getFilePath, saveFile, saveFileFromBas
 const { ObjectId } = require('mongodb');
 import AdmZip from "adm-zip";
 import express, { Request, Response } from 'express';
-import { check, validationResult } from 'express-validator'
 import verifyToken, { verifyRole } from '../middleware/auth';
-
-// File
-import { writeFileSync, existsSync, mkdirSync } from 'fs';
-import path from "path";
 
 const router = express.Router();
 
-let initiated: Boolean = false;
 var collections: any[] = [];
 const db = mongoose.connection
 
@@ -159,7 +153,8 @@ router.post('/import', verifyToken, verifyRole("ADMIN"),
 			console.log(error);
 			return res.status(500).json({ message: "Something went wrong" });
 		}
-	});
+	},
+);
 
 router.patch('/check', verifyToken, async (req: Request, res: Response) => {
 	try {
@@ -227,5 +222,34 @@ router.patch('/check', verifyToken, async (req: Request, res: Response) => {
 		return res.status(500).json({ message: "Something went wrong" });
 	}
 });
+
+/**
+ * Clear tables
+ */
+router.delete('/clear', verifyToken, verifyRole("ADMIN"),
+	async (req: Request, res: Response) => {
+		try {
+			// Get list of collection name
+			const collectionList = await listCollection();
+			if (!collectionList || collectionList.length === 0) {
+				return res.status(404).json({ message: "No collections found" });
+			}
+			console.log(collectionList)
+			// Loop collection
+			for (const collection of collectionList) {
+				try {
+					// Delete all records
+					await db.collection(collection).deleteMany({});
+				} catch (errorFile) {
+					console.error(`Error processing file for collection ${collection}:`, errorFile);
+				}
+			}
+			res.status(200).json({ message: "Success" });
+		} catch (error) {
+			console.log(error);
+			return res.status(500).json({ message: "Something went wrong" });
+		}
+	}
+);
 
 export default router;
