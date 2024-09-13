@@ -35,7 +35,7 @@
 ## MongoDB Backup Procedure
 - Make sure to follow and execute the **`Setup MongoDB Command Line DB Tools`**
 - Start your currently using docker container (old one), instructed on **`Docker command and control scripts`** above
-- Open a command prompt or on git bash (Open CMD/Gitbash in C:\Users\documents)
+- Open a command prompt or on Gitbash (Open CMD/Gitbash in C:\Users\documents)
 - To generate a backup, run this command `mongodump --uri "mongodb://fullscale:fullscale@localhost:27020/inventory?authSource=admin" --out ./data/backup`
 
 ## MongoDB Restore Procedure
@@ -43,6 +43,7 @@
 - To run the new docker image, please use this command as follow below **Note** *You'll only need to rename your container name and don't delete or remove the existing one*
 - [x] `docker run -itd -p 3000:3000 -p 27020:27020 --name stockpilot_staging cvillaflor/fsinventory:staging sh start.sh` for staging server
 - [x] `docker run -itd -p 3000:3000 -p 27020:27020 --name stockpilot_production cvillaflor/fsinventory:prod sh start.sh` for production server
+- Open a command prompt or on Gitbash (Open CMD/Gitbash in C:\Users\documents\data\backup)
 - Load and restore the mongodb dump file (the Back up file) using this command `mongorestore --uri "mongodb://fullscale:fullscale@localhost:27020/inventory?authSource=admin" --db inventory --drop ./data/backup/inventory`
 
 ## Updating the Gitlab Credentials
