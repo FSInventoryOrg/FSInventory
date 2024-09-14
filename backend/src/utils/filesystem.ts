@@ -1,5 +1,7 @@
 import path from "path";
 import { mkdirSync, existsSync, readFileSync, writeFileSync, chmodSync, copyFileSync, readdir, stat, unlink, readdirSync, statSync } from 'fs';
+import { getJSONFromExcelFile } from "./excel";
+import { getJSONFromCSVFile } from "./csv";
 
 const directory = path.join(path.resolve(), '../');
 
@@ -71,6 +73,62 @@ export const getFileFromDir = async (filepath: string, isFullPath?: boolean) => 
 		return readFileSync(tmpFolder)
 	} catch (err) {
 		return null
+	}
+}
+
+/**
+ * Reads and parses a JSON file from the specified directory and file format.
+ * @param directory - The directory where the file is located.
+ * @param collection - The name of the collection (used to name the file).
+ * @param fileFormat - The file format/extension of the file (e.g., 'json').
+ * @returns A promise that resolves to the parsed JSON data.
+ */
+export const readJSONDataFromJSONFile = async (directory: string, filename: string) => {
+	try {
+		// Construct the file path
+		const jsonDir = getDirPath(directory);
+		// Get file data
+		const fileData: any = await getFileFromDir(`${jsonDir}/${filename}`, true);
+		// Parse data
+		const jsonData = JSON.parse(fileData.toString());
+		return jsonData;
+	} catch (error) {
+		console.error('Error reading or parsing file:', error);
+		throw error;
+	}
+}
+
+/**
+ * 
+ * @param directory 
+ * @param filename 
+ * @returns json data
+ * @description return a promise that returns json data
+ */
+export const readJSONDataFromExcelFile = async (directory: string, filename: string) => {
+	try {
+		const jsonData = await getJSONFromExcelFile(directory, filename);
+		return jsonData;
+	} catch (error) {
+		console.error('Error reading Excel file:', error);
+		throw error;
+	}
+}
+
+/**
+ * 
+ * @param directory 
+ * @param filename 
+ * @returns json data
+ * @description return a promise that returns json data
+ */
+export const readJSONDataFromCSVFile = async (directory: string, filename: string) => {
+	try {
+		const jsonData = await getJSONFromCSVFile(directory, filename);
+		return jsonData;
+	} catch (error) {
+		console.error('Error reading Excel file:', error);
+		throw error;
 	}
 }
 

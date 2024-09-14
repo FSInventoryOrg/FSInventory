@@ -175,19 +175,22 @@ export const removeStatus = async () => {
 	const statusToDelete = ['Shelved'];
 	let options: any = await Option.aggregate().match({});
 
-	if (options.length > 0) options = options[0]
-	else return
+	// Just added a handler, it creates an error when the database is empty
+	if (options && options.status) {
+		if (options.length > 0) options = options[0]
+		else return
 
-	const idToUsed = options._id
-	const stateLength = options.status.length
-	delete options._id
+		const idToUsed = options._id
+		const stateLength = options.status.length
+		delete options._id
 
-	options.status = options.status.filter((f: any) => !statusToDelete.includes(f['value']));
+		options.status = options.status.filter((f: any) => !statusToDelete.includes(f['value']));
 
-	if (stateLength !== options.status.length) {
-		await Option.updateOne({ _id: idToUsed }, options);
+		if (stateLength !== options.status.length) {
+			await Option.updateOne({ _id: idToUsed }, options);
 
-		console.log(`Status [${statusToDelete.toString()}] has been removed`)
+			console.log(`Status [${statusToDelete.toString()}] has been removed`)
+		}
 	}
 }
 

@@ -5,9 +5,9 @@ import express, { Request, Response } from 'express';
 import { getUploadFormat } from "../utils/common";
 import verifyToken, { verifyRole } from '../middleware/auth';
 import { extractUploadData } from "../utils/upload";
-import { unzipFile } from "../utils/zip";
-import { convertIdObjectIdToDocument, convertIdToDocumentObjectId } from "../utils/document";
-import { deleteAllFilesInDir, getDirPath, getFileFromDir, saveFileIntoDir, saveFileIntoDirFromBase64 } from "../utils/filesystem";
+import { unzipFileToDir } from "../utils/zip";
+import { convertIdToObjectId, convertObjectIdToId, formatDate, stringifyNestedFields } from "../utils/document";
+import { deleteAllFilesInDir, getDirPath, getFileFromDir, readJSONDataFromCSVFile, readJSONDataFromExcelFile, readJSONDataFromJSONFile, saveFileIntoDir, saveFileIntoDirFromBase64 } from "../utils/filesystem";
 
 const db = mongoose.connection;
 const router = express.Router();
@@ -41,10 +41,14 @@ export const extractDocuments = async (fileFormat: string = "json") => {
 			await saveFileIntoDir(collectionsDir, `${collection}.json`, JSON.stringify(documents), true);
 		} else {
 			// Sanitize documents to handle _id
-			const sanitizedDocuments = documents.map(doc => convertIdObjectIdToDocument(doc));
+			const sanitizedDocuments = documents.map(doc => convertObjectIdToId(doc));
+			// Stringify nested fields
+			const stringifiedDocuments = sanitizedDocuments.map(doc => stringifyNestedFields(doc));
+			// Format dates
+			const formattedDocuments = stringifiedDocuments.map(doc => formatDate(doc, ['updated']));
 			// Create excel or csv
 			const wb = xlsx.utils.book_new();
-			const ws = xlsx.utils.json_to_sheet(sanitizedDocuments);
+			const ws = xlsx.utils.json_to_sheet(formattedDocuments);
 			xlsx.utils.book_append_sheet(wb, ws, collection);
 			const buffer = xlsx.write(wb, { bookType: fileFormat === 'csv' ? 'csv' : 'xlsx', type: 'buffer' });
 			await saveFileIntoDir(collectionsDir, `${collection}.${fileFormat === 'csv' ? 'csv' : 'xlsx'}`, buffer, true);
@@ -55,7 +59,7 @@ export const extractDocuments = async (fileFormat: string = "json") => {
 	const zipFilename = `backup_${timestamp}.zip`; // Filename with timestamp
 	const pathFile = await saveFileIntoDir(archiveDir, zipFilename, zip.toBuffer(), true);
 	// set the backup folder
-	const backupCollectionsFolder = pathFile.replace(`/backup/archive/${zipFilename}`, `/backup/${fileFormat}`);
+	const backupCollectionsFolder = getDirPath(`/public/backup/${fileFormat}`);
 	// Create zip file
 	zip.addLocalFolder(backupCollectionsFolder);
 	zip.writeZip(pathFile);
@@ -91,25 +95,22 @@ router.get('/export', verifyToken, verifyRole("ADMIN"), async (req: Request, res
  * Verify the backup data to be uploaded then save it on disk
  */
 router.post('/validate', verifyToken, verifyRole("ADMIN"), async (req: Request, res: Response) => {
-	const uploadData = await extractUploadData(req, 'application/zip');
-	if (uploadData.status !== 200) return { status: uploadData.status, message: uploadData.message };
-	let srcFormat = uploadData.data;
-	// EXTRACTION PROCESS
-	// delete previous extracts
-	await deleteAllFilesInDir('/public/import/collections');
-	// save file
-	const backupDir = await saveFileIntoDirFromBase64('/public/import/archive', 'backup.zip', srcFormat?.base64);
-	// extract collections from zip file
-	const extractDir = backupDir.replace("/archive/backup.zip", "/collections");
-	await unzipFile(backupDir, extractDir);
-	const fileFormat = getUploadFormat('/public/import/collections')?.split('.')[1];
-	// VALIDATION PROCESS
-	let staleCollections: { [key: string]: { current: any[], backup: any[] } } = {};
-	let hasStale = false;
-	console.log("FILEFORMAT: " + fileFormat);
-	if (fileFormat === 'json') {
-		// Get import filepath
-		const verifiedUploadedDir = getDirPath("/public/import/collections");
+	try {
+		const uploadData = await extractUploadData(req, 'application/zip');
+		if (uploadData.status !== 200) return { status: uploadData.status, message: uploadData.message };
+		let srcFormat = uploadData.data;
+		// EXTRACTION PROCESS
+		// delete previous extracts
+		await deleteAllFilesInDir('/public/import/collections');
+		// save file
+		const backupDir = await saveFileIntoDirFromBase64('/public/import/archive', 'backup.zip', srcFormat?.base64);
+		// extract collections from zip file
+		const extractDir = getDirPath("/public/import/collections");
+		await unzipFileToDir(backupDir, extractDir);
+		const fileFormat = getUploadFormat('/public/import/collections')?.split('.')[1];
+		// VALIDATION PROCESS
+		let staleCollections: { [key: string]: { current: any[], backup: any[] } } = {};
+		let hasStale = false;
 		// Get list of collection name
 		const collectionList = await listCollection();
 		if (!collectionList || collectionList.length === 0) return res.status(404).json({ message: "No collections found" });
@@ -118,19 +119,26 @@ router.post('/validate', verifyToken, verifyRole("ADMIN"), async (req: Request, 
 			// Get collection documents
 			const collectionDocuments = await db.collection(collection).find().toArray();
 			try {
-				const backupFileData: any = await getFileFromDir(`${verifiedUploadedDir.replace(/\\/g, '/')}/${collection}.${fileFormat}`, true);
-				console.log(backupFileData.toString());
-				const backupJsonData = JSON.parse(backupFileData.toString());
-				const backupDeserializedData = backupJsonData.map(convertIdToDocumentObjectId);
+				let backupJsonData;
+				if (fileFormat === 'json') {
+					backupJsonData = await readJSONDataFromJSONFile('/public/import/collections', `${collection}.${fileFormat}`);
+				} else if (fileFormat === 'xlsx') {
+					backupJsonData = await readJSONDataFromExcelFile('/public/import/collections', `${collection}.${fileFormat}`);
+				} else {
+					backupJsonData = await readJSONDataFromCSVFile('/public/import/collections', `${collection}.${fileFormat}`);
+				}
+				if (collection == "options") {
+					console.log(backupJsonData);
+				}
+				if (!backupJsonData) continue;
+				const backupDeserializedData = backupJsonData.map(convertIdToObjectId);
 				// Create a map of backup data for quick lookup
 				const backupDataMap = new Map<string, any>(backupDeserializedData.map((doc: any) => [doc._id.toString(), doc]));
 				// Arrays to hold stale documents
 				const currentStaleDocs: any[] = [];
 				const backupStaleDocs: any[] = [];
 				// Check if there is any data to import
-				if (backupDeserializedData.length === 0) {
-					continue;
-				}
+				if (backupDeserializedData.length === 0) continue;
 				// Check for stale records
 				for (const doc of collectionDocuments) {
 					const backupDoc = backupDataMap.get(doc._id.toString());
@@ -171,16 +179,18 @@ router.post('/validate', verifyToken, verifyRole("ADMIN"), async (req: Request, 
 				console.error(`Error processing file for collection ${collection}:`, errorFile);
 			}
 		}
-	}
-	// Response
-	if (Object.keys(staleCollections).length > 0) {
-		res.status(200).json({
-			message: "oudated record found on the backup file",
-			outdated_records: hasStale,
-			values: staleCollections,
-		});
-	} else {
-		res.status(200).json({ message: "no outdated record" });
+		// Response
+		if (Object.keys(staleCollections).length > 0) {
+			res.status(200).json({
+				message: "oudated record found on the backup file",
+				outdated: hasStale,
+				values: staleCollections,
+			});
+		} else {
+			res.status(200).json({ message: "no outdated record" });
+		}
+	} catch (err) {
+		res.status(500).json({ message: "something went wrong" });
 	}
 });
 
@@ -190,30 +200,36 @@ router.post('/validate', verifyToken, verifyRole("ADMIN"), async (req: Request, 
 router.post('/import', verifyToken, verifyRole("ADMIN"),
 	async (req: Request, res: Response) => {
 		try {
-			// Get import filepath
-			const verifiedUploadedDir = getDirPath("/public/import/collections");
 			// Get list of collection name
 			const collectionList = await listCollection();
 			if (!collectionList || collectionList.length === 0) {
 				return res.status(404).json({ message: "No collections found" });
 			}
+			// Get file format
+			const fileFormat = getUploadFormat('/public/import/collections')?.split('.')[1];
 			// Loop collection
 			for (const collection of collectionList) {
 				try {
-					const importFileData: any = await getFileFromDir(`${verifiedUploadedDir}/${collection}.json`, true)
-					const importJsonData = JSON.parse(importFileData.toString());
-					const importDeserializedData = importJsonData.map(convertIdToDocumentObjectId);
+					let importJsonData;
+					if (fileFormat === 'json') {
+						importJsonData = await readJSONDataFromJSONFile('/public/import/collections', `${collection}.${fileFormat}`);
+					} else if (fileFormat === 'xlsx') {
+						importJsonData = await readJSONDataFromExcelFile('/public/import/collections', `${collection}.${fileFormat}`);
+					} else {
+						importJsonData = await readJSONDataFromCSVFile('/public/import/collections', `${collection}.${fileFormat}`);
+					}
+					if (!importJsonData) continue;
+					let importDeserializedData = importJsonData.map(convertIdToObjectId);
 					// Loop selected backup data
 					if (req.body[collection]) {
 						for (const bkpData of req.body[collection]) {
-							const bkpConvertedData = convertIdToDocumentObjectId(bkpData);
+							const bkpConvertedData = convertIdToObjectId(bkpData);
 							const bkpIndex = importDeserializedData.findIndex((bkpItem: any) => bkpItem._id.equals(bkpConvertedData._id));
 							if (bkpIndex !== -1) {
 								importDeserializedData[bkpIndex] = bkpConvertedData;
 							}
 						}
 					}
-
 					// Check if there is any data to import
 					if (importDeserializedData.length === 0) {
 						continue;
@@ -233,6 +249,10 @@ router.post('/import', verifyToken, verifyRole("ADMIN"),
 	},
 );
 
+
+/**
+ * IGNORE THIS PART
+ */
 router.patch('/check', verifyToken, async (req: Request, res: Response) => {
 	try {
 		// Get import filepath
@@ -311,7 +331,6 @@ router.delete('/clear', verifyToken, verifyRole("ADMIN"),
 			if (!collectionList || collectionList.length === 0) {
 				return res.status(404).json({ message: "No collections found" });
 			}
-			console.log(collectionList)
 			// Loop collection
 			for (const collection of collectionList) {
 				try {
