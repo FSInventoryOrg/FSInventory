@@ -38,25 +38,6 @@ export const saveFile = async (folder: string, filename: string, src: any, fullD
 	return fullDirectory ? tmpFolder.replace(/\/\//g, '/') : tmpFolder.replace(directory, '');
 }
 
-// Save file from base64
-export const saveFileFromBase64 = async (folder: string, filename: string, base64Data: any) => {
-	const folderDir = `${directory}${folder}`;
-	// Ensure the directory exists
-	if (!existsSync(folderDir)) {
-		mkdirSync(folderDir, { recursive: true });
-	}
-	// Decode base64 string and save as ZIP file
-	const fileBuffer = Buffer.from(base64Data, 'base64');
-	const filePath = path.join(folderDir, filename);
-	// Save file
-	writeFileSync(filePath, fileBuffer);
-	return `${folderDir}/${filename}`;
-}
-
-export const getFilePath = (folder: string) => {
-	return path.join(directory, folder);
-}
-
 export const getFile = async (filepath: string, isFullPath?: boolean) => {
 	const tmpFolder = isFullPath ? filepath : `${directory}${filepath}`.replace(/\/\//g, '/');
 	try {
@@ -66,49 +47,10 @@ export const getFile = async (filepath: string, isFullPath?: boolean) => {
 	}
 }
 
-export const readFile = async (filepath: string) => {
-	try {
-		return readFileSync(filepath);
-	} catch (err) {
-		return null
-	}
-}
-
-export const deleteFilesInDirectory = (folder: string) => {
-	const folderDir = `${directory}${folder}`;
-	// Read folder files
-	readdir(folderDir, (err, files) => {
-		if (err) {
-			console.error(`Unable to read directory: ${err}`);
-			return;
-		}
-		// Loop and delete files
-		files.forEach(file => {
-			const filePath = path.join(folderDir, file);
-			// Check content is a file
-			stat(filePath, (err, stats) => {
-				if (err) {
-					console.error(`Unable to get stats for file: ${err}`);
-					return;
-				}
-				// Delete if a file
-				if (stats.isFile()) {
-					unlink(filePath, err => {
-						if (err) {
-							console.error(`Unable to delete file: ${err}`);
-						} else {
-							console.log(`Deleted file: ${filePath}`);
-						}
-					});
-				}
-			});
-		});
-	});
-}
-
 // Get first file on a directory filename
 export const getUploadFormat = (folder: string) => {
 	try {
+		``
 		const folderDir = `${directory}${folder}`;
 		// Read all files and directories in the specified folder
 		const files = readdirSync(folderDir)

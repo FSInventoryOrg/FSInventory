@@ -2,18 +2,20 @@ import mongoose from "mongoose";
 import AdmZip from "adm-zip";
 import xlsx from 'xlsx';
 import express, { Request, Response } from 'express';
-import { deleteFilesInDirectory, getFile, getFilePath, getUploadFormat, saveFile, saveFileFromBase64 } from "../utils/common";
+import { getUploadFormat } from "../utils/common";
 import verifyToken, { verifyRole } from '../middleware/auth';
 import { extractUploadData } from "../utils/upload";
 import { unzipFile } from "../utils/zip";
 import { convertIdObjectIdToDocument, convertIdToDocumentObjectId } from "../utils/document";
+import { deleteAllFilesInDir, getDirPath, getFileFromDir, saveFileIntoDir, saveFileIntoDirFromBase64 } from "../utils/filesystem";
 
 const db = mongoose.connection;
 const router = express.Router();
 
-// Set list of documents
+// Get the list of documents
 export const listCollection = async () => {
-	return (await db.db.listCollections().toArray()).map((f: any) => f['name']);
+	const collectionList = await db.db.listCollections().toArray();
+	return collectionList.map((f: any) => f['name']);
 }
 
 // Extract documents
@@ -24,7 +26,7 @@ export const extractDocuments = async (fileFormat: string = "json") => {
 	const collections = await listCollection();
 	if (collections.length === 0) return { status: 404, };
 	// Clear previous files
-	deleteFilesInDirectory('/public/backup/archive');
+	await deleteAllFilesInDir('/public/backup/archive');
 	// Initialize zip
 	const zip = new AdmZip();
 	// Directories
@@ -36,7 +38,7 @@ export const extractDocuments = async (fileFormat: string = "json") => {
 		const documents = await db.collection(collection).find().toArray();
 		if (fileFormat === 'json') {
 			// save json file to public dir
-			await saveFile(collectionsDir, `${collection}.json`, JSON.stringify(documents), true);
+			await saveFileIntoDir(collectionsDir, `${collection}.json`, JSON.stringify(documents), true);
 		} else {
 			// Sanitize documents to handle _id
 			const sanitizedDocuments = documents.map(doc => convertIdObjectIdToDocument(doc));
@@ -45,13 +47,13 @@ export const extractDocuments = async (fileFormat: string = "json") => {
 			const ws = xlsx.utils.json_to_sheet(sanitizedDocuments);
 			xlsx.utils.book_append_sheet(wb, ws, collection);
 			const buffer = xlsx.write(wb, { bookType: fileFormat === 'csv' ? 'csv' : 'xlsx', type: 'buffer' });
-			await saveFile(collectionsDir, `${collection}.${fileFormat === 'csv' ? 'csv' : 'xlsx'}`, buffer, true);
+			await saveFileIntoDir(collectionsDir, `${collection}.${fileFormat === 'csv' ? 'csv' : 'xlsx'}`, buffer, true);
 		}
 	}
 	// save zip file to the piblic dir
 	const timestamp = new Date().toISOString().replace(/[:.-]/g, ''); // Format: YYYYMMDDTHHMMSS
 	const zipFilename = `backup_${timestamp}.zip`; // Filename with timestamp
-	const pathFile = await saveFile(archiveDir, zipFilename, zip.toBuffer(), true);
+	const pathFile = await saveFileIntoDir(archiveDir, zipFilename, zip.toBuffer(), true);
 	// set the backup folder
 	const backupCollectionsFolder = pathFile.replace(`/backup/archive/${zipFilename}`, `/backup/${fileFormat}`);
 	// Create zip file
@@ -73,7 +75,7 @@ router.get('/export', verifyToken, verifyRole("ADMIN"), async (req: Request, res
 		const initiateBackup: any = await extractDocuments(fileFormat);
 		if (initiateBackup['status'] == 404) return res.status(404).json({ message: 'No collections found' });
 		if (initiateBackup['status'] == 500) return res.status(500).json({ message: 'Invalid file format' });
-		const filesrc = await getFile(initiateBackup.pathFile, true)
+		const filesrc = await getFileFromDir(initiateBackup.pathFile, true)
 		if (!filesrc) return res.status(404).json({ message: 'File does not exists anymore' });
 		res.status(200)
 			.contentType('application/zip')
@@ -94,9 +96,9 @@ router.post('/validate', verifyToken, verifyRole("ADMIN"), async (req: Request, 
 	let srcFormat = uploadData.data;
 	// EXTRACTION PROCESS
 	// delete previous extracts
-	deleteFilesInDirectory('/public/import/collections');
+	await deleteAllFilesInDir('/public/import/collections');
 	// save file
-	const backupDir = await saveFileFromBase64('/public/import/archive', 'backup.zip', srcFormat?.base64);
+	const backupDir = await saveFileIntoDirFromBase64('/public/import/archive', 'backup.zip', srcFormat?.base64);
 	// extract collections from zip file
 	const extractDir = backupDir.replace("/archive/backup.zip", "/collections");
 	await unzipFile(backupDir, extractDir);
@@ -104,9 +106,10 @@ router.post('/validate', verifyToken, verifyRole("ADMIN"), async (req: Request, 
 	// VALIDATION PROCESS
 	let staleCollections: { [key: string]: { current: any[], backup: any[] } } = {};
 	let hasStale = false;
+	console.log("FILEFORMAT: " + fileFormat);
 	if (fileFormat === 'json') {
 		// Get import filepath
-		const verifiedUploadedDir = getFilePath("/public/import/collections");
+		const verifiedUploadedDir = getDirPath("/public/import/collections");
 		// Get list of collection name
 		const collectionList = await listCollection();
 		if (!collectionList || collectionList.length === 0) return res.status(404).json({ message: "No collections found" });
@@ -115,7 +118,8 @@ router.post('/validate', verifyToken, verifyRole("ADMIN"), async (req: Request, 
 			// Get collection documents
 			const collectionDocuments = await db.collection(collection).find().toArray();
 			try {
-				const backupFileData: any = await getFile(`${verifiedUploadedDir.replace(/\\/g, '/')}/${collection}.${fileFormat}`, true);
+				const backupFileData: any = await getFileFromDir(`${verifiedUploadedDir.replace(/\\/g, '/')}/${collection}.${fileFormat}`, true);
+				console.log(backupFileData.toString());
 				const backupJsonData = JSON.parse(backupFileData.toString());
 				const backupDeserializedData = backupJsonData.map(convertIdToDocumentObjectId);
 				// Create a map of backup data for quick lookup
@@ -187,7 +191,7 @@ router.post('/import', verifyToken, verifyRole("ADMIN"),
 	async (req: Request, res: Response) => {
 		try {
 			// Get import filepath
-			const verifiedUploadedDir = getFilePath("/public/import/collections");
+			const verifiedUploadedDir = getDirPath("/public/import/collections");
 			// Get list of collection name
 			const collectionList = await listCollection();
 			if (!collectionList || collectionList.length === 0) {
@@ -196,14 +200,17 @@ router.post('/import', verifyToken, verifyRole("ADMIN"),
 			// Loop collection
 			for (const collection of collectionList) {
 				try {
-					const importFileData: any = await getFile(`${verifiedUploadedDir}/${collection}.json`, true)
+					const importFileData: any = await getFileFromDir(`${verifiedUploadedDir}/${collection}.json`, true)
 					const importJsonData = JSON.parse(importFileData.toString());
 					const importDeserializedData = importJsonData.map(convertIdToDocumentObjectId);
 					// Loop selected backup data
 					if (req.body[collection]) {
 						for (const bkpData of req.body[collection]) {
-							const bkpIndex = importDeserializedData[collection].findIndex((bkpItem: any) => bkpItem._id === bkpData._id);
-							importDeserializedData[bkpIndex] = convertIdToDocumentObjectId(bkpData);
+							const bkpConvertedData = convertIdToDocumentObjectId(bkpData);
+							const bkpIndex = importDeserializedData.findIndex((bkpItem: any) => bkpItem._id.equals(bkpConvertedData._id));
+							if (bkpIndex !== -1) {
+								importDeserializedData[bkpIndex] = bkpConvertedData;
+							}
 						}
 					}
 
@@ -229,7 +236,7 @@ router.post('/import', verifyToken, verifyRole("ADMIN"),
 router.patch('/check', verifyToken, async (req: Request, res: Response) => {
 	try {
 		// Get import filepath
-		const verifiedUploadedDir = getFilePath("/public/backup/collections");
+		const verifiedUploadedDir = getDirPath("/public/backup/collections");
 
 		const collectionList = await listCollection();
 		let noIDs: any[] = [];
@@ -240,7 +247,7 @@ router.patch('/check', verifyToken, async (req: Request, res: Response) => {
 		collectionList?.forEach(async (collection) => {
 			let backupDocuments: any
 			try {
-				const bkFile: any = await getFile(`${verifiedUploadedDir}/${collection}.json`, true)
+				const bkFile: any = await getFileFromDir(`${verifiedUploadedDir}/${collection}.json`, true)
 				backupDocuments = JSON.parse(bkFile.toString())
 
 				const fileLength = backupDocuments.length;
