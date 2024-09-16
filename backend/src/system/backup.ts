@@ -127,9 +127,6 @@ router.post('/validate', verifyToken, verifyRole("ADMIN"), async (req: Request, 
 				} else {
 					backupJsonData = await readJSONDataFromCSVFile('/public/import/collections', `${collection}.${fileFormat}`);
 				}
-				if (collection == "options") {
-					console.log(backupJsonData);
-				}
 				if (!backupJsonData) continue;
 				const backupDeserializedData = backupJsonData.map(convertIdToObjectId);
 				// Create a map of backup data for quick lookup
