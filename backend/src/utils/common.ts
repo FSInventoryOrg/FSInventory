@@ -39,10 +39,11 @@ export const saveFile = async (folder: string, filename: string, src: any, fullD
 
 export const getFile = async (filepath: string, isFullPath?: boolean) => {
     const tmpFolder = isFullPath ? filepath : `${directory}${filepath}`.replace(/\/\//g, '/');
-
+    console.log('tmpFolder', tmpFolder)
     try {
         return readFileSync(tmpFolder)
     } catch (err) {
+        console.log('getFile_Error: ', err)
         return null
     }
 }
