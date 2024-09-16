@@ -55,6 +55,8 @@ const activateAutoMailing = async (data: any) => {
         recipient: recipients,
         attachments: [tableFile, backupFile]
       })
+    const rollOut = new Date()
+    await AutoMail.updateOne({ _id: data._id }, {lastRollOut: rollOut}, { upsert: true })
 }
 
 const nextRollComputatuion = (doc: AutoMailType, referenceDate?: Date) => {
