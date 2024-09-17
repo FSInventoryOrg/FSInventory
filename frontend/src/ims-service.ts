@@ -579,6 +579,19 @@ export const updateAssetCounter = async ({ prefixCode, updatedAssetCounter }: { 
     return true;    
 }
 
+export const deleteAssetCounter = async (prefixCode: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/assetcounter/${prefixCode}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message ||'Failed to delete asset counter');
+  }
+  return true;    
+}
+
 export const fetchNotifications = async () => {
   const response = await fetch(`${API_BASE_URL}/api/notification`, {
     credentials: 'include',
