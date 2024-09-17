@@ -1,5 +1,8 @@
 # UI CHANGELOG
 
+### 2024-09-12 [v2.5.7](https://connect.zoho.com/portal/intranet/task/623367000000597066)
+- *Fix* - Added lacking option for automated reports email frequency sending monthly and added invalidate query for auto refresh
+
 ### 2024-08-29 [v2.5.5](https://connect.zoho.com/portal/intranet/task/623367000000597066)
 - *New* - Settings: Frequency of email can be changeable by Admin
 

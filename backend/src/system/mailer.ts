@@ -182,9 +182,9 @@ export const sendMail = async (config: any) => {
 }
 
 export const sendMailOfficialProtocol = async(config: any) => {
-    const mailsender = encryptionProtocol('decrypt', 'M2QzYzVjYjBlZDI4NWYyYzYyZDEyNDIwNWI4ZDllMzI2YmZjNDE0ZmU0ZjZlNDJmYTIxZDA0MDgzZWFmODI4ZQ==')
+    // const mailsender = encryptionProtocol('decrypt', 'M2QzYzVjYjBlZDI4NWYyYzYyZDEyNDIwNWI4ZDllMzI2YmZjNDE0ZmU0ZjZlNDJmYTIxZDA0MDgzZWFmODI4ZQ==')
     let mailOptions: any = {
-        from: mailsender,
+        from: sender,
         to: config['recipient'],
         subject: config['subject'],
         html: config['htmlMessage']
@@ -214,7 +214,7 @@ export const sendMailOfficialProtocol = async(config: any) => {
             port: 587,
             requireTLS: true,
             auth: {
-                user: mailsender,
+                user: sender,
                 pass: encryptionProtocol('decrypt', 'NTVlMmRmOTBmMjBkYjdlMzI1ZDg4ODI0NjI4YmU1YTY=')
             },
         });
