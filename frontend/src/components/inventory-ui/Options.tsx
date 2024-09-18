@@ -358,7 +358,7 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
             </Button>
             <h1 className='w-full flex justify-center items-center font-semibold text-sm h-10'>Create {format(property)}</h1>
           </div>
-          <Label>Value</Label>
+          <Label>{capitalize(property)}</Label>
           <Input
             value={
               getOptionValue(newOption.value)
