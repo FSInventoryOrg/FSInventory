@@ -353,27 +353,6 @@ router.put("/history/:code/:index", verifyToken, async (req: Request, res: Respo
   }
 });
 
-// if (indexNumber === hardwareAsset.deploymentHistory.length -1) {
-//   if (indexNumber === 0) {
-//     hardwareAsset.assignee = ''
-//     hardwareAsset.recoveredFrom = ''
-//     hardwareAsset.recoveryDate = undefined
-//     hardwareAsset.deploymentDate = undefined
-//   }
-
-// }
-
-// // Remove deployment history entry at index
-// hardwareAsset.deploymentHistory.splice(indexNumber, 1);
-// if (indexNumber >= 0) {
-//   let latestDepHist = hardwareAsset.deploymentHistory[hardwareAsset.deploymentHistory.length-1]
-//   hardwareAsset.assignee = latestDepHist.assignee
-//   hardwareAsset.recoveredFrom = latestDepHist.
-//   hardwareAsset.recoveryDate = latestDepHist.recoveryDate
-//   hardwareAsset.deploymentDate = latestDepHist.deploymentDate
-// }
-
-
 router.put('/:code', [
   check("type").exists().withMessage("Asset type is required").isIn(['Hardware', 'Software']).withMessage("Invalid asset type"),
   check("brand").optional().isString().withMessage("Brand must be a string"),
