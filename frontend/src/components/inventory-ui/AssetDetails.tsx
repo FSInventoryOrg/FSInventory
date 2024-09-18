@@ -192,7 +192,7 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
                       {/* Render assignee */}
                       <div className='flex gap-2 px-2'>
                         <div className='w-full flex gap-2 text-sm items-center font-bold uppercase'>
-                          {record?._addonData_assignee || record.assignee}
+                          {record?._addonData_assignee || record.assignee || 'null'}
                         </div>
                         <span className='w-fit'></span>
                       </div>
