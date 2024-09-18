@@ -241,21 +241,31 @@ export const deleteAssetByCode = async (code: string) => {
 
 /* OPTIONS */
 
-export const addOptionValue = async ({property, value}: { property: string, value: string | object }) => {
-  const response = await fetch(`${API_BASE_URL}/api/options/${property}`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ value })
-  });
-  if (!response.ok) {
-    const responseBody = await response.json();
-    throw new Error(responseBody.error);
-  }
+export const addOptionValue = async ({ property, value, prefixCode }: { property: string, value: string | object, prefixCode?: string }) => {
+  try {
+    if (property === 'category' && !prefixCode) {
+      throw new Error('Prefix code is required.');
+    }
+    const response = await fetch(`${API_BASE_URL}/api/options/${property}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ value })
+    });
+    await postAssetCounter({
+      category: value as string,
+      prefixCode: prefixCode as string,
+      threshold: 1,
+      counter: 0,
+      type: 'Hardware'
+    });
 
-  return response.json();
+    return response.json();
+  } catch (err: any) {
+    throw new Error(err);
+  }
 };
 
 export const updateOptionDefaults = async (defaults: Defaults) => {
