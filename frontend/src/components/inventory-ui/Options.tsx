@@ -415,7 +415,12 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
             type='button'
             onClick={() => {
               if (newOption) {
-                addOptionValue(newOption)
+                if (property === 'category') {
+                  addOptionValue({ ...newOption, prefixCode })
+                }
+                else {
+                  addOptionValue(newOption)
+                }
               }
             }}
           >
