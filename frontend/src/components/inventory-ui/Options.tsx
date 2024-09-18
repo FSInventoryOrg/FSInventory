@@ -65,7 +65,7 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
   const [optionToEdit, setOptionToEdit] = React.useState<string>('');
   const [isCreating, setIsCreating] = React.useState<boolean>(false);
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
-  const [categoryPrefix, setCategoryPrefix] = React.useState<string>('');
+  const [prefixCode, setPrefixCode] = React.useState<string>('');
 
   const { data: optionValues } = useQuery<string[] | ColorOption[] | TagOption[]>({ 
     queryKey: ['fetchOptionValues', property], 
@@ -390,13 +390,13 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
               <Label>Prefix Code</Label>
               <Input
                 value={
-                  categoryPrefix
+                  prefixCode
                 }
                 type="input"
                 className="focus-visible:ring-0 focus-visible:ring-popover"
                 onChange={(e) => {
                   const newValue = e.target.value;
-                  setCategoryPrefix(newValue);
+                  setPrefixCode(newValue);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
