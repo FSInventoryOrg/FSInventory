@@ -47,6 +47,8 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
   const [open, setOpen] = React.useState(false);
   const { showToast } = useAppContext();
 
+  const assignee = assetData?._addonData_assignee || assetData?.assignee;
+
   const form = useForm<z.infer<typeof RetrieveAssetSchema>>({
     resolver: zodResolver(RetrieveAssetSchema),
     defaultValues: {
@@ -160,10 +162,9 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
         <SheetHeader>
           <SheetTitle>Recover asset {assetData.code}</SheetTitle>
           <SheetDescription>
-            Recovering this asset from{' '}
-            {assetData?._addonData_assignee || assetData.assignee} will remove
-            it from their deployed assets list and set the status of this asset
-            to '{form.getValues('status')}'.
+            Recovering this asset {assignee ? `from ${assignee}` : ''} will
+            remove it from their deployed assets list and set the status of this
+            asset to '{form.getValues('status')}'.
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
