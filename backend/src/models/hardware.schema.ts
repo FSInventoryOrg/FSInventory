@@ -2,7 +2,7 @@ import { Schema } from 'mongoose';
 import Asset, { AssetType } from './asset.schema';
 
 export type DeploymentHistory = {
-  deploymentDate: Date;
+  deploymentDate?: Date;
   recoveryDate?: Date;
   assignee: string;
 }
@@ -21,9 +21,9 @@ export interface HardwareType extends AssetType {
   isRGE: boolean;
   equipmentType: string;
   remarks: string;
-  deploymentDate: Date;
+  deploymentDate?: Date;
   recoveredFrom: string;
-  recoveryDate: Date;
+  recoveryDate?: Date;
   client: string;
   deploymentHistory: DeploymentHistory[];
 }
