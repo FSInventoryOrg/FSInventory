@@ -297,7 +297,7 @@ router.put('/retrieve/:code', [
         lastDeploymentRecord.recoveryDate = data.recoveryDate;
       } else {
         deploymentHistory.push({
-          deploymentDate: data.recoveryDate,
+          deploymentDate: existingAsset.deploymentDate,
           assignee: data.recoveredFrom,
           recoveryDate: data.recoveryDate,
         });
@@ -352,6 +352,27 @@ router.put("/history/:code/:index", verifyToken, async (req: Request, res: Respo
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+// if (indexNumber === hardwareAsset.deploymentHistory.length -1) {
+//   if (indexNumber === 0) {
+//     hardwareAsset.assignee = ''
+//     hardwareAsset.recoveredFrom = ''
+//     hardwareAsset.recoveryDate = undefined
+//     hardwareAsset.deploymentDate = undefined
+//   }
+
+// }
+
+// // Remove deployment history entry at index
+// hardwareAsset.deploymentHistory.splice(indexNumber, 1);
+// if (indexNumber >= 0) {
+//   let latestDepHist = hardwareAsset.deploymentHistory[hardwareAsset.deploymentHistory.length-1]
+//   hardwareAsset.assignee = latestDepHist.assignee
+//   hardwareAsset.recoveredFrom = latestDepHist.
+//   hardwareAsset.recoveryDate = latestDepHist.recoveryDate
+//   hardwareAsset.deploymentDate = latestDepHist.deploymentDate
+// }
+
 
 router.put('/:code', [
   check("type").exists().withMessage("Asset type is required").isIn(['Hardware', 'Software']).withMessage("Invalid asset type"),
