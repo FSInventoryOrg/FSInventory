@@ -65,6 +65,7 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
   const [optionToEdit, setOptionToEdit] = React.useState<string>('');
   const [isCreating, setIsCreating] = React.useState<boolean>(false);
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
+  const [categoryPrefix, setCategoryPrefix] = React.useState<string>('');
 
   const { data: optionValues } = useQuery<string[] | ColorOption[] | TagOption[]>({ 
     queryKey: ['fetchOptionValues', property], 
