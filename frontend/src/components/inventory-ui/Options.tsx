@@ -385,6 +385,27 @@ const Options = ({ property, colorSelect=false, tagSelect=false, field, classNam
               }
             }}
           />
+          {property === 'category' ?
+            <>
+              <Label>Prefix Code</Label>
+              <Input
+                value={
+                  categoryPrefix
+                }
+                type="input"
+                className="focus-visible:ring-0 focus-visible:ring-popover"
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  setCategoryPrefix(newValue);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    setOpen(!open)
+                  }
+                }}
+              />
+            </> : <></>}
           {colorSelect && <ColorSelect onColorSelect={handleColorSelect} reset={isEditing || isCreating} />}
           {tagSelect && <TagSelect onTagSelect={handleTagSelect} reset={isEditing || isCreating} />}
           <Separator className='my-1' />
