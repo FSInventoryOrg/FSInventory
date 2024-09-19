@@ -246,6 +246,8 @@ export const addOptionValue = async ({ property, value, prefixCode }: { property
     if (property === 'category' && !prefixCode) {
       throw new Error('Prefix code is required.');
     }
+    const { status } = await fetch(`${API_BASE_URL}/api/assetcounter/${prefixCode}`);
+    if (status !== 404) throw new Error(`${property} with prefix code ${prefixCode} already exists.`)
     const response = await fetch(`${API_BASE_URL}/api/options/${property}`, {
       method: 'POST',
       credentials: 'include',
