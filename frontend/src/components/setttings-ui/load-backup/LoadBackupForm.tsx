@@ -21,7 +21,7 @@ const SystemBackup = () => {
 
   const [uploadedFile, setUploadedFile] = useState<string>('');
 
-  const acceptedFileTypes: string = '.xls,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
+  const acceptedFileTypes: string = '.zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed'
 
   const handleFile = (file: File | undefined) => {
     console.log(file);
