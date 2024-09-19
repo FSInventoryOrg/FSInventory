@@ -69,6 +69,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
   const [optionToEdit, setOptionToEdit] = React.useState<string>('');
   const [isCreating, setIsCreating] = React.useState<boolean>(false);
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
+  const [prefixCode, setPrefixCode] = React.useState<string>('');
 
   const { data: optionValues } = useQuery<string[] | ColorOption[] | TagOption[]>({ 
     queryKey: ['fetchOptionValues', property], 
@@ -322,7 +323,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
             </Button>
             <h1 className='w-full flex justify-center items-center font-semibold text-sm h-10'>Create {format(property)}</h1>
           </div>
-          <Label>Value</Label>
+          <Label>{capitalize(property)}</Label>
           <Input 
             value={typeof newOption.value === 'object' ? newOption.value.value : newOption.value}
             type='input'
@@ -347,6 +348,27 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
               }
             }}
           />
+          {property === 'category' ?
+            <>
+              <Label>Prefix Code</Label>
+              <Input
+                value={
+                  prefixCode
+                }
+                type="input"
+                className="focus-visible:ring-0 focus-visible:ring-popover"
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  setPrefixCode(newValue);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    setOpen(!open)
+                  }
+                }}
+              />
+            </> : <></>}
           {colorSelect && <ColorSelect onColorSelect={handleColorSelect} reset={isEditing || isCreating} />}
           {tagSelect && <TagSelect onTagSelect={handleTagSelect} reset={isEditing || isCreating} />}
           <Separator className='my-1' />
@@ -356,7 +378,12 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
             type='button'
             onClick={() => {
               if (newOption) {
-                addOptionValue(newOption)
+                if (property === 'category') {
+                  addOptionValue({ ...newOption, prefixCode })
+                }
+                else {
+                  addOptionValue(newOption)
+                }
               }
             }}
           >
