@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/select';
 import Recipients from './Recipients';
 import { WEEKDAYS } from '@/lib/data';
+import { format } from "date-fns";
 
 const AutomatedReportForm = ({
   defaultValues,
@@ -71,6 +72,7 @@ const AutomatedReportForm = ({
   const { mutate: sendNow, isPending: isSendPending } = useMutation({
     mutationFn: imsService.sendAutoMailNow,
     onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ['autoMailSettings'] });
       showToast({ message: 'Email report sent!', type: 'SUCCESS' });
     },
     onError: (error: Error) => {
@@ -156,7 +158,7 @@ const AutomatedReportForm = ({
                     {/* <SelectItem value="Daily">Daily</SelectItem> */}
                     <SelectItem value="Weekly">Weekly</SelectItem>
                     <SelectItem value="Bi-Weekly">Bi-Weekly</SelectItem>
-                    {/* <SelectItem value="Monthly">Monthly</SelectItem> */}
+                    <SelectItem value="Monthly">Monthly</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormDescription>
@@ -246,9 +248,9 @@ const AutomatedReportForm = ({
           />
           <p className="italic text-xs text-primary">
             {defaultValues?.lastRollOut &&
-              `Last report was sent on ${defaultValues.lastRollOut.toLocaleString()}, `}
+              `Last report was sent on ${format(defaultValues.lastRollOut.toLocaleString('en-PH'), 'PPP ppp')}, `}
             {defaultValues?.nextRoll &&
-              `Next report will be sent on ${defaultValues.nextRoll.toLocaleString()}`}
+              `Next report will be sent on ${format(defaultValues.nextRoll.toLocaleString('en-PH'), 'PPP ppp')}`}
           </p>
           <Separator className="my-4" />
           <div className="flex flex-row justify-end gap-4">
