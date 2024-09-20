@@ -11,28 +11,28 @@ cd ../frontend
 npm ci
 ```
 2. Create `backend/.env` config file. Ask teammate for updated values.
-
+3. Create `frontend/.env` config file. Add this value:
+```sh
+VITE_API_BASE_URL=http://localhost:8080
+```
 ### Setup MongoDB
-3. Install docker, if haven't yet. https://docs.docker.com/engine/install/
-4. Download the backup zip (inventory_data.zip somewhere in zoho chat). Unarchive somewhere.
-5. Add the path to the `inventory` folder to `backend/.env`
+4. Install docker, if haven't yet. https://docs.docker.com/engine/install/
+5. Download the backup zip (inventory_data.zip somewhere in zoho chat). Unarchive somewhere.
+6. Add the path to the `inventory` folder to `backend/.env`
 ```sh
 DUMP_DIRECTORY=<path to inventory folder>
 ```
-6. Run mongodb. This has replica set enabled and automatically restores the dump files.
+7. Run mongodb. This has replica set enabled and automatically restores the dump files.
 ```sh
 cd backend
 docker compose up
 ```
-7. Install mongodb compass (or any mongodb client/gui that you like). Connect using this connecting string: `mongodb://127.0.0.1:27017?replicaSet=rs0`. Test that you can connect and the inventory database was populated.
-8. Add/modify your mongodb connection string in `backend/.env`:
+8. Install mongodb compass (or any mongodb client/gui that you like). Connect using this connecting string: `mongodb://127.0.0.1:27017?replicaSet=rs0`. Test that you can connect and the inventory database was populated.
+9. Add/modify your mongodb connection string in `backend/.env`:
 ```sh
 MONGODB_CONNECTION_STRING=mongodb://127.0.0.1:27017/inventory?replicaSet=rs0
 ```
-9. Create `frontend/.env` config file. Add this value:
-```sh
-VITE_API_BASE_URL=http://localhost:8080
-```
+### Running/Debugging
 10. Add `.vscode/launch.json` config for running always with debugging enabled:
 ```json
 {
