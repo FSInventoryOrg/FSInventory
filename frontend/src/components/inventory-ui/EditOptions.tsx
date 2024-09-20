@@ -221,6 +221,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
         setFilteredData([]);
       }, 100)
       setNewOption({ property: property, value: '' })
+      setPrefixCode('')
     }
   }, [open, filterValue, optionValues, property]);
 
@@ -317,6 +318,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
               onClick={() => {
                 setIsCreating(!isCreating)
                 setNewOption({ property: property, value: '' })
+                setPrefixCode('')
               }}
             >
               <ChevronLeftIcon />
