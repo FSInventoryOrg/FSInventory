@@ -11,6 +11,8 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/Spinner';
 import { FileUploader } from '@/components/ui/file-uploader';
+import { BackupValidationModal } from './BackupValidationModal';
+import { validateBackupFile } from '@/ims-service';
 
 export type ValidationResult = {
   message: string,
@@ -32,6 +34,7 @@ const SystemBackup = () => {
 
   const [uploadedFile, setUploadedFile] = useState<File | undefined>();
   const [fileAsBase64, setFileAsBase64] = useState<{ src: string }>({ src: '' });
+  const [validationResult, setValidationResult] = useState<ValidationResult>({ message: ''});
 
   const acceptedFileTypes: string = '.zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed'
 
@@ -40,7 +43,7 @@ const SystemBackup = () => {
     
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         const base64String = reader.result as string;
         const plainText = base64String!!.split(',')[1]
         const backendExpected = "data:application/zip;base64," + plainText
@@ -49,6 +52,13 @@ const SystemBackup = () => {
         };
         console.log(payload);
         setFileAsBase64(payload);
+        try {
+          const validation: ValidationResult = await validateBackupFile(fileAsBase64);
+
+          setValidationResult(validation);
+        } catch (err) {
+          throw err;
+        }
       };
       reader.readAsDataURL(file);
     } else {
@@ -89,6 +99,7 @@ const SystemBackup = () => {
           />
           <Separator className="my-4" />
           <div className="flex flex-row justify-end gap-4">
+            <BackupValidationModal result={validationResult} />
             <Button
               type="submit"
               disabled={!uploadedFile}
