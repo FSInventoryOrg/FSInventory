@@ -243,11 +243,11 @@ export const deleteAssetByCode = async (code: string) => {
 
 export const addOptionValue = async ({ property, value, prefixCode }: { property: string, value: string | object, prefixCode?: string }) => {
   try {
-    if (property === 'category' && !prefixCode) {
-      throw new Error('Prefix code is required.');
+    if (property === 'category') {
+      if(!prefixCode) throw new Error('Prefix code is required.');
+      const { status } = await fetch(`${API_BASE_URL}/api/assetcounter/${prefixCode}`);
+      if (status !== 404) throw new Error(`${property} with prefix code ${prefixCode} already exists.`)
     }
-    const { status } = await fetch(`${API_BASE_URL}/api/assetcounter/${prefixCode}`);
-    if (status !== 404) throw new Error(`${property} with prefix code ${prefixCode} already exists.`)
     const response = await fetch(`${API_BASE_URL}/api/options/${property}`, {
       method: 'POST',
       credentials: 'include',
