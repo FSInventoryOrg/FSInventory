@@ -20,6 +20,7 @@ const SystemBackup = () => {
   });
 
   const [uploadedFile, setUploadedFile] = useState<File | undefined>();
+  const [fileAsBase64, setFileAsBase64] = useState<{ src: string }>({ src: '' });
 
   const acceptedFileTypes: string = '.zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed'
 
@@ -36,8 +37,11 @@ const SystemBackup = () => {
           src: backendExpected,
         };
         console.log(payload);
+        setFileAsBase64(payload);
       };
       reader.readAsDataURL(file);
+    } else {
+      setFileAsBase64({ src: '' })
     }
   }
 
