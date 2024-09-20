@@ -5,7 +5,7 @@ import ErrorAlert from '../ErrorAlert'
 
 interface FileUploaderProps {
   handleFile: (file: File | undefined) => void;
-  uploadedFile: string;
+  uploadedFile: File | undefined;
   accept: string;
 }
 
@@ -39,10 +39,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, a
       <div className="w-full flex flex-col items-center border-[1px] rounded p-4">
         <div className="w-full flex flex-col cursor-pointer items-center gap-y-2" onClick={handleClick}>
           {errorMessage ? <ErrorAlert errorMessage={errorMessage}/> : null}
-          {uploadedFile.length ?
+          {uploadedFile ?
             <>
               <FileSpreadsheet />
-              File selected: {`${uploadedFile}`}
+              File selected: {`${uploadedFile.name}`}
             </> :
             <>
               <Upload />

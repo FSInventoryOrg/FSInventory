@@ -19,13 +19,26 @@ const SystemBackup = () => {
     }
   });
 
-  const [uploadedFile, setUploadedFile] = useState<string>('');
+  const [uploadedFile, setUploadedFile] = useState<File | undefined>();
 
   const acceptedFileTypes: string = '.zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed'
 
   const handleFile = (file: File | undefined) => {
-    console.log(file);
-    setUploadedFile(file!!.name);
+    setUploadedFile(file);
+    
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        const plainText = base64String!!.split(',')[1]
+        const backendExpected = "data:application/zip;base64," + plainText
+        const payload = {
+          src: backendExpected,
+        };
+        console.log(payload);
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   return (
@@ -63,7 +76,7 @@ const SystemBackup = () => {
           <div className="flex flex-row justify-end gap-4">
             <Button
               type="submit"
-              disabled={!uploadedFile.length}
+              disabled={!uploadedFile}
               className="w-[125px]"
             >
               {/* {isSavePending ? (
