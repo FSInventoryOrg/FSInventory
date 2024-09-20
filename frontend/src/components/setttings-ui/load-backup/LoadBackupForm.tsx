@@ -12,6 +12,17 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/Spinner';
 import { FileUploader } from '@/components/ui/file-uploader';
 
+type ValidationResult = {
+  message: string,
+  outdated: boolean,
+  values: {
+    [index: string]: {
+      current: Array<Object>,
+      backup: Array<Object>
+    }
+  }
+}
+
 const SystemBackup = () => {
   const form = useForm({
     defaultValues: {
