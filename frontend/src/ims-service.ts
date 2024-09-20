@@ -243,7 +243,8 @@ export const deleteAssetByCode = async (code: string) => {
 
 export const addOptionValue = async ({ property, value, prefixCode }: { property: string, value: string | object, prefixCode?: string }) => {
   try {
-    if (property === 'category') {
+    const propertyBeingChangedIsCategory: boolean = property === 'category';
+    if (propertyBeingChangedIsCategory) {
       if(!prefixCode) throw new Error('Prefix code is required.');
       const { status } = await fetch(`${API_BASE_URL}/api/assetcounter/${prefixCode}`);
       if (status !== 404) throw new Error(`${property} with prefix code ${prefixCode} already exists.`)
@@ -256,13 +257,15 @@ export const addOptionValue = async ({ property, value, prefixCode }: { property
       },
       body: JSON.stringify({ value })
     });
-    await postAssetCounter({
-      category: value as string,
-      prefixCode: prefixCode as string,
-      threshold: 1,
-      counter: 0,
-      type: 'Hardware'
-    });
+    if (propertyBeingChangedIsCategory) {
+      await postAssetCounter({
+        category: value as string,
+        prefixCode: prefixCode as string,
+        threshold: 1,
+        counter: 0,
+        type: 'Hardware'
+      });
+    }
 
     return response.json();
   } catch (err: any) {
