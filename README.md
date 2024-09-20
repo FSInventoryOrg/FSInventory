@@ -1,7 +1,7 @@
 # FS Inventory System
 
 ## Local setup using Docker
-1. Clone this repository, checkout `staging` branch, build dependencies
+1. Clone this repository, checkout `staging` branch, install dependencies
 ```sh
 git clone https://github.com/FSInventoryOrg/FSInventory.git
 git checkout staging
