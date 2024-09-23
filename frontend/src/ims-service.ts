@@ -708,6 +708,9 @@ export const validateBackupFile = async (fileAsBase64: { src: string }) => {
     const response = await fetch(`${API_BASE_URL}/backup/validate`, {
       method: 'POST',
       credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(fileAsBase64)
     });
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Form,
@@ -41,7 +41,7 @@ const SystemBackup = () => {
   const handleFile = (file: File | undefined) => {
     setUploadedFile(file);
     
-    if (file) {
+    if (file !== undefined) {
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64String = reader.result as string;
@@ -50,11 +50,9 @@ const SystemBackup = () => {
         const payload = {
           src: backendExpected,
         };
-        console.log(payload);
         setFileAsBase64(payload);
         try {
-          const validation: ValidationResult = await validateBackupFile(fileAsBase64);
-
+          const validation: ValidationResult = await validateBackupFile(payload);
           setValidationResult(validation);
         } catch (err) {
           throw err;
@@ -100,20 +98,6 @@ const SystemBackup = () => {
           <Separator className="my-4" />
           <div className="flex flex-row justify-end gap-4">
             <BackupValidationModal result={validationResult} />
-            <Button
-              type="submit"
-              disabled={!uploadedFile}
-              className="w-[125px]"
-            >
-              {/* {isSavePending ? (
-                <>
-                  <Spinner className="mr-2 h-4 w-4" size={18} /> Loading...
-                </>
-              ) : (
-                'Load file'
-              )} */}
-              Load file
-            </Button>
           </div>
         </form>
       </Form>
