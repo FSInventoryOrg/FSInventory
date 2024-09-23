@@ -1,9 +1,12 @@
 # BACKEND CHANGELOG
 
-### 2024-09-12 [v2.6.1](https://connect.zoho.com/portal/intranet/task/623367000000281173)
+### 2024-09-12 [v2.12.2](https://connect.zoho.com/portal/intranet/task/623367000000281173)
 - *New* - Inventory page: Software Asset Type
 
-### 2024-09-10 [v2.6.0](https://connect.zoho.com/portal/intranet/task/623367000000658393)
+### 2024-09-12 [v2.12.1](https://connect.zoho.com/portal/intranet/task/623367000000597066)
+- *Fix* - Automated email reports sending email function and append update function for last email report sent date
+
+### 2024-09-10 [v2.12.0](https://connect.zoho.com/portal/intranet/task/623367000000658393)
 - *Bug* - Deployed asset status is selected by default in Settings: Tracked status
 
 ### 2024-08-29 [v2.5.6](https://connect.zoho.com/portal/intranet/task/623367000000590081)
