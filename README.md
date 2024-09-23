@@ -32,21 +32,25 @@ export default defineConfig({
 ```sh
 DUMP_DIRECTORY=<path to inventory folder>
 ```
-8. Due to running a replicat set, we need to make sure we make also sure that the `host.docker.internal` hostname can be resolved to the host machine's IP address. On Windows, there is a setting (https://docs.docker.com/desktop/settings/) to automatically add the *.docker.internal hostnames in the hosts file. If host.docker.internal cannot be resolved on Linux, you must add a line in your /etc/hosts file to map host.docker.internal to the IP address 127.17.0.1.
+8. Due to running a replicat set, we need to make sure we make also sure that the `host.docker.internal` hostname can be resolved to the host machine's IP address. 
 
-8. Run mongodb replica set and automatically restores the dump files.
+On Windows, there is a setting (https://docs.docker.com/desktop/settings/) to automatically add the *.docker.internal hostnames in the hosts file. 
+
+If host.docker.internal cannot be resolved on Linux, you must add a line in your /etc/hosts file to map host.docker.internal to the IP address 127.17.0.1.
+
+9. Run mongodb replica set and automatically restores the dump files.
 ```sh
 cd backend
 docker compose up
 ```
 
-9. Install mongodb compass (or any mongodb client/gui that you like). Connect using this connecting string: `mongodb://127.0.0.1:27017?replicaSet=rs0`. Test that you can connect and the inventory database was populated.
-10. Add/modify your mongodb connection string in `backend/.env`:
+10. Install mongodb compass (or any mongodb client/gui that you like). Connect using this connecting string: `mongodb://127.0.0.1:27017?replicaSet=rs0`. Test that you can connect and the inventory database was populated.
+11. Add/modify your mongodb connection string in `backend/.env`:
 ```sh
 MONGODB_CONNECTION_STRING=mongodb://127.0.0.1:27017/inventory?replicaSet=rs0
 ```
 ### Running/Debugging
-11. Add `.vscode/launch.json` config for running always with debugging enabled:
+12. Add `.vscode/launch.json` config for running always with debugging enabled:
 ```json
 {
     "version": "0.2.0",
@@ -70,10 +74,10 @@ MONGODB_CONNECTION_STRING=mongodb://127.0.0.1:27017/inventory?replicaSet=rs0
     ]
 }
 ```
-12. Go to `Run and Debug`, CTRL+SHIFT+D, Run both `Run backend` and `Run frontend`. Add breakpoints and debug.
+13. Go to `Run and Debug`, CTRL+SHIFT+D, Run both `Run backend` and `Run frontend`. Add breakpoints and debug.
 
 ![running](docs/images/debugging.png)
 
-13. Visit `http://localhost:3000`
+14. Visit `http://localhost:3000`
 
 ![running](docs/images/running.png)
