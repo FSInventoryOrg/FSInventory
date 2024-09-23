@@ -34,7 +34,8 @@ const SystemBackup = () => {
 
   const [uploadedFile, setUploadedFile] = useState<File | undefined>();
   const [fileAsBase64, setFileAsBase64] = useState<{ src: string }>({ src: '' });
-  const [validationResult, setValidationResult] = useState<ValidationResult>({ message: ''});
+  const [validationResult, setValidationResult] = useState<ValidationResult>({ message: '' });
+  const [validationComplete, setValidationComplete] = useState<boolean | null>(null);
 
   const acceptedFileTypes: string = '.zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed'
 
@@ -52,8 +53,10 @@ const SystemBackup = () => {
         };
         setFileAsBase64(payload);
         try {
+          setValidationComplete(false)
           const validation: ValidationResult = await validateBackupFile(payload);
           setValidationResult(validation);
+          setValidationComplete(true);
         } catch (err) {
           throw err;
         }
@@ -97,7 +100,7 @@ const SystemBackup = () => {
           />
           <Separator className="my-4" />
           <div className="flex flex-row justify-end gap-4">
-            <BackupValidationModal result={validationResult} />
+            <BackupValidationModal result={validationResult} validationComplete={validationComplete} />
           </div>
         </form>
       </Form>
