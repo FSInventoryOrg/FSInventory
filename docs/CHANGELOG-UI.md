@@ -1,6 +1,6 @@
 # UI CHANGELOG
 
-### 2024-09-18 [v2.12.2](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000672055)
+### 2024-09-18 [v2.13.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000672055)
 - *Fix* - Settings: Fix currently selected sidebar item not visible in light mode
 
 ### 2024-09-12 [v2.12.1](https://connect.zoho.com/portal/intranet/task/623367000000281173)
