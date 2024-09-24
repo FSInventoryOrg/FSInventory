@@ -361,7 +361,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
                 className="focus-visible:ring-0 focus-visible:ring-popover"
                 onChange={(e) => {
                   const newValue = e.target.value;
-                  setPrefixCode(newValue.toUpperCase());
+                  setPrefixCode(newValue.toUpperCase().trim());
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
