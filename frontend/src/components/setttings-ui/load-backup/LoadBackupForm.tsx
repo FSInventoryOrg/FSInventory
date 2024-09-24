@@ -14,13 +14,18 @@ import { FileUploader } from '@/components/ui/file-uploader';
 import { BackupValidationModal } from './BackupValidationModal';
 import { validateBackupFile } from '@/ims-service';
 
+export type MongoResult = {
+  _id: string,
+  [index: string]: string | number
+}
+
 export type ValidationResult = {
   message: string,
   outdated?: boolean,
   values?: {
     [index: string]: {
-      current: Array<Object>,
-      backup: Array<Object>
+      current: Array<MongoResult>,
+      backup: Array<MongoResult>
     }
   }
 }

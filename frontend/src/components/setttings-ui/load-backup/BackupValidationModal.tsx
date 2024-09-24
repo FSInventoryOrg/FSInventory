@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/Spinner';
-import { ValidationResult } from './LoadBackupForm';
+import { Separator } from '@/components/ui/separator';
+import { ValidationResult, MongoResult } from './LoadBackupForm';
 import { XIcon } from "lucide-react"
 
 interface BackupValidationModalProps {
@@ -21,12 +22,11 @@ interface BackupValidationModalProps {
 export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ result, validationComplete }) => { 
   const [open, setOpen] = useState<boolean>(false);
 
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
           <Button
-            disabled={result.message === ''}
+            disabled={result.message === '' && !validationComplete}
             className="w-[125px]"
           >
             {validationComplete === false ?
@@ -40,13 +40,49 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
         <div className="sm:max-w-[500px] w-full bg-card h-fit flex justify-between flex-col gap-6 p-6 rounded-lg">
           <DialogHeader className="relative">
             <DialogTitle className="flex justify-center items-center my-2">
-              Confirm Loading Backup File
+              Confirm Changes
             </DialogTitle>
             <DialogClose className="absolute right-0 top-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
               <XIcon className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </DialogClose>
+            <DialogDescription className='flex flex-col gap-4'>
+              <span className='w-full flex justify-center text-xl text-primary font-semibold'>The following data will be affected:</span>
+            </DialogDescription>
           </DialogHeader>
+          {result.values === undefined ?
+            <>No conflicts with the database.</> :
+            <ul className="flex flex-col">
+              {Object.keys(result.values).map((key) => {
+                return (
+                  <li>
+                    {key}
+                    <Separator />
+                    <ul className="flex">
+                      <ul className="w-full flex flex-col">
+                        {Object.values(result.values!![key].current).map((current: MongoResult) => {
+                          return (
+                            <li key={current._id}>
+                              {current._id}
+                            </li>
+                          )
+                        })}
+                      </ul>
+                      <ul className="w-full flex flex-col">
+                        {Object.values(result.values!![key].backup).map((backup: MongoResult) => {
+                          return (
+                            <li key={backup._id}>
+                              {backup._id}
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </ul>
+                  </li>
+                )
+              })}
+            </ul>
+          }
         </div>
       </DialogContent> 
     </Dialog>)
