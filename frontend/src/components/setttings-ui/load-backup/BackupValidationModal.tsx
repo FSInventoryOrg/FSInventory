@@ -47,7 +47,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
               <span className="sr-only">Close</span>
             </DialogClose>
             <DialogDescription className='flex flex-col gap-4'>
-              <span className='w-full flex justify-center text-xl text-primary font-semibold'>The following data will be affected:</span>
+              <span className='w-full flex justify-center text-xl text-primary font-semibold'>The following collections will be affected:</span>
             </DialogDescription>
           </DialogHeader>
           {result.values === undefined ?
