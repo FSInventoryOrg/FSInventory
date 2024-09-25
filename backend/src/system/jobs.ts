@@ -10,6 +10,13 @@ import { triggerNotif } from "../utils/common";
 import { renewAutoMailingActivation } from "./automail";
 import { getVersion } from "./version";
 
+const LICENSE_TYPES: string[] = [
+    'Subscription',
+    'Single-User (Named User)',
+    'Multi-User (Site)',
+    'OEM',
+  ]
+
 export const rotateLogs = async () => {
     const conn = await MongoClient.connect(process.env.MONGODB_CONNECTION_STRING as string);
     const db = conn.db('admin');
@@ -40,7 +47,17 @@ export const setDefaults = async () => {
         accum.push(value)
         return accum;
     }, [])
-    await Option.updateOne({ _id: options['_id'] }, { status: updateStatus })
+
+    const licenseType = options.licenseType?.length ? options.licenseType : LICENSE_TYPES;
+    
+    const updatedCategories = options['category'].reduce((accum: any[], category: any) => {
+        if (category?.type !=='Software') {
+            category.type = 'Hardware'
+        }
+        accum.push(category)
+        return accum
+    }, [])
+    await Option.updateOne({ _id: options['_id'] }, { status: updateStatus, category: updatedCategories, licenseType })
 
     const newCreds: any = {
         "created": "2024-08-02T12:05:49.192Z",
@@ -94,7 +111,7 @@ export const softwareExpirationMonitoring = async () => {
         $expr: {
             $and: [
                 {
-                    $lt: ['$expirationDate', bufferedDate]
+                    $lt: ['$licenseExpirationDate', bufferedDate]
                 },
                 {
                     $eq: ['$type', 'Software']
@@ -125,7 +142,7 @@ export const softwareExpirationMonitoring = async () => {
                 query: { code: value.code }
             };
 
-            const isExpired = dateNow > new Date(value.expirationDate)
+            const isExpired = dateNow > new Date(value.licenseExpirationDate)
 
             if (value?.assignee) {
                 const findUser = employees.find(f => f['code'] === value.assignee);
@@ -135,11 +152,11 @@ export const softwareExpirationMonitoring = async () => {
                     value.assignee = `${findUser['firstName']} ${findUser['lastName']}`
                 }
 
-                notifValue['messge'] = `Software Asset ${value.code} assigned to ${value.assignee} is ${isExpired ? 'expired' : 'expiring soon'}`
-                notifValue['messge_html'] = `<p>Software Asset <strong>${value.code}</strong> assigned to <strong>${value.assignee}</strong> is ${isExpired ? 'expired' : 'expiring soon'}`
+                notifValue['message'] = `Software Asset ${value.code} assigned to ${value.assignee} is ${isExpired ? 'expired' : 'expiring soon'}`
+                notifValue['message_html'] = `<p>Software Asset <strong>${value.code}</strong> assigned to <strong>${value.assignee}</strong> is ${isExpired ? 'expired' : 'expiring soon'}`
             } else {
-                notifValue['messge'] = `Software Asset ${value.code} is ${isExpired ? 'expired' : 'expiring soon'}`
-                notifValue['messge_html'] = `<p>Software Asset <strong>${value.code}</strong> is ${isExpired ? 'expired' : 'expiring soon'}`
+                notifValue['message'] = `Software Asset ${value.code} is ${isExpired ? 'expired' : 'expiring soon'}`
+                notifValue['message_html'] = `<p>Software Asset <strong>${value.code}</strong> is ${isExpired ? 'expired' : 'expiring soon'}`
             }
 
             accum.push(notifValue);
@@ -169,7 +186,6 @@ export const autoMail = async() => {
 export const removeStatus = async() => {
     const statusToDelete = ['Shelved'];
     let options: any = await Option.aggregate().match({});
-
     if(options.length > 0) options = options[0]
     else return
 

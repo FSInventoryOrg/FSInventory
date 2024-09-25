@@ -3,13 +3,13 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { HardwareType } from "@/types/asset";
+import { HardwareType, SoftwareType } from "@/types/asset";
 import ActionCell from './EmployeeAssetsAction';
 import DeploymentDuration from "./DeploymentDuration";
 import AssetCode from '../inventory-ui/AssetCode';
 import DeployRetrieveAsset from '../inventory-ui/DeployRetrieveAsset';
 
-export const EmployeeAssetsColumns: ColumnDef<HardwareType>[] = [
+export const EmployeeAssetsColumns: ColumnDef<HardwareType & SoftwareType>[] = [
   {
     accessorKey: "code",
     header: ({ column }) => {
@@ -37,7 +37,8 @@ export const EmployeeAssetsColumns: ColumnDef<HardwareType>[] = [
   },
   {
     accessorKey: "modelName",
-    header: "Model Name",
+    header: "Model/Software Name",
+    accessorFn: (row) => row.modelName || row.softwareName || '',
   },
   {
     accessorKey: "modelNo",

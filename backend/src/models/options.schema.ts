@@ -9,6 +9,7 @@ export type StatusOptions = {
 export type CategoryOptions = {
   value: string;
   properties?: string[];
+  type?: string;
 }
 
 export type Defaults = {
@@ -27,6 +28,7 @@ export interface OptionsType extends Document {
   equipmentType: string[];
   defaults: Defaults;
   adminLists?: string[];
+  licenseType: string[];
 }
 
 const optionsSchema: Schema<OptionsType> = new Schema<OptionsType>({
@@ -41,10 +43,12 @@ const optionsSchema: Schema<OptionsType> = new Schema<OptionsType>({
   category: { 
     type: [{
       value: { type: String, required: true },
-      properties: { type: [String], required: false}
+      properties: { type: [String], required: false},
+      type: { type: String, required: false}
     }],
     required: true },
   equipmentType: { type: [String], required: true },
+  licenseType: { type: [String], required: false},
   defaults: {
     type: { 
       status: { type: String, required: false }, 

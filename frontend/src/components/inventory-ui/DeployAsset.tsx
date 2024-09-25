@@ -22,7 +22,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Input, InputProps } from '../ui/input';
-import { HardwareType } from "@/types/asset"
+import { HardwareType, SoftwareType } from "@/types/asset"
 import { CalendarIcon } from "lucide-react"
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -40,7 +40,7 @@ import { RocketLaunch } from "@phosphor-icons/react"
 import { EmployeeType } from "@/types/employee";
 
 interface DeployAssetProps {
-  assetData: HardwareType;
+  assetData: HardwareType | SoftwareType
 }
 
 const DeployAsset = ({ assetData }: DeployAssetProps) => {
