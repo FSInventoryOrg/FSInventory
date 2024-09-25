@@ -1,10 +1,13 @@
 # UI CHANGELOG
 
-### 2024-09-24 [v2.13.1](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000701197)
+### 2024-09-24 [v2.13.2](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000701197)
 - *Fix* - Make Prefix Code a required field when creating new Category in Add Asset form
 
-### 2024-09-18 [v2.13.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000672055)
+### 2024-09-18 [v2.13.1](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000672055)
 - *Fix* - Settings: Fix currently selected sidebar item not visible in light mode
+
+### 2024-09-17 [v2.13.0](https://connect.zoho.com/portal/intranet/task/623367000000701215)
+- *Fix* - Category deletion is only soft delete
 
 ### 2024-09-12 [v2.12.1](https://connect.zoho.com/portal/intranet/task/623367000000281173)
 - *New* - Inventory page: Software Asset Type

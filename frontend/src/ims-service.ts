@@ -716,12 +716,25 @@ export const updateAssetCounter = async ({
     }
   );
 
+    if (!response.ok) {
+      const responseBody = await response.json();
+      throw new Error(responseBody.message || 'Failed to update asset counter');
+    }
+    return true;    
+}
+
+export const deleteAssetCounter = async (prefixCode: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/assetcounter/${prefixCode}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
   if (!response.ok) {
     const responseBody = await response.json();
-    throw new Error(responseBody.message || 'Failed to update asset counter');
+    throw new Error(responseBody.message ||'Failed to delete asset counter');
   }
-  return true;
-};
+  return true;    
+}
 
 export const fetchNotifications = async () => {
   const response = await fetch(`${API_BASE_URL}/api/notification`, {
