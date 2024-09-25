@@ -52,6 +52,7 @@ interface OptionsProps {
   colorSelect?: boolean
   tagSelect?: boolean
   className?: string
+  type?: 'Hardware' | 'Software'
 }
 
 function capitalize(str: string): string {
@@ -62,7 +63,7 @@ function format(str: string): string {
   return str.split(/(?=[A-Z])/).map(part => part.toLowerCase()).join(' ');
 }
 
-const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }: OptionsProps) => {
+const EditOptions = ({ property, colorSelect=false, tagSelect=false, type='Hardware', className }: OptionsProps) => {
   const [open, setOpen] = React.useState(false)
   const { showToast } = useAppContext();
   const [newOption, setNewOption] = React.useState<OptionType>({ property: property, value: '' });
@@ -217,9 +218,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
       setIsEditing(false)
     } else {
       setFilterValue('')
-      setTimeout(() => {
-        setFilteredData([]);
-      }, 100)
+      setFilteredData([]);
       setNewOption({ property: property, value: '' })
       setPrefixCode('')
     }
@@ -381,7 +380,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
             onClick={() => {
               if (newOption) {
                 if (property === 'category') {
-                  addOptionValue({ ...newOption, prefixCode })
+                  addOptionValue({ ...newOption, prefixCode, type })
                 }
                 else {
                   addOptionValue(newOption)
@@ -409,7 +408,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
             </Button>
             <h1 className='w-full flex justify-center items-center font-semibold text-sm h-10'>Edit {format(property)}</h1>
           </div>
-          <Label>Value</Label>
+          <Label>{capitalize(property)}</Label>
           <Input 
             value={typeof newOption.value === 'object' ? newOption.value.value : newOption.value}            
             type='input'
