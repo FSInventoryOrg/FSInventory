@@ -16,7 +16,7 @@ import {
   FormMessage,
   Form,
 } from '@/components/ui/form';
-import { HardwareType } from '@/types/asset';
+import { HardwareType, SoftwareType } from '@/types/asset';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as imsService from '@/ims-service';
@@ -39,7 +39,7 @@ import { RetrieveAssetSchema } from '@/schemas/RetrieveAssetSchema';
 import LackingDeploymentDetailsDialog from './LackingDeploymentDetailsDialog';
 
 interface RetrieveAssetProps {
-  assetData: HardwareType;
+  assetData: HardwareType | SoftwareType;
   onRetrieve?: () => void;
 }
 

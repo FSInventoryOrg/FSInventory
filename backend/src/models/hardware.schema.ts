@@ -1,31 +1,18 @@
 import { Schema } from 'mongoose';
 import Asset, { AssetType } from './asset.schema';
 
-export type DeploymentHistory = {
-  deploymentDate?: Date;
-  recoveryDate?: Date;
-  assignee: string;
-}
 
 export interface HardwareType extends AssetType {
-  category: string;
   processor: string;
   memory: string;
   storage: string;
-  status: string;
-  assignee: string;
   purchaseDate: Date;
   supplierVendor: string;
   pezaForm8105: string;
   pezaForm8106: string;
   isRGE: boolean;
   equipmentType: string;
-  remarks: string;
-  deploymentDate?: Date;
-  recoveredFrom: string;
-  recoveryDate?: Date;
   client: string;
-  deploymentHistory: DeploymentHistory[];
 }
 
 /**
@@ -130,11 +117,9 @@ export interface HardwareType extends AssetType {
  *          description: History of deployments for this asset
  */
 const hardwareSchema: Schema<HardwareType> = new Schema<HardwareType>({
-  category: { type: String, required: true },
   processor: { type: String, required: false },
   memory: { type: String, required: false },
   storage: { type: String, required: false },
-  status: { type: String, required: true },
   assignee: { type: String, required: false },
   purchaseDate: { type: Date, required: false },
   supplierVendor: { type: String, required: false },
@@ -142,18 +127,7 @@ const hardwareSchema: Schema<HardwareType> = new Schema<HardwareType>({
   pezaForm8106: { type: String, required: false },
   isRGE: { type: Boolean, required: false },
   equipmentType: { type: String, required: true },
-  remarks: { type: String, required: false },
-  deploymentDate: { type: Date, required: false },
-  recoveredFrom: { type: String, required: false },
-  recoveryDate: { type: Date, required: false },
   client: { type: String, required: false },
-  deploymentHistory: { 
-    type: [{
-      deploymentDate: { type: Date, required: false },
-      recoveryDate: { type: Date, required: false},
-      assignee: { type: String, required: true },
-    }],
-    required: false },
 });
 
 const Hardware = Asset.discriminator<HardwareType>("Hardware", hardwareSchema);

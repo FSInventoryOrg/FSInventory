@@ -126,58 +126,46 @@ router.post('/', [
         data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
       }
 
-      if (data.type === 'Hardware') {
-        const existingAsset = await Hardware.findOne({ code: data.code });
-        if (existingAsset) {
-          return res.status(400).json({ message: "Asset code already exists" });
-        }
-
-        if (data['assignee']) {
-          data['status'] = 'Deployed';
-          data['deploymentHistory'] = [
-            {
-              assignee: data['assignee'],
-              deploymentDate: data['deploymentDate'] ? data['deploymentDate'] : new Date()
-            }
-          ]
-        } else if(data['status'] === 'Deployed' && !data['assignee']) data['status'] = 'IT Storage'
-
-        if (data['recoveredFrom']) {
-          const recovery = {
-            assignee: data['recoveredFrom'],
-            recoveryDate: data['recoveryDate'] ? data['recoveryDate'] : new Date()
-          }
-          if (!Array.isArray(data['deploymentHistory'])) data['deploymentHistory'] = [recovery]
-          else {
-             data['deploymentHistory'].push(recovery)
-          }
-        }
-
-        if (!data['serialNo']) return res.status(422).json({ message: 'Serial Number is required' });
-        if (!data['category']) return res.status(422).json({ message: 'Category is required' });
-
-        const checkSerial = await checkSerialNo(data['serialNo']);
-        if (checkSerial !== 'SUCCESS') return res.status(422).json({ message: checkSerial });
-
-        data['code'] = await getCodeAndIncrement(data['category'], data['type']);
-        if (!data['code']) return res.status(422).json({ message: `Need to configure the index of ${data['type']} - ${data['category']}` });
-
-        const newAsset = new Hardware(data);
-        await newAsset.save();
-        await auditAssets();
-
-        return res.status(201).json(newAsset);
-      } else {
-        const existingAsset = await Software.findOne({ code: data.code });
-        if (existingAsset) {
-          return res.status(400).json({ message: "Asset code already exists" });
-        }
-
-        const newAsset = new Software(data);
-        await newAsset.save();
-
-        return res.status(201).json(newAsset);
+      const existingAsset = await Asset.findOne({ code: data.code });
+      if (existingAsset) {
+        return res.status(400).json({ message: "Asset code already exists" });
       }
+
+      if (data['assignee']) {
+        data['status'] = 'Deployed';
+        data['deploymentHistory'] = [
+          {
+            assignee: data['assignee'],
+            deploymentDate: data['deploymentDate'] ? data['deploymentDate'] : new Date()
+          }
+        ]
+      } else if(data['status'] === 'Deployed' && !data['assignee']) data['status'] = 'IT Storage'
+
+      if (data['recoveredFrom']) {
+        const recovery = {
+          assignee: data['recoveredFrom'],
+          recoveryDate: data['recoveryDate'] ? data['recoveryDate'] : new Date()
+        }
+        if (!Array.isArray(data['deploymentHistory'])) data['deploymentHistory'] = [recovery]
+        else {
+            data['deploymentHistory'].push(recovery)
+        }
+      }
+
+      if (!data['serialNo']) return res.status(422).json({ message: 'Serial Number is required' });
+      if (!data['category']) return res.status(422).json({ message: 'Category is required' });
+
+      const checkSerial = await checkSerialNo(data['serialNo']);
+      if (checkSerial !== 'SUCCESS') return res.status(422).json({ message: checkSerial });
+
+      data['code'] = await getCodeAndIncrement(data['category'], data['type']);
+      if (!data['code']) return res.status(422).json({ message: `Need to configure the index of ${data['type']} - ${data['category']}` });
+
+      const newAsset =  data.type === 'Hardware' ? new Hardware(data) : new Software(data)
+      await newAsset.save();
+      await auditAssets();
+
+      return res.status(201).json(newAsset);
     } catch (error) {
       console.error('Error creating asset:', error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -209,7 +197,7 @@ router.put('/deploy/:code', [
         return res.status(400).json({ message: 'Asset code mismatch' });
       }
 
-      const existingAsset = await Hardware.findOne({ code });
+      const existingAsset = await Asset.findOne({ code });
       if (!existingAsset) {
         return res.status(404).json({ message: 'Asset not found' });
       }
@@ -233,8 +221,8 @@ router.put('/deploy/:code', [
       data.deploymentHistory = [...existingAsset.deploymentHistory, deploymentRecord];
 
       let updatedAsset;
-      await Hardware.updateOne({ code: data.code }, data);
-      updatedAsset = await Hardware.findOne({ code });
+      await Asset.updateOne({ code: data.code }, data);
+      updatedAsset = await Asset.findOne({ code });
 
       await auditAssets();
 
@@ -270,7 +258,7 @@ router.put('/retrieve/:code', [
         return res.status(400).json({ message: 'Asset code mismatch' });
       }
 
-      const existingAsset = await Hardware.findOne({ code });
+      const existingAsset = await Asset.findOne({ code });
       if (!existingAsset) {
         return res.status(404).json({ message: 'Asset not found' });
       }
@@ -306,8 +294,8 @@ router.put('/retrieve/:code', [
       data.deploymentHistory = deploymentHistory;
 
       let updatedAsset;
-      await Hardware.updateOne({ code: data.code }, data);
-      updatedAsset = await Hardware.findOne({ code });
+      await Asset.updateOne({ code: data.code }, data);
+      updatedAsset = await Asset.findOne({ code });
 
       await auditAssets();
       res.status(200).json(updatedAsset);
@@ -439,79 +427,77 @@ router.put('/:code', [
       delete data['code'];
 
       let updatedAsset;
-      if (data.type === 'Hardware') {
-        let depHist = existingAsset['deploymentHistory']
-        if (!Array.isArray(depHist)) depHist = [];
-        else depHist = depHist.reverse();
+      let depHist = existingAsset['deploymentHistory']
+      if (!Array.isArray(depHist)) depHist = [];
+      else depHist = depHist.reverse();
 
-        const recoveryProcess = (assignee :string, recoveryDate?: Date, deploymentDate?: Date) => {
-          if(assignee) {
-            const findIndex = depHist.findIndex((f: any) => { return f['assignee'] === assignee })
-            const recovery = {
-              assignee,
-              recoveryDate: recoveryDate ?? new Date()
-            }
-            // Update recovery fields
-            data.recoveredFrom = recovery.assignee
-            data.recoveryDate = recovery.recoveryDate
-            
-            if (findIndex == 0) depHist[findIndex] = { ...depHist[findIndex].toObject(), ...recovery }
-            else {
-              depHist.unshift({...recovery,  deploymentDate: deploymentDate ?? null})
-            }
+      const recoveryProcess = (assignee :string, recoveryDate?: Date, deploymentDate?: Date) => {
+        if(assignee) {
+          const findIndex = depHist.findIndex((f: any) => { return f['assignee'] === assignee })
+          const recovery = {
+            assignee,
+            recoveryDate: recoveryDate ?? new Date()
+          }
+          // Update recovery fields
+          data.recoveredFrom = recovery.assignee
+          data.recoveryDate = recovery.recoveryDate
+          
+          if (findIndex == 0) depHist[findIndex] = { ...depHist[findIndex].toObject(), ...recovery }
+          else {
+            depHist.unshift({...recovery,  deploymentDate: deploymentDate ?? null})
           }
         }
-
-        if(data['assignee']) {
-          // If 'Assignee' is filled in, deploy the asset to assignee
-          data['status'] = "Deployed";
-          if(data['assignee'] !== existingAsset['assignee']) {
-            // Recover asset from old assignee and deploy to new assignee
-            recoveryProcess(existingAsset['assignee'], new Date(), existingAsset['deploymentDate']);
-            const deploy = {
-              assignee: data['assignee'],
-              deploymentDate: data['deploymentDate'] ? data['deploymentDate'] : new Date()
-            }
-            depHist.unshift(deploy)
-          }
-        } else if(data['status'] === 'Deployed' && !data['assignee']) {
-          // Recover asset from current assignee if 'Assignee' field is left blank and status is 'Deployed'
-          data['status'] = "IT Storage";
-          if(data['assignee'] !== existingAsset['assignee']) {
-            recoveryProcess(existingAsset['assignee'],  new Date(), existingAsset['deploymentDate'])
-          }
-        }
-
-        const recoveredFrom = data['recoveredFrom']
-        const recoveryDate = data['recoveryDate']
-        if (existingAsset['status'] === 'Deployed' && existingAsset['status'] !== data['status']) {
-          // Recover asset from current assignee if status is changed from 'Deployed'
-            recoveryProcess(existingAsset['assignee'], new Date(), existingAsset['deploymentDate']) 
-        }
-  
-        // If 'Recovered From' is filled in, recover asset from that assignee regardless of asset status
-        if(recoveredFrom && recoveredFrom !== existingAsset['recoveredFrom']) {
-          recoveryProcess(recoveredFrom, recoveryDate)
-        }
-        
-
-        depHist = depHist.reverse();
-
-        if(depHist.length > 0) data['deploymentHistory'] = depHist
-        
-        // Remove undefined date properties and set them to null
-        data.deploymentDate ??= null;
-        data.purchaseDate ??= null;
-        data.recoveryDate ??= null;
-
-        // Update the asset
-        updatedAsset = await Hardware.findOneAndUpdate({ code: code }, data, { new: true });
-
-        await auditAssets();
-      } else {
-        updatedAsset = await Software.findOneAndUpdate({ code: code }, data, { new: true });
       }
 
+      if(data['assignee']) {
+        // If 'Assignee' is filled in, deploy the asset to assignee
+        data['status'] = "Deployed";
+        if(data['assignee'] !== existingAsset['assignee']) {
+          // Recover asset from old assignee and deploy to new assignee
+          recoveryProcess(existingAsset['assignee'], new Date(), existingAsset['deploymentDate']);
+          const deploy = {
+            assignee: data['assignee'],
+            deploymentDate: data['deploymentDate'] ? data['deploymentDate'] : new Date()
+          }
+          depHist.unshift(deploy)
+        }
+      } else if(data['status'] === 'Deployed' && !data['assignee']) {
+        // Recover asset from current assignee if 'Assignee' field is left blank and status is 'Deployed'
+        data['status'] = "IT Storage";
+        if(data['assignee'] !== existingAsset['assignee']) {
+          recoveryProcess(existingAsset['assignee'],  new Date(), existingAsset['deploymentDate'])
+        }
+      }
+
+      const recoveredFrom = data['recoveredFrom']
+      const recoveryDate = data['recoveryDate']
+      if (existingAsset['status'] === 'Deployed' && existingAsset['status'] !== data['status']) {
+        // Recover asset from current assignee if status is changed from 'Deployed'
+          recoveryProcess(existingAsset['assignee'], new Date(), existingAsset['deploymentDate']) 
+      }
+
+      // If 'Recovered From' is filled in, recover asset from that assignee regardless of asset status
+      if(recoveredFrom && recoveredFrom !== existingAsset['recoveredFrom']) {
+        recoveryProcess(recoveredFrom, recoveryDate)
+      }
+      
+
+      depHist = depHist.reverse();
+
+      if(depHist.length > 0) data['deploymentHistory'] = depHist
+      
+      // Remove undefined date properties and set them to null
+      data.deploymentDate ??= null;
+      data.purchaseDate ??= null;
+      data.recoveryDate ??= null;
+
+      // Update the asset
+      updatedAsset = data.type === 'Hardware' 
+        ? await Hardware.findOneAndUpdate({ code: code }, data, { new: true }) 
+        : await Software.findOneAndUpdate({ code: code }, data, { new: true }) 
+
+      await auditAssets();
+      
       res.status(200).json(updatedAsset);
     } catch (error) {
       console.error('Error updating asset:', error);
