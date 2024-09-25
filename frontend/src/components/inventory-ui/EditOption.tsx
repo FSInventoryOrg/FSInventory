@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronLeftIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { format } from '@/lib/utils';
+import { capitalize, format } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -9,7 +9,7 @@ import { Spinner } from '../Spinner';
 import TagSelect from './TagSelect';
 import ColorSelect from './ColorSelect';
 import DeletePropertyDialog from './DeletePropertyDialog';
-import { ColorOption, OptionType, TagOption } from '@/types/options';
+import { OptionType } from '@/types/options';
 import useOption from './useOptions';
 
 interface EditOptionProps {
@@ -74,7 +74,7 @@ const EditOption = ({
           Edit {format(property)}
         </h1>
       </div>
-      <Label>Value</Label>
+      <Label>{capitalize(property)}</Label>
       <Input
         value={getOptionValue(editedOption.value) as string}
         type='input'

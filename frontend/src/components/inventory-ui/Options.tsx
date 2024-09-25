@@ -140,8 +140,8 @@ const Options = ({
     });
   };
 
-  const handleAddOption = (option: OptionType) => {
-    addOptionValue({ ...option, type });
+  const handleAddOption = (option: OptionType, prefixCode?: string) => {
+    addOptionValue({ ...option, prefixCode, type });
   };
   const handleUpdateOption = (updatedOption: OptionType) => {
     const indexOfValueToEdit = findIndexInOptions(optionToEdit);
