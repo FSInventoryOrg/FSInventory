@@ -307,8 +307,8 @@ export const deleteAssetByCode = async (code: string) => {
 export const addOptionValue = async ({
   property,
   value,
-  type,
   prefixCode,
+  type,
 }: {
   property: string;
   value: string | object;
@@ -355,7 +355,7 @@ export const addOptionValue = async ({
 
     return response.json();
   } catch (err: any) {
-    throw new Error(err);
+    throw new Error(err.message);
   }
 };
 
