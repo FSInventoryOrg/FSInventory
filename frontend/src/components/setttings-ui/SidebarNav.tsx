@@ -29,7 +29,7 @@ const SidebarNav = ({ className, items, ...props }: SidebarNavProps) => {
             buttonVariants({ variant: "ghost" }),
             "flex w-full  font-semibold items-center rounded-md p-2 hover:underline",
             {
-              "bg-muted": pathname === item.href,
+              "bg-secondary": pathname === item.href,
             },
             "justify-start"
           )}

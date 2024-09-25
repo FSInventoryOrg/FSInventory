@@ -77,3 +77,11 @@ export function exportToExcel(columns: string[], data: any, fileName: string) {
     }
   });
 }
+
+export function format(str: string): string {
+  return str.split(/(?=[A-Z])/).map(part => part.toLowerCase()).join(' ');
+}
+
+export function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
