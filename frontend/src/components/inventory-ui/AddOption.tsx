@@ -1,6 +1,6 @@
 import { ChevronLeftIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { format } from '@/lib/utils';
+import { capitalize, format } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -9,6 +9,7 @@ import TagSelect from './TagSelect';
 import ColorSelect from './ColorSelect';
 import { OptionType } from '@/types/options';
 import useOption from './useOptions';
+import { useState } from 'react';
 
 interface AddOptionProps {
   defaultOption: OptionType;
@@ -17,7 +18,7 @@ interface AddOptionProps {
   tagSelect?: boolean;
   className?: string;
   onCancel: () => void;
-  onSave: (option: OptionType) => void;
+  onSave: (option: OptionType, prefixCode?: string) => void;
   isCreating: boolean;
   isAddPending: boolean;
   onEnterPressed?: () => void;
@@ -34,6 +35,7 @@ const AddOption = ({
   isAddPending,
   onEnterPressed,
 }: AddOptionProps) => {
+  const [prefixCode, setPrefixCode] = useState<string>('');
   const {
     newOption,
     setNewOption,
@@ -45,10 +47,15 @@ const AddOption = ({
   const handleCancel = () => {
     onCancel();
     setNewOption({ property, value: '' });
+    setPrefixCode('');
   };
 
   const handleAddOption = () => {
-    onSave(newOption);
+    if (property === 'category') {
+      onSave(newOption, prefixCode);
+    } else {
+      onSave(newOption);
+    }
   };
 
   return (
@@ -67,7 +74,7 @@ const AddOption = ({
           Create {format(property)}
         </h1>
       </div>
-      <Label>Value</Label>
+      <Label>{capitalize(property)}</Label>
       <Input
         value={getOptionValue(newOption.value)}
         type='input'
@@ -93,6 +100,28 @@ const AddOption = ({
           }
         }}
       />
+      {property === 'category' ? (
+        <>
+          <Label>Prefix Code</Label>
+          <Input
+            value={prefixCode}
+            type='input'
+            className='focus-visible:ring-0 focus-visible:ring-popover'
+            onChange={(e) => {
+              const newValue = e.target.value;
+              setPrefixCode(newValue.toUpperCase().trim());
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                onEnterPressed?.();
+              }
+            }}
+          />
+        </>
+      ) : (
+        <></>
+      )}
       {colorSelect && (
         <ColorSelect onColorSelect={handleColorSelect} reset={isCreating} />
       )}

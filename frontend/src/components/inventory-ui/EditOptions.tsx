@@ -52,6 +52,7 @@ interface OptionsProps {
   colorSelect?: boolean
   tagSelect?: boolean
   className?: string
+  type?: 'Hardware' | 'Software'
 }
 
 function capitalize(str: string): string {
@@ -62,13 +63,14 @@ function format(str: string): string {
   return str.split(/(?=[A-Z])/).map(part => part.toLowerCase()).join(' ');
 }
 
-const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }: OptionsProps) => {
+const EditOptions = ({ property, colorSelect=false, tagSelect=false, type='Hardware', className }: OptionsProps) => {
   const [open, setOpen] = React.useState(false)
   const { showToast } = useAppContext();
   const [newOption, setNewOption] = React.useState<OptionType>({ property: property, value: '' });
   const [optionToEdit, setOptionToEdit] = React.useState<string>('');
   const [isCreating, setIsCreating] = React.useState<boolean>(false);
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
+  const [prefixCode, setPrefixCode] = React.useState<string>('');
 
   const { data: optionValues } = useQuery<string[] | ColorOption[] | TagOption[]>({ 
     queryKey: ['fetchOptionValues', property], 
@@ -216,10 +218,9 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
       setIsEditing(false)
     } else {
       setFilterValue('')
-      setTimeout(() => {
-        setFilteredData([]);
-      }, 100)
+      setFilteredData([]);
       setNewOption({ property: property, value: '' })
+      setPrefixCode('')
     }
   }, [open, filterValue, optionValues, property]);
 
@@ -316,13 +317,14 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
               onClick={() => {
                 setIsCreating(!isCreating)
                 setNewOption({ property: property, value: '' })
+                setPrefixCode('')
               }}
             >
               <ChevronLeftIcon />
             </Button>
             <h1 className='w-full flex justify-center items-center font-semibold text-sm h-10'>Create {format(property)}</h1>
           </div>
-          <Label>Value</Label>
+          <Label>{capitalize(property)}</Label>
           <Input 
             value={typeof newOption.value === 'object' ? newOption.value.value : newOption.value}
             type='input'
@@ -347,6 +349,27 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
               }
             }}
           />
+          {property === 'category' ?
+            <>
+              <Label>Prefix Code</Label>
+              <Input
+                value={
+                  prefixCode
+                }
+                type="input"
+                className="focus-visible:ring-0 focus-visible:ring-popover"
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  setPrefixCode(newValue.toUpperCase().trim());
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    setOpen(!open)
+                  }
+                }}
+              />
+            </> : <></>}
           {colorSelect && <ColorSelect onColorSelect={handleColorSelect} reset={isEditing || isCreating} />}
           {tagSelect && <TagSelect onTagSelect={handleTagSelect} reset={isEditing || isCreating} />}
           <Separator className='my-1' />
@@ -356,7 +379,12 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
             type='button'
             onClick={() => {
               if (newOption) {
-                addOptionValue(newOption)
+                if (property === 'category') {
+                  addOptionValue({ ...newOption, prefixCode, type })
+                }
+                else {
+                  addOptionValue(newOption)
+                }
               }
             }}
           >
@@ -380,7 +408,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, className }
             </Button>
             <h1 className='w-full flex justify-center items-center font-semibold text-sm h-10'>Edit {format(property)}</h1>
           </div>
-          <Label>Value</Label>
+          <Label>{capitalize(property)}</Label>
           <Input 
             value={typeof newOption.value === 'object' ? newOption.value.value : newOption.value}            
             type='input'
