@@ -10,6 +10,17 @@ export interface AssetType {
   modelName: string;
   modelNo: string;
   serialNo: string;
+  category: string;
+  deploymentDate: Date;
+  recoveredFrom: string;
+  recoveryDate: Date;
+  deploymentHistory: DeploymentHistory[];
+  status: string;
+  assignee: string;
+  _addonData_assignee?: string;
+  _addonData_recoveredFrom?: string;
+  purchaseDate: Date;
+  remarks: string;
 }
 
 export type DeploymentHistory = {
@@ -19,31 +30,27 @@ export type DeploymentHistory = {
 }
 
 export interface HardwareType extends AssetType {
-  _addonData_assignee?: string;
-  _addonData_recoveredFrom?: string;
-  category: string;
   processor: string;
   memory: string;
   storage: string;
-  status: string;
-  assignee: string;
-  purchaseDate: Date;
   supplierVendor: string;
   pezaForm8105: string;
   pezaForm8106: string;
   isRGE: boolean;
   equipmentType: string;
-  remarks: string;
-  deploymentDate: Date;
-  recoveredFrom: string;
-  recoveryDate: Date;
   client: string;
-  deploymentHistory: DeploymentHistory[];
 }
 
 export interface SoftwareType extends AssetType {
   license: string;
+  licenseType: string;
+  licenseCost: number;
+  licenseExpirationDate: Date;
+  noOfLicense: number;
   version: string;
+  softwareName: string;
+  vendor: string;
+  installationPath: string;
 }
 
 export type AssetCounterType = {

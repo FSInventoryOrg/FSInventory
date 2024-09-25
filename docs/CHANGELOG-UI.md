@@ -1,7 +1,13 @@
 # UI CHANGELOG
 
-### 2024-09-18 [v2.5.8](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000672055)
+### 2024-09-18 [v2.13.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000672055)
 - *Fix* - Settings: Fix currently selected sidebar item not visible in light mode
+
+### 2024-09-12 [v2.12.1](https://connect.zoho.com/portal/intranet/task/623367000000281173)
+- *New* - Inventory page: Software Asset Type
+
+### 2024-09-10 [v2.12.0](https://connect.zoho.com/portal/intranet/task/623367000000670005)
+- *New* - Dashboard: added serial number on latest asset table
 
 ### 2024-09-12 [v2.5.7](https://connect.zoho.com/portal/intranet/task/623367000000597066)
 - *Fix* - Added lacking option for automated reports email frequency sending monthly and added invalidate query for auto refresh

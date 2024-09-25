@@ -4,7 +4,7 @@ import { check, validationResult } from 'express-validator'
 import verifyToken from '../middleware/auth';
 import jwt from "jsonwebtoken";
 import User from '../models/user.schema';
-import { getCodeAndIncrement, getHardwareIndexes } from '../utils/asset-counter';
+import { getCodeAndIncrement, getAssetIndexes } from '../utils/asset-counter';
 import { auditAssets, deleteNotif } from '../utils/common';
 
 const router = express.Router();
@@ -167,7 +167,7 @@ router.get('/', async (req: Request, res: Response) => {
 
         let assetcounter;
 
-        if (!Object.keys(query).length) assetcounter = await getHardwareIndexes();
+        if (!Object.keys(query).length) assetcounter = await getAssetIndexes();
         else assetcounter = await AssetCounter.find(query);
 
         res.status(200).json(assetcounter);

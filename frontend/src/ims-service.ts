@@ -241,8 +241,20 @@ export const deleteAssetByCode = async (code: string) => {
 
 /* OPTIONS */
 
-export const addOptionValue = async ({property, value}: { property: string, value: string | object }) => {
-  const response = await fetch(`${API_BASE_URL}/api/options/${property}`, {
+export const addOptionValue = async ({
+  property,
+  value,
+  type,
+}: {
+  property: string;
+  value: string | object;
+  type?: 'Hardware' | 'Software';
+}) => {
+  let url = `${API_BASE_URL}/api/options/${property}/`
+  if (type) {
+    url += `?type=${type}`;
+  }
+  const response = await fetch(url, {
     method: 'POST',
     credentials: 'include',
     headers: {

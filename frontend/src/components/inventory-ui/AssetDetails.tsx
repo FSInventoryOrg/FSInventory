@@ -1,4 +1,4 @@
-import { HardwareType } from '@/types/asset'
+import { HardwareType, SoftwareType } from '@/types/asset'
 import { CreditCardIcon, InfoIcon, LibraryBig, NotebookPenIcon, ScaleIcon, SettingsIcon, TrashIcon } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -13,7 +13,7 @@ import { Button } from '../ui/button';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface AssetDetailsProps {
-  asset: HardwareType;
+  asset: HardwareType & SoftwareType;
   onRetrieve?: () => void;
 }
 

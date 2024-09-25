@@ -6,3 +6,20 @@ export type Defaults = {
   retrievableStatus: string;
   inventoryColumns?: string[];
 }
+
+export type ColorOption = {
+  value: string;
+  color?: string;
+};
+
+export type TagOption = {
+  value: string;
+  properties?: string[];
+  type: string;
+};
+
+export type OptionType = {
+  property: string;
+  value: string | ColorOption | TagOption;
+};
+
