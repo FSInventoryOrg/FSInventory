@@ -1,5 +1,8 @@
 # UI CHANGELOG
 
+### 2024-09-24 [v2.13.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000701197)
+- *Fix* - Make Prefix Code a required field when creating new Category in Add Asset form
+
 ### 2024-09-12 [v2.5.7](https://connect.zoho.com/portal/intranet/task/623367000000597066)
 - *Fix* - Added lacking option for automated reports email frequency sending monthly and added invalidate query for auto refresh
 
