@@ -201,9 +201,7 @@ const Options = ({
 
   const reset = () => {
     setFilterValue('');
-    setTimeout(() => {
-      setFilteredData([]);
-    }, 100);
+    setFilteredData([]);
     setNewOption({ property: property, value: '' });
   };
   
