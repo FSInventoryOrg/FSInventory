@@ -51,9 +51,10 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys }
           border-0 rounded-lg
           flex justify-center
           font-sans font-bold text-xs
-          ${backup ? "bg-[#2380C2]" : "bg-[#3C843E]"}
+          text-nowrap
+          ${backup ? "bg-[#2380C2]" : "bg-destructive"}
           `}>
-          <>{backup ? "CHANGED" : "NEW"}</>
+          <>{backup ? "CHANGED" : "NO BACKUP"}</>
         </span>
       </div>
       {open &&
