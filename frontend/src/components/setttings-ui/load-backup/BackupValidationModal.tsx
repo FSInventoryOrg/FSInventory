@@ -37,7 +37,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
             }
           </Button>
       </DialogTrigger>
-      <DialogContent tabIndex={-1} className="w-full overflow-y-auto h-full bg-transparent items-center justify-center flex border-none px-0 py-0 sm:py-16 overflow-none">
+      <DialogContent tabIndex={-1} className="w-full overflow-y-auto h-full bg-transparent items-center justify-center flex flex-col border-none px-0 py-0 sm:py-16 overflow-none">
         <div className="sm:max-w-[500px] w-full bg-card h-fit flex justify-between flex-col gap-6 p-6 rounded-lg">
           <DialogHeader className="relative">
             <DialogTitle className="flex justify-center items-center my-2">
@@ -47,7 +47,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
               <XIcon className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </DialogClose>
-            <DialogDescription className='flex flex-col gap-4'>
+            <DialogDescription className='flex flex-col gap-1'>
               <span className='w-full flex justify-center text-xl text-primary font-semibold'>The following collections will be affected:</span>
             </DialogDescription>
           </DialogHeader>
