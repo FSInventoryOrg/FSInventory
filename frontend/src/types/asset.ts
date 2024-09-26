@@ -62,3 +62,5 @@ export type AssetCounterType = {
   type: "Hardware" | "Software";
 };
 
+export type AssetUnionType = HardwareType | SoftwareType
+
