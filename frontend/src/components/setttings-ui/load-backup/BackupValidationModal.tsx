@@ -14,6 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { ValidationResult, MongoResult } from './LoadBackupForm';
 import { BackupDiffDisplay } from './BackupDiffDisplay';
 import { XIcon } from "lucide-react"
+import { Warning } from '@phosphor-icons/react';
 
 interface BackupValidationModalProps {
   result: ValidationResult,
@@ -56,15 +57,18 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
             <BackupDiffDisplay values={result.values} />
           }
           <div className="flex flex-col gap-y-2">
-            <span className="flex gap-x-1 text-sm">
+            <span className="flex gap-x-1 text-sm items-center font-bold">
+              <Warning size={24} weight="fill" color="#fac514" />
+              DOCUMENTS MARKED 
               <span className={`
                 w-fit h-fit px-2 py-1
                 border-0 rounded-lg
                 flex justify-center
-                font-sans font-bold text-xs bg-[#3C843E]
+                font-sans font-bold text-xs bg-destructive
+                text-nowrap
               `}>
-                NEW
-              </span> documents will not be saved and will not be retrievable.
+                NO BACKUP
+              </span> WILL BE ERASED!
             </span>
             <span className="flex gap-x-1 text-sm">
               <span className={`
@@ -74,7 +78,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
                 font-sans font-bold text-xs bg-[#2380C2]
               `}>
                 CHANGED
-              </span> documents will apply the selected changes. (Default: Backup)
+              </span> documents will follow selected changes.
             </span>
             <span className="text-sm">Please go through all of the affected documents before confirming.</span>
           </div>
