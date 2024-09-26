@@ -55,6 +55,34 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
             <>No conflicts with the database.</> :
             <BackupDiffDisplay values={result.values} />
           }
+          <div className="flex flex-col gap-y-2">
+            <span className="flex gap-x-1 text-sm">
+              <span className={`
+                w-fit h-fit px-2 py-1
+                border-0 rounded-lg
+                flex justify-center
+                font-sans font-bold text-xs bg-[#3C843E]
+              `}>
+                NEW
+              </span> documents will not be saved and will not be retrievable.
+            </span>
+            <span className="flex gap-x-1 text-sm">
+              <span className={`
+                w-fit h-fit px-2 py-1
+                border-0 rounded-lg
+                flex justify-center
+                font-sans font-bold text-xs bg-[#2380C2]
+              `}>
+                CHANGED
+              </span> documents will apply the selected changes. (Default: Backup)
+            </span>
+            <span className="text-sm">Please go through all of the affected documents before confirming.</span>
+          </div>
+          <div className="w-full flex flex-row-reverse">
+            <Button disabled={true} className="w-[125px]">
+              Confirm
+            </Button>
+          </div>
         </div>
       </DialogContent> 
     </Dialog>)
