@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/Spinner';
 import { Separator } from '@/components/ui/separator';
 import { ValidationResult, MongoResult } from './LoadBackupForm';
+import { BackupDiffDisplay } from './BackupDiffDisplay';
 import { XIcon } from "lucide-react"
 
 interface BackupValidationModalProps {
@@ -36,7 +37,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
             }
           </Button>
       </DialogTrigger>
-      <DialogContent tabIndex={-1} className="min-w-full overflow-y-auto h-full bg-transparent items-center justify-center flex border-none px-0 py-0 sm:py-16">
+      <DialogContent tabIndex={-1} className="w-full overflow-y-auto h-full bg-transparent items-center justify-center flex border-none px-0 py-0 sm:py-16 overflow-none">
         <div className="sm:max-w-[500px] w-full bg-card h-fit flex justify-between flex-col gap-6 p-6 rounded-lg">
           <DialogHeader className="relative">
             <DialogTitle className="flex justify-center items-center my-2">
@@ -52,36 +53,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
           </DialogHeader>
           {result.values === undefined ?
             <>No conflicts with the database.</> :
-            <ul className="flex flex-col">
-              {Object.keys(result.values).map((key) => {
-                return (
-                  <li>
-                    {key}
-                    <Separator />
-                    <ul className="flex">
-                      <ul className="w-full flex flex-col">
-                        {Object.values(result.values!![key].current).map((current: MongoResult) => {
-                          return (
-                            <li key={current._id}>
-                              {current._id}
-                            </li>
-                          )
-                        })}
-                      </ul>
-                      <ul className="w-full flex flex-col">
-                        {Object.values(result.values!![key].backup).map((backup: MongoResult) => {
-                          return (
-                            <li key={backup._id}>
-                              {backup._id}
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    </ul>
-                  </li>
-                )
-              })}
-            </ul>
+            <BackupDiffDisplay values={result.values} />
           }
         </div>
       </DialogContent> 
