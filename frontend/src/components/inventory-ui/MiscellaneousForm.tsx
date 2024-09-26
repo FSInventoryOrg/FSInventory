@@ -33,6 +33,7 @@ import { EmployeeSuggestiveInput } from './DeployAsset';
 import WarningAlert from '../WarningAlert';
 import { Defaults } from '@/types/options';
 import { Box } from '../ui/box';
+import { Checkbox } from '../ui/checkbox';
 
 interface MiscellaneousFormProps {
   defaults?: Defaults;
@@ -48,6 +49,7 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
   const [openRecoveryDate, setOpenRecoveryDate] = useState(false);
   const status = watch('status');
   const type = watch('type');
+  const remarks = watch('remarks')
   const isRetrievable = status && status === defaults?.retrievableStatus;
 
   useEffect(() => {
@@ -262,6 +264,25 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
           </FormItem>
         )}
       />
+      { remarks && <FormField
+        control={control}
+        name="notifyRemarks"
+        render={({ field }) => (
+          <FormItem className="w-full mt-2 flex items-center">
+            <FormLabel className="text-md text-secondary-foreground mt-2">
+              Show remarks indicator
+            </FormLabel>
+            <FormControl>
+              <Checkbox
+                className='ml-2'
+                checked={field.value !== false}
+                onCheckedChange={field.onChange}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />}
     </div>
   );
 };

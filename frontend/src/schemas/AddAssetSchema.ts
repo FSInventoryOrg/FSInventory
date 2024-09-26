@@ -8,6 +8,7 @@ export const AssetBaseSchema = z.object({
   modelNo: z.string().trim().optional(),
   serialNo: z.string().trim().min(1, 'Serial number is required'),
   remarks: z.string().trim().optional(),
+  notifyRemarks: z.boolean().optional(),
   status: z.string().trim().min(1, 'Asset status is required'),
   deploymentDate: z.date().nullable().optional(),
   recoveredFrom: z.string().trim().optional(),

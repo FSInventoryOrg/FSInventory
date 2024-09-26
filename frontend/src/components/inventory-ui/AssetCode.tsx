@@ -12,6 +12,7 @@ import {
 import { XIcon } from 'lucide-react';
 import AssetDetails from './AssetDetails';
 import { AssetUnionType } from '@/types/asset';
+import { Circle } from '@phosphor-icons/react';
 
 interface AssetCodeProps {
   asset:  AssetUnionType;
@@ -28,6 +29,10 @@ const AssetCode = ({ asset }: AssetCodeProps) => {
           className='text-xs font-normal px-2 py-0 w-fit overflow-hidden text-ellipsis whitespace-nowrap hover:underline'
         >
           {asset.code}
+          {
+            // if asset.notifyRemarks == undefined, then assume that it was not initialized yet and we display the remark indicator
+            asset.remarks && asset.notifyRemarks !== false && <Circle className='ml-1' weight='fill' color="#ebb505" size={12} />
+          }
         </Button>
       </DialogTrigger>
       <DialogContent className='flex flex-col'>
