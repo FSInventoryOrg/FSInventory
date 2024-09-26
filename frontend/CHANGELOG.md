@@ -72,7 +72,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Include view details from asset code in Tracker employee assets
 
 ## [2.4.17](https://connect.zoho.com/portal/intranet/task/623367000000510432) 2024-08-14
-- *Fix* - Need to manually press back button for previous Month and Year for Add new employee start date
+### Fixed
+- Need to manually press back button for previous Month and Year for Add new employee start date
 
 ## [2.4.16](https://connect.zoho.com/portal/intranet/task/623367000000533577) 2024-08-13
 ### Fixed
@@ -89,7 +90,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove Small settings button in Inventory page
 
 ## [2.4.13](https://connect.zoho.com/portal/intranet/task/623367000000560167) 2024-08-12
-- *New* - Bulk Delete for Items (frontend)
+### Added
+- Bulk Delete for Items (frontend)
 
 ## [2.4.12](https://connect.zoho.com/portal/intranet/task/623367000000579041) 2024-08-12
 ### Added
