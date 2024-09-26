@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Separator } from '@/components/ui/separator';
 import { ValidationResult, MongoResult } from './LoadBackupForm';
-import { CaretCircleDown, CaretCircleUp } from '@phosphor-icons/react';
+import { CaretCircleDown, CaretCircleUp, Circle, RadioButton } from '@phosphor-icons/react';
 
 interface CollectionDiffProps {
   current: MongoResult,
@@ -23,6 +23,7 @@ interface BackupDiffDisplayProps {
 
 const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys }) => {
   const [open, setOpen] = useState<boolean>(true);
+  const [selection, setSelection] = useState<string>('')
 
   const keysToExclude: string[] = ['created', 'createdBy', 'updated', 'updatedBy', '_id', '__v']
   const cleanedKeys: string[] = keys.filter((key: string) => !keysToExclude.includes(key));
@@ -62,17 +63,37 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys }
         {(backup && keys) &&
           <>
             <div className="flex flex-col gap-y-0">
-              <div className="p-2 bg-[#cd7169] border-0 rounded-t font-semibold">Currently in DB</div>
-              <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
-                <>
-                  {cleanedKeys.map((key: string) => {
-                    return (<span>{`${key}: ${current[key]}`}</span>)
-                  })}  
-                </>
-              </div>
+            <div
+              className="p-2 bg-[#cd7169] 
+              border-0 rounded-t 
+              font-semibold flex 
+              gap-x-2 items-center 
+              cursor-pointer"
+              onClick={() => setSelection("current")}
+            >
+              {selection === "current" ? <RadioButton size={20} color="#5e5454" weight="fill" /> : <Circle size={20} color="#bbbbbb" />}
+              Currently in DB
+            </div>
+            <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
+              <>
+                {cleanedKeys.map((key: string) => {
+                  return (<span>{`${key}: ${current[key]}`}</span>)
+                })}  
+              </>
+            </div>
             </div>
             <div className="flex flex-col gap-y-0">
-              <div className="p-2 bg-[#549a59] border-0 rounded-t font-semibold">Change from Backup File</div>
+            <div
+              className="p-2 bg-[#549a59] 
+              border-0 rounded-t
+              font-semibold flex
+              gap-x-2 items-center
+              cursor-pointer"
+              onClick={() => setSelection("backup")}
+            >
+              {selection === "backup" ? <RadioButton size={20} color="#5e5454" weight="fill" /> : <Circle size={20} color="#bbbbbb" />}
+              Change from Backup File
+            </div>
               <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
                 <>
                   {cleanedKeys.map((key: string) => {
