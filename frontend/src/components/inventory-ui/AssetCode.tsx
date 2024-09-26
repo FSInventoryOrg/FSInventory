@@ -14,7 +14,7 @@ import AssetDetails from './AssetDetails';
 import { HardwareType, SoftwareType } from '@/types/asset';
 
 interface AssetCodeProps {
-  asset:  HardwareType & SoftwareType;
+  asset:  HardwareType | SoftwareType;
 }
 const AssetCode = ({ asset }: AssetCodeProps) => {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);

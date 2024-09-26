@@ -5,11 +5,12 @@ import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HardwareType, SoftwareType } from "@/types/asset";
 import ActionCell from './EmployeeAssetsAction';
+import CellProps from './EmployeeAssetsAction';
 import DeploymentDuration from "./DeploymentDuration";
 import AssetCode from '../inventory-ui/AssetCode';
 import DeployRetrieveAsset from '../inventory-ui/DeployRetrieveAsset';
 
-export const EmployeeAssetsColumns: ColumnDef<HardwareType & SoftwareType>[] = [
+export const EmployeeAssetsColumns: ColumnDef<HardwareType | SoftwareType>[] = [
   {
     accessorKey: "code",
     header: ({ column }) => {
@@ -38,7 +39,7 @@ export const EmployeeAssetsColumns: ColumnDef<HardwareType & SoftwareType>[] = [
   {
     accessorKey: "modelName",
     header: "Model/Software Name",
-    accessorFn: (row) => row.modelName || row.softwareName || '',
+    accessorFn: (row) => row.modelName || (row as SoftwareType).softwareName || '',
   },
   {
     accessorKey: "modelNo",
@@ -82,6 +83,6 @@ export const EmployeeAssetsColumns: ColumnDef<HardwareType & SoftwareType>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <ActionCell row={row} />
+    cell: ({ row }) => <ActionCell row={(row as {index: number; original: HardwareType;})} />
   },
 ]

@@ -20,7 +20,7 @@ import {
 import { HardwareType } from '@/types/asset';
 import AssetDetails from '../inventory-ui/AssetDetails';
 
-interface CellProps {
+export interface CellProps {
   row: {
     index: number;
     original: HardwareType;

@@ -13,7 +13,7 @@ import { Button } from '../ui/button';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface AssetDetailsProps {
-  asset: HardwareType & SoftwareType;
+  asset: HardwareType | SoftwareType;
   onRetrieve?: () => void;
 }
 
@@ -74,9 +74,9 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
   ];
 
   const systemSpecs: Field[] = [
-    { label: 'Processor:', value: asset.processor },
-    { label: 'Memory:', value: asset.memory },
-    { label: 'Storage:', value: asset.storage }
+    { label: 'Processor:', value: (asset as HardwareType).processor },
+    { label: 'Memory:', value: (asset as HardwareType).memory },
+    { label: 'Storage:', value: (asset as HardwareType).storage }
   ];
 
   const purchaseDate = asset.purchaseDate ? new Date(asset.purchaseDate) : null;
@@ -87,18 +87,18 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
   const purchaseDetails: Field[] = [
       { label: 'Date of Purchase:', value: purchaseDate ? purchaseDate.toDateString() : '' },
       { label: 'Years of Service:', value: yearsOfService },
-      { label: 'Supplier/Vendor:', value: asset.supplierVendor }
+      { label: 'Supplier/Vendor:', value: (asset as HardwareType).supplierVendor }
   ];
 
   const legalInfo: Field[] = [
-    { label: 'PEZA Form 8105:', value: asset.pezaForm8105 },
-    { label: 'PEZA Form 8106:', value: asset.pezaForm8105 },
-    { label: 'Is RGE:', value: asset.isRGE ? 'YES' : 'NO' }
+    { label: 'PEZA Form 8105:', value: (asset as HardwareType).pezaForm8105 },
+    { label: 'PEZA Form 8106:', value: (asset as HardwareType).pezaForm8105 },
+    { label: 'Is RGE:', value: (asset as HardwareType).isRGE ? 'YES' : 'NO' }
   ]
 
   const otherInfo: Field[] = [
-    { label: 'Equipment Type:', value: asset.equipmentType },
-    { label: 'From Client:', value: asset.client },
+    { label: 'Equipment Type:', value: (asset as HardwareType).equipmentType },
+    { label: 'From Client:', value: (asset as HardwareType).client },
     { label: 'Assigned To:', value: asset._addonData_assignee || asset.assignee },
     { label: 'Deployment Date:', value: asset.deploymentDate ? new Date(asset.deploymentDate).toLocaleString() : '' },
     { label: 'Recovered From:', value: asset._addonData_recoveredFrom || asset.recoveredFrom },
