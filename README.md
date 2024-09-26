@@ -101,7 +101,7 @@ npm version major
 npm version minor
 ```
 
-`PATCH` version when you make bug fixes. This usually corresponds to tickets tagged as bugs.
+`PATCH` version when you make bug fixes or security patches. This usually corresponds to tickets tagged as bugs.
 ```sh
 npm version patch
 ```
