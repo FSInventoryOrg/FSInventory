@@ -16,7 +16,7 @@ import { validateBackupFile } from '@/ims-service';
 
 export type MongoResult = {
   _id: string,
-  [index: string]: string | number
+  [index: string]: string | number | Array<any>
 }
 
 export type ValidationResult = {
