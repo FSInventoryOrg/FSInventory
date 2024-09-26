@@ -90,19 +90,18 @@ After you done your work and committed your changes, create a PR and target `sta
 The PR should also include the following:
 
 ### Version Bump
-Do a version bump to backend and/or frontend project. Follow [Semantic Versioning](https://semver.org/).
+Do a version bump to backend and/or frontend project. Follow [Semantic Versioning](https://semver.org/). `MAJOR.MINOR.PATCH`
 
-Given a version number MAJOR.MINOR.PATCH, increment the:
-
-1. MAJOR version when you make incompatible API changes
+`MAJOR` version when you make incompatible changes like major refactors, change in ORM or database, where there is considerable risk involved
 ```sh
 npm version major
 ```
-2. MINOR version when you add functionality in a backward compatible manner (feature branches/tickets)
+`MINOR` version when you add functionality or features or changes in a backward compatible manner.
 ```sh
 npm version minor
 ```
-3. PATCH version when you make backward compatible bug fixes (fix branches/tickets)
+
+`PATCH` version when you make bug fixes. This usually corresponds to tickets tagged as bugs.
 ```sh
 npm version patch
 ```
@@ -110,29 +109,3 @@ npm version patch
 ### Changelog
 
 Add a changelog entry to backend and/or frontend project. Follow [Keep a Changelog](https://keepachangelog.com/) to be consistent. The entries should be brief and mostly the same with the PR description.
-
-```md
-## [1.2.1](zoho link) - 2023-03-05
-
-### Fixed
-
-- Italian translation (#332).
-- Indonesian translation (#336).
-
-## [1.2.0](zoho link) - 2023-02-15
-
-### Added
-
-- v1.1 Brazilian Portuguese translation.
-
-### Changed
-
-- Use frontmatter title & description in each language version template
-- Replace broken OpenGraph image
-
-## [1.1.0](zoho link) - 2023-02-01
-
-### Removed
-
-- Trademark sign previously shown after the project description
-```
