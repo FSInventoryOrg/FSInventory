@@ -1,22 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Separator } from '@/components/ui/separator';
 import { ValidationResult, MongoResult } from './LoadBackupForm';
 import { CaretCircleDown, CaretCircleUp } from '@phosphor-icons/react';
 
-type ChangeToAdopt = 'current' | 'backup'
+export type ChangeToAdopt = 'current' | 'backup'
 
 interface DocumentProps {
   current?: boolean,
   document: MongoResult,
   keys: string[],
   selection: ChangeToAdopt | ""
-  setSelection: (value: ChangeToAdopt) => void;
+  setSelection: (id: string, value: ChangeToAdopt) => void;
 }
 
 interface CollectionDiffProps {
   current: MongoResult,
   backup?: MongoResult,
-  keys: string[]
+  keys: string[],
+  setChanges: (id: string, change: ChangeToAdopt) => void
 }
 
 interface CollectionDiffDisplayProps {
@@ -24,16 +25,18 @@ interface CollectionDiffDisplayProps {
     current: Array<MongoResult>,
     backup: Array<MongoResult>
   },
-  className?: string
+  className?: string,
+  setChanges: (id: string, change: ChangeToAdopt) => void
 }
 
 interface BackupDiffDisplayProps {
-  values: ValidationResult['values'],
+  values: ValidationResult['values'];
   changes: {
     [index: string]: {
       [index: string]: '' | ChangeToAdopt
     }
-  }
+  };
+  setChanges: (changes: { [index: string]: { [index: string]: '' | ChangeToAdopt } }) => void;
 }
 
 const DocumentDiff: React.FC<DocumentProps> = ({ current = false, document, keys, selection = "", setSelection }) => {
@@ -49,7 +52,7 @@ const DocumentDiff: React.FC<DocumentProps> = ({ current = false, document, keys
         cursor-pointer
         ${current ? "bg-[#cd7169]" : "bg-[#549a59]"}
         `}
-        onClick={() => {setSelection(whichDocument)}}
+        onClick={() => {setSelection(document._id, whichDocument)}}
       >
         <div className={`
           h-5 w-5 border-2 rounded-full
@@ -73,7 +76,7 @@ const DocumentDiff: React.FC<DocumentProps> = ({ current = false, document, keys
   )
 }
 
-const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys }) => {
+const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys, setChanges }) => {
   const [open, setOpen] = useState<boolean>(true);
   const [selection, setSelection] = useState<"" | ChangeToAdopt>('')
 
@@ -114,8 +117,23 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys }
         <>
         {(backup && keys) &&
           <>
-            <DocumentDiff current document={current} keys={cleanedKeys} selection={selection} setSelection={setSelection} />
-            <DocumentDiff document={backup} keys={cleanedKeys} selection={selection} setSelection={setSelection} />
+          <DocumentDiff
+            current
+            document={current}
+            keys={cleanedKeys}
+            selection={selection}
+            setSelection={(id: string, value: ChangeToAdopt) => {
+              setSelection(value)
+              setChanges(id, value)
+            }} />
+          <DocumentDiff
+            document={backup}
+            keys={cleanedKeys}
+            selection={selection}
+            setSelection={(id: string, value: ChangeToAdopt) => {
+              setSelection(value)
+              setChanges(id, value)
+            }} />
           </>}
         {(!backup && keys) &&
           <>
@@ -137,7 +155,7 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys }
   )
 }
 
-const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collection, className }) => {
+const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collection, className, setChanges }) => {
   const { current, backup } = collection;
   return (
     <div className={`flex flex-col gap-y-6  ${className}`}>
@@ -161,8 +179,19 @@ const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collectio
           return (
             <>
               {isNew ?
-                <CollectionDiff current={docInCurrent} keys={keys} /> :
-                <CollectionDiff current={docInCurrent} backup={backup[backupIndex]} keys={diffKeys} />
+                <CollectionDiff
+                  current={docInCurrent}
+                  keys={keys}
+                  setChanges={() => setChanges}
+                /> :
+                <CollectionDiff
+                  current={docInCurrent}
+                  backup={backup[backupIndex]}
+                  keys={diffKeys}
+                  setChanges={(id: string, change: ChangeToAdopt) => {
+                    setChanges(id, change)
+                  }}
+                />
               }
             </>
           )
@@ -172,11 +201,15 @@ const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collectio
   )
 }
 
-export const BackupDiffDisplay: React.FC<BackupDiffDisplayProps> = ({ values }) => {
+export const BackupDiffDisplay: React.FC<BackupDiffDisplayProps> = ({ values, changes, setChanges }) => {
   const givenValues: ValidationResult['values'] = values!!
   const affectedCollections: string[] = Object.keys(givenValues);
 
   const [currentTab, setCurrentTab] = useState<string>(affectedCollections[0]);
+
+  const setChangeToAdopt = (collection: string, id: string, change: ChangeToAdopt) => {
+    changes[collection][id] = change;
+  }
 
   return (
     <div className="flex flex-col">
@@ -203,7 +236,14 @@ export const BackupDiffDisplay: React.FC<BackupDiffDisplayProps> = ({ values }) 
         {
           affectedCollections.map((collection: string) => {
             return (
-              <CollectionDiffDisplay collection={givenValues[collection]} className={`${currentTab === collection ? 'visible' : 'hidden'}`} />
+              <CollectionDiffDisplay
+                collection={givenValues[collection]}
+                className={`${currentTab === collection ? 'visible' : 'hidden'}`}
+                setChanges={(id, string) => {
+                  setChangeToAdopt(collection, id, string)
+                  setChanges(changes)
+                }}
+              />
             )
           })
         }

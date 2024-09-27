@@ -15,6 +15,9 @@ import { ValidationResult, MongoResult } from './LoadBackupForm';
 import { BackupDiffDisplay } from './BackupDiffDisplay';
 import { XIcon } from "lucide-react"
 import { Warning } from '@phosphor-icons/react';
+import { ChangeToAdopt } from './BackupDiffDisplay';
+
+type CollectionChanges = { [index: string]: { [index: string]: '' | ChangeToAdopt } }
 
 interface BackupValidationModalProps {
   result: ValidationResult,
@@ -23,7 +26,20 @@ interface BackupValidationModalProps {
 
 export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ result, validationComplete }) => { 
   const [open, setOpen] = useState<boolean>(false);
-  const collectionChanges: { [index: string]: {[index:string]: '' | 'current' | 'backup'} } = {}
+  const collectionChanges: CollectionChanges = {}
+  
+  const [changes, setChanges] = useState<CollectionChanges>({})
+  const [readAll, setReadAll] = useState<boolean>(false)
+
+  const checkSelectedChanges = (): boolean => {
+    for (const change in changes) {
+      for (const doc in changes[change]) {
+        if (changes[change][doc] === '') return false;
+      }
+    }
+
+    return true;
+  }
 
   useEffect(() => {
     if(validationComplete) {
@@ -33,6 +49,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
           collectionChanges[collection][document._id] = ''
         }
       }
+      setChanges(collectionChanges)
     }
   }, [validationComplete])
 
@@ -66,7 +83,10 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
           </DialogHeader>
           {result.values === undefined ?
             <>No conflicts with the database.</> :
-            <BackupDiffDisplay values={result.values} />
+            <BackupDiffDisplay values={result.values} changes={changes} setChanges={(change: CollectionChanges) => {
+              setChanges(change)
+              setReadAll(checkSelectedChanges())
+            }} />
           }
           <div className="flex flex-col gap-y-2">
             <span className="flex gap-x-1 text-sm items-center font-bold">
@@ -95,7 +115,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
             <span className="text-sm">Please go through all of the affected documents before confirming.</span>
           </div>
           <div className="w-full flex flex-row-reverse">
-            <Button disabled={true} className="w-[125px]">
+            <Button disabled={!readAll} className="w-[125px]">
               Confirm
             </Button>
           </div>
