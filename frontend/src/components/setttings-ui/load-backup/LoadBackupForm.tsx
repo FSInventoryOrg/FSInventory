@@ -13,22 +13,8 @@ import { Spinner } from '@/components/Spinner';
 import { FileUploader } from '@/components/ui/file-uploader';
 import { BackupValidationModal } from './BackupValidationModal';
 import { validateBackupFile } from '@/ims-service';
+import { MongoResult, ValidationResult } from '@/types/backup';
 
-export type MongoResult = {
-  _id: string,
-  [index: string]: string | number | Array<any>
-}
-
-export type ValidationResult = {
-  message: string,
-  outdated?: boolean,
-  values?: {
-    [index: string]: {
-      current: Array<MongoResult>,
-      backup: Array<MongoResult>
-    }
-  }
-}
 
 const SystemBackup = () => {
   const form = useForm({

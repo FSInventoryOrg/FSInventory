@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Separator } from '@/components/ui/separator';
-import { ValidationResult, MongoResult } from './LoadBackupForm';
+import { ValidationResult, MongoResult } from '@/types/backup';
 import { CaretCircleDown, CaretCircleUp } from '@phosphor-icons/react';
 
 export type ChangeToAdopt = 'current' | 'backup'
