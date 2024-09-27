@@ -1,4 +1,4 @@
-import { AssetUnionType,   DeploymentHistory } from '@/types/asset'
+import { AssetUnionType,   DeploymentHistory, HardwareType, SoftwareType } from '@/types/asset'
 import { CreditCardIcon, InfoIcon, LibraryBig, NotebookPenIcon, ScaleIcon, SettingsIcon, TrashIcon, 
   CodeIcon } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -24,9 +24,9 @@ interface Field {
   type?: string;
 }
 
-const isHardware = (asset: AssetType): asset is HardwareType =>
+const isHardware = (asset: AssetUnionType): asset is HardwareType =>
   asset.type === 'Hardware';
-const isSoftware = (asset: AssetType): asset is SoftwareType =>
+const isSoftware = (asset: AssetUnionType): asset is SoftwareType =>
   asset.type === 'Software';
 
 function calculateDuration(diffInMs: number): string {
@@ -130,21 +130,34 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
     { label: 'Is RGE:', value: "isRGE" in asset ? (asset.isRGE ? 'YES' : 'NO'): '' }
   ]
 
-  const softwareDetails: Field[] = isSoftware(asset)
-    ? [
-        { label: 'License Type:', value: asset.licenseType },
-        {
-          label: 'License Expiration Date:',
-          value: asset.licenseExpirationDate
+  const softwareDetails: Field[] = [
+    {
+      label: 'License Type:',
+      value: 'licenseType' in asset ? asset.licenseType : '',
+    },
+    {
+      label: 'License Expiration Date:',
+      value:
+        'licenseExpirationDate' in asset
+          ? asset.licenseExpirationDate
             ? new Date(asset.licenseExpirationDate).toLocaleString()
-            : '',
-        },
-        { label: 'License Cost:', value: `₱${asset.licenseCost ?? 0}` },
-        { label: 'Number of License:', value: asset.noOfLicense?.toString() },
-        { label: 'Installation Path:', value: asset.installationPath },
-      ]
-    : [];
-
+            : ''
+          : '',
+    },
+    {
+      label: 'License Cost:',
+      value: 'licenseCost' in asset ? `₱${asset.licenseCost ?? 0}` : '',
+    },
+    {
+      label: 'Number of License:',
+      value: 'noOfLicense' in asset ? asset.noOfLicense?.toString() : '',
+    },
+    {
+      label: 'Installation Path:',
+      value: 'installationPath' in asset ? asset.installationPath : '',
+    },
+  ]
+  
   const otherInfo: Field[] = [
     ...(isHardware(asset)
       ? [
