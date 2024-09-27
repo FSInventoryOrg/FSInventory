@@ -11,13 +11,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/Spinner';
 import { Separator } from '@/components/ui/separator';
-import { ValidationResult, MongoResult } from './LoadBackupForm';
+import { ValidationResult, CollectionChanges } from '@/types/backup';
 import { BackupDiffDisplay } from './BackupDiffDisplay';
 import { XIcon } from "lucide-react"
 import { Warning } from '@phosphor-icons/react';
-import { ChangeToAdopt } from './BackupDiffDisplay';
-
-type CollectionChanges = { [index: string]: { [index: string]: '' | ChangeToAdopt } }
+import { MongoResult } from '@/types/backup';
+import { importBackupFile } from '@/ims-service';
 
 interface BackupValidationModalProps {
   result: ValidationResult,
@@ -39,6 +38,26 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
     }
 
     return true;
+  }
+
+  const initiateImport = async (changes: CollectionChanges | undefined = undefined) => {
+    const requestBody: {[index: string]: MongoResult[]} = {};
+    for (const collection in changes) {
+      requestBody[collection] = []
+      for (const document in changes[collection]) {
+        if (changes[collection][document] === 'backup') {
+          requestBody[collection].push(result.values!![collection].backup.find((res: MongoResult) => res._id === document)!!)
+        } else if (changes[collection][document] === 'current') {
+          requestBody[collection].push(result.values!![collection].current.find((res: MongoResult) => res._id === document)!!)
+        }
+      }
+    }
+    console.log(requestBody);
+    try {
+      await importBackupFile(requestBody);
+    } catch (err) {
+      throw err;
+    }
   }
 
   useEffect(() => {
@@ -115,8 +134,18 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
             <span className="text-sm">Please go through all of the affected documents before confirming.</span>
           </div>
           <div className="w-full flex flex-row-reverse">
-            <Button disabled={!readAll} className="w-[125px]">
-              Confirm
+            <Button
+              disabled={!readAll}
+              className="w-[125px]"
+              onClick={async () => {
+                await initiateImport(changes)
+              }}
+            >
+              {validationComplete === false ?
+              <Spinner size={18} />
+              :
+              <>Confirm</>
+            }
             </Button>
           </div>
         </div>
