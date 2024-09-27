@@ -47,7 +47,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
   console.log(changes, readAll, importing, finished, validationComplete)
 
   const close = () => {
-    setReadAll(result.values ? false : true)
+    setReadAll(false)
     setImporting(false)
     setFinished(false)
     resetChanges()
@@ -100,7 +100,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
 
   useEffect(() => {
     if (!open) {
-      setReadAll(result.values ? false : true)
+      setReadAll(false)
       setImporting(false)
       setFinished(false)
       resetChanges()
@@ -125,17 +125,17 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
         <div className="sm:max-w-[500px] w-full bg-card h-fit flex justify-between flex-col gap-6 p-6 rounded-lg">
           <DialogHeader className="relative">
             <DialogTitle className="flex justify-center items-center my-2">
-              Confirm Changes
+              {!finished ? "Confirm Changes" : "Backup Success!"}
             </DialogTitle>
             <DialogClose className="absolute right-0 top-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
               <XIcon className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </DialogClose>
             <DialogDescription className='flex flex-col gap-1'>
-              <span className='w-full flex justify-center text-xl text-primary font-semibold'>The following collections will be affected:</span>
+              <span className='w-full flex justify-center text-xl text-primary font-semibold'>{!finished ? "The following collections will be affected:" : "Backup file successfully loaded."}</span>
             </DialogDescription>
           </DialogHeader>
-          {!result.values ?
+          {!finished && <>{!result.values ?
             <>No conflicts with the database.</> :
             <BackupDiffDisplay values={result.values} changes={changes} setChanges={(change: CollectionChanges) => {
               setChanges(change)
@@ -167,10 +167,10 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
               </span> documents will follow selected changes.
             </span>
             <span className="text-sm">Please go through all of the affected documents before confirming.</span>
-          </div>}
+          </div>}</>}
           <div className="w-full flex flex-row-reverse">
             {!finished && <Button
-              disabled={!readAll}
+              disabled={!readAll || importing}
               className="w-[125px]"
               onClick={async () => {
                 await initiateImport(changes)
