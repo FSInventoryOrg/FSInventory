@@ -30,7 +30,7 @@ interface BackupDiffDisplayProps {
 }
 
 const DocumentDiff: React.FC<DocumentProps> = ({ current = false, document, keys, selection = "", setSelection }) => {
-  const whichDocument: string = current ? "current" : "backup";
+  const whichDocument: "current" | "backup" = current ? "current" : "backup";
 
   return (
     <div className="flex flex-col gap-y-0">
@@ -42,7 +42,7 @@ const DocumentDiff: React.FC<DocumentProps> = ({ current = false, document, keys
         cursor-pointer
         ${current ? "bg-[#cd7169]" : "bg-[#549a59]"}
         `}
-        onClick={() => setSelection("current")}
+        onClick={() => {setSelection(whichDocument)}}
       >
         <div className={`
           h-5 w-5 border-2 rounded-full
