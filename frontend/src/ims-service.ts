@@ -8,6 +8,7 @@ import { UserData } from "./schemas/UserSchema";
 import { UploadImage } from "./types/user";
 import { AutoMailType } from "@/types/automail";
 import { AssetCounterFormData } from "./schemas/AssetCounterSchema";
+import { MongoResult } from "./types/backup";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -712,6 +713,23 @@ export const validateBackupFile = async (fileAsBase64: { src: string }) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(fileAsBase64)
+    });
+
+    return response.json();
+  } catch (err) {
+    throw err;
+  }
+}
+
+export const importBackupFile = async (changes: { [index: string]: MongoResult[] } | undefined = undefined) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/backup/import`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(changes)
     });
 
     return response.json();
