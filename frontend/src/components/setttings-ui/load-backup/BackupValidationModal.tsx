@@ -44,12 +44,22 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
     return true;
   }
 
+  console.log(changes, readAll, importing, finished, validationComplete)
+
   const close = () => {
-    setChanges({})
     setReadAll(result.values ? false : true)
     setImporting(false)
     setFinished(false)
+    resetChanges()
     setOpen(false)
+  }
+
+  const resetChanges = () => {
+    for (const collection in changes) {
+      for (const document in changes[collection]) {
+        changes[collection][document] = ''
+      }
+    }
   }
 
   const initiateImport = async (changes: CollectionChanges | undefined = undefined) => {
@@ -87,6 +97,15 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
       setChanges(collectionChanges)
     }
   }, [validationComplete])
+
+  useEffect(() => {
+    if (!open) {
+      setReadAll(result.values ? false : true)
+      setImporting(false)
+      setFinished(false)
+      resetChanges()
+    }
+  }, [open])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -165,7 +184,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
             </Button>}
             {finished && <Button
               className="w-[125px]"
-              onClick={close}
+              onClick={() => close()}
             >
               <>Close</>
             </Button>}
