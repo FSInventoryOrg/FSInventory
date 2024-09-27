@@ -71,7 +71,12 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys }
               cursor-pointer"
               onClick={() => setSelection("current")}
             >
-              {selection === "current" ? <RadioButton size={20} color="#5e5454" weight="fill" /> : <Circle size={20} color="#bbbbbb" />}
+              {selection === "current" ?
+                <div className="h-5 w-5 border-2 rounded-full border-[#5e5454] bg-white flex justify-center items-center">
+                  <div className="h-[10px] w-[10px] border-0 rounded-full border-[#5e5454] bg-[#5e5454] text-nowrap"></div>
+                </div> :
+                <div className="h-5 w-5 border-2 rounded-full border-[#bbbbbb] bg-white flex justify-center items-center"></div>
+              }
               Currently in DB
             </div>
             <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
@@ -91,7 +96,12 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys }
               cursor-pointer"
               onClick={() => setSelection("backup")}
             >
-              {selection === "backup" ? <RadioButton size={20} color="#5e5454" weight="fill" /> : <Circle size={20} color="#bbbbbb" />}
+              {selection === "backup" ?
+                <div className="h-5 w-5 border-2 rounded-full border-[#5e5454] bg-white flex justify-center items-center">
+                  <div className="h-[10px] w-[10px] border-0 rounded-full border-[#5e5454] bg-[#5e5454] text-nowrap"></div>
+                </div> :
+                <div className="h-5 w-5 border-2 rounded-full border-[#bbbbbb] bg-white flex justify-center items-center"></div>
+              }
               Change from Backup File
             </div>
               <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
