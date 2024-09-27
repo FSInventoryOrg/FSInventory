@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogClose,
@@ -23,6 +23,18 @@ interface BackupValidationModalProps {
 
 export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ result, validationComplete }) => { 
   const [open, setOpen] = useState<boolean>(false);
+  const collectionChanges: { [index: string]: {[index:string]: '' | 'current' | 'backup'} } = {}
+
+  useEffect(() => {
+    if(validationComplete) {
+      for (const collection in result.values!!) {
+        collectionChanges[collection] = {}
+        for (const document of result.values[collection].backup) {
+          collectionChanges[collection][document._id] = ''
+        }
+      }
+    }
+  }, [validationComplete])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

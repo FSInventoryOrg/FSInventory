@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { Separator } from '@/components/ui/separator';
 import { ValidationResult, MongoResult } from './LoadBackupForm';
-import { CaretCircleDown, CaretCircleUp, Circle, RadioButton } from '@phosphor-icons/react';
+import { CaretCircleDown, CaretCircleUp } from '@phosphor-icons/react';
+
+type ChangeToAdopt = 'current' | 'backup'
 
 interface DocumentProps {
   current?: boolean,
   document: MongoResult,
   keys: string[],
-  selection: "current" | "backup" | ""
-  setSelection: (value: "current" | "backup") => void;
+  selection: ChangeToAdopt | ""
+  setSelection: (value: ChangeToAdopt) => void;
 }
 
 interface CollectionDiffProps {
@@ -26,11 +28,16 @@ interface CollectionDiffDisplayProps {
 }
 
 interface BackupDiffDisplayProps {
-  values: ValidationResult['values']
+  values: ValidationResult['values'],
+  changes: {
+    [index: string]: {
+      [index: string]: '' | ChangeToAdopt
+    }
+  }
 }
 
 const DocumentDiff: React.FC<DocumentProps> = ({ current = false, document, keys, selection = "", setSelection }) => {
-  const whichDocument: "current" | "backup" = current ? "current" : "backup";
+  const whichDocument: ChangeToAdopt = current ? "current" : "backup";
 
   return (
     <div className="flex flex-col gap-y-0">
@@ -68,7 +75,7 @@ const DocumentDiff: React.FC<DocumentProps> = ({ current = false, document, keys
 
 const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys }) => {
   const [open, setOpen] = useState<boolean>(true);
-  const [selection, setSelection] = useState<"" | "current" | "backup">('')
+  const [selection, setSelection] = useState<"" | ChangeToAdopt>('')
 
   const keysToExclude: string[] = ['created', 'createdBy', 'updated', 'updatedBy', '_id', '__v']
   const cleanedKeys: string[] = keys.filter((key: string) => !keysToExclude.includes(key));
