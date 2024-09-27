@@ -58,7 +58,7 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
 
   const hardwareDefaultValues = {
     ...defaultAssetValues,
-    category: defaultValues.category,
+    category: defaultValues.hardwareCategory,
     processor: '',
     memory: '',
     storage: '',
@@ -74,7 +74,7 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
   
   const softwareDefaultValues = {
     ...defaultAssetValues,
-    softwareName: '',
+    category: defaultValues.softwareCategory,
     vendor: '',
     licenseType: '',
     purchaseDate: undefined,
@@ -82,7 +82,6 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
     type: undefined,
     license: '',
     version: '',
-    category: '',
     noOfLicense: '1',
     licenseCost: ''
   }
