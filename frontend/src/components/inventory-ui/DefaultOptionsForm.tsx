@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import { ColorOption, TagOption } from "./Options";
+import { ColorOption, TagOption } from "@/types/options";
 import * as imsService from '@/ims-service'
 import { useQuery } from "@tanstack/react-query";
 import { InventorySettingsFormData } from "@/schemas/InventorySettingsSchema";

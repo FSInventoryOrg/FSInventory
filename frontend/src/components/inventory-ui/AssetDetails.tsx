@@ -1,22 +1,9 @@
-import {
-  AssetType,
-  DeploymentHistory,
-  HardwareType,
-  SoftwareType,
-} from '@/types/asset';
-import {
-  CreditCardIcon,
-  InfoIcon,
-  LibraryBig,
-  NotebookPenIcon,
-  ScaleIcon,
-  SettingsIcon,
-  TrashIcon,
-  CodeIcon,
-} from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import * as imsService from '@/ims-service';
+import { AssetUnionType,   DeploymentHistory } from '@/types/asset'
+import { CreditCardIcon, InfoIcon, LibraryBig, NotebookPenIcon, ScaleIcon, SettingsIcon, TrashIcon, 
+  CodeIcon } from 'lucide-react';
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import * as imsService from '@/ims-service'
 import StatusBadge from './StatusBadge';
 import DeployAsset from './DeployAsset';
 import RetrieveAsset from './RetrieveAsset';
@@ -27,7 +14,7 @@ import { Button } from '../ui/button';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface AssetDetailsProps {
-  asset: AssetType;
+  asset: AssetUnionType;
   onRetrieve?: () => void;
 }
 
@@ -115,13 +102,11 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
       : []),
   ];
 
-  const systemSpecs: Field[] = isHardware(asset)
-    ? [
-        { label: 'Processor:', value: asset.processor },
-        { label: 'Memory:', value: asset.memory },
-        { label: 'Storage:', value: asset.storage },
-      ]
-    : [];
+  const systemSpecs: Field[] = [
+    { label: 'Processor:', value: "processor" in asset ? asset.processor: '' },
+    { label: 'Memory:', value: "memory" in asset ? asset.memory: '' },
+    { label: 'Storage:', value: "storage" in asset ? asset.storage: '' }
+  ];
 
   const purchaseDate = asset.purchaseDate ? new Date(asset.purchaseDate) : null;
   const currentDate = new Date();
@@ -134,18 +119,16 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
     : '';
 
   const purchaseDetails: Field[] = [
-    {
-      label: 'Supplier/Vendor:',
-      value:
-        (asset as HardwareType).supplierVendor ||
-        (asset as SoftwareType).vendor,
-    },
-    {
-      label: 'Date of Purchase:',
-      value: purchaseDate ? purchaseDate.toDateString() : '',
-    },
-    { label: 'Years of Service:', value: yearsOfService },
+      { label: 'Date of Purchase:', value: purchaseDate ? purchaseDate.toDateString() : '' },
+      { label: 'Years of Service:', value: yearsOfService },
+      { label: 'Supplier/Vendor:', value: "supplierVendor" in asset ? asset.supplierVendor: "vendor" in asset ? asset.vendor : '' }
   ];
+
+  const legalInfo: Field[] = [
+    { label: 'PEZA Form 8105:', value: "pezaForm8105" in asset? asset.pezaForm8105: '' },
+    { label: 'PEZA Form 8106:', value: "pezaForm8105" in asset? asset.pezaForm8105: '' },
+    { label: 'Is RGE:', value: "isRGE" in asset ? (asset.isRGE ? 'YES' : 'NO'): '' }
+  ]
 
   const softwareDetails: Field[] = isSoftware(asset)
     ? [
@@ -159,14 +142,6 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
         { label: 'License Cost:', value: `₱${asset.licenseCost ?? 0}` },
         { label: 'Number of License:', value: asset.noOfLicense?.toString() },
         { label: 'Installation Path:', value: asset.installationPath },
-      ]
-    : [];
-
-  const legalInfo: Field[] = isHardware(asset)
-    ? [
-        { label: 'PEZA Form 8105:', value: asset.pezaForm8105 },
-        { label: 'PEZA Form 8106:', value: asset.pezaForm8105 },
-        { label: 'Is RGE:', value: asset.isRGE ? 'YES' : 'NO' },
       ]
     : [];
 

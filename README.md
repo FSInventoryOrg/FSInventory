@@ -1,6 +1,6 @@
 # FS Inventory System
 
-## Local setup using Docker
+## Setup Dev Environment
 1. Clone this repository, checkout `staging` branch, install dependencies
 ```sh
 git clone https://github.com/FSInventoryOrg/FSInventory.git
@@ -24,12 +24,11 @@ VITE_API_BASE_URL=http://localhost:8080
 DUMP_DIRECTORY=<path to inventory folder>
 ```
 7. Due to running a replicat set, we need to make sure that the `host.docker.internal` hostname can be resolved to the host machine's IP address. 
+> On Windows, there is a [setting](https://docs.docker.com/desktop/settings/) to automatically add the `*.docker.internal` hostnames in the hosts file. 
 
-On Windows, there is a [setting](https://docs.docker.com/desktop/settings/) to automatically add the `*.docker.internal` hostnames in the hosts file. 
+> If `host.docker.internal` cannot be resolved on Linux, you must add a line in your /etc/hosts file to map `host.docker.internal` to the IP address 127.17.0.1.
 
-If `host.docker.internal` cannot be resolved on Linux, you must add a line in your /etc/hosts file to map `host.docker.internal` to the IP address 127.17.0.1.
-
-8. Run mongodb replica set and automatically restores the dump files.
+8. Run mongodb replica set. This automatically restores the dump files.
 ```sh
 cd backend
 docker compose up
@@ -72,3 +71,41 @@ MONGODB_CONNECTION_STRING=mongodb://127.0.0.1:27017/inventory?replicaSet=rs0
 13. Visit `http://localhost:3000`
 
 ![running](docs/images/running.png)
+
+## Contributing
+
+### Create a feature/fix branch
+Branch off `staging`. Prefix the name of the branch with either `feature/` or `fix/`
+```sh
+git checkout staging
+git pull #make sure you have the latest code
+git checkout -b feature/my-nice-feature
+#or
+git checkout -b fix/my-nice-fix
+```
+
+### Create a PR
+After you done your work and committed your changes, create a PR and target `staging`. Add a brief description of what you have done.
+
+The PR should also include the following:
+
+### Version Bump
+Do a version bump to backend and/or frontend project. Follow [Semantic Versioning](https://semver.org/). `MAJOR.MINOR.PATCH`
+
+`MAJOR` version when you make incompatible changes like major refactors, change in ORM or database, where there is considerable risk involved
+```sh
+npm version major
+```
+`MINOR` version when you add functionality or features or changes in a backward compatible manner.
+```sh
+npm version minor
+```
+
+`PATCH` version when you make bug fixes or security patches. This usually corresponds to tickets tagged as bugs.
+```sh
+npm version patch
+```
+
+### Changelog
+
+Add a changelog entry to backend and/or frontend project. Follow [Keep a Changelog](https://keepachangelog.com/) to be consistent. The entries should be brief and mostly the same with the PR description.
