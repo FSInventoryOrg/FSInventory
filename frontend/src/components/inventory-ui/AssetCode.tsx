@@ -21,7 +21,7 @@ const AssetCode = ({ asset }: AssetCodeProps) => {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center gap-1">
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogTrigger asChild>
           <Button

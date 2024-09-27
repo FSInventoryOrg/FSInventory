@@ -9,7 +9,7 @@ import {
 } from "../ui/dialog";
 import { NotebookPenIcon, XIcon } from "lucide-react";
 import { AssetUnionType } from "@/types/asset";
-import { Circle } from "@phosphor-icons/react";
+import { Button } from "../ui/button";
 
 interface AssetCodeProps {
   asset: AssetUnionType;
@@ -20,7 +20,13 @@ const RemarksIndicator = ({ asset }: AssetCodeProps) => {
   return (
     <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
       <DialogTrigger asChild>
-        <Circle className="ml-1" weight="fill" color="#ebb505" size={12} />
+        <Button
+          variant="ghost"
+          size="sm"
+          className="px-2 py-0"
+        >
+          <NotebookPenIcon size={16} className="text-primary cursor-pointer " />
+        </Button>
       </DialogTrigger>
       <DialogContent className="flex flex-col">
         <DialogHeader>
