@@ -3,6 +3,14 @@ import { Separator } from '@/components/ui/separator';
 import { ValidationResult, MongoResult } from './LoadBackupForm';
 import { CaretCircleDown, CaretCircleUp, Circle, RadioButton } from '@phosphor-icons/react';
 
+interface DocumentProps {
+  current?: boolean,
+  document: MongoResult,
+  keys: string[],
+  selection: "current" | "backup" | ""
+  setSelection: (value: "current" | "backup") => void;
+}
+
 interface CollectionDiffProps {
   current: MongoResult,
   backup?: MongoResult,
@@ -21,9 +29,46 @@ interface BackupDiffDisplayProps {
   values: ValidationResult['values']
 }
 
+const DocumentDiff: React.FC<DocumentProps> = ({ current = false, document, keys, selection = "", setSelection }) => {
+  const whichDocument: string = current ? "current" : "backup";
+
+  return (
+    <div className="flex flex-col gap-y-0">
+      <div
+        className={`p-2
+        border-0 rounded-t 
+        font-semibold flex 
+        gap-x-2 items-center 
+        cursor-pointer
+        ${current ? "bg-[#cd7169]" : "bg-[#549a59]"}
+        `}
+        onClick={() => setSelection("current")}
+      >
+        <div className={`
+          h-5 w-5 border-2 rounded-full
+          bg-white flex
+          justify-center items-center
+          ${selection === whichDocument ? "border-[#5e5454]" : "border-[#bbbbbb]"}
+          `}
+        >
+          {selection === whichDocument && <div className="h-[10px] w-[10px] border-0 rounded-full border-[#5e5454] bg-[#5e5454]"/>}
+        </div>
+        {current ? "Currently in DB" : "Change from Backup File"}
+      </div>
+      <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
+        <>
+          {keys.map((key: string) => {
+            return (<span>{`${key}: ${document[key]}`}</span>)
+          })}  
+        </>
+      </div>
+    </div>
+  )
+}
+
 const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys }) => {
   const [open, setOpen] = useState<boolean>(true);
-  const [selection, setSelection] = useState<string>('')
+  const [selection, setSelection] = useState<"" | "current" | "backup">('')
 
   const keysToExclude: string[] = ['created', 'createdBy', 'updated', 'updatedBy', '_id', '__v']
   const cleanedKeys: string[] = keys.filter((key: string) => !keysToExclude.includes(key));
@@ -62,56 +107,8 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys }
         <>
         {(backup && keys) &&
           <>
-            <div className="flex flex-col gap-y-0">
-            <div
-              className="p-2 bg-[#cd7169] 
-              border-0 rounded-t 
-              font-semibold flex 
-              gap-x-2 items-center 
-              cursor-pointer"
-              onClick={() => setSelection("current")}
-            >
-              {selection === "current" ?
-                <div className="h-5 w-5 border-2 rounded-full border-[#5e5454] bg-white flex justify-center items-center">
-                  <div className="h-[10px] w-[10px] border-0 rounded-full border-[#5e5454] bg-[#5e5454] text-nowrap"></div>
-                </div> :
-                <div className="h-5 w-5 border-2 rounded-full border-[#bbbbbb] bg-white flex justify-center items-center"></div>
-              }
-              Currently in DB
-            </div>
-            <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
-              <>
-                {cleanedKeys.map((key: string) => {
-                  return (<span>{`${key}: ${current[key]}`}</span>)
-                })}  
-              </>
-            </div>
-            </div>
-            <div className="flex flex-col gap-y-0">
-            <div
-              className="p-2 bg-[#549a59] 
-              border-0 rounded-t
-              font-semibold flex
-              gap-x-2 items-center
-              cursor-pointer"
-              onClick={() => setSelection("backup")}
-            >
-              {selection === "backup" ?
-                <div className="h-5 w-5 border-2 rounded-full border-[#5e5454] bg-white flex justify-center items-center">
-                  <div className="h-[10px] w-[10px] border-0 rounded-full border-[#5e5454] bg-[#5e5454] text-nowrap"></div>
-                </div> :
-                <div className="h-5 w-5 border-2 rounded-full border-[#bbbbbb] bg-white flex justify-center items-center"></div>
-              }
-              Change from Backup File
-            </div>
-              <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
-                <>
-                  {cleanedKeys.map((key: string) => {
-                    return (<span>{`${key}: ${backup[key]}`}</span>)
-                  })}  
-                </>  
-              </div>
-            </div>
+            <DocumentDiff current document={current} keys={cleanedKeys} selection={selection} setSelection={setSelection} />
+            <DocumentDiff document={backup} keys={cleanedKeys} selection={selection} setSelection={setSelection} />
           </>}
         {(!backup && keys) &&
           <>
