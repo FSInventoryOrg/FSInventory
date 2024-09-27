@@ -17,6 +17,7 @@ import { XIcon } from "lucide-react"
 import { Warning } from '@phosphor-icons/react';
 import { MongoResult } from '@/types/backup';
 import { importBackupFile } from '@/ims-service';
+import { useAppContext } from '@/hooks/useAppContext';
 
 interface BackupValidationModalProps {
   result: ValidationResult,
@@ -24,11 +25,14 @@ interface BackupValidationModalProps {
 }
 
 export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ result, validationComplete }) => { 
+  const { showToast } = useAppContext();
   const [open, setOpen] = useState<boolean>(false);
   const collectionChanges: CollectionChanges = {}
   
   const [changes, setChanges] = useState<CollectionChanges>({})
-  const [readAll, setReadAll] = useState<boolean>(false)
+  const [readAll, setReadAll] = useState<boolean>(result.values ? false : true)
+  const [importing, setImporting] = useState<boolean>(false);
+  const [finished, setFinished] = useState<boolean>(false);
 
   const checkSelectedChanges = (): boolean => {
     for (const change in changes) {
@@ -38,6 +42,14 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
     }
 
     return true;
+  }
+
+  const close = () => {
+    setChanges({})
+    setReadAll(result.values ? false : true)
+    setImporting(false)
+    setFinished(false)
+    setOpen(false)
   }
 
   const initiateImport = async (changes: CollectionChanges | undefined = undefined) => {
@@ -52,10 +64,14 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
         }
       }
     }
-    console.log(requestBody);
     try {
-      await importBackupFile(requestBody);
+      setImporting(true);
+      await importBackupFile(result.values ? requestBody : undefined);
+      setImporting(false);
+      showToast({ message: 'Loading of system backup file successful.', type: 'SUCCESS' })
+      setFinished(true);
     } catch (err) {
+      showToast({message: 'Something went wrong', type: 'SUCCESS'})
       throw err;
     }
   }
@@ -100,14 +116,14 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
               <span className='w-full flex justify-center text-xl text-primary font-semibold'>The following collections will be affected:</span>
             </DialogDescription>
           </DialogHeader>
-          {result.values === undefined ?
+          {!result.values ?
             <>No conflicts with the database.</> :
             <BackupDiffDisplay values={result.values} changes={changes} setChanges={(change: CollectionChanges) => {
               setChanges(change)
               setReadAll(checkSelectedChanges())
             }} />
           }
-          <div className="flex flex-col gap-y-2">
+          {result.values && <div className="flex flex-col gap-y-2">
             <span className="flex gap-x-1 text-sm items-center font-bold">
               <Warning size={24} weight="fill" color="#fac514" />
               DOCUMENTS MARKED 
@@ -132,21 +148,27 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
               </span> documents will follow selected changes.
             </span>
             <span className="text-sm">Please go through all of the affected documents before confirming.</span>
-          </div>
+          </div>}
           <div className="w-full flex flex-row-reverse">
-            <Button
+            {!finished && <Button
               disabled={!readAll}
               className="w-[125px]"
               onClick={async () => {
                 await initiateImport(changes)
               }}
             >
-              {validationComplete === false ?
+              {importing ?
               <Spinner size={18} />
               :
               <>Confirm</>
             }
-            </Button>
+            </Button>}
+            {finished && <Button
+              className="w-[125px]"
+              onClick={close}
+            >
+              <>Close</>
+            </Button>}
           </div>
         </div>
       </DialogContent> 
