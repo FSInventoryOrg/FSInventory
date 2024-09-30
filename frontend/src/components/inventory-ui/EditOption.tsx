@@ -96,13 +96,13 @@ const EditOption = ({
           option={optionToEdit as string}
         />
       )}
-      {tagSelect && (
+      {/* {tagSelect && (
         <TagSelect
           onTagSelect={handleTagSelect}
           property={property}
           option={optionToEdit as string}
         />
-      )}
+      )} */}
       <Separator className='my-1' />
       <div className='flex justify-between'>
         <Button

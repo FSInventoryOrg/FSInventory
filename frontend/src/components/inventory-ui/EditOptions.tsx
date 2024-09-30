@@ -371,7 +371,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, type='Hardw
               />
             </> : <></>}
           {colorSelect && <ColorSelect onColorSelect={handleColorSelect} reset={isEditing || isCreating} />}
-          {tagSelect && <TagSelect onTagSelect={handleTagSelect} reset={isEditing || isCreating} />}
+          {/* {tagSelect && <TagSelect onTagSelect={handleTagSelect} reset={isEditing || isCreating} />} */}
           <Separator className='my-1' />
           <Button 
             className='gap-2'
@@ -424,7 +424,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, type='Hardw
             }}
           />
           {colorSelect && <ColorSelect onColorSelect={handleColorSelect} property={property} option={optionToEdit} />}
-          {tagSelect && <TagSelect onTagSelect={handleTagSelect} property={property} option={optionToEdit} />}
+          {/* {tagSelect && <TagSelect onTagSelect={handleTagSelect} property={property} option={optionToEdit} />} */}
           <Separator className='my-1' />
           <div className='flex justify-between'>
             <Button 

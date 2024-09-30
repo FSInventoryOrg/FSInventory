@@ -125,9 +125,9 @@ const AddOption = ({
       {colorSelect && (
         <ColorSelect onColorSelect={handleColorSelect} reset={isCreating} />
       )}
-      {tagSelect && (
+      {/* {tagSelect && (
         <TagSelect onTagSelect={handleTagSelect} reset={isCreating} />
-      )}
+      )} */}
       <Separator className='my-1' />
       <Button
         className='gap-2'
