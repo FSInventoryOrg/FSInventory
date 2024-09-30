@@ -349,7 +349,7 @@ export const addOptionValue = async ({
         prefixCode: prefixCode as string,
         threshold: 1,
         counter: 0,
-        type: 'Hardware',
+        type: type ?? 'Hardware',
       });
     }
 
