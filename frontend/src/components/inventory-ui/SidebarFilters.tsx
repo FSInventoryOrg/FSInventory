@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { FilterIcon, MonitorSmartphoneIcon, RefreshCcwIcon } from 'lucide-react'
+import { CodeIcon, FilterIcon, MonitorSmartphoneIcon, RefreshCcwIcon } from 'lucide-react'
 import { Button } from '../ui/button'
 import {
   Select,
@@ -21,24 +21,27 @@ import {
 import CountUp from 'react-countup';
 import * as imsService from '@/ims-service';
 import { useQuery } from '@tanstack/react-query';
-import { HardwareType } from '@/types/asset';
+import { HardwareType, SoftwareType } from '@/types/asset';
 import { Skeleton } from '../ui/skeleton';
 
 interface SidebarFiltersProps {
+  onTypeChange: (type: string) => void;
   onFilterChange: (status: string) => void;
-  onCategoryChange: (status: string) => void;
+  onCategoryChange: (category: string) => void;
   onProcessorChange: (processor: string) => void;
   onMemoryChange: (memory: string) => void;
   onStorageChange: (storage: string) => void;
   onToggleFilters: (visible: boolean) => void;
   isFiltersVisible: boolean;
+  selectedType: string;
   selectedStatus: string;
   selectedCategory: string;
   selectedSystemSpecs: Record<string, string>;
   totalAssets: number;
 }
 
-const SidebarFilters = ({ 
+const SidebarFilters = ({
+    onTypeChange,
     onFilterChange, 
     onCategoryChange,
     onProcessorChange,
@@ -46,16 +49,18 @@ const SidebarFilters = ({
     onStorageChange,
     onToggleFilters, 
     isFiltersVisible, 
+    selectedType,
     selectedStatus, 
     selectedCategory, 
     selectedSystemSpecs,
     totalAssets 
   }: SidebarFiltersProps) => {
 
-  const { data, isLoading } = useQuery({ queryKey: ['fetchAllAssets', 'Hardware'], queryFn: () => imsService.fetchAllAssets('Hardware') })
+  const { data, isLoading } = useQuery({ queryKey: ['fetchAllAssets', selectedType], queryFn: () => imsService.fetchAllAssets(selectedType) })
   const statusCounts: Record<string, number> = {};
   const categoriesCounts: Record<string, number> = {};
-  const categories = new Set<string>();
+  const softwareCategories = new Set<string>();
+  const hardwareCategories = new Set<string>();
   const processors = new Array<string>();
   const memories = new Array<string>();
   const storage = new Array<string>();
@@ -67,10 +72,11 @@ const SidebarFilters = ({
     const memorySet = new Set<string>();
     const storageSet = new Set<string>();
     
-    data.forEach((asset: HardwareType) => {      
+    data.forEach((asset: HardwareType & SoftwareType) => {      
       statusCounts[asset.status] = (statusCounts[asset.status] || 0) + 1;
 
-      categories.add(asset.category);
+      asset.type === 'Software' && softwareCategories.add(asset.category);
+      asset.type === 'Hardware' && hardwareCategories.add(asset.category);
       categoriesCounts[asset.category] = (categoriesCounts[asset.category] || 0) + 1;
       
       asset.processor && processorSet.add(asset.processor);
@@ -139,16 +145,26 @@ const SidebarFilters = ({
             Filter Settings
           </h2>
           <div className='flex flex-col gap-2'>
-            <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>Type</span>
+            <span className='uppercase font-semibold text-xs text-accent-foreground tracking-wide'>
+              Type
+            </span>
             <div className='flex gap-2 w-full md:w-fit xl:w-full'>
-              <Button variant='outline' className='bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2'>
+              <Button
+                variant='outline'
+                className={`bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2  ${selectedType === 'Hardware' ? 'border-primary' : ''}`}
+                onClick={() => onTypeChange('Hardware')}
+              >
                 Hardware
                 <MonitorSmartphoneIcon size={18} />
               </Button>
-              {/* <Button variant='outline' className='bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2'>
+              <Button
+                variant='outline'
+                className={`bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2  ${selectedType === 'Software' ? 'border-primary' : ''}`}
+                onClick={() => onTypeChange('Software')}
+              >
                 Software
-                <CodeIcon size={18} />
-              </Button> */}
+                <CodeIcon size={18}/>
+              </Button>
             </div>
           </div>
           <div className='flex flex-col gap-2'>
@@ -213,15 +229,28 @@ const SidebarFilters = ({
                     <SelectValue placeholder="All assets" />
                   </SelectTrigger>
                   <SelectContent>
+                    {selectedType !== 'Software' && (
                     <SelectGroup>
                       <SelectLabel>Hardware</SelectLabel>
                       <SelectItem value='all'>All</SelectItem>
-                      {[...categories].map((category: string) => (
+                      {[...hardwareCategories].map((category: string) => (
                         <SelectItem key={category} value={category} className='w-full'>
                             {category}
                         </SelectItem>
                       ))}
                     </SelectGroup>
+                    )}
+                    { selectedType !== 'Hardware' && (
+                       <SelectGroup>
+                       <SelectLabel>Software</SelectLabel>
+                       <SelectItem value='all'>All</SelectItem>
+                       {[...softwareCategories].map((category: string) => (
+                         <SelectItem key={category} value={category} className='w-full'>
+                             {category}
+                         </SelectItem>
+                       ))}
+                     </SelectGroup>
+                    )}
                   </SelectContent>
                 </Select>
               }

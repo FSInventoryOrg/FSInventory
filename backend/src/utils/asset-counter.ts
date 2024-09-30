@@ -14,18 +14,16 @@ export const getCodeAndIncrement = async(category: string, type: string) => {
     return `${assetCounter['prefixCode']}-${assetCounter['counter'] + 1}`;
 }
 
-export const getHardwareIndexes = async() => {
+export const getAssetIndexes = async() => {
     const options: any = await Option.findOne();
-    const assetCounter: any[] = await AssetCounter.aggregate().match({
-        type: { $eq: "Hardware" }
-    })
+    const assetCounter: any[] = await AssetCounter.find();
 
     const categories: any[] = options['category'];
     const possibleIndices = categories.reduce((accum, value, index) => {
         const findCategory = assetCounter.find(f => f['category'] === value['value']);
 
         if(findCategory) accum.push(findCategory);
-        else accum.push({type: "Hardware", category: value['value']});
+        else accum.push({type: value.type as 'Hardware' | 'Software', category: value['value']});
 
         return accum;
     }, [])

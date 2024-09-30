@@ -10,6 +10,13 @@ import { triggerNotif } from "../utils/common";
 import { renewAutoMailingActivation } from "./automail";
 import { getVersion } from "./version";
 
+const LICENSE_TYPES: string[] = [
+    'Subscription',
+    'Single-User (Named User)',
+    'Multi-User (Site)',
+    'OEM',
+  ]
+
 export const rotateLogs = async () => {
 	const conn = await MongoClient.connect(process.env.MONGODB_CONNECTION_STRING as string);
 	const db = conn.db('admin');
@@ -33,21 +40,31 @@ export const convertStatusToUnaccounted = async () => {
 }
 
 export const setDefaults = async () => {
-	/**
+    /**
 	 * Notification options
 	 * - added handlers for empty database
 	 * */
-	const optionStatus = ['IT Storage']; //'Shelved'
-	const options: any = await Option.findOne({});
+	const optionStatus = ['IT Storage', 'Shelved'];
+    const options: any = await Option.findOne({});
 	if (options) {
 		const updateStatus = options['status'].reduce((accum: any[], value: any, index: number) => {
 			if (optionStatus.includes(value.value)) value.tracked = true;
 			accum.push(value)
 			return accum;
-		}, []);
-		await Option.updateOne({ _id: options['_id'] }, { status: updateStatus });
+		}, [])
+	
+		const licenseType = options.licenseType?.length ? options.licenseType : LICENSE_TYPES;
+		
+		const updatedCategories = options['category'].reduce((accum: any[], category: any) => {
+			if (category?.type !=='Software') {
+				category.type = 'Hardware'
+			}
+			accum.push(category)
+			return accum
+		}, [])
+		await Option.updateOne({ _id: options['_id'] }, { status: updateStatus, category: updatedCategories, licenseType })
 	}
-
+   
 	/** Create oauth credentials */
 	const newCreds: any = {
 		"created": "2024-08-02T12:05:49.192Z",
@@ -95,25 +112,25 @@ export const softwareExpirationMonitoring = async () => {
 
 	notifRecords = notifRecords.map(d => d['uniqueLabel'])
 
-	const assets = await Software.aggregate().match({
-		$expr: {
-			$and: [
-				{
-					$lt: ['$expirationDate', bufferedDate]
-				},
-				{
-					$eq: ['$type', 'Software']
-				},
-				{
-					$not: [
-						{
-							$in: ['$status', ['Damaged', '', 'Unaccounted']]
-						}
-					]
-				}
-			]
-		}
-	})
+    const assets = await Software.aggregate().match({
+        $expr: {
+            $and: [
+                {
+                    $lt: ['$licenseExpirationDate', bufferedDate]
+                },
+                {
+                    $eq: ['$type', 'Software']
+                },
+                {
+                    $not: [
+                        {
+                            $in: ['$status', ['Damaged', '', 'Unaccounted']]
+                        }
+                    ]
+                }
+            ]
+        }
+    })
 
 	let notifDocs: any[] = [];
 
@@ -130,7 +147,7 @@ export const softwareExpirationMonitoring = async () => {
 				query: { code: value.code }
 			};
 
-			const isExpired = dateNow > new Date(value.expirationDate)
+            const isExpired = dateNow > new Date(value.licenseExpirationDate)
 
 			if (value?.assignee) {
 				const findUser = employees.find(f => f['code'] === value.assignee);
@@ -140,12 +157,12 @@ export const softwareExpirationMonitoring = async () => {
 					value.assignee = `${findUser['firstName']} ${findUser['lastName']}`
 				}
 
-				notifValue['messge'] = `Software Asset ${value.code} assigned to ${value.assignee} is ${isExpired ? 'expired' : 'expiring soon'}`
-				notifValue['messge_html'] = `<p>Software Asset <strong>${value.code}</strong> assigned to <strong>${value.assignee}</strong> is ${isExpired ? 'expired' : 'expiring soon'}`
-			} else {
-				notifValue['messge'] = `Software Asset ${value.code} is ${isExpired ? 'expired' : 'expiring soon'}`
-				notifValue['messge_html'] = `<p>Software Asset <strong>${value.code}</strong> is ${isExpired ? 'expired' : 'expiring soon'}`
-			}
+                notifValue['message'] = `Software Asset ${value.code} assigned to ${value.assignee} is ${isExpired ? 'expired' : 'expiring soon'}`
+                notifValue['message_html'] = `<p>Software Asset <strong>${value.code}</strong> assigned to <strong>${value.assignee}</strong> is ${isExpired ? 'expired' : 'expiring soon'}`
+            } else {
+                notifValue['message'] = `Software Asset ${value.code} is ${isExpired ? 'expired' : 'expiring soon'}`
+                notifValue['message_html'] = `<p>Software Asset <strong>${value.code}</strong> is ${isExpired ? 'expired' : 'expiring soon'}`
+            }
 
 			accum.push(notifValue);
 

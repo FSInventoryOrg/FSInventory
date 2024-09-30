@@ -27,7 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { HardwareType } from '@/types/asset';
+import { HardwareType, SoftwareType } from '@/types/asset';
 import * as imsService from '@/ims-service'
 import EditAsset from './EditAsset';
 import TrashCan from '../graphics/TrashCan';
@@ -36,7 +36,7 @@ import { Defaults } from '@/types/options';
 
 interface CellProps {
   row: {
-    original: HardwareType;
+    original: HardwareType | SoftwareType;
   };
 }
 

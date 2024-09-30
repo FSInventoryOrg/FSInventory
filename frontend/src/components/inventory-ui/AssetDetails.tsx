@@ -1,4 +1,4 @@
-import { HardwareType } from '@/types/asset'
+import { AssetUnionType } from '@/types/asset'
 import { CreditCardIcon, InfoIcon, LibraryBig, NotebookPenIcon, ScaleIcon, SettingsIcon, TrashIcon } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -13,7 +13,7 @@ import { Button } from '../ui/button';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface AssetDetailsProps {
-  asset: HardwareType;
+  asset: AssetUnionType;
   onRetrieve?: () => void;
 }
 
@@ -74,9 +74,9 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
   ];
 
   const systemSpecs: Field[] = [
-    { label: 'Processor:', value: asset.processor },
-    { label: 'Memory:', value: asset.memory },
-    { label: 'Storage:', value: asset.storage }
+    { label: 'Processor:', value: "processor" in asset ? asset.processor: '' },
+    { label: 'Memory:', value: "memory" in asset ? asset.memory: '' },
+    { label: 'Storage:', value: "storage" in asset ? asset.storage: '' }
   ];
 
   const purchaseDate = asset.purchaseDate ? new Date(asset.purchaseDate) : null;
@@ -87,18 +87,18 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
   const purchaseDetails: Field[] = [
       { label: 'Date of Purchase:', value: purchaseDate ? purchaseDate.toDateString() : '' },
       { label: 'Years of Service:', value: yearsOfService },
-      { label: 'Supplier/Vendor:', value: asset.supplierVendor }
+      { label: 'Supplier/Vendor:', value: "supplierVendor" in asset ? asset.supplierVendor: '' }
   ];
 
   const legalInfo: Field[] = [
-    { label: 'PEZA Form 8105:', value: asset.pezaForm8105 },
-    { label: 'PEZA Form 8106:', value: asset.pezaForm8105 },
-    { label: 'Is RGE:', value: asset.isRGE ? 'YES' : 'NO' }
+    { label: 'PEZA Form 8105:', value: "pezaForm8105" in asset? asset.pezaForm8105: '' },
+    { label: 'PEZA Form 8106:', value: "pezaForm8105" in asset? asset.pezaForm8105: '' },
+    { label: 'Is RGE:', value: "isRGE" in asset ? (asset.isRGE ? 'YES' : 'NO'): '' }
   ]
 
   const otherInfo: Field[] = [
-    { label: 'Equipment Type:', value: asset.equipmentType },
-    { label: 'From Client:', value: asset.client },
+    { label: 'Equipment Type:', value: "equipmentType" in asset ? asset.equipmentType: '' },
+    { label: 'From Client:', value: "client" in asset ? asset.client: '' },
     { label: 'Assigned To:', value: asset._addonData_assignee || asset.assignee },
     { label: 'Deployment Date:', value: asset.deploymentDate ? new Date(asset.deploymentDate).toLocaleString() : '' },
     { label: 'Recovered From:', value: asset._addonData_recoveredFrom || asset.recoveredFrom },
