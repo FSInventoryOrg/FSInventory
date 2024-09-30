@@ -119,9 +119,9 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
     : '';
 
   const purchaseDetails: Field[] = [
+      { label: 'Supplier/Vendor:', value: "supplierVendor" in asset ? asset.supplierVendor: "vendor" in asset ? asset.vendor : '' },
       { label: 'Date of Purchase:', value: purchaseDate ? purchaseDate.toDateString() : '' },
-      { label: 'Years of Service:', value: yearsOfService },
-      { label: 'Supplier/Vendor:', value: "supplierVendor" in asset ? asset.supplierVendor: "vendor" in asset ? asset.vendor : '' }
+      { label: 'Years of Service:', value: yearsOfService }
   ];
 
   const legalInfo: Field[] = [
