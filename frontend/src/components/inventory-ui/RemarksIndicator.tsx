@@ -10,13 +10,13 @@ import {
 import { NotebookPenIcon, XIcon } from "lucide-react";
 import { AssetUnionType } from "@/types/asset";
 import { Button } from "../ui/button";
+import { format } from "date-fns";
 
 interface AssetCodeProps {
   asset: AssetUnionType;
 }
 const RemarksIndicator = ({ asset }: AssetCodeProps) => {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-
   return (
     <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
       <DialogTrigger asChild>
@@ -41,9 +41,10 @@ const RemarksIndicator = ({ asset }: AssetCodeProps) => {
             <NotebookPenIcon size={16} className="text-primary" />
             Remarks
           </h1>
-          <span className="border rounded-md p-2 min-h-20 bg-muted">
+          <span className="pt-2 pl-2">
             {asset.remarks}
           </span>
+          <span className='pb-2 pl-2 font-extralight text-accent-foreground text-xs text-start italic'>{format(asset.updated, "PP")}</span>
         </div>
       </DialogContent>
     </Dialog>
