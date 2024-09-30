@@ -4,13 +4,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { HardwareType } from "@/types/asset";
+import { HardwareType, SoftwareType } from "@/types/asset";
 import ActionCell from './InventoryAction';
 import StatusBadge from "./StatusBadge";
 import AssetCode from './AssetCode';
 import DeployRetrieveAsset from "./DeployRetrieveAsset";
 
-export const InventoryColumns: ColumnDef<HardwareType>[] = [
+export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -60,7 +60,8 @@ export const InventoryColumns: ColumnDef<HardwareType>[] = [
   },
   {
     accessorKey: "modelName",
-    header: "Model Name",
+    header: "Model/Software Name",
+    accessorFn: (row) => row.modelName || row.softwareName || '',
   },
   {
     accessorKey: "modelNo",

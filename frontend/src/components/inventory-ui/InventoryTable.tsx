@@ -37,7 +37,7 @@ import { FilterIcon, SearchIcon } from 'lucide-react';
 import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import { ColumnVisibility } from './ColumnVisibility';
 import Empty from '../graphics/Empty';
-import { TagOption } from './Options';
+import { TagOption } from '@/types/options';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as imsService from '@/ims-service';
 import { Button } from '../ui/button';
@@ -94,7 +94,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed;
 };
 
-const searchColumns: any[] = ["code", "serialNo", "assignee"]
+const searchColumns: any[] = ["code", "serialNo", "assignee", "modelName"]
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const exactFilter: FilterFn<any> = (row, _columnId, value) => {
   const objectValue: string = searchColumns.reduce((accum: any, element: any) => {

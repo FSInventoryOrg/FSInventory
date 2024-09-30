@@ -15,7 +15,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as imsService from '@/ims-service'
 import { useAppContext } from '@/hooks/useAppContext'
 import { Spinner } from '../Spinner'
-import { AssetFormData, AssetSchema, refineAssetSchema} from "@/schemas/AddAssetSchema";
+import { AssetBaseSchema, AssetFormData, HardwareSchema, refineAssetSchema, SoftwareSchema} from "@/schemas/AddAssetSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Tabs,
@@ -40,48 +40,59 @@ const EditAsset = ({ assetData, defaultValues, onClose }: EditAssetProps) => {
   const isHardware = assetData.type === 'Hardware';
   const isSoftware = assetData.type === 'Software';
 
-  const RetrievableAssetSchema = AssetSchema.superRefine(refineAssetSchema(defaultValues?.retrievableStatus))
+  const RetrievableAssetSchema = isHardware
+    ? HardwareSchema.superRefine(refineAssetSchema(defaultValues?.retrievableStatus)) 
+    : SoftwareSchema.superRefine(refineAssetSchema(defaultValues?.retrievableStatus))
   
-  const form = useForm<z.infer<typeof AssetSchema>>({
+  const form = useForm<z.infer<typeof AssetBaseSchema>>({
     resolver: zodResolver(RetrievableAssetSchema),
     defaultValues: {
-      code: assetData.code,
       type: assetData.type,
+      code: assetData.code,
       brand: assetData.brand,
       modelName: assetData.modelName,
       modelNo: assetData.modelNo,
       serialNo: assetData.serialNo,
+      deploymentDate: assetData.deploymentDate ? new Date(assetData.deploymentDate) : undefined,
+      recoveredFrom: assetData.recoveredFrom,
+      recoveryDate: assetData.recoveryDate ? new Date(assetData.recoveryDate) : undefined,
+      assignee: assetData.assignee,
+      category: assetData.category,
+      remarks: assetData.remarks,
+      purchaseDate: assetData.purchaseDate ? new Date(assetData.purchaseDate) : undefined,
+      status: assetData.status,
       /* Hardware */
       ...(isHardware && {
-        category: (assetData as HardwareType).category,
         processor: (assetData as HardwareType).processor,
         memory: (assetData as HardwareType).memory,
         storage: (assetData as HardwareType).storage,
-        status: (assetData as HardwareType).status,
-        assignee: (assetData as HardwareType).assignee,
-        purchaseDate: (assetData as HardwareType).purchaseDate ? new Date((assetData as HardwareType).purchaseDate) : undefined,
         supplierVendor: (assetData as HardwareType).supplierVendor,
         pezaForm8105: (assetData as HardwareType).pezaForm8105,
         pezaForm8106: (assetData as HardwareType).pezaForm8106,
         isRGE: (assetData as HardwareType).isRGE,
         equipmentType: (assetData as HardwareType).equipmentType,
-        remarks: (assetData as HardwareType).remarks,
-        deploymentDate: (assetData as HardwareType).deploymentDate ? new Date((assetData as HardwareType).deploymentDate) : undefined,
-        recoveredFrom: (assetData as HardwareType).recoveredFrom,
-        recoveryDate: (assetData as HardwareType).recoveryDate ? new Date((assetData as HardwareType).recoveryDate) : undefined,
         client: (assetData as HardwareType).client,
       }),
       /* Software */
       ...(isSoftware && {
+        softwareName: (assetData as SoftwareType).softwareName,
+        serialNo: (assetData as SoftwareType).serialNo,
+        vendor: (assetData as SoftwareType).vendor,
         license: (assetData as SoftwareType).license,
+        licenseType: (assetData as SoftwareType).licenseType,
+        licenseCost: (assetData as SoftwareType).licenseCost,
+        licenseExpirationDate: (assetData as SoftwareType).licenseExpirationDate ? 
+          new Date((assetData as SoftwareType).licenseExpirationDate): undefined,
         version: (assetData as SoftwareType).version,
+        noOfLicense: (assetData as SoftwareType).noOfLicense,
+        installationPath: (assetData as SoftwareType).installationPath
       })
     }
   });
 
   const queryClient = useQueryClient()
   const { showToast } = useAppContext();
-  const [tabValue, setTabValue] = useState<"Hardware" | "Software">("Hardware"); // State to track the tab value
+  const [tabValue, setTabValue] = useState<"Hardware" | "Software">(assetData.type); // State to track the tab value
 
   const handleTabChange = (newValue: "Hardware" | "Software") => {
     setTabValue(newValue);
@@ -119,7 +130,8 @@ useEffect(()=> {
 
 const triggerValidation = () => form?.trigger()
 
-const onSubmit = (data: z.infer<typeof AssetSchema>) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const onSubmit = (data: any) => {
 
     if (data.status !== defaultValues?.retrievableStatus) {
       data.assignee = '';
@@ -166,7 +178,7 @@ const onSubmit = (data: z.infer<typeof AssetSchema>) => {
               </FormItem>
             )}
           />
-          <Tabs defaultValue="Hardware" className="w-full">
+          <Tabs defaultValue='Hardware' value={assetData.type} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="Hardware" onClick={() => handleTabChange("Hardware")}>Hardware</TabsTrigger>
               <TabsTrigger value="Software" onClick={() => handleTabChange("Software")} disabled>Software</TabsTrigger>
@@ -178,6 +190,8 @@ const onSubmit = (data: z.infer<typeof AssetSchema>) => {
                 <MiscellaneousForm defaults={defaultValues} mode="edit"/>
               </TabsContent>
               <TabsContent tabIndex={-1} value="Software">
+                <GeneralInfoForm />
+                <MiscellaneousForm defaults={defaultValues} mode='edit'/>
               </TabsContent>
             </div>     
           </Tabs>            

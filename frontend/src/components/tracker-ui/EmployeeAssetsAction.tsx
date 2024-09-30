@@ -17,13 +17,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { HardwareType } from '@/types/asset';
+import { AssetUnionType } from '@/types/asset';
 import AssetDetails from '../inventory-ui/AssetDetails';
 
 interface CellProps {
   row: {
     index: number;
-    original: HardwareType;
+    original: AssetUnionType;
   };
 }
 

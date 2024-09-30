@@ -10,6 +10,13 @@ import { triggerNotif } from "../utils/common";
 import { renewAutoMailingActivation } from "./automail";
 import { getVersion } from "./version";
 
+const LICENSE_TYPES: string[] = [
+    'Subscription',
+    'Single-User (Named User)',
+    'Multi-User (Site)',
+    'OEM',
+  ]
+
 export const rotateLogs = async () => {
 	const conn = await MongoClient.connect(process.env.MONGODB_CONNECTION_STRING as string);
 	const db = conn.db('admin');
@@ -33,20 +40,24 @@ export const convertStatusToUnaccounted = async () => {
 }
 
 export const setDefaults = async () => {
-	/**
-	 * Notification options
-	 * - added handlers for empty database
-	 * */
-	const optionStatus = ['IT Storage']; //'Shelved'
-	const options: any = await Option.findOne({});
-	if (options) {
-		const updateStatus = options['status'].reduce((accum: any[], value: any, index: number) => {
-			if (optionStatus.includes(value.value)) value.tracked = true;
-			accum.push(value)
-			return accum;
-		}, []);
-		await Option.updateOne({ _id: options['_id'] }, { status: updateStatus });
-	}
+    const optionStatus = ['IT Storage', 'Shelved'];
+    const options: any = await Option.findOne({});
+    const updateStatus = options['status'].reduce((accum: any[], value: any, index: number) => {
+        if (optionStatus.includes(value.value)) value.tracked = true;
+        accum.push(value)
+        return accum;
+    }, [])
+
+    const licenseType = options.licenseType?.length ? options.licenseType : LICENSE_TYPES;
+    
+    const updatedCategories = options['category'].reduce((accum: any[], category: any) => {
+        if (category?.type !=='Software') {
+            category.type = 'Hardware'
+        }
+        accum.push(category)
+        return accum
+    }, [])
+    await Option.updateOne({ _id: options['_id'] }, { status: updateStatus, category: updatedCategories, licenseType })
 
 	/** Create oauth credentials */
 	const newCreds: any = {
@@ -171,14 +182,11 @@ export const autoMail = async () => {
 	await renewAutoMailingActivation()
 }
 
-export const removeStatus = async () => {
-	const statusToDelete = ['Shelved'];
-	let options: any = await Option.aggregate().match({});
-
-	// Just added a handler, it creates an error when the database is empty
-	if (options && options.status) {
-		if (options.length > 0) options = options[0]
-		else return
+export const removeStatus = async() => {
+    const statusToDelete = ['Shelved'];
+    let options: any = await Option.aggregate().match({});
+    if(options.length > 0) options = options[0]
+    else return
 
 		const idToUsed = options._id
 		const stateLength = options.status.length
@@ -192,7 +200,7 @@ export const removeStatus = async () => {
 			console.log(`Status [${statusToDelete.toString()}] has been removed`)
 		}
 	}
-}
+
 
 export const getVersions = async () => {
 	const versions = await getVersion()
