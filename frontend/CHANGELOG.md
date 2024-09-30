@@ -3,9 +3,14 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 ## [2.14.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000745289)
 ### Removed
 - Removed "+" button in the forms for adding and editing a Category; IT say it's no longer needed
+
+## [2.13.3](https://connect.zoho.com/portal/intranet/task/623367000000281173/623367000000745247) 2024-09-27
+### Fixed
+- Unable to add new software asset. Used the asset type in post request for Asset counter instead of a string literal
 
 ## [2.13.2](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000701197) 2024-09-24 
 ### Fixed
