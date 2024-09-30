@@ -3,18 +3,17 @@ import { Input } from '@/components/ui/input';
 
 interface FileInputProps {
   onError: (errorMessage: Error) => void;
-  onChange: ChangeEventHandler<HTMLInputElement>;
+  onChange: (file: File) => void;
   accept: string;
 }
 
 const FileInput = forwardRef(function FileInput(props: FileInputProps, ref: ForwardedRef<HTMLInputElement>) {
   const { onChange, accept, onError } = props;  
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const fileUploaded = event.target.files!![0];
+  const handleChange = (file: File) => {
     try {
-      checkFileType(fileUploaded!!);
-      onChange(event);
+      checkFileType(file);
+      onChange(file);
     } catch (err: any) {
       onError(err);
     }
@@ -35,13 +34,14 @@ const FileInput = forwardRef(function FileInput(props: FileInputProps, ref: Forw
 
 
   return (
-    <Input 
-      type="file"
-      ref={ref}
-      onChange={handleChange}
-      style={{ display: 'none' }}
-      accept={accept}
-    />
+      <Input 
+        type="file"
+        ref={ref}
+        onChange={(file) => handleChange(file.target.files!![0])}
+        style={{ display: 'none' }}
+        accept={accept}
+        onDragOver={(event) => event.preventDefault()}
+      />
   )
 });
   
