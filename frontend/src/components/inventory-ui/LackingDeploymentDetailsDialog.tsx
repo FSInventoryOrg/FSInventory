@@ -9,12 +9,12 @@ import {
     AlertDialogTitle,
   } from '../ui/alert-dialog';
 import { Button } from '../ui/button';
-import { HardwareType } from '@/types/asset';
+import { AssetUnionType } from '@/types/asset';
   
 interface LackingDeploymentDetailsDialogProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  asset: HardwareType;
+  asset: AssetUnionType
   onRecoverAsset: () => void;
 }
 
