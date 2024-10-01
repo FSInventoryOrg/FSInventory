@@ -238,7 +238,7 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, type, class
               "justify-between text-muted-foreground",
             )}
           >
-            Edit {format(property)} options
+            Edit {`${format(type ?? '')} ${format(property)}`} options
             <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </FormControl>

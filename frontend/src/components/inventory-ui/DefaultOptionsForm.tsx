@@ -115,7 +115,7 @@ const DefaultOptionsForm = () => {
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select default category" />
+                      <SelectValue placeholder="Select default hardware category" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -162,7 +162,7 @@ const DefaultOptionsForm = () => {
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select default category" />
+                      <SelectValue placeholder="Select default software category" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
