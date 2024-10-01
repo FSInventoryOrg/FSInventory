@@ -20,6 +20,7 @@ export interface AssetType extends Document {
   category: string;
   status: string;
   remarks: string;
+  notifyRemarks: boolean,
   deploymentDate?: Date;
   recoveredFrom: string;
   recoveryDate?: Date;
@@ -85,6 +86,7 @@ const assetSchema: Schema<AssetType> = new Schema<AssetType>({
   status: { type: String, required: true },
   category: { type: String, required: true },
   remarks: { type: String, required: false },
+  notifyRemarks: { type: Boolean, required: false },
   deploymentDate: { type: Date, required: false },
   recoveredFrom: { type: String, required: false },
   recoveryDate: { type: Date, required: false },
