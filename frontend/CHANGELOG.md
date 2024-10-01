@@ -11,9 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Make Prefix Code a required field when creating new Category in Add Asset form
 
-## [2.13.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000672055) 2024-09-18
+## [2.13.1](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000672055) 2024-09-18
 ### Fixed
 - Settings: Fix currently selected sidebar item not visible in light mode
+
+## [2.13.0](https://connect.zoho.com/portal/intranet/task/623367000000701215) 2024-09-17
+### Fixed
+- Deletion of asset counter 
 
 ## [2.12.1](https://connect.zoho.com/portal/intranet/task/623367000000281173) 2024-09-12
 ### Added
