@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query'
 import * as imsService from '@/ims-service'
-import { ColorOption } from './Options';
+import { ColorOption } from '@/types/options';
 import { Color, COLORS } from '@/lib/data';
 
 interface ColorSelectProps {

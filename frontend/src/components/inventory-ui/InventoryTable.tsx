@@ -37,7 +37,7 @@ import { FilterIcon, SearchIcon } from 'lucide-react';
 import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import { ColumnVisibility } from './ColumnVisibility';
 import Empty from '../graphics/Empty';
-import { TagOption } from './Options';
+import { TagOption } from '@/types/options';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as imsService from '@/ims-service';
 import { Button } from '../ui/button';

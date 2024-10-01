@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Tag as TagType } from "../ui/tag-input";
 import { useQuery } from '@tanstack/react-query'
 import * as imsService from '@/ims-service'
-import { TagOption } from './Options';
+import { TagOption } from '@/types/options';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { motion } from "framer-motion"

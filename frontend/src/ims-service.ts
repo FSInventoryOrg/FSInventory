@@ -8,6 +8,16 @@ import { UserData } from './schemas/UserSchema';
 import { UploadImage } from './types/user';
 import { AutoMailType } from '@/types/automail';
 import { AssetCounterFormData } from './schemas/AssetCounterSchema';
+import { AssetFormData } from './schemas/AddAssetSchema';
+import { AssetFormData as DeployAssetFormData } from './schemas/DeployAssetSchema';
+import { AssetFormData as RetrieveAssetFormData } from './schemas/RetrieveAssetSchema';
+import { EmployeeFormData } from './schemas/AddEmployeeSchema';
+import { AssetsHistory } from './types/employee';
+import { Defaults } from './types/options';
+import { UserData } from './schemas/UserSchema';
+import { UploadImage } from './types/user';
+import { AutoMailType } from '@/types/automail';
+import { AssetCounterFormData } from './schemas/AssetCounterSchema';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -349,7 +359,7 @@ export const addOptionValue = async ({
         prefixCode: prefixCode as string,
         threshold: 1,
         counter: 0,
-        type: 'Hardware',
+        type: type ?? 'Hardware',
       });
     }
 
