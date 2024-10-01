@@ -3,6 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.1](https://connect.zoho.com/portal/intranet/task/623367000000698093)  2024-09-19
+### Fixed 
+- Asset recovery with missing deployment details
+
+### Added
+- Prompt to continue recovering asset with missing deployment details 
+
 ## [2.14.0](https://connect.zoho.com/portal/intranet/task/623367000000728119) 2024-09-27 
 ### Added
 - Indicator if an asset has remarks
