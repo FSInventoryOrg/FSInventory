@@ -1,6 +1,6 @@
 {
   "name": "stockpilot-backend",
-  "version": "2.12.2",
+  "version": "2.13.0",
   "main": "./src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

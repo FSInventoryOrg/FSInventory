@@ -21,6 +21,7 @@ export interface AssetType {
   _addonData_recoveredFrom?: string;
   purchaseDate: Date;
   remarks: string;
+  notifyRemarks?: boolean
 }
 
 export type DeploymentHistory = {

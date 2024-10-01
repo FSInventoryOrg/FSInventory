@@ -50,6 +50,7 @@ const AddAsset = ({ defaultValues }: { defaultValues: Defaults }) => {
     modelNo: '',
     serialNo: '',
     remarks: '',
+    notifyRemarks: true,
     deploymentDate: undefined,
     recoveredFrom: '',
     recoveryDate: undefined,
