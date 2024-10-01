@@ -3,6 +3,12 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.15.0](https://connect.zoho.com/portal/intranet/task/623367000000718019) 2024-09-27
+### Added
+- Settings for default software and hardware category
+- Separate dropdowns for software and hardware categories
+- Toggle in Asset Index setting to switch between hardware and software 
+
 ## [2.14.0](https://connect.zoho.com/portal/intranet/task/623367000000728119) 2024-09-27 
 ### Added
 - Indicator if an asset has remarks
