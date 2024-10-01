@@ -12,6 +12,7 @@ import Empty from '../graphics/Empty';
 import { UserIcon } from '../icons/UserIcon';
 import { Button } from '../ui/button';
 import { useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
 
 interface AssetDetailsProps {
   asset: AssetUnionType;
@@ -270,9 +271,10 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
                 <NotebookPenIcon size={16} className='text-primary' />
                 Remarks
               </h1>
-              <span className='border rounded-md p-2 min-h-20 bg-muted'>
+              <span className="pt-2 pl-2">
                 {asset.remarks}
               </span>
+              <span className='pb-2 pl-2 font-extralight text-accent-foreground text-xs text-start italic'>{format(asset.updated, "PP")}</span>
             </div>
           </ScrollArea>
         </TabsContent>
