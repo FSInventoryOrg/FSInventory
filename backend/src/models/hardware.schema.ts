@@ -88,6 +88,8 @@ export interface HardwareType extends AssetType {
  *          example: DEV
  *        remarks:
  *          type: string
+  *       notifyRemarks:
+ *          type: boolean
  *        deploymentDate:
  *          type: string
  *          format: date-time
