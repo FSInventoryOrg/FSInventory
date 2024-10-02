@@ -42,44 +42,67 @@ export const convertStatusToUnaccounted = async () => {
 export const setDefaults = async () => {
     const optionStatus = ['IT Storage', 'Shelved'];
     const options: any = await Option.findOne({});
-    const updateStatus = options['status'].reduce((accum: any[], value: any, index: number) => {
-        if (optionStatus.includes(value.value)) value.tracked = true;
-        accum.push(value)
-        return accum;
-    }, [])
-
-    const licenseType = options.licenseType?.length ? options.licenseType : LICENSE_TYPES;
-    
-    const updatedCategories = options['category'].reduce((accum: any[], category: any) => {
-        if (category?.type !=='Software') {
-            category.type = 'Hardware'
+    if (options) {
+      const updateStatus = options['status'].reduce(
+        (accum: any[], value: any, index: number) => {
+          if (optionStatus.includes(value.value)) value.tracked = true;
+          accum.push(value);
+  
+          return accum;
+        },
+        []
+      );
+  
+      const licenseType = options.licenseType?.length
+        ? options.licenseType
+        : LICENSE_TYPES;
+      // If there is an existing default category, migrate it to hardwareCategory
+      let defaults = options.defaults;
+      if (defaults?.category) {
+        defaults.hardwareCategory = defaults.category;
+        defaults.category = undefined;
+      }
+  
+      const updatedCategories = options['category'].reduce(
+        (accum: any[], category: any) => {
+          if (category?.type !== 'Software') {
+            category.type = 'Hardware';
+          }
+          accum.push(category);
+          return accum;
+        },
+        []
+      );
+      await Option.updateOne(
+        { _id: options['_id'] },
+        {
+          status: updateStatus,
+          category: updatedCategories,
+          licenseType,
+          defaults,
         }
-        accum.push(category)
-        return accum
-    }, [])
-    await Option.updateOne({ _id: options['_id'] }, { status: updateStatus, category: updatedCategories, licenseType })
-
+      );
+    }
+  
     const newCreds: any = {
-        "created": "2024-08-02T12:05:49.192Z",
-        "createdBy": "Reynand Hingcayog",
-        "updated":"2024-08-02T12:05:49.192Z",
-        "updatedBy": "Reynand Hingcayog",
-        "clientID": "1000.L6RTKSI39I26CYYC165MV9GZI6NRRP",
-        "clientSecret": "92679d735a7c47d06bd443776a1759d066ecb922af",
-        "url": "http://192.168.50.220:3000/",
-        "scopes": [
-            "aaaserver.profile.READ"
-        ],
-        "__v": 0
+      created: '2024-08-02T12:05:49.192Z',
+      createdBy: 'Reynand Hingcayog',
+      updated: '2024-08-02T12:05:49.192Z',
+      updatedBy: 'Reynand Hingcayog',
+      clientID: '1000.L6RTKSI39I26CYYC165MV9GZI6NRRP',
+      clientSecret: '92679d735a7c47d06bd443776a1759d066ecb922af',
+      url: 'http://192.168.50.220:3000/',
+      scopes: ['aaaserver.profile.READ'],
+      __v: 0,
+    };
+  
+    const findOAuth = await OAuth.findOne({ url: newCreds.url });
+  
+    if (!findOAuth) {
+      const newOAuth = new OAuth(newCreds);
+      await newOAuth.save();
     }
-
-    const findOAuth = await OAuth.findOne({url: newCreds.url})
-
-    if(!findOAuth) {
-        const newOAuth = new OAuth(newCreds);
-        await newOAuth.save();
-    }
-}
+  };
 
 export const softwareExpirationMonitoring = async () => {
     const repeatTime = 86400000; // 24-hour repeatation
