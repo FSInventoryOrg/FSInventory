@@ -1,229 +1,356 @@
 import mongoose from "mongoose";
-import { getFile, saveFile } from "../utils/common";
 import AdmZip from "adm-zip";
+import xlsx from 'xlsx';
 import express, { Request, Response } from 'express';
-import jwt from "jsonwebtoken";
-import verifyToken from '../middleware/auth';
+import { getUploadFormat } from "../utils/common";
+import verifyToken, { verifyRole } from '../middleware/auth';
+import { extractUploadData } from "../utils/upload";
+import { unzipFileToDir } from "../utils/zip";
+import { convertIdToObjectId, convertObjectIdToId, formatDate, stringifyNestedFields } from "../utils/document";
+import { deleteAllFilesInDir, getDirPath, getFileFromDir, readJSONDataFromCSVFile, readJSONDataFromExcelFile, readJSONDataFromJSONFile, saveFileIntoDir, saveFileIntoDirFromBase64 } from "../utils/filesystem";
 
-let initiated: Boolean = false;
-var collections: any[] = [];
-const db = mongoose.connection
-
-const initiate = async() => {
-    return await new Promise((resolve, reject) => {
-        setTimeout(() => { initiated = true; resolve(true) }, 2000)
-    })
-}
-
-export const extractDocuments = async () => {
-    if(collections.length === 0) await listCollection()
-    
-    const zip = new AdmZip();
-    let filepaths: any[] = []
-    collections.forEach(async(collection) => {
-        const _tmpCollection = db.collection(collection);
-        const documents = await _tmpCollection.aggregate().match({}).toArray();
-
-        const filePath = await saveFile('/public/backup', `${collection}.json`, JSON.stringify(documents), true)
-
-        filepaths.push(filePath)
-    })
-
-    const pathFile = await saveFile('/public/attachments', 'backup.zip', zip.toBuffer(), true);
-    const backupFolder = pathFile.replace(`/attachments/backup.zip`, '/backup');
-
-    return await new Promise((resolve, _reject) => {
-        zip.addLocalFolderAsync(backupFolder, (_success, _error) => {
-            zip.writeZip(pathFile);
-
-            resolve(pathFile)
-
-            console.log('Backup has been completed')
-        })
-    })
-}
-
-const unzipFile = async(src: string, target: string) => {
-    const zip = new AdmZip(src);
-
-    zip.extractAllTo(target, true)
-}
-
-export const listCollection = async () => {
-    if (!initiated) await initiate();
-    else return collections
-
-    collections = (await db.db.listCollections().toArray()).map((f: any) => f['name']);
-}
-
-const verifyUpload = async(req: Request) => {
-    const token = req.cookies.auth_token;
-    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
-
-    if (decodedToken.role !== "ADMIN") return { code: 403, message: "Only users with admin role can perform this action" }
-
-    const { src } = req.body;
-    let srcFormat = { data: "", base64: "" };
-
-    if (!src) return { code: 400, message: "Source file is needed and must be in base64 format i.e data:text/plain;base64,abcdef123456789" }
-
-    try {
-        let tmp = src.split(';');
-        srcFormat['data'] = tmp[0].replace('data:', '');
-        srcFormat['base64'] = tmp[1].replace('base64,', '');
-    } catch (errorProcess) {
-        console.log(errorProcess);
-        return { code: 500, message: "Source file must be in base64 format i.e data:text/plain;base64,abcdef123456789" }
-    }
-
-    if (!srcFormat['data'].includes('application/zip')) return { code: 400, message: "Attachment should be a zip file" }
-
-    const location = `/public/files/imports`;
-    const path = await saveFile(location, 'backup.zip', srcFormat['base64'], true)
-    const target = path.replace(`/imports/backup.zip`, '/backup');
-
-    await unzipFile(path, target);
-
-    return { code: 200, message: "success", path: target}
-}
-
+const db = mongoose.connection;
 const router = express.Router();
 
-router.get('/export', verifyToken, async(req: Request, res: Response) => {
-    try {
-        const token = req.cookies.auth_token;
-        const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+// Get the list of documents
+export const listCollection = async () => {
+	const collectionList = await db.db.listCollections().toArray();
+	return collectionList.map((f: any) => f['name']);
+}
 
-        if (decodedToken.role !== "ADMIN") {
-            return res.status(403).json({ message: "Only users with admin role can perform this action" });
-        }
+// Extract documents
+export const extractDocuments = async (fileFormat: string = "json") => {
+	// Validate file format
+	if (!['json', 'excel', 'csv'].includes(fileFormat)) return { status: 500, };
+	// Get list of collections
+	const collections = await listCollection();
+	if (collections.length === 0) return { status: 404, };
+	// Clear previous files
+	await deleteAllFilesInDir('/public/backup/archive');
+	// Initialize zip
+	const zip = new AdmZip();
+	// Directories
+	const collectionsDir = `/public/backup/${fileFormat}`;
+	const archiveDir = '/public/backup/archive';
+	// Create a list of promises for file saving
+	for (const collection of collections) {
+		// get all record from a collection
+		const documents = await db.collection(collection).find().toArray();
+		if (fileFormat === 'json') {
+			// save json file to public dir
+			await saveFileIntoDir(collectionsDir, `${collection}.json`, JSON.stringify(documents), true);
+		} else {
+			// Sanitize documents to handle _id
+			const sanitizedDocuments = documents.map(doc => convertObjectIdToId(doc));
+			// Stringify nested fields
+			const stringifiedDocuments = sanitizedDocuments.map(doc => stringifyNestedFields(doc));
+			// Format dates
+			const formattedDocuments = stringifiedDocuments.map(doc => formatDate(doc, ['updated']));
+			// Create excel or csv
+			const wb = xlsx.utils.book_new();
+			const ws = xlsx.utils.json_to_sheet(formattedDocuments);
+			xlsx.utils.book_append_sheet(wb, ws, collection);
+			const buffer = xlsx.write(wb, { bookType: fileFormat === 'csv' ? 'csv' : 'xlsx', type: 'buffer' });
+			await saveFileIntoDir(collectionsDir, `${collection}.${fileFormat === 'csv' ? 'csv' : 'xlsx'}`, buffer, true);
+		}
+	}
+	// save zip file to the piblic dir
+	const timestamp = new Date().toISOString().replace(/[:.-]/g, ''); // Format: YYYYMMDDTHHMMSS
+	const zipFilename = `backup_${timestamp}.zip`; // Filename with timestamp
+	const pathFile = await saveFileIntoDir(archiveDir, zipFilename, zip.toBuffer(), true);
+	// set the backup folder
+	const backupCollectionsFolder = getDirPath(`/public/backup/${fileFormat}`);
+	// Create zip file
+	zip.addLocalFolder(backupCollectionsFolder);
+	zip.writeZip(pathFile);
+	return {
+		status: 200,
+		pathFile,
+		zipFilename
+	};
+}
 
-        const initiateBackup: any = await extractDocuments()
-        const filesrc = await getFile(initiateBackup, true)
-        if(!filesrc) return res.status(404).json({ message: 'File does not exists anymore' });
-
-        res.status(200)
-            .contentType('application/zip')
-            .setHeader('Content-Disposition', `attachment; filename=backup.zip`)
-            .end(filesrc);
-      } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Something went wrong" });
-      }
+/**
+ * Export system data into zip file
+ */
+router.get('/export', verifyToken, verifyRole("ADMIN"), async (req: Request, res: Response) => {
+	try {
+		const { fileFormat } = req.query as { fileFormat: string };
+		const initiateBackup: any = await extractDocuments(fileFormat);
+		if (initiateBackup['status'] == 404) return res.status(404).json({ message: 'No collections found' });
+		if (initiateBackup['status'] == 500) return res.status(500).json({ message: 'Invalid file format' });
+		const filesrc = await getFileFromDir(initiateBackup.pathFile, true)
+		if (!filesrc) return res.status(404).json({ message: 'File does not exists anymore' });
+		res.status(200)
+			.contentType('application/zip')
+			.setHeader('Content-Disposition', `attachment; filename=${initiateBackup.zipFilename}`)
+			.end(filesrc);
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({ message: "Something went wrong" });
+	}
 });
 
-router.patch('/import', verifyToken, async(req: Request, res: Response) => {
-    try {
-        const verifyUploadedFile = await verifyUpload(req);
+/**
+ * Verify the backup data to be uploaded then save it on disk
+ */
+router.post('/validate', verifyToken, verifyRole("ADMIN"), async (req: Request, res: Response) => {
+	try {
+		const uploadData = await extractUploadData(req, 'application/zip');
+		if (uploadData.status !== 200) return { status: uploadData.status, message: uploadData.message };
+		let srcFormat = uploadData.data;
+		// EXTRACTION PROCESS
+		// delete previous extracts
+		await deleteAllFilesInDir('/public/import/collections');
+		// save file
+		const backupDir = await saveFileIntoDirFromBase64('/public/import/archive', 'backup.zip', srcFormat?.base64);
+		// extract collections from zip file
+		const extractDir = getDirPath("/public/import/collections");
+		await unzipFileToDir(backupDir, extractDir);
 
-        if(verifyUploadedFile['code'] !== 200) return res.status(verifyUploadedFile['code']).json(verifyUploadedFile['message'])
-        else {
-            const collectionList = await listCollection();
+		const fileFormat = getUploadFormat('/public/import/collections')?.split('.')[1];
+		if(!fileFormat){
+			res.status(400).json({ message: "invalid file format" });
+		}
 
-            collectionList?.forEach(async(collection) => {
-                let backupDocuments: any
-                try {
-                    const bkFile: any = await getFile(`${verifyUploadedFile['path']}/${collection}.json`, true)
-                    backupDocuments = JSON.parse(bkFile.toString())
-                    
-                    const fileLength = backupDocuments.length;
-                    backupDocuments = backupDocuments.reduce((accum: any, value: any) => {
-                        if (value?._id) {
-                            value._id = {
-                                '$oid': value._id
-                            }
-
-                            accum.push(value)
-                        }
-                        return accum
-                    }, [])
-
-                    if(fileLength !== backupDocuments.length) backupDocuments = null
-                } catch (errorFile) {}
-
-                if (Array.isArray(backupDocuments)) {
-                    if(backupDocuments.length > 0) {
-                        await db.dropCollection(collection);
-                        const _tmpCollection = db.collection(collection);
-        
-                        await _tmpCollection.insertMany(backupDocuments)
-                    }
-                }
-            })
-        }
-      } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Something went wrong" });
-      }
+		// VALIDATION PROCESS
+		let staleCollections: { [key: string]: { current: any[], backup: any[] } } = {};
+		let hasStale = false;
+		// Get list of collection name
+		const collectionList = await listCollection();
+		if (!collectionList || collectionList.length === 0) return res.status(404).json({ message: "No collections found" });
+		// Loop collection
+		for (const collection of collectionList) {
+			// Get collection documents
+			const collectionDocuments = await db.collection(collection).find().toArray();
+			try {
+				let backupJsonData;
+				if (fileFormat === 'json') {
+					backupJsonData = await readJSONDataFromJSONFile('/public/import/collections', `${collection}.${fileFormat}`);
+				} else if (fileFormat === 'xlsx') {
+					backupJsonData = await readJSONDataFromExcelFile('/public/import/collections', `${collection}.${fileFormat}`);
+				} else {
+					backupJsonData = await readJSONDataFromCSVFile('/public/import/collections', `${collection}.${fileFormat}`);
+				}
+				if (!backupJsonData) continue;
+				const backupDeserializedData = backupJsonData.map(convertIdToObjectId);
+				// Create a map of backup data for quick lookup
+				const backupDataMap = new Map<string, any>(backupDeserializedData.map((doc: any) => [doc._id.toString(), doc]));
+				// Arrays to hold stale documents
+				const currentStaleDocs: any[] = [];
+				const backupStaleDocs: any[] = [];
+				// Check if there is any data to import
+				if (backupDeserializedData.length === 0) continue;
+				// Check for stale records
+				for (const doc of collectionDocuments) {
+					const backupDoc = backupDataMap.get(doc._id.toString());
+					if (backupDoc) {
+						// Check if updated exists and is greater
+						const dbUpdatedAt = doc.updated ? new Date(doc.updated) : null;
+						const backupUpdatedAt = backupDoc.updated ? new Date(backupDoc.updated) : null;
+						// Check if the document is stale
+						if (dbUpdatedAt && backupUpdatedAt && dbUpdatedAt > backupUpdatedAt) {
+							currentStaleDocs.push(doc);
+							backupStaleDocs.push(backupDoc);
+							hasStale = true;
+						} else if (!dbUpdatedAt && backupUpdatedAt) {
+							// Fallback to created if updated is missing
+							const dbCreatedAt = doc.created ? new Date(doc.created) : null;
+							const backupCreatedAt = backupDoc.created ? new Date(backupDoc.created) : null;
+							// Check by created at
+							if (dbCreatedAt && backupCreatedAt && dbCreatedAt > backupCreatedAt) {
+								currentStaleDocs.push(doc);
+								backupStaleDocs.push(backupDoc);
+								hasStale = true;
+							}
+						}
+					} else {
+						// Document in the database is not present in backup
+						currentStaleDocs.push(doc);
+					}
+				}
+				// If there are stale documents, add them to the result
+				if (currentStaleDocs.length > 0 || backupStaleDocs.length > 0) {
+					staleCollections[collection] = {
+						current: currentStaleDocs,
+						backup: backupStaleDocs
+					};
+				}
+				// Validate each record
+			} catch (errorFile) {
+				console.error(`Error processing file for collection ${collection}:`, errorFile);
+			}
+		}
+		// Response
+		if (Object.keys(staleCollections).length > 0) {
+			res.status(200).json({
+				message: "oudated record found on the backup file",
+				outdated: hasStale,
+				values: staleCollections,
+			});
+		} else {
+			res.status(200).json({ message: "no outdated record" });
+		}
+	} catch (err) {
+		res.status(500).json({ message: "something went wrong" });
+	}
 });
 
-router.patch('/check', verifyToken, async(req: Request, res: Response) => {
-    try {
-        const verifyUploadedFile = await verifyUpload(req);
+/**
+ * Import into database the verified file
+ */
+router.post('/import', verifyToken, verifyRole("ADMIN"),
+	async (req: Request, res: Response) => {
+		try {
+			// Get list of collection name
+			const collectionList = await listCollection();
+			if (!collectionList || collectionList.length === 0) {
+				return res.status(404).json({ message: "No collections found" });
+			}
+			// Get file format
+			const fileFormat = getUploadFormat('/public/import/collections')?.split('.')[1];
+            if(!fileFormat){
+                res.status(400).json({ message: "invalid file format" });
+            }
+			// Loop collection
+			for (const collection of collectionList) {
+				try {
+					let importJsonData;
+					if (fileFormat === 'json') {
+						importJsonData = await readJSONDataFromJSONFile('/public/import/collections', `${collection}.${fileFormat}`);
+					} else if (fileFormat === 'xlsx') {
+						importJsonData = await readJSONDataFromExcelFile('/public/import/collections', `${collection}.${fileFormat}`);
+					} else {
+						importJsonData = await readJSONDataFromCSVFile('/public/import/collections', `${collection}.${fileFormat}`);
+					}
+					if (!importJsonData) continue;
+					let importDeserializedData = importJsonData.map(convertIdToObjectId);
+					// Loop selected backup data
+					if (req.body[collection]) {
+						for (const bkpData of req.body[collection]) {
+							const bkpConvertedData = convertIdToObjectId(bkpData);
+							const bkpIndex = importDeserializedData.findIndex((bkpItem: any) => bkpItem._id.equals(bkpConvertedData._id));
+							if (bkpIndex !== -1) {
+								importDeserializedData[bkpIndex] = bkpConvertedData;
+							}
+						}
+					}
+					// Check if there is any data to import
+					if (importDeserializedData.length === 0) {
+						continue;
+					}
+					// Delete then insert data
+					await db.collection(collection).deleteMany({});
+					await db.collection(collection).insertMany(importDeserializedData);
+				} catch (errorFile) {
+					console.error(`Error processing file for collection ${collection}:`, errorFile);
+				}
+			}
+			res.status(200).json({ message: "Success" });
+		} catch (error) {
+			console.log(error);
+			return res.status(500).json({ message: "Something went wrong" });
+		}
+	},
+);
 
-        if(verifyUploadedFile['code'] !== 200) return res.status(verifyUploadedFile['code']).json(verifyUploadedFile['message'])
-        else {
-            const collectionList = await listCollection();
-            let noIDs: any[] = [];
-            let noRecord: any[] = []
-            let errorParsing: any[] = [];
-            let currentMoreUpdated: boolean = false;
 
-            collectionList?.forEach(async(collection) => {
-                let backupDocuments: any
-                try {
-                    const bkFile: any = await getFile(`${verifyUploadedFile['path']}/${collection}.json`, true)
-                    backupDocuments = JSON.parse(bkFile.toString())
-                    
-                    const fileLength = backupDocuments.length;
-                    backupDocuments = backupDocuments.reduce((accum: any, value: any) => {
-                        if (value?._id) {
-                            value._id = {
-                                '$oid': value._id
-                            }
+/**
+ * IGNORE THIS PART
+ */
+router.patch('/check', verifyToken, async (req: Request, res: Response) => {
+	try {
+		// Get import filepath
+		const verifiedUploadedDir = getDirPath("/public/backup/collections");
 
-                            accum.push(value)
-                        }
-                        return accum
-                    }, [])
+		const collectionList = await listCollection();
+		let noIDs: any[] = [];
+		let noRecord: any[] = []
+		let errorParsing: any[] = [];
+		let currentMoreUpdated: boolean = false;
 
-                    if(fileLength !== backupDocuments.length) noIDs.push(collection)
-                    
-                    if(backupDocuments.length === 0) noRecord.push(collection)
-                } catch (errorFile) {
-                    errorParsing.push(collection)
-                }
+		collectionList?.forEach(async (collection) => {
+			let backupDocuments: any
+			try {
+				const bkFile: any = await getFileFromDir(`${verifiedUploadedDir}/${collection}.json`, true)
+				backupDocuments = JSON.parse(bkFile.toString())
 
-                if (Array.isArray(backupDocuments) && collection === 'assets') {
-                    if(backupDocuments.length > 0) {
-                        backupDocuments = backupDocuments.sort((a,b) => b.updated.toString().localCompare(a.updated))
-                        
-                        const _tmpCollection = db.collection(collection);
-                        let lastupdate: any = await _tmpCollection.aggregate().match({}).sort({updated: -1}).limit(1).toArray()
+				const fileLength = backupDocuments.length;
+				backupDocuments = backupDocuments.reduce((accum: any, value: any) => {
+					if (value?._id) {
+						value._id = {
+							'$oid': value._id
+						}
 
-                        if(lastupdate.length > 0) {
-                            lastupdate = lastupdate[0]
+						accum.push(value)
+					}
+					return accum
+				}, [])
 
-                            const backupLastEntry = new Date(backupDocuments[0].updated)
-                            const currentLastEntry = new Date(lastupdate.updated)
+				if (fileLength !== backupDocuments.length) noIDs.push(collection)
 
-                            if (currentLastEntry > backupLastEntry) currentMoreUpdated = true
-                        }
-                    }
-                }
-            })
+				if (backupDocuments.length === 0) noRecord.push(collection)
+			} catch (errorFile) {
+				errorParsing.push(collection)
+			}
 
-            return res.status(200).json({
-                no_id_collection: noIDs,
-                no_record_collection: noRecord,
-                error_in_parsing: errorParsing,
-                currentIsUpdated: currentMoreUpdated
-            })
-        }
-      } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Something went wrong" });
-      }
+			if (Array.isArray(backupDocuments) && collection === 'assets') {
+				if (backupDocuments.length > 0) {
+					backupDocuments = backupDocuments.sort((a, b) => b.updated.toString().localCompare(a.updated))
+
+					const _tmpCollection = db.collection(collection);
+					let lastupdate: any = await _tmpCollection.aggregate().match({}).sort({ updated: -1 }).limit(1).toArray()
+
+					if (lastupdate.length > 0) {
+						lastupdate = lastupdate[0]
+
+						const backupLastEntry = new Date(backupDocuments[0].updated)
+						const currentLastEntry = new Date(lastupdate.updated)
+
+						if (currentLastEntry > backupLastEntry) currentMoreUpdated = true
+					}
+				}
+			}
+		})
+
+		return res.status(200).json({
+			no_id_collection: noIDs,
+			no_record_collection: noRecord,
+			error_in_parsing: errorParsing,
+			currentIsUpdated: currentMoreUpdated
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({ message: "Something went wrong" });
+	}
 });
+
+/**
+ * Clear tables
+ */
+router.delete('/clear', verifyToken, verifyRole("ADMIN"),
+	async (req: Request, res: Response) => {
+		try {
+			// Get list of collection name
+			const collectionList = await listCollection();
+			if (!collectionList || collectionList.length === 0) {
+				return res.status(404).json({ message: "No collections found" });
+			}
+			// Loop collection
+			for (const collection of collectionList) {
+				try {
+					// Delete all records
+					await db.collection(collection).deleteMany({});
+				} catch (errorFile) {
+					console.error(`Error processing file for collection ${collection}:`, errorFile);
+				}
+			}
+			res.status(200).json({ message: "Success" });
+		} catch (error) {
+			console.log(error);
+			return res.status(500).json({ message: "Something went wrong" });
+		}
+	}
+);
 
 export default router;

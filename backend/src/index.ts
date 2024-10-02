@@ -35,11 +35,11 @@ mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string);
 const db = mongoose.connection;
 
 db.on('connected', () => {
-  logger.info('Connected to MongoDB');
+	logger.info('Connected to MongoDB');
 });
 
 db.on('error', (err) => {
-  logger.error('MongoDB connection error:', err);
+	logger.error('MongoDB connection error:', err);
 });
 
 startChangeStream();
@@ -47,11 +47,11 @@ startChangeStream();
 const app = express();
 
 app.use(cookieParser());
-app.use(express.json({limit: "200mb"}))
-app.use(express.urlencoded({limit: "200mb", extended: true}))
+app.use(express.json({ limit: "200mb" }))
+app.use(express.urlencoded({ limit: "200mb", extended: true }))
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true,
+	origin: process.env.FRONTEND_URL,
+	credentials: true,
 }))
 
 app.use(express.static(path.join(__dirname, FRONTENDLOC)))
@@ -73,32 +73,32 @@ app.use("/version", versionRoutes)
 
 // Catch-all route for unmatched URLs (place it here)
 if (process.env.NODE_ENV !== 'development') {
-  app.get('/*', function(req, res) {
-    res.sendFile(path.join(__dirname, `${FRONTENDLOC}/index.html`), function(err) {
-      if (err) {
-        res.status(500).send(err);
-      }
-    });
-  });
+	app.get('/*', function (req, res) {
+		res.sendFile(path.join(__dirname, `${FRONTENDLOC}/index.html`), function (err) {
+			if (err) {
+				res.status(500).send(err);
+			}
+		});
+	});
 }
 
-const onStartupJobs = async() => {
-  await getVersions();
-  rotateLogs()
-  await removeStatus();
-  await setDefaults();
-  await convertStatusToStorage()
-  await convertStatusToUnaccounted()
-  await auditAssets();
-  await autoMail();
-  await listCollection();
-  
-  softwareExpirationMonitoring();
+const onStartupJobs = async () => {
+	await getVersions();
+	// rotateLogs()
+	await removeStatus();
+	await setDefaults();
+	await convertStatusToStorage()
+	await convertStatusToUnaccounted()
+	await auditAssets();
+	await autoMail();
+	await listCollection();
+
+	softwareExpirationMonitoring();
 }
 
 onStartupJobs();
 
 app.listen(port, HOST, () => {
-  logger.info(`Server running on http://${HOST}:${port}`)
-  swaggerDocs(app, port);
+	logger.info(`Server running on http://${HOST}:${port}`)
+	swaggerDocs(app, port);
 })
