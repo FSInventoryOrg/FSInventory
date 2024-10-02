@@ -67,7 +67,7 @@ const DocumentDiff: React.FC<DocumentProps> = ({ current = false, document, keys
       <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
         <>
           {keys.map((key: string) => {
-            return (<li key={document._id+'.'+key}><span>{`${key}: ${document[key]}`}</span></li>)
+            return (<li className="list-none" key={document._id+'.'+key}><span>{`${key}: ${document[key]}`}</span></li>)
           })}  
         </>
       </div>
@@ -141,7 +141,7 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys, 
               <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
                 <ul>
                   {keys.map((key: string) => {
-                    return (<li key={current._id+'.'+key} className="list-none"><span>{`${key}: ${current[key]}`}</span></li>)
+                    return (<li className="list-none" key={current._id+'.'+key}><span>{`${key}: ${current[key]}`}</span></li>)
                   })}  
                 </ul>
               </div>
@@ -177,7 +177,7 @@ const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collectio
 
 
           return (
-            <li key={docInCurrent._id} className="list-none">
+            <li className="list-none" key={docInCurrent._id}>
               {isNew ?
                 <CollectionDiff
                   current={docInCurrent}
@@ -217,7 +217,7 @@ export const BackupDiffDisplay: React.FC<BackupDiffDisplayProps> = ({ values, ch
       <div className="flex gap-x-2">
         {affectedCollections.map((key: string) => {
           return (
-            <li key={key}>
+            <li className="list-none" key={key}>
               <div
                 className={`
                   flex justify-center px-4 py-1
@@ -240,7 +240,7 @@ export const BackupDiffDisplay: React.FC<BackupDiffDisplayProps> = ({ values, ch
           {
             affectedCollections.map((collection: string) => {
               return (
-                <li key={collection+'_changes'}>
+                <li className="list-none" key={collection+'_changes'}>
                   <CollectionDiffDisplay
                     collection={givenValues[collection]}
                     className={`${currentTab === collection ? 'visible' : 'hidden'}`}
