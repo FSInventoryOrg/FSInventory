@@ -67,7 +67,7 @@ const DocumentDiff: React.FC<DocumentProps> = ({ current = false, document, keys
       <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
         <>
           {keys.map((key: string) => {
-            return (<span>{`${key}: ${document[key]}`}</span>)
+            return (<li key={document._id+'.'+key}><span>{`${key}: ${document[key]}`}</span></li>)
           })}  
         </>
       </div>
@@ -139,11 +139,11 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys, 
             <div className="flex flex-col gap-y-0">
               <div className="p-2 bg-[#6d6c6c] border-0 rounded-t font-semibold">In Database (Not Found In Backup)</div>
               <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
-                <>
+                <ul>
                   {keys.map((key: string) => {
-                    return (<span>{`${key}: ${current[key]}`}</span>)
+                    return (<li key={current._id+'.'+key} className="list-none"><span>{`${key}: ${current[key]}`}</span></li>)
                   })}  
-                </>
+                </ul>
               </div>
             </div>
           </>
@@ -158,6 +158,7 @@ const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collectio
   const { current, backup } = collection;
   return (
     <div className={`flex flex-col gap-y-6  ${className}`}>
+      <ul>
       {
         current.map((docInCurrent: MongoResult) => {
           const backupIndex: number = backup.findIndex((docInBackup: MongoResult) => docInCurrent._id === docInBackup._id)
@@ -176,7 +177,7 @@ const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collectio
 
 
           return (
-            <>
+            <li key={docInCurrent._id} className="list-none">
               {isNew ?
                 <CollectionDiff
                   current={docInCurrent}
@@ -192,10 +193,11 @@ const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collectio
                   }}
                 />
               }
-            </>
+            </li>
           )
         })
       }
+      </ul>
     </div>
   )
 }
@@ -215,37 +217,43 @@ export const BackupDiffDisplay: React.FC<BackupDiffDisplayProps> = ({ values, ch
       <div className="flex gap-x-2">
         {affectedCollections.map((key: string) => {
           return (
-            <div
-              className={`
-                flex justify-center px-4 py-1
-                hover:text-primary
-                ${currentTab === key ?
-                'text-primary font-bold' :
-                ''
-                } cursor-pointer
-                transition-colors duration-300 ease-in-out`}
-                onClick={() => setCurrentTab(key)}
-            >
-              <span>{key}</span>
-            </div>
+            <li key={key}>
+              <div
+                className={`
+                  flex justify-center px-4 py-1
+                  hover:text-primary
+                  ${currentTab === key ?
+                  'text-primary font-bold' :
+                  ''
+                  } cursor-pointer
+                  transition-colors duration-300 ease-in-out`}
+                  onClick={() => setCurrentTab(key)}
+              >
+                <span>{key}</span>
+              </div>
+            </li>
           )
         })}
       </div>
       <div className="w-full h-96 border-0 bg-[#141d1f] py-2 overflow-auto">
-        {
-          affectedCollections.map((collection: string) => {
-            return (
-              <CollectionDiffDisplay
-                collection={givenValues[collection]}
-                className={`${currentTab === collection ? 'visible' : 'hidden'}`}
-                setChanges={(id, string) => {
-                  setChangeToAdopt(collection, id, string)
-                  setChanges(changes)
-                }}
-              />
-            )
-          })
-        }
+        <ul>
+          {
+            affectedCollections.map((collection: string) => {
+              return (
+                <li key={collection+'_changes'}>
+                  <CollectionDiffDisplay
+                    collection={givenValues[collection]}
+                    className={`${currentTab === collection ? 'visible' : 'hidden'}`}
+                    setChanges={(id, string) => {
+                      setChangeToAdopt(collection, id, string)
+                      setChanges(changes)
+                    }}
+                  />
+                </li>
+              )
+            })
+          }
+        </ul>
       </div>
     </div>
   )
