@@ -93,6 +93,18 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
       }
       setChanges(collectionChanges)
     }
+    const isDiffAllNew = (): boolean => {
+      if (result.values) {
+        Object.keys(result.values!!).forEach((collection: string) => {
+          if (result.values!![collection].backup.length) {
+            console.log(result.values!![collection].backup.length)
+            return false;
+          }
+        })
+      }
+      return true;
+    }
+    setReadAll(isDiffAllNew());
   }, [validationComplete])
 
   useEffect(() => {
