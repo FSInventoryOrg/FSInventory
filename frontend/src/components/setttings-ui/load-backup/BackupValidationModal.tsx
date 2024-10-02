@@ -43,8 +43,6 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
     return true;
   }
 
-  console.log(changes, readAll, importing, finished, validationComplete)
-
   const close = () => {
     setReadAll(false)
     setImporting(false)
