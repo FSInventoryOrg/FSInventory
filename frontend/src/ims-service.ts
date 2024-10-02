@@ -8,6 +8,7 @@ import { UserData } from './schemas/UserSchema';
 import { UploadImage } from './types/user';
 import { AutoMailType } from '@/types/automail';
 import { AssetCounterFormData } from './schemas/AssetCounterSchema';
+import { MongoResult } from './types/backup';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
