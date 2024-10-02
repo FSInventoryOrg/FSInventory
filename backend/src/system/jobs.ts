@@ -193,20 +193,20 @@ export const removeStatus = async () => {
 	let options: any = await Option.aggregate().match({});
 
 	// Just added a handler, it creates an error when the database is empty
-	if (options && options.status) {
-		if (options.length > 0) options = options[0]
-		else return
-
-		const idToUsed = options._id
-		const stateLength = options.status.length
-		delete options._id
-
-		options.status = options.status.filter((f: any) => !statusToDelete.includes(f['value']));
-
-		if (stateLength !== options.status.length) {
-			await Option.updateOne({ _id: idToUsed }, options);
-
-			console.log(`Status [${statusToDelete.toString()}] has been removed`)
+	if (options?.length > 0) {
+		const option = options[0]
+		if (option.status) {
+			const idToUsed = option._id
+			const stateLength = option.status.length
+			delete option._id
+	
+			option.status = option.status.filter((f: any) => !statusToDelete.includes(f['value']));
+	
+			if (stateLength !== option.status.length) {
+				await Option.updateOne({ _id: idToUsed }, option);
+	
+				console.log(`Status [${statusToDelete.toString()}] has been removed`)
+			}
 		}
 	}
 }
