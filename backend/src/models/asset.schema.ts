@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export type DeploymentHistory = {
-  deploymentDate: Date;
+  deploymentDate?: Date;
   recoveryDate?: Date;
   assignee: string;
 }
@@ -21,9 +21,9 @@ export interface AssetType extends Document {
   status: string;
   remarks: string;
   notifyRemarks: boolean,
-  deploymentDate: Date;
+  deploymentDate?: Date;
   recoveredFrom: string;
-  recoveryDate: Date;
+  recoveryDate?: Date;
   assignee: string;
   deploymentHistory: DeploymentHistory[];
   purchaseDate: Date;

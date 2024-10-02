@@ -286,7 +286,7 @@ router.put('/retrieve/:code', [
         lastDeploymentRecord.recoveryDate = data.recoveryDate;
       } else {
         deploymentHistory.push({
-          deploymentDate: data.recoveryDate,
+          deploymentDate: existingAsset.deploymentDate,
           assignee: data.recoveredFrom,
           recoveryDate: data.recoveryDate,
         });
