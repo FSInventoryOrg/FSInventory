@@ -16,7 +16,7 @@ import {
   FormMessage,
   Form,
 } from '@/components/ui/form';
-import { AssetType } from '@/types/asset';
+import { AssetUnionType } from '@/types/asset';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as imsService from '@/ims-service';
@@ -24,7 +24,7 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { Spinner } from '../Spinner';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowFatLinesDown } from '@phosphor-icons/react';
 import { EmployeeType } from '@/types/employee';
 import {
@@ -36,16 +36,20 @@ import {
 } from '../ui/select';
 import { Defaults } from '@/types/options';
 import { RetrieveAssetSchema } from '@/schemas/RetrieveAssetSchema';
+import LackingDeploymentDetailsDialog from './LackingDeploymentDetailsDialog';
 
 interface RetrieveAssetProps {
-  assetData: AssetType;
+  assetData: AssetUnionType;
   onRetrieve?: () => void;
 }
 
 const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
   const queryClient = useQueryClient();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [openPrompt, setOpenPrompt] = useState(false);
   const { showToast } = useAppContext();
+
+  const assignee = assetData?._addonData_assignee || assetData?.assignee;
 
   const form = useForm<z.infer<typeof RetrieveAssetSchema>>({
     resolver: zodResolver(RetrieveAssetSchema),
@@ -128,13 +132,21 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof RetrieveAssetSchema>) => {
+  const onSubmit = () => {
+    if (!assetData.assignee) {
+      return setOpenPrompt(true);
+    }
+    handleRecoverAsset();
+  };
+
+  const handleRecoverAsset = () => {
+    const [code, status] = form.getValues(['code', 'status']);
     const retrievedAsset = {
       _id: assetData._id,
-      code: data.code,
+      code,
+      status,
       recoveryDate: new Date(),
       recoveredFrom: assetData.assignee,
-      status: data.status,
     };
     retrieveAsset({ code: assetData.code, retrievedAsset: retrievedAsset });
   };
@@ -160,10 +172,9 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
         <SheetHeader>
           <SheetTitle>Recover asset {assetData.code}</SheetTitle>
           <SheetDescription>
-            Recovering this asset from{' '}
-            {assetData?._addonData_assignee || assetData.assignee} will remove
-            it from their deployed assets list and set the status of this asset
-            to '{form.getValues('status')}'.
+            Recovering this asset {assignee ? `from ${assignee}` : ''} will
+            remove it from their deployed assets list and set the status of this
+            asset to '{form.getValues('status')}'.
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
@@ -224,6 +235,12 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
             </SheetFooter>
           </form>
         </Form>
+        <LackingDeploymentDetailsDialog
+          open={openPrompt}
+          setOpen={setOpenPrompt}
+          asset={assetData}
+          onRecoverAsset={handleRecoverAsset}
+        />
       </SheetContent>
     </Sheet>
   );

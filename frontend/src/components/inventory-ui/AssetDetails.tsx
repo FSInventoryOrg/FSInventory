@@ -5,13 +5,12 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import * as imsService from '@/ims-service'
 import StatusBadge from './StatusBadge';
-import DeployAsset from './DeployAsset';
-import RetrieveAsset from './RetrieveAsset';
 import DeploymentDuration from '../tracker-ui/DeploymentDuration';
 import Empty from '../graphics/Empty';
 import { UserIcon } from '../icons/UserIcon';
 import { Button } from '../ui/button';
 import { useQueryClient } from '@tanstack/react-query';
+import DeployRetrieveAsset from './DeployRetrieveAsset';
 import { format } from 'date-fns';
 
 interface AssetDetailsProps {
@@ -197,10 +196,7 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
         <div className='text-sm w-fit bg-accent text-accent-foreground font-semibold border-border border rounded-full px-2.5 py-1 flex items-center gap-2'>
           <StatusBadge status={asset.status} />
         </div>
-        {asset.status === 'Deployed' && (
-          <RetrieveAsset assetData={asset} onRetrieve={onRetrieve} />
-        )}
-        {asset.status === 'IT Storage' && <DeployAsset assetData={asset} />}
+        <DeployRetrieveAsset assetData={asset} onRetrieve={onRetrieve}/>
       </div>
       <div className='text-muted-foreground flex flex-col pt-2'>
         <div className='italic text-xs'>
@@ -322,7 +318,7 @@ const AssetDetails = ({ asset, onRetrieve }: AssetDetailsProps) => {
                         {/* Render assignee */}
                         <div className='flex gap-2 px-2'>
                           <div className='w-full flex gap-2 text-sm items-center font-bold uppercase'>
-                            {record?._addonData_assignee || record.assignee}
+                            {record?._addonData_assignee || record.assignee || 'null'}
                           </div>
                           <span className='w-fit'></span>
                         </div>
