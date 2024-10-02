@@ -40,45 +40,73 @@ export const convertStatusToUnaccounted = async () => {
 }
 
 export const setDefaults = async () => {
-    const optionStatus = ['IT Storage', 'Shelved'];
+    /**
+	 * Notification options
+	 * - added handlers for empty database
+	 * */
+	const optionStatus = ['IT Storage', 'Shelved'];
     const options: any = await Option.findOne({});
-    const updateStatus = options['status'].reduce((accum: any[], value: any, index: number) => {
-        if (optionStatus.includes(value.value)) value.tracked = true;
-        accum.push(value)
-        return accum;
-    }, [])
-
-    const licenseType = options.licenseType?.length ? options.licenseType : LICENSE_TYPES;
-    
-    const updatedCategories = options['category'].reduce((accum: any[], category: any) => {
-        if (category?.type !=='Software') {
-            category.type = 'Hardware'
+    if (options) {
+      const updateStatus = options['status'].reduce(
+        (accum: any[], value: any, index: number) => {
+          if (optionStatus.includes(value.value)) value.tracked = true;
+          accum.push(value);
+  
+          return accum;
+        },
+        []
+      );
+  
+      const licenseType = options.licenseType?.length
+        ? options.licenseType
+        : LICENSE_TYPES;
+      // If there is an existing default category, migrate it to hardwareCategory
+      let defaults = options.defaults;
+      if (defaults?.category) {
+        defaults.hardwareCategory = defaults.category;
+        defaults.category = undefined;
+      }
+  
+      const updatedCategories = options['category'].reduce(
+        (accum: any[], category: any) => {
+          if (category?.type !== 'Software') {
+            category.type = 'Hardware';
+          }
+          accum.push(category);
+          return accum;
+        },
+        []
+      );
+      await Option.updateOne(
+        { _id: options['_id'] },
+        {
+          status: updateStatus,
+          category: updatedCategories,
+          licenseType,
+          defaults,
         }
-        accum.push(category)
-        return accum
-    }, [])
-    await Option.updateOne({ _id: options['_id'] }, { status: updateStatus, category: updatedCategories, licenseType })
-
-	/** Create oauth credentials */
-	const newCreds: any = {
-		"created": "2024-08-02T12:05:49.192Z",
-		"createdBy": "Reynand Hingcayog",
-		"updated": "2024-08-02T12:05:49.192Z",
-		"updatedBy": "Reynand Hingcayog",
-		"clientID": "1000.L6RTKSI39I26CYYC165MV9GZI6NRRP",
-		"clientSecret": "92679d735a7c47d06bd443776a1759d066ecb922af",
-		"url": "http://192.168.50.220:3000/",
-		"scopes": [
-			"aaaserver.profile.READ"
-		],
-		"__v": 0
-	}
-	const findOAuth = await OAuth.findOne({ url: newCreds.url })
-	if (!findOAuth) {
-		const newOAuth = new OAuth(newCreds);
-		await newOAuth.save();
-	}
-}
+      );
+    }
+  
+    const newCreds: any = {
+      created: '2024-08-02T12:05:49.192Z',
+      createdBy: 'Reynand Hingcayog',
+      updated: '2024-08-02T12:05:49.192Z',
+      updatedBy: 'Reynand Hingcayog',
+      clientID: '1000.L6RTKSI39I26CYYC165MV9GZI6NRRP',
+      clientSecret: '92679d735a7c47d06bd443776a1759d066ecb922af',
+      url: 'http://192.168.50.220:3000/',
+      scopes: ['aaaserver.profile.READ'],
+      __v: 0,
+    };
+  
+    const findOAuth = await OAuth.findOne({ url: newCreds.url });
+  
+    if (!findOAuth) {
+      const newOAuth = new OAuth(newCreds);
+      await newOAuth.save();
+    }
+  };
 
 export const softwareExpirationMonitoring = async () => {
 	const repeatTime = 86400000; // 24-hour repeatation
@@ -106,25 +134,25 @@ export const softwareExpirationMonitoring = async () => {
 
 	notifRecords = notifRecords.map(d => d['uniqueLabel'])
 
-	const assets = await Software.aggregate().match({
-		$expr: {
-			$and: [
-				{
-					$lt: ['$expirationDate', bufferedDate]
-				},
-				{
-					$eq: ['$type', 'Software']
-				},
-				{
-					$not: [
-						{
-							$in: ['$status', ['Damaged', '', 'Unaccounted']]
-						}
-					]
-				}
-			]
-		}
-	})
+    const assets = await Software.aggregate().match({
+        $expr: {
+            $and: [
+                {
+                    $lt: ['$licenseExpirationDate', bufferedDate]
+                },
+                {
+                    $eq: ['$type', 'Software']
+                },
+                {
+                    $not: [
+                        {
+                            $in: ['$status', ['Damaged', '', 'Unaccounted']]
+                        }
+                    ]
+                }
+            ]
+        }
+    })
 
 	let notifDocs: any[] = [];
 
@@ -141,7 +169,7 @@ export const softwareExpirationMonitoring = async () => {
 				query: { code: value.code }
 			};
 
-			const isExpired = dateNow > new Date(value.expirationDate)
+            const isExpired = dateNow > new Date(value.licenseExpirationDate)
 
 			if (value?.assignee) {
 				const findUser = employees.find(f => f['code'] === value.assignee);
@@ -151,12 +179,12 @@ export const softwareExpirationMonitoring = async () => {
 					value.assignee = `${findUser['firstName']} ${findUser['lastName']}`
 				}
 
-				notifValue['messge'] = `Software Asset ${value.code} assigned to ${value.assignee} is ${isExpired ? 'expired' : 'expiring soon'}`
-				notifValue['messge_html'] = `<p>Software Asset <strong>${value.code}</strong> assigned to <strong>${value.assignee}</strong> is ${isExpired ? 'expired' : 'expiring soon'}`
-			} else {
-				notifValue['messge'] = `Software Asset ${value.code} is ${isExpired ? 'expired' : 'expiring soon'}`
-				notifValue['messge_html'] = `<p>Software Asset <strong>${value.code}</strong> is ${isExpired ? 'expired' : 'expiring soon'}`
-			}
+                notifValue['message'] = `Software Asset ${value.code} assigned to ${value.assignee} is ${isExpired ? 'expired' : 'expiring soon'}`
+                notifValue['message_html'] = `<p>Software Asset <strong>${value.code}</strong> assigned to <strong>${value.assignee}</strong> is ${isExpired ? 'expired' : 'expiring soon'}`
+            } else {
+                notifValue['message'] = `Software Asset ${value.code} is ${isExpired ? 'expired' : 'expiring soon'}`
+                notifValue['message_html'] = `<p>Software Asset <strong>${value.code}</strong> is ${isExpired ? 'expired' : 'expiring soon'}`
+            }
 
 			accum.push(notifValue);
 
@@ -182,25 +210,28 @@ export const autoMail = async () => {
 	await renewAutoMailingActivation()
 }
 
-export const removeStatus = async() => {
-    const statusToDelete = ['Shelved'];
-    let options: any = await Option.aggregate().match({});
-    if(options.length > 0) options = options[0]
-    else return
+export const removeStatus = async () => {
+	const statusToDelete = ['Shelved'];
+	let options: any = await Option.aggregate().match({});
 
-		const idToUsed = options._id
-		const stateLength = options.status.length
-		delete options._id
-
-		options.status = options.status.filter((f: any) => !statusToDelete.includes(f['value']));
-
-		if (stateLength !== options.status.length) {
-			await Option.updateOne({ _id: idToUsed }, options);
-
-			console.log(`Status [${statusToDelete.toString()}] has been removed`)
+	// Just added a handler, it creates an error when the database is empty
+	if (options?.length > 0) {
+		const option = options[0]
+		if (option.status) {
+			const idToUsed = option._id
+			const stateLength = option.status.length
+			delete option._id
+	
+			option.status = option.status.filter((f: any) => !statusToDelete.includes(f['value']));
+	
+			if (stateLength !== option.status.length) {
+				await Option.updateOne({ _id: idToUsed }, option);
+	
+				console.log(`Status [${statusToDelete.toString()}] has been removed`)
+			}
 		}
 	}
-
+}
 
 export const getVersions = async () => {
 	const versions = await getVersion()

@@ -94,6 +94,7 @@ router.post('/', [
     return true;
   }),
   check("remarks").optional().isString().withMessage("Remarks must be a string"),
+  check("notifyRemarks").optional().isBoolean().withMessage("Notify Remarks must be a boolean"),
   check("deploymentDate").optional().isISO8601().toDate().withMessage("Invalid deployment date"),
   check("recoveredFrom").optional().isString().withMessage("Recovered from must be a string"),
   check("recoveryDate").optional().isISO8601().toDate().withMessage("Invalid recovery date"),
@@ -285,7 +286,7 @@ router.put('/retrieve/:code', [
         lastDeploymentRecord.recoveryDate = data.recoveryDate;
       } else {
         deploymentHistory.push({
-          deploymentDate: data.recoveryDate,
+          deploymentDate: existingAsset.deploymentDate,
           assignee: data.recoveredFrom,
           recoveryDate: data.recoveryDate,
         });
@@ -376,6 +377,7 @@ router.put('/:code', [
     return true;
   }),
   check("remarks").optional().isString().withMessage("Remarks must be a string"),
+  check("notifyRemarks").optional().isBoolean().withMessage("Notify Remarks must be a boolean"),
   check("deploymentDate").optional().isISO8601().toDate().withMessage("Invalid deployment date"),
   check("recoveredFrom").optional().isString().withMessage("Recovered from must be a string"),
   check("recoveryDate").optional().isISO8601().toDate().withMessage("Invalid recovery date"),
@@ -618,6 +620,7 @@ router.put('/:property/:value', [
   check('isRGE').optional().isBoolean().withMessage('isRGE must be a boolean'),
   check('equipmentType').optional().isString().withMessage('Equipment type must be a string'),
   check('remarks').optional().isString().withMessage('Remarks must be a string'),
+  check('notifyRemarks').optional().isBoolean().withMessage('Notify remarks must be a boolean'),
   check('deploymentDate').optional().isISO8601().toDate().withMessage('Invalid deployment date'),
   check('recoveredFrom').optional().isString().withMessage('Recovered from must be a string'),
   check('recoveryDate').optional().isISO8601().toDate().withMessage('Invalid recovery date'),

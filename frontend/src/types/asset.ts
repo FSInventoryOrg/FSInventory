@@ -21,9 +21,11 @@ export interface AssetType {
   _addonData_recoveredFrom?: string;
   purchaseDate: Date;
   remarks: string;
+  notifyRemarks?: boolean
 }
 
 export type DeploymentHistory = {
+  _addonData_assignee?: string;
   deploymentDate: Date;
   recoveryDate?: Date;
   assignee: string;

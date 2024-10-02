@@ -107,7 +107,12 @@ router.post('/validate', verifyToken, verifyRole("ADMIN"), async (req: Request, 
 		// extract collections from zip file
 		const extractDir = getDirPath("/public/import/collections");
 		await unzipFileToDir(backupDir, extractDir);
+
 		const fileFormat = getUploadFormat('/public/import/collections')?.split('.')[1];
+		if(!fileFormat){
+			res.status(400).json({ message: "invalid file format" });
+		}
+
 		// VALIDATION PROCESS
 		let staleCollections: { [key: string]: { current: any[], backup: any[] } } = {};
 		let hasStale = false;
@@ -204,6 +209,9 @@ router.post('/import', verifyToken, verifyRole("ADMIN"),
 			}
 			// Get file format
 			const fileFormat = getUploadFormat('/public/import/collections')?.split('.')[1];
+            if(!fileFormat){
+                res.status(400).json({ message: "invalid file format" });
+            }
 			// Loop collection
 			for (const collection of collectionList) {
 				try {
