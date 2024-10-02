@@ -1,6 +1,8 @@
 export type Defaults = {
   status?: string;
   category?: string;
+  softwareCategory?: string;
+  hardwareCategory?: string;
   equipmentType?: string;
   deployableStatus: string[];
   retrievableStatus: string;
@@ -15,7 +17,7 @@ export type ColorOption = {
 export type TagOption = {
   value: string;
   properties?: string[];
-  type: string;
+  type?: string;
 };
 
 export type OptionType = {
