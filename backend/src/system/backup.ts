@@ -209,6 +209,9 @@ router.post('/import', verifyToken, verifyRole("ADMIN"),
 			}
 			// Get file format
 			const fileFormat = getUploadFormat('/public/import/collections')?.split('.')[1];
+            if(!fileFormat){
+                res.status(400).json({ message: "invalid file format" });
+            }
 			// Loop collection
 			for (const collection of collectionList) {
 				try {
