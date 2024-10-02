@@ -1,4 +1,4 @@
-import { forwardRef, ForwardedRef, ChangeEventHandler } from 'react';
+import { forwardRef, ForwardedRef } from 'react';
 import { Input } from '@/components/ui/input';
 
 interface FileInputProps {

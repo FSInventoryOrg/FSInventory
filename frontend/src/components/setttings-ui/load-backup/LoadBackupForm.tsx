@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Form,
@@ -8,12 +8,10 @@ import {
   FormDescription
 } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/Spinner';
 import { FileUploader } from '@/components/ui/file-uploader';
 import { BackupValidationModal } from './BackupValidationModal';
 import { validateBackupFile } from '@/ims-service';
-import { MongoResult, ValidationResult } from '@/types/backup';
+import { ValidationResult } from '@/types/backup';
 
 
 const SystemBackup = () => {
@@ -24,7 +22,7 @@ const SystemBackup = () => {
   });
 
   const [uploadedFile, setUploadedFile] = useState<File | undefined>();
-  const [fileAsBase64, setFileAsBase64] = useState<{ src: string }>({ src: '' });
+  const [, setFileAsBase64] = useState<{ src: string }>({ src: '' });
   const [validationResult, setValidationResult] = useState<ValidationResult>({ message: '' });
   const [validationComplete, setValidationComplete] = useState<boolean | null>(null);
 

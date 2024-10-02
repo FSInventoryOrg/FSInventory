@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { Separator } from '@/components/ui/separator';
+import { useState } from 'react';
 import { ValidationResult, MongoResult } from '@/types/backup';
 import { CaretCircleDown, CaretCircleUp } from '@phosphor-icons/react';
 

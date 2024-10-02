@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/Spinner';
-import { Separator } from '@/components/ui/separator';
 import { ValidationResult, CollectionChanges } from '@/types/backup';
 import { BackupDiffDisplay } from './BackupDiffDisplay';
 import { XIcon } from "lucide-react"
