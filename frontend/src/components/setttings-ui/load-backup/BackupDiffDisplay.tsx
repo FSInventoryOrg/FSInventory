@@ -10,6 +10,7 @@ interface DocumentProps {
   keys: string[],
   selection: ChangeToAdopt | ""
   setSelection: (id: string, value: ChangeToAdopt) => void;
+  isLight: 'light' | 'dark' | 'system';
 }
 
 interface CollectionDiffProps {
@@ -17,6 +18,7 @@ interface CollectionDiffProps {
   backup?: MongoResult,
   keys: string[],
   setChanges: (id: string, change: ChangeToAdopt) => void
+  isLight: 'light' | 'dark' | 'system';
 }
 
 interface CollectionDiffDisplayProps {
@@ -26,6 +28,7 @@ interface CollectionDiffDisplayProps {
   },
   className?: string,
   setChanges: (id: string, change: ChangeToAdopt) => void
+  isLight: 'light' | 'dark' | 'system';
 }
 
 interface BackupDiffDisplayProps {
@@ -36,46 +39,35 @@ interface BackupDiffDisplayProps {
     }
   };
   setChanges: (changes: { [index: string]: { [index: string]: '' | ChangeToAdopt } }) => void;
+  isLight: 'light' | 'dark' | 'system';
 }
 
-const DocumentDiff: React.FC<DocumentProps> = ({ current = false, document, keys, selection = "", setSelection }) => {
+const DocumentDiff: React.FC<DocumentProps> = ({ current = false, document, keys, selection = "", setSelection, isLight }) => {
   const whichDocument: ChangeToAdopt = current ? "current" : "backup";
 
   return (
-    <div className="flex flex-col gap-y-0">
+    <ul className={`doc-info ${selection === whichDocument ? "selected" : "unselected"}`}>
       <div
-        className={`p-2
-        border-0 rounded-t 
-        font-semibold flex 
-        gap-x-2 items-center 
-        cursor-pointer
-        ${current ? "bg-[#cd7169]" : "bg-[#549a59]"}
-        `}
+        className={`source changed ${current ? "current" : "backup"}`}
         onClick={() => {setSelection(document._id, whichDocument)}}
       >
-        <div className={`
-          h-5 w-5 border-2 rounded-full
-          bg-white flex
-          justify-center items-center
-          ${selection === whichDocument ? "border-[#5e5454]" : "border-[#bbbbbb]"}
-          `}
-        >
-          {selection === whichDocument && <div className="h-[10px] w-[10px] border-0 rounded-full border-[#5e5454] bg-[#5e5454]"/>}
+        <div className={`radio ${selection === whichDocument ? "selected" : "unselected"}`}>
+          {selection === whichDocument && <div />}
         </div>
         {current ? "Currently in DB" : "Change from Backup File"}
       </div>
-      <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
+      <div className={`fields ${isLight}`}>
         <>
           {keys.map((key: string) => {
             return (<li className="list-none" key={document._id+'.'+key}><span>{`${key}: ${document[key]}`}</span></li>)
           })}  
         </>
       </div>
-    </div>
+    </ul>
   )
 }
 
-const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys, setChanges }) => {
+const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys, setChanges, isLight }) => {
   const [open, setOpen] = useState<boolean>(true);
   const [selection, setSelection] = useState<"" | ChangeToAdopt>('')
 
@@ -90,25 +82,18 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys, 
   }
 
   return (
-    <div className={"bg-[#334043] border-0 rounded p-2 flex flex-col gap-y-3 drop-shadow-lg"}>
+    <div className={`doc ${isLight}`}>
       <div className="flex gap-x-2">
         <span className="w-fit h-max cursor-pointer">
-          {open && <CaretCircleDown size={28} color="#ffffff" weight="fill" onClick={() => setOpen(!open)} />}
-          {!open && <CaretCircleUp size={28} color="#ffffff" weight="fill" onClick={() => setOpen(!open)} />}
+          {open && <CaretCircleDown size={28} color={`${isLight === 'light' ? '#000000' : '#EBEDEF'}`} weight="fill" onClick={() => setOpen(!open)} />}
+          {!open && <CaretCircleUp size={28} color={`${isLight === 'light' ? '#000000' : '#EBEDEF'}`} weight="fill" onClick={() => setOpen(!open)} />}
         </span>
         <div className="w-full flex flex-col gap-y-[2px]">
           <span>{`Document ID: ${current._id}`}</span>
           {backup && <span className="font-light text-sm">{`Updated: ${formatDate(current['updated'] as string)} by ${current['updatedBy']}`}</span>}
           {!backup && <span className="font-light text-sm">{`Created: ${formatDate(current['created'] as string)} by ${current['createdBy']}`}</span>}
         </div>
-        <span className={`
-          w-fit h-fit px-2 py-1
-          border-0 rounded-lg
-          flex justify-center
-          font-sans font-bold text-xs
-          text-nowrap
-          ${backup ? "bg-[#2380C2]" : "bg-destructive"}
-          `}>
+        <span className={`diff-tag ${backup ? "bg-[#2380C2]" : "bg-destructive"}`}>
           <>{backup ? "CHANGED" : "NO BACKUP"}</>
         </span>
       </div>
@@ -124,7 +109,9 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys, 
             setSelection={(id: string, value: ChangeToAdopt) => {
               setSelection(value)
               setChanges(id, value)
-            }} />
+            }}
+            isLight={isLight}
+          />
           <DocumentDiff
             document={backup}
             keys={cleanedKeys}
@@ -132,13 +119,15 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys, 
             setSelection={(id: string, value: ChangeToAdopt) => {
               setSelection(value)
               setChanges(id, value)
-            }} />
+            }}
+            isLight={isLight}
+          />
           </>}
         {(!backup && keys) &&
           <>
-            <div className="flex flex-col gap-y-0">
-              <div className="p-2 bg-[#6d6c6c] border-0 rounded-t font-semibold">In Database (Not Found In Backup)</div>
-              <div className="flex flex-col gap-x-2 p-2 bg-[#141d1f] border-0 rounded-b font-mono">
+            <div className={`doc-info ${isLight}`}>
+              <div className="source new">In Database (Not Found In Backup)</div>
+              <div className={`fields ${isLight}`}>
                 <ul>
                   {keys.map((key: string) => {
                     return (<li className="list-none" key={current._id+'.'+key}><span>{`${key}: ${current[key]}`}</span></li>)
@@ -154,11 +143,11 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys, 
   )
 }
 
-const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collection, className, setChanges }) => {
+const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collection, className, setChanges, isLight }) => {
   const { current, backup } = collection;
   return (
-    <div className={`flex flex-col gap-y-6  ${className}`}>
-      <ul>
+    <div className={`${className}`}>
+      <ul className="flex flex-col gap-y-6">
       {
         current.map((docInCurrent: MongoResult) => {
           const backupIndex: number = backup.findIndex((docInBackup: MongoResult) => docInCurrent._id === docInBackup._id)
@@ -183,6 +172,7 @@ const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collectio
                   current={docInCurrent}
                   keys={keys}
                   setChanges={() => setChanges}
+                  isLight={isLight}
                 /> :
                 <CollectionDiff
                   current={docInCurrent}
@@ -191,6 +181,7 @@ const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collectio
                   setChanges={(id: string, change: ChangeToAdopt) => {
                     setChanges(id, change)
                   }}
+                  isLight={isLight}
                 />
               }
             </li>
@@ -202,7 +193,7 @@ const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collectio
   )
 }
 
-export const BackupDiffDisplay: React.FC<BackupDiffDisplayProps> = ({ values, changes, setChanges }) => {
+export const BackupDiffDisplay: React.FC<BackupDiffDisplayProps> = ({ values, changes, setChanges, isLight }) => {
   const givenValues: ValidationResult['values'] = values!!
   const affectedCollections: string[] = Object.keys(givenValues);
 
@@ -213,21 +204,14 @@ export const BackupDiffDisplay: React.FC<BackupDiffDisplayProps> = ({ values, ch
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="diffs">
       <div className="flex gap-x-2">
         {affectedCollections.map((key: string) => {
           return (
             <li className="list-none" key={key}>
               <div
-                className={`
-                  flex justify-center px-4 py-1
-                  hover:text-primary
-                  ${currentTab === key ?
-                  'text-primary font-bold' :
-                  ''
-                  } cursor-pointer
-                  transition-colors duration-300 ease-in-out`}
-                  onClick={() => setCurrentTab(key)}
+                className={`tab ${currentTab === key ? 'text-primary font-bold' : ''}`}
+                onClick={() => setCurrentTab(key)}
               >
                 <span>{key}</span>
               </div>
@@ -235,7 +219,7 @@ export const BackupDiffDisplay: React.FC<BackupDiffDisplayProps> = ({ values, ch
           )
         })}
       </div>
-      <div className="w-full h-96 border-0 bg-[#141d1f] py-2 overflow-auto">
+      <div className={`w-full h-96 border-0 py-2 overflow-auto`}>
         <ul>
           {
             affectedCollections.map((collection: string) => {
@@ -248,6 +232,7 @@ export const BackupDiffDisplay: React.FC<BackupDiffDisplayProps> = ({ values, ch
                       setChangeToAdopt(collection, id, string)
                       setChanges(changes)
                     }}
+                    isLight={isLight}
                   />
                 </li>
               )

@@ -17,6 +17,7 @@ import { Warning } from '@phosphor-icons/react';
 import { MongoResult } from '@/types/backup';
 import { importBackupFile } from '@/ims-service';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useTheme } from "@/hooks/useTheme";
 
 interface BackupValidationModalProps {
   result: ValidationResult,
@@ -25,6 +26,7 @@ interface BackupValidationModalProps {
 
 export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ result, validationComplete }) => { 
   const { showToast } = useAppContext();
+  const { theme } = useTheme();
   const [open, setOpen] = useState<boolean>(false);
   const collectionChanges: CollectionChanges = {}
   
@@ -146,7 +148,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
           </DialogHeader>
           {!finished && <>{!result.values ?
             <>No conflicts with the database.</> :
-            <BackupDiffDisplay values={result.values} changes={changes} setChanges={(change: CollectionChanges) => {
+            <BackupDiffDisplay isLight={theme} values={result.values} changes={changes} setChanges={(change: CollectionChanges) => {
               setChanges(change)
               setReadAll(checkSelectedChanges())
             }} />

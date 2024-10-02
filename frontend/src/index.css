@@ -160,3 +160,116 @@ html {
   height: 100%;
   background-size: 150px;
 }
+
+/* CSS for System Backup */
+@layer components {
+  .diffs {
+    @apply flex flex-col;
+  }
+
+  .diffs > .light {
+    @apply bg-card;
+  }
+
+  .diffs > .dark {
+    @apply bg-[#141d1f];
+  }
+  
+  .doc {
+    @apply border-0 rounded p-2 flex flex-col gap-y-3 drop-shadow-lg;
+  }
+
+  .tab {
+    @apply flex justify-center px-4 py-1 hover:text-primary cursor-pointer transition-colors duration-300 ease-in-out;
+  }
+
+  .doc .diff-tag {
+    @apply w-fit h-fit px-2 py-1 border-0 rounded-lg flex justify-center font-sans font-bold text-xs text-nowrap text-white;
+  }
+
+  .doc .doc-info {
+    @apply flex flex-col gap-y-0;
+  }
+
+  .doc.light {
+    @apply border border-[#dde1e3];
+  }
+
+  .doc.dark {
+    @apply bg-[#334043];
+  }
+
+  .doc .doc-info.selected {
+    @apply border border-[#4C96A7] rounded; 
+    box-shadow: 0px 0px 1px 2px rgba(81, 195, 221, 0.25);
+
+  }
+
+  .doc-info .source {
+    @apply p-2 border-0 rounded-t font-semibold;
+  }
+
+  .doc-info .source.new {
+    @apply bg-[#6d6c6c];
+  }
+
+  .doc-info .source.changed {
+    @apply flex gap-x-2 items-center cursor-pointer;
+  }
+
+  .doc-info .source.changed.current {
+    @apply bg-[#cd7169];
+  }
+
+  .doc-info .source.changed.backup {
+    @apply bg-[#549a59];
+  }
+
+  .source.changed .radio {
+    @apply h-5 w-5 border-2 rounded-full bg-white flex justify-center items-center;
+  }
+
+  .source.changed .selected {
+    @apply border-[#5e5454];
+  }
+
+  .radio.selected > div {
+    @apply h-[10px] w-[10px] border-0 rounded-full border-[#5e5454] bg-[#5e5454];
+  }
+
+  .source.changed .unselected {
+    @apply border-[#bbbbbb];
+  }
+
+  .doc-info .fields {
+    @apply flex flex-col gap-x-2 p-2 border-0 rounded-b font-mono;
+  }
+
+  .doc-info .fields.light {
+    @apply border border-[#dde1e3] bg-card;
+  }
+
+  .doc-info .fields.dark {
+    @apply border-0 bg-[#141d1f];
+  }
+
+  .doc-info.details.radio {
+    @apply h-5 w-5 border-2 rounded-full bg-white flex justify-center items-center;
+  }
+
+  .doc-info.details.radio.selected {
+    @apply border-[#5e5454];
+  }
+
+  .doc-info.details.radio.selected .selected-inner {
+    @apply h-[10px] w-[10px] border-0 rounded-full border-[#5e5454] bg-[#5e5454]
+  }
+
+  .doc-info.details.radio.unselected {
+    @apply border-[#bbbbbb];
+  }
+
+  .doc-info.fields {
+    @apply flex flex-col gap-x-2 p-2 rounded-b font-mono;
+  }
+}
