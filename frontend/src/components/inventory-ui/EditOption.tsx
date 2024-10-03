@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '../Spinner';
+import TagSelect from './TagSelect';
 import ColorSelect from './ColorSelect';
 import DeletePropertyDialog from './DeletePropertyDialog';
 import { OptionType } from '@/types/options';
@@ -27,6 +28,7 @@ interface EditOptionProps {
 const EditOption = ({
   option,
   property,
+  tagSelect,
   colorSelect,
   onCancel,
   onDelete,
@@ -40,6 +42,7 @@ const EditOption = ({
     newOption: editedOption,
     setNewOption: setEditedOption,
     handleColorSelect,
+    handleTagSelect,
     getOptionValue,
   } = useOption(option);
 
@@ -89,6 +92,13 @@ const EditOption = ({
       {colorSelect && (
         <ColorSelect
           onColorSelect={handleColorSelect}
+          property={property}
+          option={optionToEdit as string}
+        />
+      )}
+      {tagSelect && (
+        <TagSelect
+          onTagSelect={handleTagSelect}
           property={property}
           option={optionToEdit as string}
         />
