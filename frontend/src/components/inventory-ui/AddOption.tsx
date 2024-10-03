@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '../Spinner';
-import TagSelect from './TagSelect';
 import ColorSelect from './ColorSelect';
 import { OptionType } from '@/types/options';
 import useOption from './useOptions';
@@ -27,7 +26,6 @@ interface AddOptionProps {
 const AddOption = ({
   defaultOption,
   property,
-  tagSelect,
   colorSelect,
   onCancel,
   onSave,
@@ -40,7 +38,6 @@ const AddOption = ({
     newOption,
     setNewOption,
     handleColorSelect,
-    handleTagSelect,
     getOptionValue,
   } = useOption(defaultOption);
 
@@ -124,9 +121,6 @@ const AddOption = ({
       )}
       {colorSelect && (
         <ColorSelect onColorSelect={handleColorSelect} reset={isCreating} />
-      )}
-      {tagSelect && (
-        <TagSelect onTagSelect={handleTagSelect} reset={isCreating} />
       )}
       <Separator className='my-1' />
       <Button
