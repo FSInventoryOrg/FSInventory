@@ -23,7 +23,8 @@ const InventorySettingsForm = ({ defaults }: { defaults: Defaults }) => {
     resolver: zodResolver(InventorySettingsSchema),
     defaultValues: {
       status: defaults.status,
-      category: defaults.category,
+      softwareCategory: defaults.softwareCategory,
+      hardwareCategory: defaults.hardwareCategory,
       equipmentType: defaults.equipmentType,
       deployableStatus: defaults.deployableStatus ?? 'Deployed',
       retrievableStatus: defaults.retrievableStatus ?? ['IT Storage'],

@@ -24,12 +24,24 @@ const SelectOptionsForm = () => {
         </div>
       </div>
       <div className="pb-2 flex flex-col gap-3 my-2">
-        <Label className="font-medium">Category</Label>
+        <Label className="font-medium">Hardware Category</Label>
         <div className="md:w-2/3">
           <EditOptions
             tagSelect={true}
             property="category"
             className="w-full"
+            type='Hardware'
+          />
+        </div>
+      </div>
+      <div className="pb-2 flex flex-col gap-3 my-2">
+        <Label className="font-medium">Software Category</Label>
+        <div className="md:w-2/3">
+          <EditOptions
+            tagSelect={true}
+            property="category"
+            className="w-full"
+            type='Software'
           />
         </div>
       </div>

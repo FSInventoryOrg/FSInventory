@@ -59,6 +59,7 @@ const EditAsset = ({ assetData, defaultValues, onClose }: EditAssetProps) => {
       assignee: assetData.assignee,
       category: assetData.category,
       remarks: assetData.remarks,
+      notifyRemarks: assetData.notifyRemarks,
       purchaseDate: assetData.purchaseDate ? new Date(assetData.purchaseDate) : undefined,
       status: assetData.status,
       /* Hardware */

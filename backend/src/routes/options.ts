@@ -149,7 +149,8 @@ router.post('/:property', [
  */
 router.put('/defaults', [
     check("status").optional().isString(),
-    check("category").optional().isString(),
+    check("softwareCategory").optional().isString(),
+    check("hardwareCategory").optional().isString(),
     check("equipmentType").optional().isString(),
     check("deployableStatus").isArray(),
     check("retrievableStatus").optional().isString(),
@@ -178,13 +179,16 @@ router.put('/defaults', [
         option.defaults = {};
       }
 
-      const { status, category, equipmentType, deployableStatus, retrievableStatus, inventoryColumns } = req.body
+      const { status, softwareCategory, hardwareCategory, equipmentType, deployableStatus, retrievableStatus, inventoryColumns } = req.body
 
       if (status !== undefined) {
         option.defaults.status = status;
       }
-      if (category !== undefined) {
-        option.defaults.category = category;
+      if (softwareCategory !== undefined) {
+        option.defaults.softwareCategory = softwareCategory;
+      }
+      if (hardwareCategory !== undefined) {
+        option.defaults.hardwareCategory = hardwareCategory;
       }
       if (equipmentType !== undefined) {
         option.defaults.equipmentType = equipmentType;

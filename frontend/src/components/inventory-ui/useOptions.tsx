@@ -1,5 +1,4 @@
-import { ColorOption, OptionType } from '@/types/options';
-import { TagOption } from './EditOptions';
+import { ColorOption, OptionType, TagOption } from '@/types/options';
 import { useState } from 'react';
 
 const useOption = (option: OptionType) => {
