@@ -80,7 +80,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
       showToast({ message: 'Loading of system backup file successful.', type: 'SUCCESS' })
       setFinished(true);
     } catch (err) {
-      showToast({message: 'Something went wrong', type: 'SUCCESS'})
+      showToast({message: 'Something went wrong', type: 'ERROR'})
       throw err;
     }
   }
