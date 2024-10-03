@@ -2,6 +2,10 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.16.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000745289) 2024-10-03
+### Removed
+- Removed "+" button in the forms for adding and editing a Category; IT say it's no longer needed
+
 ## [2.15.1](https://connect.zoho.com/portal/intranet/task/623367000000698093)  2024-09-19
 ### Fixed 
 - Asset recovery with missing deployment details
@@ -33,11 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Indicator if an asset has remarks
 - Toggle in Add/Edit Asset form to disable the indicator
-
-
-## [2.14.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000745289)
-### Removed
-- Removed "+" button in the forms for adding and editing a Category; IT say it's no longer needed
 
 ## [2.13.3](https://connect.zoho.com/portal/intranet/task/623367000000281173/623367000000745247) 2024-09-27
 ### Fixed
