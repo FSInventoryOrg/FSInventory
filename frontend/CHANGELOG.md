@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Frontend UI and workflow for loading system backup files
 
+## [2.16.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000745289) 2024-10-03
+### Removed
+- Removed "+" button in the forms for adding and editing a Category; IT say it's no longer needed
+
 ## [2.15.1](https://connect.zoho.com/portal/intranet/task/623367000000698093)  2024-09-19
 ### Fixed 
 - Asset recovery with missing deployment details

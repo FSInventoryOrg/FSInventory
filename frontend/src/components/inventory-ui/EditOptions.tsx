@@ -29,7 +29,6 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '../Spinner';
 import TrashCan from '../graphics/TrashCan'
-import TagSelect from './TagSelect'
 import ColorSelect from './ColorSelect'
 import { ColorOption, OptionType, TagOption } from '@/types/options'
 
@@ -56,7 +55,7 @@ function format(str: string): string {
   return str.split(/(?=[A-Z])/).map(part => part.toLowerCase()).join(' ');
 }
 
-const EditOptions = ({ property, colorSelect=false, tagSelect=false, type, className }: OptionsProps) => {
+const EditOptions = ({ property, colorSelect=false, type, className }: OptionsProps) => {
   const [open, setOpen] = React.useState(false)
   const { showToast } = useAppContext();
   const [newOption, setNewOption] = React.useState<OptionType>({ property: property, value: '' });
@@ -82,21 +81,6 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, type, class
     }
     return '';
   };
-
-  const handleTagSelect = (tags: string[]) => {
-    if (newOption) {
-      if (typeof newOption.value === 'string') {
-        const newTagOption: TagOption = {
-          value: newOption.value,
-          properties: tags
-        };
-        setNewOption({ ...newOption, value: newTagOption });
-      } else if (typeof newOption.value === 'object' && 'value' in newOption.value) {
-        const newValue = { ...newOption.value, properties: tags };
-        setNewOption({ ...newOption, value: newValue });
-      }
-    }
-  };  
   
   const handleColorSelect = (color: string) => {
     if (newOption) {
@@ -374,7 +358,6 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, type, class
               />
             </> : <></>}
           {colorSelect && <ColorSelect onColorSelect={handleColorSelect} reset={isEditing || isCreating} />}
-          {tagSelect && <TagSelect onTagSelect={handleTagSelect} reset={isEditing || isCreating} />}
           <Separator className='my-1' />
           <Button 
             className='gap-2'
@@ -427,7 +410,6 @@ const EditOptions = ({ property, colorSelect=false, tagSelect=false, type, class
             }}
           />
           {colorSelect && <ColorSelect onColorSelect={handleColorSelect} property={property} option={optionToEdit} />}
-          {tagSelect && <TagSelect onTagSelect={handleTagSelect} property={property} option={optionToEdit} />}
           <Separator className='my-1' />
           <div className='flex justify-between'>
             <Button 
