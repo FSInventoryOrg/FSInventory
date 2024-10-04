@@ -862,7 +862,6 @@ export const sendAutoMailNow = async () => {
 /* BACKUP FILE IMPORT/EXPORT */
 export const validateBackupFile = async (fileAsBase64: { src: string }) => {
   try {
-    if (!fileAsBase64.src.includes('application/zip')) throw new Error('Invalid file.');
     const response = await fetch(`${API_BASE_URL}/backup/validate`, {
       method: 'POST',
       credentials: 'include',
