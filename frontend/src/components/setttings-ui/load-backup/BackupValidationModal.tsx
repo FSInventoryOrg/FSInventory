@@ -69,9 +69,9 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
       requestBody[collection] = []
       for (const document in changes[collection]) {
         if (changes[collection][document] === 'backup') {
-          requestBody[collection].push(result.values!![collection].backup.find((res: MongoResult) => res._id === document)!!)
+          requestBody[collection].push(result.values![collection].backup.find((res: MongoResult) => res._id === document)!)
         } else if (changes[collection][document] === 'current') {
-          requestBody[collection].push(result.values!![collection].current.find((res: MongoResult) => res._id === document)!!)
+          requestBody[collection].push(result.values[collection].current.find((res: MongoResult) => res._id === document)!)
         }
       }
     }
@@ -89,7 +89,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
 
   useEffect(() => {
     if(validationComplete) {
-      for (const collection in result.values!!) {
+      for (const collection in result.values!) {
         collectionChanges[collection] = {}
         for (const document of result.values[collection].backup) {
           collectionChanges[collection][document._id] = ''

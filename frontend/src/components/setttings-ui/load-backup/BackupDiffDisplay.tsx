@@ -194,7 +194,7 @@ const CollectionDiffDisplay: React.FC<CollectionDiffDisplayProps> = ({ collectio
 }
 
 export const BackupDiffDisplay: React.FC<BackupDiffDisplayProps> = ({ values, changes, setChanges, isLight }) => {
-  const givenValues: ValidationResult['values'] = values!!
+  const givenValues: ValidationResult['values'] = values!
   const affectedCollections: string[] = Object.keys(givenValues);
 
   const [currentTab, setCurrentTab] = useState<string>(affectedCollections[0]);
