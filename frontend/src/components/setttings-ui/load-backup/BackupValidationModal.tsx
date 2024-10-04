@@ -71,7 +71,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
         if (changes[collection][document] === 'backup') {
           requestBody[collection].push(result.values![collection].backup.find((res: MongoResult) => res._id === document)!)
         } else if (changes[collection][document] === 'current') {
-          requestBody[collection].push(result.values[collection].current.find((res: MongoResult) => res._id === document)!)
+          requestBody[collection].push(result.values![collection].current.find((res: MongoResult) => res._id === document)!)
         }
       }
     }
