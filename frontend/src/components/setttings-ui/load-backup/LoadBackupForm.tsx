@@ -36,7 +36,7 @@ const SystemBackup = () => {
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64String = reader.result as string;
-        const plainText = base64String!!.split(',')[1]
+        const plainText = base64String.split(',')[1]
         const backendExpected = "data:application/zip;base64," + plainText
         const payload = {
           src: backendExpected,
