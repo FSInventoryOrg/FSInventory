@@ -90,7 +90,7 @@ const CollectionDiff: React.FC<CollectionDiffProps> = ({ current, backup, keys, 
         </span>
         <div className="w-full flex flex-col gap-y-[2px]">
           <span>{`Document ID: ${current._id}`}</span>
-          {backup && <span className="font-light text-sm">{`Updated: ${formatDate(current['updated'] as string)} by ${current['updatedBy']}`}</span>}
+          {backup && backup['updated'] && <span className="font-light text-sm">{`Updated: ${formatDate(current['updated'] as string)} by ${current['updatedBy']}`}</span>}
           {!backup && <span className="font-light text-sm">{`Created: ${formatDate(current['created'] as string)} by ${current['createdBy']}`}</span>}
         </div>
         <span className={`diff-tag ${backup ? "bg-[#2380C2]" : "bg-destructive"}`}>
