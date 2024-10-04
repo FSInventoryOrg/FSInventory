@@ -32,7 +32,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
   const collectionChanges: CollectionChanges = {}
   
   const [changes, setChanges] = useState<CollectionChanges>({})
-  const [readAll, setReadAll] = useState<boolean>(result.values ? false : true)
+  const [readAll, setReadAll] = useState<boolean>(!result.values)
   const [importing, setImporting] = useState<boolean>(false);
   const [finished, setFinished] = useState<boolean>(false);
 
@@ -49,9 +49,11 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
   const close = () => {
     setReadAll(false)
     setImporting(false)
+    if (finished) {
+      onComplete()
+    }
     setFinished(false)
     resetChanges()
-    onComplete()
     setOpen(false)
   }
 
@@ -115,9 +117,14 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
     if (!open) {
       setReadAll(false)
       setImporting(false)
+      if (finished) {
+        onComplete()
+      }
       setFinished(false)
-      onComplete()
       resetChanges()
+    }
+    if (open) {
+      setReadAll(!result.values)
     }
   }, [open])
 
