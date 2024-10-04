@@ -21,10 +21,11 @@ import { useTheme } from "@/hooks/useTheme";
 
 interface BackupValidationModalProps {
   result: ValidationResult,
-  validationComplete: boolean | null
+  validationComplete: boolean | null,
+  onComplete: () => void
 }
 
-export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ result, validationComplete }) => { 
+export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ result, validationComplete, onComplete }) => { 
   const { showToast } = useAppContext();
   const { theme } = useTheme();
   const [open, setOpen] = useState<boolean>(false);
@@ -50,6 +51,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
     setImporting(false)
     setFinished(false)
     resetChanges()
+    onComplete()
     setOpen(false)
   }
 
@@ -114,6 +116,7 @@ export const BackupValidationModal: React.FC<BackupValidationModalProps> = ({ re
       setReadAll(false)
       setImporting(false)
       setFinished(false)
+      onComplete()
       resetChanges()
     }
   }, [open])

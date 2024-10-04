@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Form,
@@ -57,6 +57,13 @@ const SystemBackup = () => {
     }
   }
 
+  useEffect(() => {
+    if (!uploadedFile) {
+      setValidationResult({ message: '' });
+      setValidationComplete(null);
+    };
+  }, [uploadedFile])
+
   return (
     <div className="flex flex-col md:w-5/6 max-w-4xl">
       <div className="pb-2">
@@ -90,7 +97,7 @@ const SystemBackup = () => {
           />
           <Separator className="my-4" />
           <div className="flex flex-row justify-end gap-4">
-            <BackupValidationModal result={validationResult} validationComplete={validationComplete} />
+            <BackupValidationModal result={validationResult} validationComplete={validationComplete} onComplete={() => {setUploadedFile(undefined)}} />
           </div>
         </form>
       </Form>
