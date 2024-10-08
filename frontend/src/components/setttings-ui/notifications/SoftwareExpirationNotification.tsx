@@ -8,7 +8,7 @@ const SoftwareExpirationNotification = () => {
         Set how many days before a software asset expires to receive a
         notification.
       </h3>
-      {/* <SoftwareExpirationNotificationForm/> */}
+      <SoftwareExpirationNotificationForm/>
     </div>
   );
 };

@@ -857,3 +857,8 @@ export const sendAutoMailNow = async () => {
 
   return response.json();
 };
+
+
+export const updateSoftwareNotif = async (val: string) => {
+  return val
+}
