@@ -33,6 +33,7 @@ import { EmployeeSuggestiveInput } from './DeployAsset';
 import WarningAlert from '../WarningAlert';
 import { Defaults } from '@/types/options';
 import { Box } from '../ui/box';
+import { Checkbox } from '../ui/checkbox';
 
 interface MiscellaneousFormProps {
   defaults?: Defaults;
@@ -48,6 +49,7 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
   const [openRecoveryDate, setOpenRecoveryDate] = useState(false);
   const status = watch('status');
   const type = watch('type');
+  const remarks = watch('remarks')
   const isRetrievable = status && status === defaults?.retrievableStatus;
 
   useEffect(() => {
@@ -243,25 +245,45 @@ const MiscellaneousForm: React.FC<MiscellaneousFormProps> = ({
           )}
         />
       </div>
-      <FormField
-        control={control}
-        name='remarks'
-        render={({ field }) => (
-          <FormItem className='w-full mt-2'>
-            <FormLabel className='text-md text-secondary-foreground'>
-              Remarks
-            </FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder='Add your remarks here.'
-                autoComplete='off'
-                {...field}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <div className='relative'>
+        <FormField
+          control={control}
+          name='remarks'
+          render={({ field }) => (
+            <FormItem className='w-full mt-2'>
+              <FormLabel className='text-md text-secondary-foreground'>
+                Remarks
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder='Add your remarks here.'
+                  autoComplete='off'
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        { remarks && <FormField
+          control={control}
+          name="notifyRemarks"
+          render={({ field }) => (
+            <FormItem className="absolute top-1 left-40 flex items-center gap-2">
+              <FormLabel className="mt-2 text-sm text-muted-foreground">
+                Show indicator
+              </FormLabel>
+              <FormControl>
+                <Checkbox
+                  checked={field.value !== false}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />}
+      </div>
     </div>
   );
 };
