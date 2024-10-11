@@ -22,13 +22,6 @@ module.exports = {
         "mobile-lg": "640px"
       },
     },
-    screens: {
-      "3xl": "1536px",
-      "2xl": "1400px",
-      "tablet": "1024px",
-      "mobile-sm": "320px",
-      "mobile-lg": "640px"
-    },
     fontFamily: {
       poppins: ["Poppins", "sans-serif"]
     },
@@ -113,7 +106,14 @@ module.exports = {
       },
       backgroundImage: {
         'login-bg': "linear-gradient(164.19deg, rgba(36, 67, 66, 0.4) 11.03%, #244342 88.77%), url('/src/assets/laptop-background.jpg')"
-      }
+      },
+      screens: {
+        "3xl": "1536px",
+        "2xl": "1400px",
+        "tablet": "1024px",
+        "mobile-sm": "320px",
+        "mobile-lg": "640px"
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
