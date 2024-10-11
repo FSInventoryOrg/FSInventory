@@ -3,11 +3,16 @@ import { Button } from '../ui/button';
 import { Select, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
-import { FileInput } from '../ui/file-input';
-import { SelectContent, SelectGroup } from '@radix-ui/react-select';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { format } from 'date-fns';
+import { Calendar } from '../ui/calendar';
+import { CalendarIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const RequestForm = () => {
   const [requestType, setRequestType] = useState('');
+  const [openRequestedDate, setOpenRequestedDate] = useState(false);
+  const [requestedDate, setRequestedDate] = useState<Date | undefined>();
   function handleSubmit(
     onSubmit: any
   ): FormEventHandler<HTMLFormElement> | undefined {
@@ -159,6 +164,38 @@ const RequestForm = () => {
                     <Datepicker {...field} placeholder="Specify a date by which you need the asset, if applicable" />
                   )}
                 /> */}
+                <Popover
+                  open={openRequestedDate}
+                  onOpenChange={setOpenRequestedDate}
+                >
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={'outline'}
+                      className={cn(
+                        'w-full pl-3 text-left font-normal',
+                        !requestedDate && 'text-muted-foreground'
+                      )}
+                    >
+                      {requestedDate ? (
+                        format(requestedDate, 'PPP')
+                      ) : (
+                        <span>
+                          Specify a date by which you need the asset, if
+                          applicable.
+                        </span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      onSelect={setRequestedDate}
+                      onDayClick={() => setOpenRequestedDate(false)}
+                      disabled={(date) => date < new Date('1900-01-01')}
+                    />
+                  </PopoverContent>
+                </Popover>
             </div>
           </>
         )}
