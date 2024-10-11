@@ -134,7 +134,13 @@ router.post("/", [
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
 
       if (decodedToken.role !== "ADMIN") {
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
@@ -201,7 +207,13 @@ router.put("/history/:code",
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
 
       if (decodedToken.role !== "ADMIN") {
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
@@ -255,7 +267,13 @@ router.put("/:code", [
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
 
       if (decodedToken.role !== "ADMIN") {
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
@@ -334,7 +352,13 @@ router.put("/:code", [
 router.delete("/:code", verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
-    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
+    });
 
     if (decodedToken.role !== "ADMIN") {
       return res.status(403).json({ message: "Only users with admin role can perform this action" });

@@ -11,7 +11,13 @@ const router = express.Router();
 const processUpload = async (req: Request, res: Response, folder: string) => {
     try {
         const token = req.cookies.auth_token;
-        const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        });
         const currentUser: any = await User.findOne({ _id: decodedToken.userId });
 
         const {src, filename } = req.body;

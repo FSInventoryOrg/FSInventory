@@ -62,7 +62,13 @@ router.post("/register", [
 router.get("/", verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
-    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+    });
     const userId = decodedToken.userId;
 
     const user: UserType | null = await User.findById(userId, { password: false });
@@ -81,7 +87,13 @@ router.get("/", verifyToken, async (req: Request, res: Response) => {
 
 router.put("/", verifyToken, async (req: Request, res: Response) => {
   const token = req.cookies.auth_token;
-  const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+  const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+    });
   const userId = decodedToken.userId;
   const updatedUser: UserType = req.body;
 
@@ -187,7 +199,13 @@ router.patch('/resetPassword', async(req: Request, res: Response) => {
 router.patch('/changePassword', verifyToken, async(req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
-    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+    });
     const userId = decodedToken.userId;
 
     const { currentPassword, newPassword } = req.body;

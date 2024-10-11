@@ -9,7 +9,13 @@ const router = express.Router();
 router.get('/', verifyToken, async (req: Request, res: Response) => {
     try {
         const token = req.cookies.auth_token;
-        const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        });
         
         const notifications: any = await Notification.aggregate().match({
             $expr: {
@@ -53,7 +59,13 @@ router.get('/', verifyToken, async (req: Request, res: Response) => {
 router.patch('/', verifyToken, async (req: Request, res: Response) => {
     try {
         const token = req.cookies.auth_token;
-        const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        });
         
         const requestBody = req.body;
 
