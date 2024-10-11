@@ -1,6 +1,13 @@
 import { FormEventHandler, useState } from 'react';
 import { Button } from '../ui/button';
-import { Select, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup,
+} from '@/components/ui/select';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { FileUploader } from '../ui/file-uploader';
@@ -9,8 +16,12 @@ import { format } from 'date-fns';
 import { Calendar } from '../ui/calendar';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useMutation } from '@tanstack/react-query';
+import { useAppContext } from '@/hooks/useAppContext';
+import * as imsService from "@/ims-service";
 
 const RequestForm = () => {
+    const { showToast } = useAppContext();
   const [requestType, setRequestType] = useState('');
   const [uploadedFile, setUploadedFile] = useState<File | undefined>();
   const [openRequestedDate, setOpenRequestedDate] = useState(false);
@@ -20,16 +31,26 @@ const RequestForm = () => {
   ): FormEventHandler<HTMLFormElement> | undefined {
     throw new Error('Function not implemented.');
   }
+  const { mutate } = useMutation({
+    mutationFn: imsService.submitRequestForm,
+    onSuccess: async () => {
+      showToast({ message: "Thank you for your request! Your request has been submitted, and you will receive a confirmation email with a tracking number shortly.", type: "SUCCESS" });
+    },
+  });
+
   const handleFile = (file: File | undefined) => {
     setUploadedFile(file);
   };
 
   return (
-    <div className="container">
-      <form className="space-y-6">
+    <div className="container mb-20">
+      <div className="flex w-7/12  mx-auto">
+        <form onSubmit={(e)=> {e.preventDefault();mutate()}} className="space-y-6 w-full ">
         {/* Request Type Selection */}
         <div className="form-group">
-          <label className="block text-sm font-medium">Request Type</label>
+            <label className="block text-sm font-medium pb-2">
+              Request Type
+            </label>
           <Select onValueChange={setRequestType}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select Request Type" />
@@ -37,7 +58,9 @@ const RequestForm = () => {
 
             <SelectContent>
               <SelectGroup>
-                <SelectItem value="Report an Issue">Report an Issue</SelectItem>
+                  <SelectItem value="Report an Issue">
+                    Report an Issue
+                  </SelectItem>
                 <SelectItem value="Request a New Asset">
                   Request a New Asset
                 </SelectItem>
@@ -49,19 +72,21 @@ const RequestForm = () => {
 
         {/* Common Fields Section */}
         <div className="form-group">
-          <label className="block text-sm font-medium">Full Name</label>
+            {/* autopopulate if logged in */}
+            <label className="block text-sm font-medium pb-2">Full Name</label>
           <Input placeholder="John Doe" />
           {/* {errors.fullName && <p className="text-red-500">{errors.fullName.message}</p>} */}
         </div>
 
         <div className="form-group">
-          <label className="block text-sm font-medium">Manager</label>
-          <Input placeholder="Manager" />
+            {/* autopopulate if logged in */}
+            <label className="block text-sm font-medium pb-2">Manager</label>
+            <Input />
           {/* {errors.manager && <p className="text-red-500">{errors.manager.message}</p>} */}
         </div>
 
         <div className="form-group">
-          <label className="block text-sm font-medium">
+            <label className="block text-sm font-medium pb-2">
             Contact Information
           </label>
           <Input placeholder="johndoe@fullscale.ph or +63 912 345 6789" />
@@ -72,7 +97,7 @@ const RequestForm = () => {
         {requestType === 'Report an Issue' && (
           <>
             <div className="form-group">
-              <label className="block text-sm font-medium">
+                <label className="block text-sm font-medium pb-2">
                 Issue Category
               </label>
               <Select>
@@ -87,7 +112,9 @@ const RequestForm = () => {
                     <SelectItem value="Software Issue">
                       Software Issue
                     </SelectItem>
-                    <SelectItem value="Network Issue">Network Issue</SelectItem>
+                      <SelectItem value="Network Issue">
+                        Network Issue
+                      </SelectItem>
                     <SelectItem value="Email or Communication Issues">
                       Email or Communication Issues
                     </SelectItem>
@@ -101,14 +128,14 @@ const RequestForm = () => {
             </div>
 
             <div className="form-group">
-              <label className="block text-sm font-medium">
+                <label className="block text-sm font-medium pb-2">
                 Asset Affected
               </label>
               <Input placeholder="Enter serial number, device ID, or select from a list of company assets" />
             </div>
 
             <div className="form-group">
-              <label className="block text-sm font-medium">
+                <label className="block text-sm font-medium pb-2">
                 Detailed Description of the Problem
               </label>
               <Textarea placeholder="Provide a detailed explanation of the issue, including any steps taken before the issue occurred" />
@@ -116,7 +143,7 @@ const RequestForm = () => {
             </div>
 
             <div className="form-group">
-              <label className="block text-sm font-medium">
+                <label className="block text-sm font-medium pb-2">
                 Upload Supporting Files
               </label>
                 <FileUploader
@@ -134,10 +161,18 @@ const RequestForm = () => {
             <div className="form-group">
               <label className="block text-sm font-medium">Asset Type</label>
               <Select>
-                <option value="">Select Asset Type</option>
-                <option value="Hardware">Hardware</option>
-                <option value="Software">Software</option>
-                <option value="Network Equipment">Network Equipment</option>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select Asset Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="Hardware Issue">Hardware</SelectItem>
+                      <SelectItem value="Software Issue">Software</SelectItem>
+                      <SelectItem value="Network Issue">
+                        Network Equipment
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
               </Select>
               {/* {errors.assetType && <p className="text-red-500">{errors.assetType.message}</p>} */}
             </div>
@@ -209,6 +244,7 @@ const RequestForm = () => {
           <Button type="submit">Submit Request</Button>
         </div>
       </form>
+      </div>
     </div>
   );
 };

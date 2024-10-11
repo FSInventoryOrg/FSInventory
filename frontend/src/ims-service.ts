@@ -893,3 +893,8 @@ export const importBackupFile = async (changes: { [index: string]: MongoResult[]
     throw err;
   }
 }
+
+
+export const submitRequestForm = async() => {
+  return true
+}
