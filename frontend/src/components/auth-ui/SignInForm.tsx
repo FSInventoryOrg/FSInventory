@@ -82,7 +82,7 @@ const SignInForm = ({ onError }: SignInFormProps) => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className={`flex gap-2 text-md items-center font-normal ${darkMode ? 'text-white' : ''}`}>Email Address</FormLabel>
+              <FormLabel className={`flex gap-2 text-md items-center font-normal dark:text-white`}>Email Address</FormLabel>
               <FormControl>
                 <Input placeholder="Enter email address" {...field} autoComplete="off" />
               </FormControl>
@@ -95,7 +95,7 @@ const SignInForm = ({ onError }: SignInFormProps) => {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className={`flex gap-2 text-md items-center font-normal ${darkMode ? 'text-white' : ''}`}>
+              <FormLabel className={`flex gap-2 text-md items-center font-normal dark:text-white`}>
                 Password
               </FormLabel>
               <div className='flex items-center relative'>

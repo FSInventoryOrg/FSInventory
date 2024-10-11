@@ -15,8 +15,19 @@ module.exports = {
       center: true,
       padding: "2rem",
       screens: {
+        "3xl": "1536px",
         "2xl": "1400px",
+        "tablet": "1024px",
+        "mobile-sm": "320px",
+        "mobile-lg": "640px"
       },
+    },
+    screens: {
+      "3xl": "1536px",
+      "2xl": "1400px",
+      "tablet": "1024px",
+      "mobile-sm": "320px",
+      "mobile-lg": "640px"
     },
     fontFamily: {
       poppins: ["Poppins", "sans-serif"]

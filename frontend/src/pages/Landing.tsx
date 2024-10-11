@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster'
 const Landing = () => {
   return (
     <div className='flex min-h-screen justify-center items-center'>
-      <AppearanceMode />
+      {/* <AppearanceMode /> */}
       <LoginScreen />
       <Toaster />
     </div>
