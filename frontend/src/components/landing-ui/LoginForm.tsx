@@ -1,10 +1,7 @@
-import { useContext, useState } from "react";
 import { FullScaleITIcon } from "../icons/FullScaleITIcon"
 import SignInForm from "@/components/auth-ui/SignInForm";
-import { ThemeProviderContext } from "../ThemeProvider";
 
 const LoginForm = () => {
-  const darkMode: boolean = useContext(ThemeProviderContext).theme === 'dark'
 
   return (
     <div className={`flex flex-col gap-8 font-poppins text-body dark:text-muted-new`}>

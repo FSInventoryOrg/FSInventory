@@ -1,9 +1,6 @@
-import { useContext } from "react"
-import { ThemeProviderContext } from "../ThemeProvider"
 import LoginForm from "./LoginForm"
 
 export const LoginScreen = () => {
-  const darkMode: boolean = useContext(ThemeProviderContext).theme === 'dark';
 
   return (
     <div className="flex w-screen h-screen tablet:bg-login-bg tablet:bg-cover">

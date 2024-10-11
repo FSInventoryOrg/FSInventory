@@ -1,4 +1,4 @@
-import { LockIcon, EyeIcon, EyeOffIcon, MailIcon } from "lucide-react"
+import { EyeIcon, EyeOffIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -13,13 +13,12 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useState, useContext } from 'react'
+import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as authService from '@/auth-service'
 import { useAppContext } from '@/hooks/useAppContext'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Spinner } from '../Spinner'
-import { ThemeProviderContext } from "../ThemeProvider"
 import CustomAlert from "../Alert"
 
 export type SignInFormData = {
@@ -37,7 +36,6 @@ const SignInForm = ({ onError }: SignInFormProps) => {
   const { showToast } = useAppContext();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [serverError, setServerError] = useState<boolean>(false);
-  const darkMode: boolean = useContext(ThemeProviderContext).theme === 'dark';
 
   const handleSignInError = (errorMessage: string) => {
     onError(errorMessage)
