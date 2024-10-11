@@ -1,4 +1,4 @@
-import { FormEventHandler, useState } from 'react';
+import { FormEventHandler, useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 import {
   Select,
@@ -23,7 +23,7 @@ import {
   ReportIssueSchema,
   RequestNewAssetSchema,
 } from '@/schemas/RequestFormSchema';
-import { FormProvider, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import RequestorForm from './RequestorForm';
@@ -71,6 +71,17 @@ const RequestForm = () => {
     defaultValues: {},
     mode: 'onChange',
   });
+
+  useEffect(()=> {
+    if (requestType === 'Report an Issue') {
+        requestAssetForm.reset();
+    } else {
+        reportIssueForm.reset();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestType])
+
+
 
   const handleFile = (file: File | undefined) => {
     setUploadedFile(file);
