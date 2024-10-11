@@ -20,6 +20,7 @@ import { useAppContext } from '@/hooks/useAppContext'
 import { Link, useNavigate } from 'react-router-dom'
 import { Spinner } from '../Spinner'
 import { ThemeProviderContext } from "../ThemeProvider"
+import CustomAlert from "../Alert"
 
 export type SignInFormData = {
   email: string;
@@ -35,6 +36,7 @@ const SignInForm = ({ onError }: SignInFormProps) => {
   const navigate = useNavigate();
   const { showToast } = useAppContext();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [serverError, setServerError] = useState<boolean>(false);
   const darkMode: boolean = useContext(ThemeProviderContext).theme === 'dark';
 
   const handleSignInError = (errorMessage: string) => {
@@ -56,11 +58,13 @@ const SignInForm = ({ onError }: SignInFormProps) => {
   const mutation = useMutation({
     mutationFn: authService.login,
     onSuccess: async () => {
+      setServerError(false)
       showToast({ message: "You have logged in to the session.", type: "SUCCESS" });
       await queryClient.invalidateQueries({ queryKey: ["validateToken"]});
       navigate("/dashboard");
     },
     onError: (error: Error) => {
+      setServerError(true)
       handleSignInError(error.message)
     }
   });
@@ -111,6 +115,7 @@ const SignInForm = ({ onError }: SignInFormProps) => {
             </FormItem>
           )}
         />
+        {serverError && <CustomAlert type="error" hideTitle message="Sorry, a server error occurred. Please try again later."/>}
         <div className='pt-4'>
           <Button type='submit' className="w-full gap-2 text-white" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? <Spinner size={18}/> : null }

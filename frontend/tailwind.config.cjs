@@ -28,7 +28,10 @@ module.exports = {
         ring: "hsl(var(--ring))",
         highlight: "hsl(var(--highlight))",
         darker: "hsl(var(--darker))",
-        error: "var(--error)",
+        error: {
+          DEFAULT: "var(--error)",
+          bg: "var(--error-bg)"
+        },
         background: {
           DEFAULT: "hsl(var(--background))",
           new: "var(--background-new)"

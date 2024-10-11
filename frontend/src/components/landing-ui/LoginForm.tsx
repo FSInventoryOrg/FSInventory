@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { FullScaleITIcon } from "../icons/FullScaleITIcon"
 import SignInForm from "@/components/auth-ui/SignInForm";
 import { ThemeProviderContext } from "../ThemeProvider";
@@ -19,7 +19,7 @@ const LoginForm = () => {
         <span className={`text-[32px] ${darkMode ? 'text-white' : 'text-black'} font-semibold`}>Sign in</span>
         <span className="text-sm">Use your Rocks credentials</span>
       </div>
-      <SignInForm onError={() => {}}/>
+      <SignInForm onError={() => { }} />
     </div>
   )
 }
