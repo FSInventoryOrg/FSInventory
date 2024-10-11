@@ -5,11 +5,11 @@ interface FileInputProps {
   onError: (errorMessage: Error) => void;
   onChange: (file: File) => void;
   accept: string;
-  maxFileSize: number 
+  maxFileSize?: number 
 }
 
 const FileInput = forwardRef(function FileInput(props: FileInputProps, ref: ForwardedRef<HTMLInputElement>) {
-  const { onChange, accept, onError, maxFileSize=5 * 1024 * 1024 } = props;  
+  const { onChange, accept, onError, maxFileSize } = props;  
 
   const handleChange = (file: File) => {
     try {
@@ -25,17 +25,20 @@ const FileInput = forwardRef(function FileInput(props: FileInputProps, ref: Forw
 
   const supportedExtensions: string = supportedTypes.join(', ');
 
+  const wildCardTypes: string[] = supportedTypes.filter((type)=> type.endsWith('/*'))
+  const isTypeInWildCard = (type: string)=> wildCardTypes.some((wildCardType)=> type.startsWith(wildCardType.slice(0,-1)))
+
   const checkFileType = (file: File) => {
     const { type, name } = file;
     const extension = '.'.concat(name.split('.')[1]);
-    const typeIsValid = supportedTypes.includes(type);
+    const typeIsValid = supportedTypes.includes(type) || (wildCardTypes.length && isTypeInWildCard(type));
     const extensionIsValid = supportedTypes.includes(extension);
 
-    if (!typeIsValid || !extensionIsValid) throw Error(`Invalid file type. Supported types are: ${supportedExtensions}`);
+    if (!typeIsValid && !extensionIsValid) throw Error(`Invalid file type. Supported types are: ${supportedExtensions}`);
   }
 
   const checkFileSize = (file: File) => {
-    if (file.size > maxFileSize) {
+    if (maxFileSize && file.size > maxFileSize) {
       throw Error(`File size exceeds ${maxFileSize} MB`);
     }
   }

@@ -7,9 +7,10 @@ interface FileUploaderProps {
   handleFile: (file: File | undefined) => void;
   uploadedFile: File | undefined;
   accept: string;
+  maxFileSize?: number 
 }
 
-const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, accept }) => {
+const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, accept, maxFileSize }) => {
   const hiddenFileInput = useRef<HTMLInputElement>(null); 
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -29,6 +30,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, a
     if (fileUploaded) {
       try {
         checkFileType(fileUploaded);
+        checkFileSize(fileUploaded)
         handleChange(fileUploaded);
       } catch (err: any) {
         handleUploadError(err);
@@ -51,13 +53,22 @@ const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, a
     .filter((type: string) => type[0] === '.')
     .join(', ');
   
+  const wildCardTypes: string[] = supportedTypes.filter((type)=> type.endsWith('/*'))
+  const isTypeInWildCard = (type: string)=> wildCardTypes.some((wildCardType)=> type.startsWith(wildCardType.slice(0,-1)))
+
   const checkFileType = (file: File) => {
     const { type, name } = file;
     const extension = '.'.concat(name.split('.')[1]);
-    const typeIsValid = supportedTypes.includes(type);
+    const typeIsValid = supportedTypes.includes(type) || (wildCardTypes.length && isTypeInWildCard(type));
     const extensionIsValid = supportedTypes.includes(extension);
 
-    if (!typeIsValid || !extensionIsValid) throw Error(`Invalid file type. Supported types are: ${supportedExtensions}`);
+    if (!typeIsValid && !extensionIsValid) throw Error(`Invalid file type. Supported types are: ${accept.replace(/,/g, ', ')}`);
+  }
+
+  const checkFileSize = (file: File) => {
+    if (maxFileSize && file.size > maxFileSize) {
+      throw Error(`File size exceeds ${maxFileSize} MB`);
+    }
   }
   
   return (
@@ -76,7 +87,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, a
             </>
           }
           <p className="text-sm text-muted-foreground">
-            Supported file types: {`${supportedExtensions}`}
+            Supported file types: {`${accept.replace(/,/g, ', ')}`}
           </p>
           <FileInput  
             ref={hiddenFileInput}
