@@ -15,6 +15,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Requests from "./pages/Requests";
 
 const App = () => {
   const { isLoggedIn, isLoading } = useAppContext();
@@ -35,7 +36,7 @@ const App = () => {
                   <Route path="/tracker/:employeeCode" element={<Layout><Tracker /></Layout>} />
                   <Route path="/profile" element={<Layout><Profile/></Layout>}/>
                   <Route path="/settings/*" element={<Layout><Settings /></Layout>}/>
-                  {/* <Route path="/requests" element={<Layout>Requests</Layout>} /> */}
+                  <Route path="/requests" element={<Layout><Requests/></Layout>} />
                 </>
               )}
               <Route path="/forgot-password" element={<ForgotPassword/>}/>
