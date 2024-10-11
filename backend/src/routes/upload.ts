@@ -11,7 +11,7 @@ const router = express.Router();
 const processUpload = async (req: Request, res: Response, folder: string) => {
     try {
         const token = req.cookies.auth_token;
-        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -20,17 +20,17 @@ const processUpload = async (req: Request, res: Response, folder: string) => {
         });
         const currentUser: any = await User.findOne({ _id: decodedToken.userId });
 
-        const {src, filename } = req.body;
-        let srcFormat = { data: "", base64: ""};
-    
-        if(!src) return res.status(400).json({ message: "Source file is needed and must be in base64 format i.e data:text/plain;base64,abcdef123456789" });
-        if(!filename) return res.status(400).json({ message: "Original filename is needed" });
-        
-        try{
+        const { src, filename } = req.body;
+        let srcFormat = { data: "", base64: "" };
+
+        if (!src) return res.status(400).json({ message: "Source file is needed and must be in base64 format i.e data:text/plain;base64,abcdef123456789" });
+        if (!filename) return res.status(400).json({ message: "Original filename is needed" });
+
+        try {
             let tmp = src.split(';');
             srcFormat['data'] = tmp[0].replace('data:', '');
             srcFormat['base64'] = tmp[1].replace('base64,', '');
-        } catch(errorProcess) {
+        } catch (errorProcess) {
             console.log(errorProcess);
             return res.status(500).json({ message: "Source file must be in base64 format i.e data:text/plain;base64,abcdef123456789" });
         }
@@ -59,14 +59,14 @@ const processUpload = async (req: Request, res: Response, folder: string) => {
         await attachment.save();
 
         return res.status(200).json(attachment);
-      } catch (error) {
+    } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Something went wrong" });
-      }
+    }
 }
 
-router.post('/user', verifyToken, async(req: Request, res: Response) => { await processUpload(req, res, 'user') });
-router.post('/request', verifyToken, async(req: Request, res: Response) => { await processUpload(req, res, 'request') });
-router.post('/asset', verifyToken, async(req: Request, res: Response) => { await processUpload(req, res, 'asset') });
+router.post('/user', verifyToken, async (req: Request, res: Response) => { await processUpload(req, res, 'user') });
+router.post('/request', verifyToken, async (req: Request, res: Response) => { await processUpload(req, res, 'request') });
+router.post('/asset', verifyToken, async (req: Request, res: Response) => { await processUpload(req, res, 'asset') });
 
 export default router;

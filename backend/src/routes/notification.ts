@@ -9,18 +9,18 @@ const router = express.Router();
 router.get('/', verifyToken, async (req: Request, res: Response) => {
     try {
         const token = req.cookies.auth_token;
-        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
             method: "POST",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json"
             },
         });
-        
+
         const notifications: any = await Notification.aggregate().match({
             $expr: {
                 $and: [
-                    { $in: [decodedToken.userId, '$target_users']}
+                    { $in: [decodedToken.userId, '$target_users'] }
                 ]
             }
         }).sort({
@@ -44,7 +44,7 @@ router.get('/', verifyToken, async (req: Request, res: Response) => {
         }, []);
 
         let notifDetails = {
-            unread: newData.filter((f: any)=> !f['read']).length,
+            unread: newData.filter((f: any) => !f['read']).length,
             count: newData.length,
             data: newData
         }
@@ -59,18 +59,18 @@ router.get('/', verifyToken, async (req: Request, res: Response) => {
 router.patch('/', verifyToken, async (req: Request, res: Response) => {
     try {
         const token = req.cookies.auth_token;
-        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
             method: "POST",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json"
             },
         });
-        
+
         const requestBody = req.body;
 
         if (!Array.isArray(requestBody)) return res.status(422).json({ message: 'Payload should be arrays of _ids' });
-        
+
         let mongoIDs = requestBody.reduce((accum, value: string, index) => {
             let valueID = new mongoose.Types.ObjectId(value);
             accum.push(valueID);
@@ -80,17 +80,17 @@ router.patch('/', verifyToken, async (req: Request, res: Response) => {
         const notifications: any = await Notification.aggregate().match({
             $expr: {
                 $and: [
-                    { $in: [decodedToken.userId, '$target_users']},
-                    { $in: ['$_id', mongoIDs]}
+                    { $in: [decodedToken.userId, '$target_users'] },
+                    { $in: ['$_id', mongoIDs] }
                 ]
             }
         });
 
-        notifications.forEach(async(notif: any) => {
+        notifications.forEach(async (notif: any) => {
             notif['seen_users'].push(decodedToken.userId);
             notif['seen_users'] = notif['seen_users'].filter((value: string, index: number, array: any) => { return array.indexOf(value) === index });
 
-            await Notification.updateOne({_id: notif['_id']}, { seen_users: notif['seen_users']})
+            await Notification.updateOne({ _id: notif['_id'] }, { seen_users: notif['seen_users'] })
         })
 
         return res.status(200).json({ message: "Successfully patched" });

@@ -32,7 +32,7 @@ router.get("/includeUnregistered", async (req: Request, res: Response) => {
         if (findIndex === -1) {
           const findEmployeeIndex = employees.findIndex(f => {
             let name = `${f['firstName']}`;
-            if(f['middleName']) name += ` ${f['middleName']}`
+            if (f['middleName']) name += ` ${f['middleName']}`
             name += ` ${f['lastName']}`;
 
             return f['code'] === value || name === value
@@ -134,7 +134,7 @@ router.post("/", [
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -207,7 +207,7 @@ router.put("/history/:code",
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -267,7 +267,7 @@ router.put("/:code", [
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -352,7 +352,7 @@ router.put("/:code", [
 router.delete("/:code", verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
-    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
       method: "POST",
       credentials: "include",
       headers: {

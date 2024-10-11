@@ -27,7 +27,7 @@ router.post('/', [
         }
         try {
             const token = req.cookies.auth_token;
-            const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+            const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -108,7 +108,7 @@ router.put('/:prefixCode', [
         }
         try {
             const token = req.cookies.auth_token;
-            const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+            const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -207,7 +207,7 @@ router.get('/:prefixCode', async (req: Request, res: Response) => {
 router.delete('/:prefixCode', verifyToken, async (req: Request, res: Response) => {
     try {
         const token = req.cookies.auth_token;
-        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
             method: "POST",
             credentials: "include",
             headers: {

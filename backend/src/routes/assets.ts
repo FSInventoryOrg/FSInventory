@@ -109,7 +109,7 @@ router.post('/', [
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -191,7 +191,7 @@ router.put('/deploy/:code', [
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -258,7 +258,7 @@ router.put('/retrieve/:code', [
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -411,7 +411,7 @@ router.put('/:code', [
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -657,7 +657,7 @@ router.put('/:property/:value', [
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -718,7 +718,7 @@ router.get('/:code', async (req: Request, res: Response) => {
 router.delete('/:property/:value', verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
-    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -751,7 +751,7 @@ router.delete('/:property/:value', verifyToken, async (req: Request, res: Respon
 router.delete('/:code', verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
-    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -782,7 +782,7 @@ router.delete('/:code', verifyToken, async (req: Request, res: Response) => {
 router.patch('/bulkDelete', verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
-    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
       method: "POST",
       credentials: "include",
       headers: {

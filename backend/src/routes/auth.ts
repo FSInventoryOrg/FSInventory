@@ -87,7 +87,7 @@ router.post("/addAdmins", verifyToken, async (req: Request, res: Response) => {
 	}
 	try {
 		const token = req.cookies.auth_token;
-		const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+		const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
 			method: "POST",
 			credentials: "include",
 			headers: {
@@ -119,7 +119,7 @@ router.post("/addOAuthCredentials", verifyToken, async (req: Request, res: Respo
 	}
 	try {
 		const token = req.cookies.auth_token;
-		const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/token`, {
+		const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
 			method: "POST",
 			credentials: "include",
 			headers: {
