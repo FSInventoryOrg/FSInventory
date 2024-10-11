@@ -156,7 +156,9 @@ const RequestForm = () => {
                           Issue Category
                         </FormLabel>
                         <FormControl>
-                          <Select>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}>
                             <SelectTrigger className="w-[180px]">
                               <SelectValue placeholder="Select Issue Category" />
                             </SelectTrigger>
@@ -197,6 +199,7 @@ const RequestForm = () => {
                             placeholder="Enter serial number, device ID, or select from a list of company assets"
                           />
                         </FormControl>
+                        <FormMessage/>
                       </FormItem>
                     )}
                   />
@@ -214,6 +217,7 @@ const RequestForm = () => {
                             placeholder="Provide a detailed explanation of the issue, including any steps taken before the issue occurred"
                           />
                         </FormControl>
+                        <FormMessage/>
                       </FormItem>
                     )}
                   />
@@ -310,7 +314,7 @@ const RequestForm = () => {
                   control={requestAssetForm.control}
                   name="requestDate"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className='w-full sm:w-fit'>
                       <FormLabel>Requested Date for Asset</FormLabel>
                       <FormControl>
                         <Popover
