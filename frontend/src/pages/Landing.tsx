@@ -1,14 +1,12 @@
-import Hero from '@/components/landing-ui/Hero'
-import AppearanceMode from '@/components/AppearanceMode'
+import AppearanceMode from '@/components/AppearanceMode';
+import { LoginScreen } from '@/components/landing-ui/LoginScreen';
 import { Toaster } from '@/components/ui/toaster'
 
 const Landing = () => {
   return (
-    <div className='flex flex-col min-h-screen justify-center items-center'>
-      <div className='absolute top-2 right-2 drop-shadow-md'>
-        <AppearanceMode />
-      </div>
-      <Hero />
+    <div className='flex min-h-screen justify-center items-center'>
+      <AppearanceMode />
+      <LoginScreen />
       <Toaster />
     </div>
   )

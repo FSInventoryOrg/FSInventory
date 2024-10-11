@@ -13,12 +13,13 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as authService from '@/auth-service'
 import { useAppContext } from '@/hooks/useAppContext'
 import { Link, useNavigate } from 'react-router-dom'
 import { Spinner } from '../Spinner'
+import { ThemeProviderContext } from "../ThemeProvider"
 
 export type SignInFormData = {
   email: string;
@@ -34,6 +35,7 @@ const SignInForm = ({ onError }: SignInFormProps) => {
   const navigate = useNavigate();
   const { showToast } = useAppContext();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const darkMode: boolean = useContext(ThemeProviderContext).theme === 'dark';
 
   const handleSignInError = (errorMessage: string) => {
     onError(errorMessage)
@@ -70,15 +72,15 @@ const SignInForm = ({ onError }: SignInFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 font-poppins">
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className='flex gap-2 text-md items-center'><MailIcon size={20}/>Email</FormLabel>
+              <FormLabel className={`flex gap-2 text-md items-center font-normal ${darkMode ? 'text-white' : ''}`}>Email Address</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} autoComplete="off" />
+                <Input placeholder="Enter email address" {...field} autoComplete="off" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,15 +91,12 @@ const SignInForm = ({ onError }: SignInFormProps) => {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className='flex gap-2 text-md items-center'><LockIcon size={20}/>
+              <FormLabel className={`flex gap-2 text-md items-center font-normal ${darkMode ? 'text-white' : ''}`}>
                 Password
-                <Link to="/forgot-password" className="ml-auto inline-block text-sm underline">
-                  Forgot your password?
-                </Link>
               </FormLabel>
               <div className='flex items-center relative'>
                 <FormControl>
-                  <Input type={isPasswordVisible ? "text" : "password"} placeholder="" {...field} autoComplete="off" />
+                  <Input type={isPasswordVisible ? "text" : "password"} placeholder="Password" {...field} autoComplete="off" />
                 </FormControl>
                 <Button 
                   type="button" 
@@ -105,7 +104,7 @@ const SignInForm = ({ onError }: SignInFormProps) => {
                   onClick={handlePasswordVisibility}
                   className='absolute right-0'
                 >
-                  { isPasswordVisible ? <EyeIcon /> : <EyeOffIcon /> }
+                  { isPasswordVisible ? <EyeIcon color="#565F5C"/> : <EyeOffIcon color="#565F5C"/> }
                 </Button>
               </div>
               <FormMessage />
@@ -113,9 +112,9 @@ const SignInForm = ({ onError }: SignInFormProps) => {
           )}
         />
         <div className='pt-4'>
-          <Button type='submit' className="w-full gap-2" disabled={form.formState.isSubmitting}>
+          <Button type='submit' className="w-full gap-2 text-white" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? <Spinner size={18}/> : null }
-            Next
+            Sign in
           </Button>
         </div>
       </form>
