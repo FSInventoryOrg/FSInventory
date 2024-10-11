@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 const SignInSchema = z.object({
-  email: z.string().trim().min(1, 'Email cannot be empty').email(),
-  password: z.string().trim().min(1, 'Password cannot be empty'),
+  email: z.string().trim().min(1, 'Email is required.').email(),
+  password: z.string().trim().min(1, 'Password is required.'),
 });
 // .refine((data) => data.password === data.confirmPassword, {
 //   message: "Password confirmation does not match!",
