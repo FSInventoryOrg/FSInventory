@@ -62,22 +62,18 @@ router.post("/register", [
 router.get("/", verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
-    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-      method: "POST",
+    const response: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/users/me`, {
       credentials: "include",
       headers: {
-        "Content-Type": "application/json"
-      },
+        "Authorization": `Bearer ${token}`
+      }
     });
-    const userId = decodedToken.userId;
-
-    const user: UserType | null = await User.findById(userId, { password: false });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const user = await response.json()
+    if (!user.data) {
+      return res.status(404).json({ message: "Id not found" });
     }
 
-    return res.status(200).json(user);
+    return res.status(200).json(user.data.id);
 
   } catch (error) {
     console.log(error);
