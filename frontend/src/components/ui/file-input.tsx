@@ -5,14 +5,16 @@ interface FileInputProps {
   onError: (errorMessage: Error) => void;
   onChange: (file: File) => void;
   accept: string;
+  maxFileSize: number 
 }
 
 const FileInput = forwardRef(function FileInput(props: FileInputProps, ref: ForwardedRef<HTMLInputElement>) {
-  const { onChange, accept, onError } = props;  
+  const { onChange, accept, onError, maxFileSize=5 * 1024 * 1024 } = props;  
 
   const handleChange = (file: File) => {
     try {
       checkFileType(file);
+      checkFileSize(file);
       onChange(file);
     } catch (err: any) {
       onError(err);
@@ -32,6 +34,11 @@ const FileInput = forwardRef(function FileInput(props: FileInputProps, ref: Forw
     if (!typeIsValid || !extensionIsValid) throw Error(`Invalid file type. Supported types are: ${supportedExtensions}`);
   }
 
+  const checkFileSize = (file: File) => {
+    if (file.size > maxFileSize) {
+      throw Error(`File size exceeds ${maxFileSize} MB`);
+    }
+  }
 
   return (
       <Input 

@@ -3,6 +3,7 @@ import { Button } from '../ui/button';
 import { Select, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
+import { FileUploader } from '../ui/file-uploader';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { format } from 'date-fns';
 import { Calendar } from '../ui/calendar';
@@ -11,6 +12,7 @@ import { cn } from '@/lib/utils';
 
 const RequestForm = () => {
   const [requestType, setRequestType] = useState('');
+  const [uploadedFile, setUploadedFile] = useState<File | undefined>();
   const [openRequestedDate, setOpenRequestedDate] = useState(false);
   const [requestedDate, setRequestedDate] = useState<Date | undefined>();
   function handleSubmit(
@@ -18,6 +20,9 @@ const RequestForm = () => {
   ): FormEventHandler<HTMLFormElement> | undefined {
     throw new Error('Function not implemented.');
   }
+  const handleFile = (file: File | undefined) => {
+    setUploadedFile(file);
+  };
 
   return (
     <div className="container">
@@ -114,10 +119,10 @@ const RequestForm = () => {
               <label className="block text-sm font-medium">
                 Upload Supporting Files
               </label>
-              <FileInput
+                <FileUploader
+                  handleFile={handleFile}
+                  uploadedFile={uploadedFile}
                 accept="image/*,.pdf,.doc,.docx"
-                onError={() => {}}
-                onChange={() => {}}
               />
             </div>
           </>
