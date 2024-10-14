@@ -36,8 +36,10 @@ const SignInForm = ({ onError }: SignInFormProps) => {
   const { showToast } = useAppContext();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [serverError, setServerError] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleSignInError = (errorMessage: string) => {
+    console.log(errorMessage)
     onError(errorMessage)
   }
   
@@ -62,12 +64,15 @@ const SignInForm = ({ onError }: SignInFormProps) => {
       navigate("/dashboard");
     },
     onError: (error: Error) => {
+      setIsSubmitting(false)
       setServerError(true)
       handleSignInError(error.message)
     }
   });
 
   const onSubmit = (data: z.infer<typeof SignInSchema>) => {
+    setServerError(false);
+    setIsSubmitting(true);
     setIsPasswordVisible(false);
     mutation.mutate(data);
   };
@@ -115,9 +120,8 @@ const SignInForm = ({ onError }: SignInFormProps) => {
         />
         {serverError && <CustomAlert type="error" hideTitle message="Sorry, a server error occurred. Please try again later."/>}
         <div className='pt-4'>
-          <Button type='submit' className="w-full gap-2 text-white" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? <Spinner size={18}/> : null }
-            Sign in
+          <Button type='submit' className="w-full gap-2 text-white" disabled={isSubmitting}>
+            {isSubmitting ? <Spinner size={18}/> : 'Sign in' }
           </Button>
         </div>
       </form>
