@@ -28,7 +28,7 @@ const CustomAlert = ({ type, message, hideTitle = false }: Props) => {
   const alert = getVariant();
 
   return (
-    <Alert variant={alert.variant as alertVariant} className="h-full flex gap-3 align-middle items-center text-center">
+    <Alert variant={alert.variant as alertVariant} className="flex gap-3 align-middle items-center text-center">
       {alert.variant === "success" ? (
         <Check className="h-4 w-4" />
       ) : (
