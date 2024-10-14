@@ -128,6 +128,8 @@ export async function extractAssetData(
   let assets: ExcelHardware[] = [];
 
   assets = assets.concat(await parseHardwareSheet(workbook.Sheets["Hardware"]));
+  // TODO
+  // add more here to parse other sheets
 
   return assets;
 }
