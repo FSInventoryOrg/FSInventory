@@ -228,10 +228,9 @@ router.post('/validate_excel', verifyToken, verifyRole("ADMIN"), async (req: Req
 		// Load all the assets into memory. THIS MIGHT BE A PROBLEM IN THE FUTURE if the asset collection gets too large! 
 		const mongoAssets = await Asset.find().lean(true);
 		
-		// Arrays to hold stale documents
 		const changedMongoData: any[] = [];
 		const changedExcelData: any[] = [];
-		// Check for stale records
+		// Check for changes
 		for (const mongoAsset of mongoAssets) {
 			// use the code to find the excel asset
 			const excelAsset = assetDataMap.get(mongoAsset.code);
@@ -244,7 +243,7 @@ router.post('/validate_excel', verifyToken, verifyRole("ADMIN"), async (req: Req
 				changedMongoData.push(mongoAsset);
 			}
 		}
-		// If there are stale documents, add them to the result
+		// Add them to the result
 		if (changedMongoData.length > 0 || changedExcelData.length > 0) {
 			staleCollections["assets"] = {
 				current: changedMongoData,
