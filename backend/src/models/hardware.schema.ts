@@ -1,7 +1,6 @@
 import { Schema } from 'mongoose';
 import Asset, { AssetType } from './asset.schema';
 
-
 export interface HardwareType extends AssetType {
   processor: string;
   memory: string;
@@ -88,7 +87,7 @@ export interface HardwareType extends AssetType {
  *          example: DEV
  *        remarks:
  *          type: string
-  *       notifyRemarks:
+ *        notifyRemarks:
  *          type: boolean
  *        deploymentDate:
  *          type: string
@@ -132,6 +131,6 @@ const hardwareSchema: Schema<HardwareType> = new Schema<HardwareType>({
   client: { type: String, required: false },
 });
 
-const Hardware = Asset.discriminator<HardwareType>("Hardware", hardwareSchema);
+const Hardware = Asset.discriminator<HardwareType>('Hardware', hardwareSchema);
 
 export default Hardware;

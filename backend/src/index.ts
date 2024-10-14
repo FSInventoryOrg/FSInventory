@@ -13,6 +13,7 @@ import employeeRoutes from './routes/employees'
 import uploadRoutes from './routes/upload'
 import downloadRoutes from './routes/download'
 import notificationRoutes from './routes/notification'
+import notificationSettingRoutes from './routes/notification-settings'
 import configRoutes from './system/config'
 
 import logger from './utils/logger';
@@ -66,6 +67,7 @@ app.use("/api/upload", uploadRoutes)
 app.use("/api/download", downloadRoutes)
 app.use("/api/download", downloadRoutes)
 app.use("/api/notification", notificationRoutes)
+app.use("/api/notification_settings", notificationSettingRoutes)
 app.use("/config", configRoutes)
 app.use("/autoMail", autoMailRoutess)
 app.use("/backup", backupRoutes)
