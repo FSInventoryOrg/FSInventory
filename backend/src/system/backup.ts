@@ -217,37 +217,38 @@ router.post('/validate_excel', verifyToken, verifyRole("ADMIN"), async (req: Req
 
 		// Parse directly, don't write to file, only to read it again
 		const fileBuffer = Buffer.from(data.base64, 'base64');
-		const assetData = await extractAssetData(xlsx.read(fileBuffer))
+		const excelAssets = await extractAssetData(xlsx.read(fileBuffer))
 
 		// Check if there is any data to import
-		if (!assetData || assetData.length === 0) return;
+		if (!excelAssets || excelAssets.length === 0) return;
 
 		// Create document cache for fast lookup
-		const assetDataMap = new Map<string, ExcelHardware>(assetData.map((asset: ExcelHardware) => [asset.code, asset]));
+		const assetDataMap = new Map<string, ExcelHardware>(excelAssets.map((asset: ExcelHardware) => [asset.code, asset]));
 
 		// Load all the assets into memory. THIS MIGHT BE A PROBLEM IN THE FUTURE if the asset collection gets too large! 
-		const assetDocuments = await Asset.find().lean(true);
+		const mongoAssets = await Asset.find().lean(true);
 		
 		// Arrays to hold stale documents
-		const changedDocs: any[] = [];
-		const changeExcelData: any[] = [];
+		const changedMongoData: any[] = [];
+		const changedExcelData: any[] = [];
 		// Check for stale records
-		for (const doc of assetDocuments) {
-			const asset = assetDataMap.get(doc.code);
-			if (asset) {
-				const changes = listChanges(doc, asset) || []
-				changeExcelData.push(applyChanges(doc, changes))
-				changedDocs.push(doc);
+		for (const mongoAsset of mongoAssets) {
+			// use the code to find the excel asset
+			const excelAsset = assetDataMap.get(mongoAsset.code);
+			if (excelAsset) {
+				const changes = listChanges(mongoAsset, excelAsset) || []
+				changedExcelData.push(applyChanges(mongoAsset, changes))
+				changedMongoData.push(mongoAsset);
 			} else {
 				// Document in the database is not present in backup
-				changedDocs.push(doc);
+				changedMongoData.push(mongoAsset);
 			}
 		}
 		// If there are stale documents, add them to the result
-		if (changedDocs.length > 0 || changeExcelData.length > 0) {
+		if (changedMongoData.length > 0 || changedExcelData.length > 0) {
 			staleCollections["assets"] = {
-				current: changedDocs,
-				backup: changeExcelData
+				current: changedMongoData,
+				backup: changedExcelData
 			};
 
 			res.status(200).json({

@@ -86,7 +86,7 @@ async function findEmployee(
   return employee.code;
 }
 
-export async function parseHardwareSheet(
+async function parseHardwareSheet(
   hardwareSheet: XLSX.WorkSheet
 ): Promise<ExcelHardware[]> {
   return Promise.all(
@@ -140,25 +140,13 @@ export async function extractAssetData(
  * @param value
  * @returns boolean
  */
-export function notDefined(value: any) {
+function notDefined(value: any) {
   return (
     value === undefined ||
     value === null ||
     (typeof value === "string" && value.trim() === "")
   );
 }
-
-export function normalizeBoolean(value: any) {
-  if (typeof value === "boolean") {
-    return value;
-  } else if (typeof value === "string") {
-    return value && value.toUpperCase() == "YES";
-  } else {
-    throw new Error("not a boolean value");
-  }
-}
-
-function areDatesEqual() {}
 
 export function listChanges(mongoData: any, excelData: any) {
   return Object.keys(excelData)
