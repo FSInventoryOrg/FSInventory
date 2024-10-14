@@ -10,7 +10,7 @@ const PasswordChange = () => {
             Choose a strong password to keep your account secure.
           </h3>
         </div>
-        <PasswordChangeModal disabled={false}/>
+        <PasswordChangeModal disabled/>
       </div>
     </>
   );

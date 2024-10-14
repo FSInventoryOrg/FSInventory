@@ -205,7 +205,7 @@ const UserProfile = ({ userData }: UserProfileProps) => {
               <div className="self-end flex flex-row justify-center items-center gap-2">
                 <Button
                   type="submit"
-                  disabled={!isDirty || !isValid} // here
+                  disabled // here
                   className="gap-2"
                 >
                   {isUpdatePending ? <Spinner size={18} /> : null}
