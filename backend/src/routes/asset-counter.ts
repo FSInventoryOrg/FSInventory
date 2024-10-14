@@ -35,7 +35,7 @@ router.post('/', [
                 },
             });
 
-            if (decodedToken.role !== "ADMIN") {
+            if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
                 return res.status(403).json({ message: "Only users with admin role can perform this action" });
             }
             const currentUser = await User.findOne({ _id: decodedToken.userId });
@@ -116,7 +116,7 @@ router.put('/:prefixCode', [
                 },
             });
 
-            if (decodedToken.role !== "ADMIN") {
+            if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
                 return res.status(403).json({ message: "Only users with admin role can perform this action" });
             }
 
@@ -215,7 +215,7 @@ router.delete('/:prefixCode', verifyToken, async (req: Request, res: Response) =
             },
         });
 
-        if (decodedToken.role !== "ADMIN") {
+        if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
             return res.status(403).json({ message: "Only users with admin role can perform this action" });
         }
 

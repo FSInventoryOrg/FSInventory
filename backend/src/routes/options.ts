@@ -65,7 +65,7 @@ router.post('/:property', [
         },
       });
 
-      if (decodedToken.role !== "ADMIN") {
+      if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
       }
 
@@ -178,7 +178,7 @@ router.put('/defaults', [
         },
       });
 
-      if (decodedToken.role !== "ADMIN") {
+      if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
       }
 
@@ -390,7 +390,7 @@ router.delete('/:property', verifyToken, async (req: Request, res: Response) => 
       },
     });
 
-    if (decodedToken.role !== "ADMIN") {
+    if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
       return res.status(403).json({ message: "Only users with admin role can perform this action" });
     }
 

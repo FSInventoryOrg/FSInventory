@@ -157,7 +157,7 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
             },
         });
 
-        if (decodedToken.role !== "ADMIN") {
+        if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
             return res.status(403).json({ message: "Only users with admin role can perform this action" });
         }
 
@@ -215,7 +215,7 @@ router.get('/', verifyToken, async (req: Request, res: Response) => {
             },
         });
 
-        if (decodedToken.role !== "ADMIN") {
+        if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
             return res.status(403).json({ message: "Only users with admin role can perform this action" });
         }
 
@@ -240,7 +240,7 @@ router.post('/activateNow', verifyToken, async (req: Request, res: Response) => 
             },
         });
 
-        if (decodedToken.role !== "ADMIN") {
+        if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
             return res.status(403).json({ message: "Only users with admin role can perform this action" });
         }
 

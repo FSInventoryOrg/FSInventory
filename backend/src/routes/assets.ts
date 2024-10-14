@@ -16,7 +16,7 @@ const checkSerialNo = async (serialNum: string, assetID?: string) => {
   const recordSerial = await Asset.aggregate().match({
     $expr: {
       $and: [
-        { $eq: ['$serialNo', serialNum]}
+        { $eq: ['$serialNo', serialNum] }
       ]
     }
   })
@@ -29,29 +29,29 @@ const checkSerialNo = async (serialNum: string, assetID?: string) => {
 }
 
 const emplyeeSnapper = async (assets: any) => {
-  const employees: any = await Employee.aggregate().match({$expr: {}}).project({ idNum: '$code', name: { $concat: ['$firstName', ' ', '$lastName']}});
+  const employees: any = await Employee.aggregate().match({ $expr: {} }).project({ idNum: '$code', name: { $concat: ['$firstName', ' ', '$lastName'] } });
 
   assets = assets.reduce((accum: any[], value: any) => {
-    const findAssignee = employees.find((f: any) =>  f['idNum'] === value['assignee']);
-    const findRecoveredFrom = employees.find((f: any) =>  f['idNum'] === value['recoveredFrom']);
+    const findAssignee = employees.find((f: any) => f['idNum'] === value['assignee']);
+    const findRecoveredFrom = employees.find((f: any) => f['idNum'] === value['recoveredFrom']);
 
-    if(findAssignee) value['_addonData_assignee'] = findAssignee['name']
+    if (findAssignee) value['_addonData_assignee'] = findAssignee['name']
     else value['_addonData_assignee'] = value['assignee']
 
-    if(findRecoveredFrom) value['_addonData_recoveredFrom'] = findRecoveredFrom['name']
+    if (findRecoveredFrom) value['_addonData_recoveredFrom'] = findRecoveredFrom['name']
     else value['_addonData_recoveredFrom'] = value['recoveredFrom']
 
-    if(Array.isArray(value?.deploymentHistory)) {
-      if(value.deploymentHistory.length > 0) {
+    if (Array.isArray(value?.deploymentHistory)) {
+      if (value.deploymentHistory.length > 0) {
         value.deploymentHistory.forEach((el: any, index: number) => {
-          const findHistAssignee = employees.find((f: any) =>  f['idNum'] === el['assignee']);
+          const findHistAssignee = employees.find((f: any) => f['idNum'] === el['assignee']);
 
-          if(findHistAssignee) value.deploymentHistory[index]['_addonData_assignee'] = findHistAssignee['name']
+          if (findHistAssignee) value.deploymentHistory[index]['_addonData_assignee'] = findHistAssignee['name']
           else value.deploymentHistory[index]['_addonData_assignee'] = el['assignee']
         })
       }
     }
-    
+
     accum.push(value)
     return accum;
   }, []);
@@ -117,7 +117,7 @@ router.post('/', [
         },
       });
 
-      if (decodedToken.role !== "ADMIN") {
+      if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
       }
       const currentUser = await User.findOne({ _id: decodedToken.userId });
@@ -146,7 +146,7 @@ router.post('/', [
             deploymentDate: data['deploymentDate'] ? data['deploymentDate'] : new Date()
           }
         ]
-      } else if(data['status'] === 'Deployed' && !data['assignee']) data['status'] = 'IT Storage'
+      } else if (data['status'] === 'Deployed' && !data['assignee']) data['status'] = 'IT Storage'
 
       if (data['recoveredFrom']) {
         const recovery = {
@@ -155,7 +155,7 @@ router.post('/', [
         }
         if (!Array.isArray(data['deploymentHistory'])) data['deploymentHistory'] = [recovery]
         else {
-            data['deploymentHistory'].push(recovery)
+          data['deploymentHistory'].push(recovery)
         }
       }
 
@@ -168,7 +168,7 @@ router.post('/', [
       data['code'] = await getCodeAndIncrement(data['category'], data['type']);
       if (!data['code']) return res.status(422).json({ message: `Need to configure the index of ${data['type']} - ${data['category']}` });
 
-      const newAsset =  data.type === 'Hardware' ? new Hardware(data) : new Software(data)
+      const newAsset = data.type === 'Hardware' ? new Hardware(data) : new Software(data)
       await newAsset.save();
       await auditAssets();
 
@@ -199,7 +199,7 @@ router.put('/deploy/:code', [
         },
       });
 
-      if (decodedToken.role !== "ADMIN") {
+      if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
       }
 
@@ -266,7 +266,7 @@ router.put('/retrieve/:code', [
         },
       });
 
-      if (decodedToken.role !== "ADMIN") {
+      if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
       }
 
@@ -419,7 +419,7 @@ router.put('/:code', [
         },
       });
 
-      if (decodedToken.role !== "ADMIN") {
+      if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
       }
 
@@ -457,8 +457,8 @@ router.put('/:code', [
       if (!Array.isArray(depHist)) depHist = [];
       else depHist = depHist.reverse();
 
-      const recoveryProcess = (assignee :string, recoveryDate?: Date, deploymentDate?: Date) => {
-        if(assignee) {
+      const recoveryProcess = (assignee: string, recoveryDate?: Date, deploymentDate?: Date) => {
+        if (assignee) {
           const findIndex = depHist.findIndex((f: any) => { return f['assignee'] === assignee })
           const recovery = {
             assignee,
@@ -467,18 +467,18 @@ router.put('/:code', [
           // Update recovery fields
           data.recoveredFrom = recovery.assignee
           data.recoveryDate = recovery.recoveryDate
-          
+
           if (findIndex == 0) depHist[findIndex] = { ...depHist[findIndex].toObject(), ...recovery }
           else {
-            depHist.unshift({...recovery,  deploymentDate: deploymentDate ?? null})
+            depHist.unshift({ ...recovery, deploymentDate: deploymentDate ?? null })
           }
         }
       }
 
-      if(data['assignee']) {
+      if (data['assignee']) {
         // If 'Assignee' is filled in, deploy the asset to assignee
         data['status'] = "Deployed";
-        if(data['assignee'] !== existingAsset['assignee']) {
+        if (data['assignee'] !== existingAsset['assignee']) {
           // Recover asset from old assignee and deploy to new assignee
           recoveryProcess(existingAsset['assignee'], new Date(), existingAsset['deploymentDate']);
           const deploy = {
@@ -487,11 +487,11 @@ router.put('/:code', [
           }
           depHist.unshift(deploy)
         }
-      } else if(data['status'] === 'Deployed' && !data['assignee']) {
+      } else if (data['status'] === 'Deployed' && !data['assignee']) {
         // Recover asset from current assignee if 'Assignee' field is left blank and status is 'Deployed'
         data['status'] = "IT Storage";
-        if(data['assignee'] !== existingAsset['assignee']) {
-          recoveryProcess(existingAsset['assignee'],  new Date(), existingAsset['deploymentDate'])
+        if (data['assignee'] !== existingAsset['assignee']) {
+          recoveryProcess(existingAsset['assignee'], new Date(), existingAsset['deploymentDate'])
         }
       }
 
@@ -499,31 +499,31 @@ router.put('/:code', [
       const recoveryDate = data['recoveryDate']
       if (existingAsset['status'] === 'Deployed' && existingAsset['status'] !== data['status']) {
         // Recover asset from current assignee if status is changed from 'Deployed'
-          recoveryProcess(existingAsset['assignee'], new Date(), existingAsset['deploymentDate']) 
+        recoveryProcess(existingAsset['assignee'], new Date(), existingAsset['deploymentDate'])
       }
 
       // If 'Recovered From' is filled in, recover asset from that assignee regardless of asset status
-      if(recoveredFrom && recoveredFrom !== existingAsset['recoveredFrom']) {
+      if (recoveredFrom && recoveredFrom !== existingAsset['recoveredFrom']) {
         recoveryProcess(recoveredFrom, recoveryDate)
       }
-      
+
 
       depHist = depHist.reverse();
 
-      if(depHist.length > 0) data['deploymentHistory'] = depHist
-      
+      if (depHist.length > 0) data['deploymentHistory'] = depHist
+
       // Remove undefined date properties and set them to null
       data.deploymentDate ??= null;
       data.purchaseDate ??= null;
       data.recoveryDate ??= null;
 
       // Update the asset
-      updatedAsset = data.type === 'Hardware' 
-        ? await Hardware.findOneAndUpdate({ code: code }, data, { new: true }) 
-        : await Software.findOneAndUpdate({ code: code }, data, { new: true }) 
+      updatedAsset = data.type === 'Hardware'
+        ? await Hardware.findOneAndUpdate({ code: code }, data, { new: true })
+        : await Software.findOneAndUpdate({ code: code }, data, { new: true })
 
       await auditAssets();
-      
+
       res.status(200).json(updatedAsset);
     } catch (error) {
       console.error('Error updating asset:', error);
@@ -622,7 +622,7 @@ router.get('/:property/:value', async (req: Request, res: Response) => {
     query[property as string] = value ? value.trim() : ""
 
     let assets: any[] = await emplyeeSnapper(await Asset.aggregate().match(query));
-    
+
     res.status(200).json(assets);
   } catch (error) {
     console.error('Error fetching assets:', error);
@@ -665,7 +665,7 @@ router.put('/:property/:value', [
         },
       });
 
-      if (decodedToken.role !== "ADMIN") {
+      if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
       }
 
@@ -726,7 +726,7 @@ router.delete('/:property/:value', verifyToken, async (req: Request, res: Respon
       },
     });
 
-    if (decodedToken.role !== "ADMIN") {
+    if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
       return res.status(403).json({ message: "Only users with admin role can perform this action" });
     }
 
@@ -759,7 +759,7 @@ router.delete('/:code', verifyToken, async (req: Request, res: Response) => {
       },
     });
 
-    if (decodedToken.role !== "ADMIN") {
+    if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
       return res.status(403).json({ message: "Only users with admin role can perform this action" });
     }
 
@@ -790,16 +790,16 @@ router.patch('/bulkDelete', verifyToken, async (req: Request, res: Response) => 
       },
     });
 
-    if (decodedToken.role !== "ADMIN") {
+    if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
       return res.status(403).json({ message: "Only users with admin role can perform this action" });
     }
 
     const codesToDelete = req.body;
 
-    if(!Array.isArray(codesToDelete)) return res.status(422).json({ message: "Request body should be an array of Asset Item Codes" });
-    if(codesToDelete.length === 0) return res.status(422).json({ message: "Request body should not be an empty array" });
+    if (!Array.isArray(codesToDelete)) return res.status(422).json({ message: "Request body should be an array of Asset Item Codes" });
+    if (codesToDelete.length === 0) return res.status(422).json({ message: "Request body should not be an empty array" });
 
-    await Asset.deleteMany({ code: { $in: codesToDelete} });
+    await Asset.deleteMany({ code: { $in: codesToDelete } });
     await auditAssets();
     res.status(200).json({ message: 'Assets deleted successfully' });
   } catch (error) {
