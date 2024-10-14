@@ -73,10 +73,9 @@ router.get("/", verifyToken, async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Id not found" });
     }
 
-    return res.status(200).json(user.data.id);
+    return res.status(200).json(user.data);
 
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 });
