@@ -3,6 +3,14 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000700495) 2024-10-14
+### Changed
+- Login now uses Rocks API for authentication
+- JWT verification replaced with Rocks API token status check
+
+### Removed
+- Permissions/role checking, to be utilized once Rocks API payload is updated to include user role
+
 ## [2.15.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000615263) 2024-09-16 
 ### Added
 - Backend support for system backup file
