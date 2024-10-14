@@ -1,4 +1,4 @@
-import { LockIcon, EyeIcon, EyeOffIcon, MailIcon } from "lucide-react"
+import { EyeIcon, EyeOffIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -17,8 +17,9 @@ import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as authService from '@/auth-service'
 import { useAppContext } from '@/hooks/useAppContext'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Spinner } from '../Spinner'
+import CustomAlert from "../Alert"
 
 export type SignInFormData = {
   email: string;
@@ -34,8 +35,11 @@ const SignInForm = ({ onError }: SignInFormProps) => {
   const navigate = useNavigate();
   const { showToast } = useAppContext();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [serverError, setServerError] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleSignInError = (errorMessage: string) => {
+    console.log(errorMessage)
     onError(errorMessage)
   }
   
@@ -54,31 +58,36 @@ const SignInForm = ({ onError }: SignInFormProps) => {
   const mutation = useMutation({
     mutationFn: authService.login,
     onSuccess: async () => {
+      setServerError(false)
       showToast({ message: "You have logged in to the session.", type: "SUCCESS" });
       await queryClient.invalidateQueries({ queryKey: ["validateToken"]});
       navigate("/dashboard");
     },
     onError: (error: Error) => {
+      setIsSubmitting(false)
+      setServerError(true)
       handleSignInError(error.message)
     }
   });
 
   const onSubmit = (data: z.infer<typeof SignInSchema>) => {
+    setServerError(false);
+    setIsSubmitting(true);
     setIsPasswordVisible(false);
     mutation.mutate(data);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 font-poppins">
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className='flex gap-2 text-md items-center'><MailIcon size={20}/>Email</FormLabel>
+              <FormLabel className={`flex gap-2 text-md items-center font-normal dark:text-white`}>Email Address</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} autoComplete="off" />
+                <Input placeholder="Enter email address" {...field} autoComplete="off" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,15 +98,12 @@ const SignInForm = ({ onError }: SignInFormProps) => {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className='flex gap-2 text-md items-center'><LockIcon size={20}/>
+              <FormLabel className={`flex gap-2 text-md items-center font-normal dark:text-white`}>
                 Password
-                <Link to="/forgot-password" className="ml-auto inline-block text-sm underline">
-                  Forgot your password?
-                </Link>
               </FormLabel>
               <div className='flex items-center relative'>
                 <FormControl>
-                  <Input type={isPasswordVisible ? "text" : "password"} placeholder="" {...field} autoComplete="off" />
+                  <Input type={isPasswordVisible ? "text" : "password"} placeholder="Password" {...field} autoComplete="off" />
                 </FormControl>
                 <Button 
                   type="button" 
@@ -105,17 +111,17 @@ const SignInForm = ({ onError }: SignInFormProps) => {
                   onClick={handlePasswordVisibility}
                   className='absolute right-0'
                 >
-                  { isPasswordVisible ? <EyeIcon /> : <EyeOffIcon /> }
+                  { isPasswordVisible ? <EyeIcon color="#565F5C"/> : <EyeOffIcon color="#565F5C"/> }
                 </Button>
               </div>
               <FormMessage />
             </FormItem>
           )}
         />
+        {serverError && <CustomAlert type="error" hideTitle message="Sorry, a server error occurred. Please try again later."/>}
         <div className='pt-4'>
-          <Button type='submit' className="w-full gap-2" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? <Spinner size={18}/> : null }
-            Next
+          <Button type='submit' className="w-full gap-2 text-white" disabled={isSubmitting}>
+            {isSubmitting ? <Spinner size={18}/> : 'Sign in' }
           </Button>
         </div>
       </form>

@@ -9,8 +9,15 @@ import Option from "../models/options.schema";
 
 const router = express.Router();
 
+const {
+	ROCKS_DEV_API_URL,
+	ROCKS_CLIENT_ID: client_id,
+	ROCKS_CLIENT_SECRET: client_secret,
+	ROCKS_GRANT_SCOPE: grant_scope
+} = process.env
+
 router.post("/login", [
-	check("email", "Email is required").isString().isLength({ min: 1, }).isEmail(),
+	check("email", "Email is required").isString().isLength({ min: 1, }),
 	check("password", "Password is required").isLength({ min: 1, }),
 ],
 	async (req: Request, res: Response) => {
@@ -19,35 +26,41 @@ router.post("/login", [
 			return res.status(400).json({ message: errors.array().map(error => error.msg).join('; ') });
 		}
 
-		const { email, password } = req.body;
+		const { email: username, password } = req.body;
 
 		try {
-			// TODO: To be modified by Reynand
-			const user = await User.findOne({ email }).select("+password")
-			if (!user) {
-				return res.status(400).json({ message: "Invalid credentials" });
+			const bodyToSend = {
+				username,
+				password,
+				client_id,
+				client_secret,
+				grant_scope,
+				grant_type: 'password'
 			}
 
-			const isMatch = await compareHash(user.password, password);
-			if (!isMatch) {
-				return res.status(400).json({ message: "Invalid credentials" });
-			}
-
-			const token = jwt.sign(
-				{
-					userId: user.id,
-					role: user.role
+			const response = await fetch(`${ROCKS_DEV_API_URL}/auth/token`, {
+				method: "POST",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json"
 				},
-				process.env.JWT_SECRET_KEY as string,
-				{ expiresIn: "1d" },
-			);
+				body: JSON.stringify(bodyToSend)
+			})
+
+			const responseBody = await response.json();
+
+			if (!response.ok) {
+				throw new Error(responseBody.message)
+			}
+
+			const { access_token: token, user_details } = responseBody;
 
 			res.cookie("auth_token", token, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === "production",
 				maxAge: 86400000,
 			});
-			res.status(200).json({ userId: user._id })
+			res.status(200).json({ userId: user_details.user_id })
 		} catch (error) {
 			console.log(error);
 			res.status(500).json({ message: "Something went wrong" });
@@ -74,9 +87,15 @@ router.post("/addAdmins", verifyToken, async (req: Request, res: Response) => {
 	}
 	try {
 		const token = req.cookies.auth_token;
-		const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+		const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
+			method: "POST",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json"
+			},
+		});
 
-		if (decodedToken.role !== "ADMIN") {
+		if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
 			return res.status(403).json({ message: "Only users with admin role can perform this action" });
 		}
 		const data: any = req.body;
@@ -100,9 +119,15 @@ router.post("/addOAuthCredentials", verifyToken, async (req: Request, res: Respo
 	}
 	try {
 		const token = req.cookies.auth_token;
-		const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+		const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
+			method: "POST",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json"
+			},
+		});
 
-		if (decodedToken.role !== "ADMIN") {
+		if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
 			return res.status(403).json({ message: "Only users with admin role can perform this action" });
 		}
 

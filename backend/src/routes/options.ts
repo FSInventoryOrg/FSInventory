@@ -47,8 +47,8 @@ const router = express.Router();
  *      - bearerAuth: []
  */
 router.post('/:property', [
-    check("value").exists().withMessage("Value is required"),
-  ],
+  check("value").exists().withMessage("Value is required"),
+],
   verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -57,9 +57,15 @@ router.post('/:property', [
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
 
-      if (decodedToken.role !== "ADMIN") {
+      if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
       }
 
@@ -84,7 +90,7 @@ router.post('/:property', [
           value = { value, type };
         }
 
-        if(property === 'status') isStatusIncluded = true
+        if (property === 'status') isStatusIncluded = true
       }
 
       const propertyValues = option.get(property) || [];
@@ -103,10 +109,10 @@ router.post('/:property', [
 
       // Append the new value to the array
       option.set(property, [...propertyValues, value]);
-      
+
       await option.save();
 
-      if(isStatusIncluded) await auditAssets();
+      if (isStatusIncluded) await auditAssets();
 
       res.status(200).json(option);
     } catch (error) {
@@ -148,15 +154,15 @@ router.post('/:property', [
  *      - bearerAuth: []
  */
 router.put('/defaults', [
-    check("status").optional().isString(),
-    check("softwareCategory").optional().isString(),
-    check("hardwareCategory").optional().isString(),
-    check("equipmentType").optional().isString(),
-    check("deployableStatus").isArray(),
-    check("retrievableStatus").optional().isString(),
-    check("inventoryColumns").optional().isArray(),
-  ],
-  verifyToken, 
+  check("status").optional().isString(),
+  check("softwareCategory").optional().isString(),
+  check("hardwareCategory").optional().isString(),
+  check("equipmentType").optional().isString(),
+  check("deployableStatus").isArray(),
+  check("retrievableStatus").optional().isString(),
+  check("inventoryColumns").optional().isArray(),
+],
+  verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -164,12 +170,18 @@ router.put('/defaults', [
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
 
-      if (decodedToken.role !== "ADMIN") {
+      if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
       }
-      
+
       let option = await Option.findOne();
       if (!option) {
         option = new Option({});
@@ -264,9 +276,9 @@ router.put('/defaults', [
  *      - bearerAuth: []
  */
 router.put('/:property', [
-    check("value").exists().withMessage("Value is required"),
-  ],
-  verifyToken, 
+  check("value").exists().withMessage("Value is required"),
+],
+  verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -298,7 +310,7 @@ router.put('/:property', [
           value = { value };
         }
 
-        if(property === 'status') isStatusIncluded = true
+        if (property === 'status') isStatusIncluded = true
       }
 
       const propertyValues = option.get(property) || [];
@@ -312,7 +324,7 @@ router.put('/:property', [
 
       await option.save();
 
-      if(isStatusIncluded) await auditAssets();
+      if (isStatusIncluded) await auditAssets();
 
       res.status(200).json({ message: 'Option updated successfully' });
     } catch (error) {
@@ -370,9 +382,15 @@ router.put('/:property', [
 router.delete('/:property', verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
-    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
+    });
 
-    if (decodedToken.role !== "ADMIN") {
+    if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
       return res.status(403).json({ message: "Only users with admin role can perform this action" });
     }
 
@@ -403,7 +421,7 @@ router.delete('/:property', verifyToken, async (req: Request, res: Response) => 
 
       const updatedProperty = propertyValue.filter(option => option.value !== value);
       option.set(property, updatedProperty);
-      if(property === 'status') isStatusIncluded = true
+      if (property === 'status') isStatusIncluded = true
     } else {
       const propertyValue: string[] = option.get(property);
       if (!propertyValue.includes(value)) {
@@ -415,7 +433,7 @@ router.delete('/:property', verifyToken, async (req: Request, res: Response) => 
 
     await option.save();
 
-    if(isStatusIncluded) await auditAssets();
+    if (isStatusIncluded) await auditAssets();
 
     res.status(200).json({ message: `Value '${value}' removed from option '${property}' successfully` });
   } catch (error) {

@@ -62,26 +62,33 @@ router.post("/register", [
 router.get("/", verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
-    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
-    const userId = decodedToken.userId;
-
-    const user: UserType | null = await User.findById(userId, { password: false });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const response: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/users/me`, {
+      credentials: "include",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    const user = await response.json()
+    if (!user.data) {
+      return res.status(404).json({ message: "Id not found" });
     }
 
-    return res.status(200).json(user);
+    return res.status(200).json(user.data);
 
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 });
 
 router.put("/", verifyToken, async (req: Request, res: Response) => {
   const token = req.cookies.auth_token;
-  const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+  const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+  });
   const userId = decodedToken.userId;
   const updatedUser: UserType = req.body;
 
@@ -98,7 +105,7 @@ router.put("/", verifyToken, async (req: Request, res: Response) => {
   }
 });
 
-router.post('/forgotPassword', async(req: Request, res: Response) => {
+router.post('/forgotPassword', async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
 
@@ -111,19 +118,19 @@ router.post('/forgotPassword', async(req: Request, res: Response) => {
     const { otp, expiration } = await generateOTP(email, "Resetting password", generateRandom6Digits());
 
     await sendMail({
-      subject: 'FS IMS Account - Password Reset Confirmation', 
-      htmlMessage: `Hi ${user['firstName']}, please use this OTP <strong style="font-size: 18px !important;">${otp}</strong> to reset your password`, 
+      subject: 'FS IMS Account - Password Reset Confirmation',
+      htmlMessage: `Hi ${user['firstName']}, please use this OTP <strong style="font-size: 18px !important;">${otp}</strong> to reset your password`,
       recipient: [email]
     })
 
-    return res.status(200).json({ message: `OTP has been sent to your email and will expire on ${expiration.toLocaleString()}`})
+    return res.status(200).json({ message: `OTP has been sent to your email and will expire on ${expiration.toLocaleString()}` })
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 })
 
-router.patch('/resetPassword', async(req: Request, res: Response) => {
+router.patch('/resetPassword', async (req: Request, res: Response) => {
   try {
     const { token, newPassword } = req.body;
     const dateNow = new Date()
@@ -138,7 +145,7 @@ router.patch('/resetPassword', async(req: Request, res: Response) => {
             $eq: ['$otp', token]
           },
           {
-            $gt: ['$expirationDate', { $toDate: dateNow}]
+            $gt: ['$expirationDate', { $toDate: dateNow }]
           }
         ]
       }
@@ -149,15 +156,15 @@ router.patch('/resetPassword', async(req: Request, res: Response) => {
 
     const OTPT = arrayOTPT[0];
 
-    const user: any = await User.findOne({ email: OTPT.email}).select("+password")
+    const user: any = await User.findOne({ email: OTPT.email }).select("+password")
 
     if (!user) res.status(404).json({ message: "User not found" });
-    
+
     const isMatchNew = await compareHash(user.password, newPassword);
 
-    if(isMatchNew) return res.status(404).json({ message: "New password is same with the original password" });
+    if (isMatchNew) return res.status(404).json({ message: "New password is same with the original password" });
 
-    await OTPTransaction.updateOne({ _id: OTPT._id }, { status: 'USED'})
+    await OTPTransaction.updateOne({ _id: OTPT._id }, { status: 'USED' })
 
     const hashedPass = await generateHash(newPassword);
     await User.updateOne({ _id: user._id }, { password: hashedPass });
@@ -184,10 +191,16 @@ router.patch('/resetPassword', async(req: Request, res: Response) => {
   }
 })
 
-router.patch('/changePassword', verifyToken, async(req: Request, res: Response) => {
+router.patch('/changePassword', verifyToken, async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
-    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+    const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
+    });
     const userId = decodedToken.userId;
 
     const { currentPassword, newPassword } = req.body;
@@ -195,15 +208,15 @@ router.patch('/changePassword', verifyToken, async(req: Request, res: Response) 
     if (!currentPassword) return res.status(422).json({ message: "Current Password is required to proceed with resetting the password" });
     if (!newPassword) return res.status(422).json({ message: "New Password is required to proceed with resetting the password" });
 
-    const user: any = await User.findOne({ _id: userId}).select("+password")
- 
+    const user: any = await User.findOne({ _id: userId }).select("+password")
+
     if (!user) res.status(404).json({ message: "User not found" });
 
     const isMatchCurrent = await compareHash(user.password, currentPassword);
     const isMatchNew = await compareHash(user.password, newPassword);
 
-    if(!isMatchCurrent) return res.status(404).json({ message: "Current password does not match the original password" });
-    if(isMatchNew) return res.status(404).json({ message: "New password is same with the original password" });
+    if (!isMatchCurrent) return res.status(404).json({ message: "Current password does not match the original password" });
+    if (isMatchNew) return res.status(404).json({ message: "New password is same with the original password" });
 
     const hashedPass = await generateHash(newPassword);
     await User.updateOne({ _id: user._id }, { password: hashedPass });

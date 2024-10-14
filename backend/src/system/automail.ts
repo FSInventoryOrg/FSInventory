@@ -20,18 +20,18 @@ const activateAutoMailing = async (data: any) => {
     let recipients = data['recipient']
 
     const allEmployees = await Employee.aggregate().match({});
-    const allHardwareAssets = await Asset.aggregate().match({ type: 'Hardware'});
-    
+    const allHardwareAssets = await Asset.aggregate().match({ type: 'Hardware' });
+
     const source = allHardwareAssets.reduce((accum: any, value: any) => {
         if (value.assignee) {
             const findEmployee = allEmployees.find(f => f['code'] === value.assignee);
 
-            if(findEmployee) value['assignee'] = `${findEmployee['firstName']} ${findEmployee['lastName']}`
+            if (findEmployee) value['assignee'] = `${findEmployee['firstName']} ${findEmployee['lastName']}`
         }
         if (value.recoveredFrom) {
             const findEmployee = allEmployees.find(f => f['code'] === value.recoveredFrom);
 
-            if(findEmployee) value['recoveredFrom'] = `${findEmployee['firstName']} ${findEmployee['lastName']}`
+            if (findEmployee) value['recoveredFrom'] = `${findEmployee['firstName']} ${findEmployee['lastName']}`
         }
 
         value['purchaseDate'] = new Date(value['purchaseDate']).toString() !== 'Invalid Date' ? new Date(value['purchaseDate']).toISOString() : '';
@@ -43,20 +43,20 @@ const activateAutoMailing = async (data: any) => {
         accum.push(value)
         return accum;
     }, [])
-    
+
     let excelTable = await createExcelTable(source, AutoMailReportTemplate)
 
     const tableFile = await saveFile('/public/attachments', 'Assets.xlsx', excelTable, true);
     const backupFile = await extractDocuments();
     const htmlMessage = await inventoryReportHtml(data);
     await sendMail({
-        subject: `Full Scale Stockpilot: Inventory Report (Date Generated ${dateReference.toLocaleDateString()})`, 
-        htmlMessage: htmlMessage, 
+        subject: `Full Scale Stockpilot: Inventory Report (Date Generated ${dateReference.toLocaleDateString()})`,
+        htmlMessage: htmlMessage,
         recipient: recipients,
         attachments: [tableFile, backupFile]
-      })
+    })
     const rollOut = new Date()
-    await AutoMail.updateOne({ _id: data._id }, {lastRollOut: rollOut}, { upsert: true })
+    await AutoMail.updateOne({ _id: data._id }, { lastRollOut: rollOut }, { upsert: true })
 }
 
 const nextRollComputatuion = (doc: AutoMailType, referenceDate?: Date) => {
@@ -139,8 +139,8 @@ export const renewAutoMailingActivation = async () => {
         activationTimeout = setTimeout(async () => {
             const rollOut = new Date()
             await activateAutoMailing(newData);
-            await AutoMail.updateOne({ _id: idToUsed }, {lastRollOut: rollOut}, { upsert: true })
-            
+            await AutoMail.updateOne({ _id: idToUsed }, { lastRollOut: rollOut }, { upsert: true })
+
             renewAutoMailingActivation();
         }, timeout)
     }
@@ -149,9 +149,15 @@ export const renewAutoMailingActivation = async () => {
 router.post('/', verifyToken, async (req: Request, res: Response) => {
     try {
         const token = req.cookies.auth_token;
-        const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        });
 
-        if (decodedToken.role !== "ADMIN") {
+        if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
             return res.status(403).json({ message: "Only users with admin role can perform this action" });
         }
 
@@ -201,9 +207,15 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
 router.get('/', verifyToken, async (req: Request, res: Response) => {
     try {
         const token = req.cookies.auth_token;
-        const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        });
 
-        if (decodedToken.role !== "ADMIN") {
+        if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
             return res.status(403).json({ message: "Only users with admin role can perform this action" });
         }
 
@@ -220,9 +232,15 @@ router.get('/', verifyToken, async (req: Request, res: Response) => {
 router.post('/activateNow', verifyToken, async (req: Request, res: Response) => {
     try {
         const token = req.cookies.auth_token;
-        const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        });
 
-        if (decodedToken.role !== "ADMIN") {
+        if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
             return res.status(403).json({ message: "Only users with admin role can perform this action" });
         }
 

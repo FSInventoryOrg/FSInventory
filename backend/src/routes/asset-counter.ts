@@ -27,9 +27,15 @@ router.post('/', [
         }
         try {
             const token = req.cookies.auth_token;
-            const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+            const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
 
-            if (decodedToken.role !== "ADMIN") {
+            if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
                 return res.status(403).json({ message: "Only users with admin role can perform this action" });
             }
             const currentUser = await User.findOne({ _id: decodedToken.userId });
@@ -102,9 +108,15 @@ router.put('/:prefixCode', [
         }
         try {
             const token = req.cookies.auth_token;
-            const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+            const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
 
-            if (decodedToken.role !== "ADMIN") {
+            if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
                 return res.status(403).json({ message: "Only users with admin role can perform this action" });
             }
 
@@ -195,9 +207,15 @@ router.get('/:prefixCode', async (req: Request, res: Response) => {
 router.delete('/:prefixCode', verifyToken, async (req: Request, res: Response) => {
     try {
         const token = req.cookies.auth_token;
-        const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        });
 
-        if (decodedToken.role !== "ADMIN") {
+        if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
             return res.status(403).json({ message: "Only users with admin role can perform this action" });
         }
 

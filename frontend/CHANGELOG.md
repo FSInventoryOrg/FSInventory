@@ -2,6 +2,14 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [3.0.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000700495) 2024-10-14
+### Added
+- New assets (Full Scale IT Hub logo, Login screen background)
+
+### Changed
+- Styling for components affected by changing login method to Rocks API
+- Login screen styling
+
 ## [2.17.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000597050) 2024-10-03
 ### Added
 - Frontend UI and workflow for loading system backup files

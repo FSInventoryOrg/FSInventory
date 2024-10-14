@@ -45,11 +45,8 @@ const UserProfile = ({ userData }: UserProfileProps) => {
   });
 
   const {
-    formState: { errors, isDirty },
     reset,
   } = form;
-
-  const isValid = !Object.keys(errors).length;
 
   const { mutate, isPending: isUpdatePending } = useMutation({
     mutationFn: imsService.updateUserData,
@@ -205,7 +202,7 @@ const UserProfile = ({ userData }: UserProfileProps) => {
               <div className="self-end flex flex-row justify-center items-center gap-2">
                 <Button
                   type="submit"
-                  disabled={!isDirty || !isValid} // here
+                  disabled // here
                   className="gap-2"
                 >
                   {isUpdatePending ? <Spinner size={18} /> : null}
