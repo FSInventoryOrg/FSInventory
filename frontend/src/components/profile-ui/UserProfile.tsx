@@ -45,11 +45,8 @@ const UserProfile = ({ userData }: UserProfileProps) => {
   });
 
   const {
-    formState: { errors, isDirty },
     reset,
   } = form;
-
-  const isValid = !Object.keys(errors).length;
 
   const { mutate, isPending: isUpdatePending } = useMutation({
     mutationFn: imsService.updateUserData,
