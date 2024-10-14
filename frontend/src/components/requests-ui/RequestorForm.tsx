@@ -1,31 +1,63 @@
+import { useFormContext } from 'react-hook-form';
 import { Input } from '../ui/input';
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../ui/form';
 
 const RequestorForm = () => {
+  const { control } = useFormContext();
   return (
-    <>
+    <div className='pb-4'>
       {/* Common Fields Section */}
-      <div className="form-group">
-        {/* autopopulate if logged in */}
-        <label className="block text-sm font-medium pb-2">Full Name</label>
-        <Input placeholder="John Doe" />
-        {/* {errors.fullName && <p className="text-red-500">{errors.fullName.message}</p>} */}
-      </div>
+      <FormField
+        control={control}
+        name="fullName"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Full Name</FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="John Doe" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      {/* autopopulate if logged in */}
 
-      <div className="form-group">
-        {/* autopopulate if logged in */}
-        <label className="block text-sm font-medium pb-2">Manager</label>
-        <Input />
-        {/* {errors.manager && <p className="text-red-500">{errors.manager.message}</p>} */}
-      </div>
-
-      <div className="form-group">
-        <label className="block text-sm font-medium pb-2">
-          Contact Information
-        </label>
-        <Input placeholder="johndoe@fullscale.ph or +63 912 345 6789" />
-        {/* {errors.contactInfo && <p className="text-red-500">{errors.contactInfo.message}</p>} */}
-      </div>
-    </>
+      <FormField
+        control={control}
+        name="manager"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Manager</FormLabel>
+            <FormControl>
+              <Input {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name="contactInfo"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Contact Information</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                placeholder="johndoe@fullscale.ph or +63 912 345 6789"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
   );
 };
 
