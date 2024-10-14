@@ -26,7 +26,7 @@ const SystemBackup = () => {
   const [validationResult, setValidationResult] = useState<ValidationResult>({ message: '' });
   const [validationComplete, setValidationComplete] = useState<boolean | null>(null);
 
-  const acceptedFileTypes: string = '.zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed'
+  const acceptedFileTypes: string = '.zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
   const handleFile = (file: File | undefined) => {
     setUploadedFile(file);
@@ -35,11 +35,8 @@ const SystemBackup = () => {
       setValidationResult({message: ''})
       const reader = new FileReader();
       reader.onloadend = async () => {
-        const base64String = reader.result as string;
-        const plainText = base64String.split(',')[1]
-        const backendExpected = "data:application/zip;base64," + plainText
         const payload = {
-          src: backendExpected,
+          src:  reader.result as string,
         };
         setFileAsBase64(payload);
         try {

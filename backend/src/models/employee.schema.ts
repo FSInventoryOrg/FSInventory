@@ -86,6 +86,8 @@ const employeeSchema: Schema<EmployeeType> = new mongoose.Schema<EmployeeType>({
     required: false },
 });
 
+employeeSchema.index({ firstName: "text", lastName: "text"})
+
 const Employee = mongoose.model<EmployeeType>("Employee", employeeSchema);
 
 export default Employee;

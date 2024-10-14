@@ -8,6 +8,9 @@ import { extractUploadData } from "../utils/upload";
 import { unzipFileToDir } from "../utils/zip";
 import { convertIdToObjectId, convertObjectIdToId, formatDate, stringifyNestedFields } from "../utils/document";
 import { deleteAllFilesInDir, getDirPath, getFileFromDir, readJSONDataFromCSVFile, readJSONDataFromExcelFile, readJSONDataFromJSONFile, saveFileIntoDir, saveFileIntoDirFromBase64 } from "../utils/filesystem";
+import logger from "../utils/logger";
+import { applyChanges, ExcelHardware, extractAssetData, listChanges } from "../utils/excel";
+import Asset, { AssetType } from "../models/asset.schema";
 
 const db = mongoose.connection;
 const router = express.Router();
@@ -195,6 +198,73 @@ router.post('/validate', verifyToken, verifyRole("ADMIN"), async (req: Request, 
 		res.status(500).json({ message: "something went wrong" });
 	}
 });
+
+/**
+ * Verify the backup data to be uploaded then save it on disk
+ * 
+ */
+router.post('/validate_excel', verifyToken, verifyRole("ADMIN"), async (req: Request, res: Response) => {
+	try{
+		const { status, data} = await extractUploadData(req, 'application/vnd.openxmlformat');
+		if(status != 200){
+			return res.status(status).json({ message: "something went wrong with parsing upload data" })
+		}
+		if(!data?.base64){
+			return res.status(400).json({ message: "data not found" })
+		}
+
+		let staleCollections: { [key: string]: { current: AssetType[], backup: ExcelHardware[] } } = {};
+
+		// Parse directly, don't write to file, only to read it again
+		const fileBuffer = Buffer.from(data.base64, 'base64');
+		const assetData = await extractAssetData(xlsx.read(fileBuffer))
+
+		// Check if there is any data to import
+		if (!assetData || assetData.length === 0) return;
+
+		// Create document cache for fast lookup
+		const assetDataMap = new Map<string, ExcelHardware>(assetData.map((asset: ExcelHardware) => [asset.code, asset]));
+
+		// Load all the assets into memory. THIS MIGHT BE A PROBLEM IN THE FUTURE if the asset collection gets too large! 
+		const assetDocuments = await Asset.find().lean(true);
+		
+		// Arrays to hold stale documents
+		const changedDocs: any[] = [];
+		const changeExcelData: any[] = [];
+		// Check for stale records
+		for (const doc of assetDocuments) {
+			const asset = assetDataMap.get(doc.code);
+			if (asset) {
+				const changes = listChanges(doc, asset) || []
+				changeExcelData.push(applyChanges(doc, changes))
+				changedDocs.push(doc);
+			} else {
+				// Document in the database is not present in backup
+				changedDocs.push(doc);
+			}
+		}
+		// If there are stale documents, add them to the result
+		if (changedDocs.length > 0 || changeExcelData.length > 0) {
+			staleCollections["assets"] = {
+				current: changedDocs,
+				backup: changeExcelData
+			};
+
+			res.status(200).json({
+				message: "oudated record found on the backup file",
+				outdated: false,
+				values: staleCollections,
+			});
+			
+		}else{
+			res.status(200).json({ message: "no outdated record" });
+		}
+	}catch(err){
+		console.error(err)
+		res.status(500).json({ message: "something went wrong" })
+	}
+
+})
 
 /**
  * Import into database the verified file
