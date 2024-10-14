@@ -22,9 +22,6 @@ module.exports = {
         "mobile-lg": "640px"
       },
     },
-    fontFamily: {
-      poppins: ["Poppins", "sans-serif"]
-    },
     extend: {
       colors: {
         body: "var(--body-new)",
@@ -113,6 +110,9 @@ module.exports = {
         "tablet": "1024px",
         "mobile-sm": "320px",
         "mobile-lg": "640px"
+      },
+      fontFamily: {
+        poppins: ["Poppins", "sans-serif"]
       },
     },
   },
