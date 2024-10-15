@@ -11,19 +11,20 @@ import User from '../models/user.schema';
 const router = express.Router();
 
 router.get('/', verifyToken, async (req: Request, res: Response) => {
-    try {
-        const notificationSettings = await NotificationSettings.findOne().exec();
-    
-        // If no settings are found, return a default value (for first-time setup)
-        if (!notificationSettings) {
-          return res.json({ daysBeforeLicenseExpiration: 5 });
-        }
-    
-        return res.json(notificationSettings);
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Failed to fetch notification settings' });
-      }
+  try {
+    const notificationSettings = await NotificationSettings.findOne();
+
+    if (!notificationSettings) {
+      return res.json({ daysBeforeLicenseExpiration: 5 });
+    }
+
+    return res.json(notificationSettings);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: 'Failed to fetch notification settings' });
+  }
 });
 
 router.post(
@@ -48,22 +49,34 @@ router.post(
       const currentUser = await User.findOne({ _id: req.user.userId });
       const currentDate = new Date();
 
-      if (!notificationSettings) {
-        notificationSettings = new NotificationSettings({daysBeforeLicenseExpiration});
-        notificationSettings.created = currentDate;
-        if (currentUser) {
-            notificationSettings.createdBy = `${currentUser.firstName} ${currentUser.lastName}`;
-        }
-      }
+      const newData = {
+        daysBeforeLicenseExpiration,
+        updated: currentDate,
+        updatedBy: currentUser
+          ? `${currentUser.firstName} ${currentUser.lastName}`
+          : undefined,
+      };
 
-      notificationSettings.updated = currentDate;
-      if (currentUser) {
-        notificationSettings.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
-      }
-      
-      notificationSettings.save();
+      const filter = notificationSettings
+        ? { _id: notificationSettings._id }
+        : {};
 
-      return res.status(200).json({ message: 'Successfully added notification setting.' });
+      await NotificationSettings.updateOne(
+        filter,
+        {
+          $set: newData,
+          $setOnInsert: {
+            created: currentDate,
+            createdBy: currentUser
+              ? `${currentUser.firstName} ${currentUser.lastName}`
+              : undefined,
+          },
+        },
+        { upsert: true }
+      );
+      return res
+        .status(200)
+        .json({ message: 'Successfully updated notification setting.' });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: 'Something went wrong' });
