@@ -35,6 +35,7 @@ const EditOption = ({
   onEnterPressed,
 }: EditOptionProps) => {
   const [openDeleteOptionDialog, setOpenDeleteOptionDialog] = useState(false);
+  const isObject: boolean = typeof option.value === 'object'
 
   const {
     newOption: editedOption,
@@ -77,7 +78,7 @@ const EditOption = ({
         type='input'
         className='focus-visible:ring-0 focus-visible:ring-popover'
         onChange={(e) => {
-          setEditedOption({ property: property, value: e.target.value });
+          setEditedOption({ property: property, value: isObject ? {...(option.value as object), value: e.target.value} : e.target.value });
         }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
