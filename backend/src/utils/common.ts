@@ -304,7 +304,6 @@ export const auditAssets = async () => {
 	const assets = await Asset.aggregate().match({
 		$expr: {
 			$and: [
-				{ $eq: ['$type', 'Hardware'] },
 				{ $in: ['$category', categories] },
 				{ $in: ['$status', assetStatueses] }
 			]
