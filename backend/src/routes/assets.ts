@@ -7,7 +7,7 @@ import verifyToken from '../middleware/auth';
 import jwt from "jsonwebtoken";
 import User from '../models/user.schema';
 import { getCodeAndIncrement } from '../utils/asset-counter';
-import { auditAssets } from '../utils/common';
+import { auditAssets, trackExpiringSoftwareLicenses } from '../utils/common';
 import Employee from '../models/employee.schema';
 
 const router = express.Router();
@@ -165,6 +165,7 @@ router.post('/', [
       const newAsset =  data.type === 'Hardware' ? new Hardware(data) : new Software(data)
       await newAsset.save();
       await auditAssets();
+      if (data.type === 'Software') await trackExpiringSoftwareLicenses();
 
       return res.status(201).json(newAsset);
     } catch (error) {
@@ -499,6 +500,7 @@ router.put('/:code', [
         : await Software.findOneAndUpdate({ code: code }, data, { new: true }) 
 
       await auditAssets();
+      if (data.type === 'Software') await trackExpiringSoftwareLicenses();
       
       res.status(200).json(updatedAsset);
     } catch (error) {
@@ -730,6 +732,7 @@ router.delete('/:code', verifyToken, async (req: Request, res: Response) => {
 
     await Asset.deleteOne({ code });
     await auditAssets();
+    if (asset.type === 'Software') await trackExpiringSoftwareLicenses();
     res.status(200).json({ message: 'Asset deleted successfully' });
   } catch (error) {
     console.error('Error deleting asset:', error);
@@ -753,6 +756,7 @@ router.patch('/bulkDelete', verifyToken, async (req: Request, res: Response) => 
 
     await Asset.deleteMany({ code: { $in: codesToDelete} });
     await auditAssets();
+    await trackExpiringSoftwareLicenses();
     res.status(200).json({ message: 'Assets deleted successfully' });
   } catch (error) {
     console.error('Error deleting assets:', error);
