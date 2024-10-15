@@ -81,7 +81,7 @@ async function findEmployee(
   const employee = await Employee.findOne({ $text: { $search: name } });
   // if we could not find the employee, just use the value inside excel
   if (employee === null) {
-    return name;
+    return '';
   }
   return employee.code;
 }
@@ -104,7 +104,7 @@ async function parseHardwareSheet(
           status: rowJson[" _1"],
           remarks: rowJson["Remarks"],
           deploymentDate: normalizeDate(rowJson["Deployed Date"]),
-          recoveredFrom: rowJson["Recovered From"],
+          recoveredFrom: await findEmployee(rowJson["Recovered From"]),
           recoveryDate: normalizeDate(rowJson["Recovered Date"]),
           assignee: await findEmployee(rowJson["Assigned To"]),
           purchaseDate: normalizeDate(rowJson["Purchase Date"]),
