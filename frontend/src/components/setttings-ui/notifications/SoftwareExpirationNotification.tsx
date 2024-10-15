@@ -1,6 +1,14 @@
+import { useQuery } from "@tanstack/react-query";
 import SoftwareExpirationNotificationForm from "./SoftwareExpirationNotificationForm";
+import * as imsService from '@/ims-service';
+import { NotificationSettingType } from "@/types/notification-setting";
 
 const SoftwareExpirationNotification = () => {
+  const { data: settingsData } = useQuery<NotificationSettingType>({
+    queryKey: ['fetchSoftwareNotificationSettings'],
+    queryFn: () => imsService.fetchSoftwareNotif()
+  });
+
   return (
     <div className="pb-2">
       <h1 className="text-xl font-semibold">Software Asset Expiration</h1>
@@ -8,7 +16,7 @@ const SoftwareExpirationNotification = () => {
         Set how many days before a software asset expires to receive a
         notification.
       </h3>
-      <SoftwareExpirationNotificationForm/>
+      {settingsData && <SoftwareExpirationNotificationForm defaultValues={settingsData}/>}
     </div>
   );
 };
