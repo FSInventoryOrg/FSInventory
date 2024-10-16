@@ -9,8 +9,8 @@ const RequestForm = () => {
   const { showToast } = useAppContext();
   const [requestType, setRequestType] = useState('Report an Issue');
 
-  const onSubmit = (data: any) => { 
-    mutate();
+  const onSubmit = (data: any) => {
+    mutate(data);
   };
 
   const { mutate } = useMutation({

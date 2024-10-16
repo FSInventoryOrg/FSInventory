@@ -14,6 +14,7 @@ export const ReportIssueSchema = RequestFormSchema.extend({
     assetAffected: z.string().optional(),
     problemDescription: z.string().trim().min(1, 'Detailed description is required'),
     supportingFiles: z.any().optional()
+
 })
 
 export const RequestNewAssetSchema = RequestFormSchema.extend({

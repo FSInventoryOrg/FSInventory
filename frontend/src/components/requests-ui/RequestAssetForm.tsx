@@ -31,15 +31,13 @@ import { RequestNewAssetSchema } from '@/schemas/RequestFormSchema';
 
 interface RequestAssetFormProps {
   onSubmit: (data: any) => void;
-  onChangeRequestType: (any) => void;
+  onChangeRequestType: (requestType: any) => void;
 }
 const RequestAssetForm = ({
   onSubmit,
   onChangeRequestType,
 }: RequestAssetFormProps) => {
   const [openRequestedDate, setOpenRequestedDate] = useState(false);
-
-  const [requestedDate, setRequestedDate] = useState<Date | undefined>();
 
   const requestAssetForm = useForm<z.infer<typeof RequestNewAssetSchema>>({
     resolver: zodResolver(RequestNewAssetSchema),

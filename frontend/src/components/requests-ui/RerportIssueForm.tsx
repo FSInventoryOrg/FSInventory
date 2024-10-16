@@ -22,18 +22,17 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import RequestorForm from './RequestorForm';
-import { useState } from 'react';
 import { Button } from '../ui/button';
 
 interface ReportIssueFormProps {
   onSubmit: (data: any) => void;
-  onChangeRequestType: (any) => void;
+  onChangeRequestType: (requestType: any) => void;
 }
 const ReportIssueForm = ({
   onSubmit,
   onChangeRequestType,
 }: ReportIssueFormProps) => {
-  const [uploadedFile, setUploadedFile] = useState<File | undefined>();
+//   const [uploadedFile, setUploadedFile] = useState<File | undefined>();
 
   const reportIssueForm = useForm<z.infer<typeof ReportIssueSchema>>({
     resolver: zodResolver(ReportIssueSchema),
@@ -47,9 +46,6 @@ const ReportIssueForm = ({
     },
     mode: 'onChange',
   });
-  const handleFile = (file: File | undefined) => {
-    setUploadedFile(file);
-  };
 
   const issueCategories = [
     {
@@ -195,8 +191,8 @@ const ReportIssueForm = ({
                   <FormLabel>Upload Supporting Files</FormLabel>
                   <FormControl>
                     <FileUploader
-                      handleFile={handleFile}
-                      uploadedFile={uploadedFile}
+                      handleFile={field.onChange}
+                      uploadedFile={field.value}
                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                       wildcard='image/'
                     />
