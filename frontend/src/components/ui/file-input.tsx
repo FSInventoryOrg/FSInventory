@@ -31,10 +31,11 @@ const FileInput = forwardRef(function FileInput(props: FileInputProps, ref: Forw
   const checkFileType = (file: File) => {
     const { type, name } = file;
     const extension = '.'.concat(name.split('.')[1]);
-    const typeIsValid = supportedTypes.includes(type) || (wildCardTypes.length && isTypeInWildCard(type));
-    const extensionIsValid = supportedTypes.includes(extension);
+    const typeIsValid =  (wildCardTypes.length && isTypeInWildCard(type)) || supportedTypes.includes(type)
+    // If the type matches a wildcard, skip extension check.
+    const extensionIsValid = (wildCardTypes.length && isTypeInWildCard(type)) ? true : supportedTypes.includes(extension)
 
-    if (!typeIsValid && !extensionIsValid) throw Error(`Invalid file type. Supported types are: ${supportedExtensions}`);
+    if (!typeIsValid || !extensionIsValid) throw Error(`Invalid file type. Supported types are: ${supportedExtensions}`);
   }
 
   const checkFileSize = (file: File) => {
