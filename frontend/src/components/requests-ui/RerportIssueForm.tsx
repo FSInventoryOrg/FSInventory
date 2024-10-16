@@ -113,7 +113,6 @@ const ReportIssueForm = ({
           />
           <div className="flex flex-col ">
             <FormField
-              // control={reportIssueForm.control}
               control={reportIssueForm.control}
               name="issueCategory"
               render={({ field }) => (
@@ -157,7 +156,6 @@ const ReportIssueForm = ({
               )}
             />
             <FormField
-              // control={reportIssueForm.control}
               control={reportIssueForm.control}
               name="assetAffected"
               render={({ field }) => (
@@ -174,7 +172,6 @@ const ReportIssueForm = ({
               )}
             />
             <FormField
-              // control={reportIssueForm.control}
               control={reportIssueForm.control}
               name="problemDescription"
               render={({ field }) => (
@@ -191,7 +188,6 @@ const ReportIssueForm = ({
               )}
             />
             <FormField
-              // control={reportIssueForm.control}
               control={reportIssueForm.control}
               name="supportingFiles"
               render={({ field }) => (
@@ -201,7 +197,8 @@ const ReportIssueForm = ({
                     <FileUploader
                       handleFile={handleFile}
                       uploadedFile={uploadedFile}
-                      accept="image/*,.pdf,.doc,.docx"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      wildcard='image/'
                     />
                   </FormControl>
                 </FormItem>

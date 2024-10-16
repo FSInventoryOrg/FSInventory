@@ -5,11 +5,12 @@ interface FileInputProps {
   onError: (errorMessage: Error) => void;
   onChange: (file: File) => void;
   accept: string;
-  maxFileSize?: number 
+  maxFileSize?: number;
+  wildcard?: string;
 }
 
 const FileInput = forwardRef(function FileInput(props: FileInputProps, ref: ForwardedRef<HTMLInputElement>) {
-  const { onChange, accept, onError, maxFileSize } = props;  
+  const { onChange, accept, onError, maxFileSize, wildcard } = props;  
 
   const handleChange = (file: File) => {
     try {
@@ -25,15 +26,12 @@ const FileInput = forwardRef(function FileInput(props: FileInputProps, ref: Forw
 
   const supportedExtensions: string = supportedTypes.join(', ');
 
-  const wildCardTypes: string[] = supportedTypes.filter((type)=> type.endsWith('/*'))
-  const isTypeInWildCard = (type: string)=> wildCardTypes.some((wildCardType)=> type.startsWith(wildCardType.slice(0,-1)))
-
   const checkFileType = (file: File) => {
     const { type, name } = file;
     const extension = '.'.concat(name.split('.')[1]);
-    const typeIsValid =  (wildCardTypes.length && isTypeInWildCard(type)) || supportedTypes.includes(type)
-    // If the type matches a wildcard, skip extension check.
-    const extensionIsValid = (wildCardTypes.length && isTypeInWildCard(type)) ? true : supportedTypes.includes(extension)
+    const typeMatchesWildcard = wildcard && type.includes(wildcard)
+    const typeIsValid =  typeMatchesWildcard ? true : supportedTypes.includes(type);
+    const extensionIsValid = supportedTypes.includes(extension);
 
     if (!typeIsValid || !extensionIsValid) throw Error(`Invalid file type. Supported types are: ${supportedExtensions}`);
   }

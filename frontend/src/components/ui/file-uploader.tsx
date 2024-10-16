@@ -7,10 +7,11 @@ interface FileUploaderProps {
   handleFile: (file: File | undefined) => void;
   uploadedFile: File | undefined;
   accept: string;
-  maxFileSize?: number 
+  maxFileSize?: number
+  wildcard?: string;
 }
 
-const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, accept, maxFileSize }) => {
+const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, accept, maxFileSize, wildcard }) => {
   const hiddenFileInput = useRef<HTMLInputElement>(null); 
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -49,22 +50,17 @@ const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, a
 
   const supportedTypes: string[] = accept.split(',')
 
-  const supportedExtensions: string[] = supportedTypes
-    .filter((type: string) => type[0] === '.')
-
-  const wildCardTypes: string[] = supportedTypes.filter((type)=> type.endsWith('/*'))
-  const isTypeInWildCard = (type: string)=> wildCardTypes.some((wildCardType)=> type.startsWith(wildCardType.slice(0,-1)))
-
-  const supportedFileTypes = [...wildCardTypes, ...supportedExtensions].filter( type => !!type?.length ).join(', ')
+  const supportedExtensions: string = supportedTypes
+    .filter((type: string) => type[0] === '.').join(', ')
 
   const checkFileType = (file: File) => {
     const { type, name } = file;
     const extension = '.'.concat(name.split('.')[1]);
-    const typeIsValid =  (wildCardTypes.length && isTypeInWildCard(type)) || supportedTypes.includes(type)
-    // If the type matches a wildcard, skip extension check.
-    const extensionIsValid = (wildCardTypes.length && isTypeInWildCard(type)) ? true : supportedTypes.includes(extension)
+    const typeMatchesWildcard = wildcard && type.includes(wildcard)
+    const typeIsValid =  typeMatchesWildcard ? true : supportedTypes.includes(type);
+    const extensionIsValid = supportedTypes.includes(extension);
 
-    if (!typeIsValid || !extensionIsValid) throw Error(`Invalid file type. Supported types are: ${supportedFileTypes}`);
+    if (!typeIsValid || !extensionIsValid) throw Error(`Invalid file type. Supported types are: ${supportedExtensions}`);
   }
 
   const checkFileSize = (file: File) => {
@@ -89,7 +85,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, a
             </>
           }
           <p className="text-sm text-muted-foreground">
-            Supported file types: {supportedFileTypes}
+            Supported file types: {supportedExtensions}
           </p>
           <FileInput  
             ref={hiddenFileInput}
