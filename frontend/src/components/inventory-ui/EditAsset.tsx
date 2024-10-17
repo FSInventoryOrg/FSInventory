@@ -181,8 +181,8 @@ const onSubmit = (data: any) => {
           />
           <Tabs defaultValue='Hardware' value={assetData.type} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="Hardware" onClick={() => handleTabChange("Hardware")}>Hardware</TabsTrigger>
-              <TabsTrigger value="Software" onClick={() => handleTabChange("Software")} disabled>Software</TabsTrigger>
+              <TabsTrigger className='data-[state=active]:bg-tab' value="Hardware" onClick={() => handleTabChange("Hardware")}>Hardware</TabsTrigger>
+              <TabsTrigger className='data-[state=active]:bg-tab' value="Software" onClick={() => handleTabChange("Software")} disabled>Software</TabsTrigger>
             </TabsList>
             <div className="">
               <TabsContent tabIndex={-1} value="Hardware" className="pb-4 px-3">
