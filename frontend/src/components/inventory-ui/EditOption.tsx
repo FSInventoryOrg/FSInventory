@@ -35,7 +35,9 @@ const EditOption = ({
   onEnterPressed,
 }: EditOptionProps) => {
   const [openDeleteOptionDialog, setOpenDeleteOptionDialog] = useState(false);
-  const isObject: boolean = typeof option.value === 'object'
+  const isObject: boolean = typeof option.value === 'object';
+  const propertyIsCategory: boolean = property === 'category';
+  const [newPrefixCode, setNewPrefixCode] = propertyIsCategory ? useState('') : [undefined, () => { }];
 
   const {
     newOption: editedOption,
