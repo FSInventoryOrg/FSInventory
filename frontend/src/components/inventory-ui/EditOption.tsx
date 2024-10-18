@@ -64,6 +64,12 @@ const EditOption = ({
 
   const optionToEdit = getOptionValue(editedOption.value);
 
+  useEffect(() => {
+    if (propertyIsCategory && newPrefixCode === '') {
+      setNewPrefixCode(oldPrefixCode);
+    }
+  }, [propertyIsCategory, assetCounter])
+
   return (
     <>
       <div className='items-center flex flex-row'>
