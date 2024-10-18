@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeftIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { capitalize, format } from '@/lib/utils';
@@ -10,6 +10,8 @@ import ColorSelect from './ColorSelect';
 import DeletePropertyDialog from './DeletePropertyDialog';
 import { OptionType } from '@/types/options';
 import useOption from './useOptions';
+import useAssetCounter from './useAssetCounter';
+import { AssetCounterType } from '@/types/asset';
 
 interface EditOptionProps {
   option: OptionType;
@@ -19,7 +21,7 @@ interface EditOptionProps {
   className?: string;
   onCancel: () => void;
   onDelete: (optionToDelete: string) => void;
-  onUpdate: (updatedOption: OptionType) => void;
+  onUpdate: (updatedOption: OptionType, updatedAssetCounter?: AssetCounterType & { oldPrefixCode: string}) => void;
   isUpdatePending: boolean;
   onEnterPressed?: () => void;
 }
@@ -59,7 +61,16 @@ const EditOption = ({
   };
 
   const handleUpdate = () => {
-    onUpdate(editedOption);
+    const isPrefixCodeChanged: boolean = !!newPrefixCode && oldPrefixCode !== newPrefixCode;
+    const category: string = typeof editedOption.value === 'object' ? editedOption.value.value : '';
+    isPrefixCodeChanged && !!assetCounter && !!newPrefixCode ?
+      (() => {
+        onUpdate(editedOption, { ...assetCounter, category, prefixCode: newPrefixCode, oldPrefixCode })
+        updateAssetCounterInCache(assetCounter._id!, { prefixCode: newPrefixCode, category })
+      })() :
+      (() => {
+        onUpdate(editedOption)
+      })();
   };
 
   const optionToEdit = getOptionValue(editedOption.value);

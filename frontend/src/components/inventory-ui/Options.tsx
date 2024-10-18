@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ColorOption, OptionType, TagOption } from '@/types/options';
+import { AssetCounterType } from '@/types/asset';
 import AddOption from './AddOption';
 import EditOption from './EditOption';
 
@@ -127,6 +128,9 @@ const Options = ({
     useMutation({
       mutationFn: imsService.updateAssetsByProperty,
     });
+  const { mutate: updateAssetCounter, isPending: isUpdateAssetCounterPending } = useMutation({
+    mutationFn: imsService.updateAssetCounter
+  })
 
   const findIndexInOptions = (optionVal: string) => {
     if (!optionValues) return -1;
@@ -143,7 +147,7 @@ const Options = ({
   const handleAddOption = (option: OptionType, prefixCode?: string) => {
     addOptionValue({ ...option, prefixCode, type });
   };
-  const handleUpdateOption = (updatedOption: OptionType) => {
+  const handleUpdateOption = (updatedOption: OptionType, updatedAssetCounter?: AssetCounterType & { oldPrefixCode: string}) => {
     const indexOfValueToEdit = findIndexInOptions(optionToEdit);
     updateOptionValue({
       property: updatedOption.property,
