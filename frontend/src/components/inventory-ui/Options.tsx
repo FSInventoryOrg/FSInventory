@@ -163,7 +163,7 @@ const Options = ({
         prefixCode,
         updatedAssetCounter: rest
       });
-      updateAssetsByProperty({
+      updateAssetPrefixCodes({
       property: 'code',
       value: prefixCode,
       newValue: rest.prefixCode
@@ -201,11 +201,7 @@ const Options = ({
           }
         }
       }
-    }
-    setOpen(false);
-    setTimeout(() => {
-      setOpen(true);
-    }, 100);
+    } 
     showToast({ message: `Option deleted successfully!`, type: 'SUCCESS' });
   };
 
@@ -236,6 +232,13 @@ const Options = ({
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, filterValue, optionValues, property, type]);
+
+  React.useEffect(() => {
+    if (open && !isAssetPrefixEditPending && !isUpdateAssetCounterPending) {
+      console.log(isUpdateAssetCounterPending);
+      setOpen(isAssetPrefixEditPending)
+    }
+  }, [isAssetPrefixEditPending, isUpdateAssetCounterPending])
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>
