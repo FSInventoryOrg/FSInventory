@@ -97,10 +97,6 @@ const Options = ({
         message: `New ${property} added successfully!`,
         type: 'SUCCESS',
       });
-      setOpen(false);
-      setTimeout(() => {
-        setOpen(true);
-      }, 100);
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: 'ERROR' });
@@ -114,10 +110,6 @@ const Options = ({
           message: `${capitalize(format(property))} updated successfully!`,
           type: 'SUCCESS',
         });
-        setOpen(false);
-        setTimeout(() => {
-          setOpen(true);
-        }, 100);
       },
       onError: (error: Error) => {
         showToast({ message: error.message, type: 'ERROR' });
