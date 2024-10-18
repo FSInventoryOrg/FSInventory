@@ -128,6 +128,9 @@ const Options = ({
     useMutation({
       mutationFn: imsService.updateAssetsByProperty,
     });
+  const { mutate: updateAssetPrefixCodes, isPending: isAssetPrefixEditPending } = useMutation({
+      mutationFn: imsService.updateAssetsByProperty,
+    });
   const { mutate: updateAssetCounter, isPending: isUpdateAssetCounterPending } = useMutation({
     mutationFn: imsService.updateAssetCounter
   })
@@ -417,7 +420,7 @@ const Options = ({
               onCancel={() => setIsEditing((prev) => !prev)}
               onDelete={handleDeleteOption}
               onUpdate={handleUpdateOption}
-              isUpdatePending={isOptionEditPending || isAssetEditPending || isUpdateAssetCounterPending}
+              isUpdatePending={isOptionEditPending || isAssetEditPending || isUpdateAssetCounterPending || isAssetPrefixEditPending}
             />
           </div>
         )}
