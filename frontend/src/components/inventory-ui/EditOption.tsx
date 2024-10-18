@@ -46,6 +46,13 @@ const EditOption = ({
     getOptionValue,
   } = useOption(option);
 
+  const {
+    getAssetCounterFromCategory,
+    updateAssetCounterInCache
+  } = useAssetCounter(propertyIsCategory, option)
+  const assetCounter = getAssetCounterFromCategory() ?? undefined;
+  const { prefixCode: oldPrefixCode } = assetCounter ?? { prefixCode: '' };
+
   const handleCancel = () => {
     onCancel();
     setEditedOption({ property, value: '' });
@@ -89,6 +96,26 @@ const EditOption = ({
           }
         }}
       />
+      {propertyIsCategory && newPrefixCode !== null && (
+        <>
+          <Label>Prefix Code</Label>
+          <Input
+            value={newPrefixCode}
+            type='input'
+            className='focus-visible:ring-0 focus-visible:ring-popover'
+            onChange={(e) => {
+              const newValue = e.target.value;
+              setNewPrefixCode(newValue.toUpperCase().trim());
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                onEnterPressed?.();
+              }
+            }}
+          />
+        </>
+      )}
       {colorSelect && (
         <ColorSelect
           onColorSelect={handleColorSelect}
