@@ -162,7 +162,18 @@ const Options = ({
           ? updatedOption.value.value
           : updatedOption.value,
     });
-
+    if (!!updatedAssetCounter) {
+      const { oldPrefixCode: prefixCode, ...rest } = updatedAssetCounter
+      updateAssetCounter({
+        prefixCode,
+        updatedAssetCounter: rest
+      });
+      updateAssetsByProperty({
+      property: 'code',
+      value: prefixCode,
+      newValue: rest.prefixCode
+    });
+    }
     if (indexOfValueToEdit === findIndexInOptions(field.value)) {
       field.onChange(
         typeof updatedOption.value === 'object'
@@ -406,7 +417,7 @@ const Options = ({
               onCancel={() => setIsEditing((prev) => !prev)}
               onDelete={handleDeleteOption}
               onUpdate={handleUpdateOption}
-              isUpdatePending={isOptionEditPending || isAssetEditPending}
+              isUpdatePending={isOptionEditPending || isAssetEditPending || isUpdateAssetCounterPending}
             />
           </div>
         )}
