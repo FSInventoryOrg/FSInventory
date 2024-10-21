@@ -1,6 +1,6 @@
 import { IconSvgProps } from "@/types/svg";
 
-export const FullScaleITIcon = ({ size = 48, width, height }: IconSvgProps) => (
+const FullScaleITIcon = ({ size = 48, width, height }: IconSvgProps) => (
   <svg width={size || width} height={size || height} viewBox="0 0 49 48" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
     <mask id="mask0_231_1411" style={{maskType:'luminance'}} maskUnits="userSpaceOnUse" x="0" y="0" width="49" height="49">
     <rect y="0.000244141" width="48.7256" height="48.0558" fill="url(#pattern0_231_1411)"/>
@@ -21,3 +21,5 @@ export const FullScaleITIcon = ({ size = 48, width, height }: IconSvgProps) => (
   </svg>
 
 )
+
+export default FullScaleITIcon;
