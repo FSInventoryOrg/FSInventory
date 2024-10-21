@@ -19,7 +19,6 @@ import * as authService from '@/auth-service'
 import { useAppContext } from '@/hooks/useAppContext'
 import { useNavigate } from 'react-router-dom'
 import { Spinner } from '../Spinner'
-import CustomAlert from "../Alert"
 
 export type SignInFormData = {
   email: string;
@@ -28,9 +27,10 @@ export type SignInFormData = {
 
 interface SignInFormProps {
   onError: (errorMessage: string | null) => void;
+  onSubmit: () => void;
 }
 
-const SignInForm = ({ onError }: SignInFormProps) => {
+const SignInForm = ({ onError, onSubmit }: SignInFormProps) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { showToast } = useAppContext();
@@ -39,7 +39,6 @@ const SignInForm = ({ onError }: SignInFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleSignInError = (errorMessage: string) => {
-    console.log(errorMessage)
     onError(errorMessage)
   }
   
@@ -68,9 +67,10 @@ const SignInForm = ({ onError }: SignInFormProps) => {
       setServerError(true)
       handleSignInError(error.message)
     }
-  });
+  }); 
 
-  const onSubmit = (data: z.infer<typeof SignInSchema>) => {
+  const handleSubmit = (data: z.infer<typeof SignInSchema>) => {
+    onSubmit()
     setServerError(false);
     setIsSubmitting(true);
     setIsPasswordVisible(false);
@@ -79,7 +79,7 @@ const SignInForm = ({ onError }: SignInFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 font-poppins">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 font-poppins">
         <FormField
           control={form.control}
           name="email"
@@ -87,7 +87,7 @@ const SignInForm = ({ onError }: SignInFormProps) => {
             <FormItem>
               <FormLabel className={`flex gap-2 text-md items-center font-normal dark:text-white`}>Email Address</FormLabel>
               <FormControl>
-                <Input placeholder="Enter email address" {...field} autoComplete="off" />
+                <Input error={serverError} placeholder="Enter email address" {...field} autoComplete="off" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -103,7 +103,7 @@ const SignInForm = ({ onError }: SignInFormProps) => {
               </FormLabel>
               <div className='flex items-center relative'>
                 <FormControl>
-                  <Input type={isPasswordVisible ? "text" : "password"} placeholder="Password" {...field} autoComplete="off" />
+                  <Input type={isPasswordVisible ? "text" : "password"} error={serverError} placeholder="Password" {...field} autoComplete="off" />
                 </FormControl>
                 <Button 
                   type="button" 
@@ -118,7 +118,6 @@ const SignInForm = ({ onError }: SignInFormProps) => {
             </FormItem>
           )}
         />
-        {serverError && <CustomAlert type="error" hideTitle message="Sorry, a server error occurred. Please try again later."/>}
         <div className='pt-4'>
           <Button type='submit' className="w-full gap-2 text-white" disabled={isSubmitting}>
             {isSubmitting ? <Spinner size={18}/> : 'Sign in' }
