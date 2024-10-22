@@ -70,6 +70,9 @@ const ReportIssueForm = ({
       caption: 'Unauthorized access, etc.',
     },
   ];
+
+  const allowedTypes = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/pdf'
+  const allowedExtensions = '.pdf,.doc,.docx,.jpg,.jpeg,.png'
   return (
       <Form {...reportIssueForm}>
         <form key={1} onSubmit={reportIssueForm.handleSubmit(onSubmit)}  className='w-full'>
@@ -193,7 +196,7 @@ const ReportIssueForm = ({
                     <FileUploader
                       handleFile={field.onChange}
                       uploadedFile={field.value}
-                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      accept={allowedTypes + ',' + allowedExtensions}
                       wildcard='image/'
                     />
                   </FormControl>
@@ -201,7 +204,7 @@ const ReportIssueForm = ({
               )}
             />
           </div>
-          <Button type="submit">Submit Request</Button>
+          <Button className='my-2' type="submit">Submit Request</Button>
         </form>
       </Form>
 

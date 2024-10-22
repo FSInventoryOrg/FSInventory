@@ -189,7 +189,7 @@ const RequestAssetForm = ({
             </FormItem>
           )}
         />
-        <Button type="submit">Submit Request</Button>
+        <Button className='my-2' type="submit">Submit Request</Button>
       </form>
     </Form>
   );
