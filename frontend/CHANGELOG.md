@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.2](https://connect.zoho.com/portal/intranet/task/623367000000745059) 2024-10-17
+### Fixed
+- Highlight color of Hardware and Software tabs to be more emphasized in Light Mode
+- Improved readability of warning alert by changing colors
+
 ## [2.17.1](https://connect.zoho.com/portal/intranet/task/623367000000795111) 2024-10-09
 ### Fixed
 - Calendar modals in Add and Edit asset dialogs to display correctly
