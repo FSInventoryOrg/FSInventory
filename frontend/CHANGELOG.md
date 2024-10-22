@@ -5,6 +5,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.18.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000745177) 2024-10-18
 - Added field for Prefix Code when editing a category in the New Asset screen
 
+## [2.17.2](https://connect.zoho.com/portal/intranet/task/623367000000745059) 2024-10-17
+### Fixed
+- Highlight color of Hardware and Software tabs to be more emphasized in Light Mode
+- Improved readability of warning alert by changing colors
+
+## [2.17.1](https://connect.zoho.com/portal/intranet/task/623367000000795111) 2024-10-09
+### Fixed
+- Calendar modals in Add and Edit asset dialogs to display correctly
+
 ## [2.17.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000597050) 2024-10-03
 ### Added
 - Frontend UI and workflow for loading system backup files
