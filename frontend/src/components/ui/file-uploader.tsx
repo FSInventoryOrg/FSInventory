@@ -92,6 +92,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, a
             onChange={handleChange}
             accept={accept}
             onError={handleUploadError}
+            wildcard={wildcard}
           />
         </div>
       </div>
