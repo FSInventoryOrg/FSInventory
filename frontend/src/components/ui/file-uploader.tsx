@@ -48,7 +48,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, a
     setErrorMessage(errorMessage.message);
   }
 
-  const supportedTypes: string[] = accept.split(',')
+  const supportedTypes: string[] = accept.toLowerCase().split(',')
 
   const supportedExtensions: string = supportedTypes
     .filter((type: string) => type[0] === '.').join(', ')
@@ -56,8 +56,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, a
   const checkFileType = (file: File) => {
     const { type, name } = file;
     const extension = '.'.concat(name.split('.')[1]);
-    const typeMatchesWildcard = wildcard && type.includes(wildcard)
-    const typeIsValid =  typeMatchesWildcard ? true : supportedTypes.includes(type);
+    const typeMatchesWildcard = wildcard && type.toLowerCase().includes(wildcard)
+    const typeIsValid =  typeMatchesWildcard ? true : supportedTypes.includes(type.toLowerCase());
     const extensionIsValid = supportedTypes.includes(extension);
 
     if (!typeIsValid || !extensionIsValid) throw Error(`Invalid file type. Supported types are: ${supportedExtensions}`);
