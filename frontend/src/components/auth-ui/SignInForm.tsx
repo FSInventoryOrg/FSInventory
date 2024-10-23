@@ -113,6 +113,14 @@ const SignInForm = ({ onError, onSubmit }: SignInFormProps) => {
                 >
                   { isPasswordVisible ? <EyeIcon color="#565F5C"/> : <EyeOffIcon color="#565F5C"/> }
                 </Button>
+                <style>{`
+                  .hide-password-toggle::-ms-reveal,
+                  .hide-password-toggle::-ms-clear {
+                    visibility: hidden;
+                    pointer-events: none;
+                    display: none;
+                  }
+                `}</style>
               </div>
               <FormMessage />
             </FormItem>
