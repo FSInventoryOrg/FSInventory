@@ -14,9 +14,11 @@ const FileInput = forwardRef(function FileInput(props: FileInputProps, ref: Forw
 
   const handleChange = (file: File) => {
     try {
-      checkFileType(file);
-      checkFileSize(file);
-      onChange(file);
+      if (file) {
+        checkFileType(file);
+        checkFileSize(file);
+        onChange(file);
+      } 
     } catch (err: any) {
       onError(err);
     }
@@ -37,8 +39,10 @@ const FileInput = forwardRef(function FileInput(props: FileInputProps, ref: Forw
   }
 
   const checkFileSize = (file: File) => {
+    console.log(maxFileSize, file.size)
     if (maxFileSize && file.size > maxFileSize) {
-      throw Error(`File size exceeds ${maxFileSize} MB`);
+      const maxFileSizeInMB = maxFileSize / (1024 * 1024);
+      throw Error(`File size exceeds ${maxFileSizeInMB} MB`);
     }
   }
 

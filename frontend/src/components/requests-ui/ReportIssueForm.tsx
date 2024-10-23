@@ -198,6 +198,7 @@ const ReportIssueForm = ({
                       uploadedFile={field.value}
                       accept={allowedTypes + ',' + allowedExtensions}
                       wildcard='image/'
+                      maxFileSize={10 * 1024 * 1024}
                     />
                   </FormControl>
                 </FormItem>

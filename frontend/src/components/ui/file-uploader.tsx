@@ -65,7 +65,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, a
 
   const checkFileSize = (file: File) => {
     if (maxFileSize && file.size > maxFileSize) {
-      throw Error(`File size exceeds ${maxFileSize} MB`);
+      const maxFileSizeInMB = maxFileSize / (1024 * 1024);
+      throw Error(`File size exceeds ${maxFileSizeInMB} MB`);
     }
   }
   
@@ -93,6 +94,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ handleFile, uploadedFile, a
             accept={accept}
             onError={handleUploadError}
             wildcard={wildcard}
+            maxFileSize={maxFileSize}
           />
         </div>
       </div>
