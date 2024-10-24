@@ -42,6 +42,7 @@ const EditOption = ({
   const propertyIsCategory: boolean = property === 'category';
   const [newPrefixCode, setNewPrefixCode] = propertyIsCategory ? useState('') : [undefined, () => { }];
   const [prefixCodeError, setPrefixCodeError] = useState('');
+  const [optionError, setOptionError] = useState('');
   const { showToast } = useAppContext();
 
   const {
@@ -72,9 +73,13 @@ const EditOption = ({
       throw new Error('Prefix code can not be empty')
     };
 
+    if (optionError) {
+      throw new Error(`${capitalize(property)} name can not be empty`)
+    }
+
     if (assetCounters) {
       const prefixCodeExists: boolean = !!assetCounters.find((assetCounter: AssetCounterType) => assetCounter.prefixCode === newPrefixCode);
-      if (prefixCodeExists) {
+      if (prefixCodeExists && isPrefixCodeChanged) {
         setPrefixCodeError('Prefix code already exists')
         throw new Error(`Prefix code ${newPrefixCode} already exists`)
       };
@@ -106,7 +111,12 @@ const EditOption = ({
     } else {
       setPrefixCodeError('')
     }
-  }, [newPrefixCode])
+    if (getOptionValue(editedOption.value) === '') {
+      setOptionError(`${capitalize(property)} name can not be empty`)
+    } else {
+      setOptionError('')
+    }
+  }, [newPrefixCode, getOptionValue(editedOption.value)])
 
   return (
     <>
@@ -131,7 +141,6 @@ const EditOption = ({
         type='input'
         className='focus-visible:ring-0 focus-visible:ring-popover'
         onChange={(e) => {
-          setPrefixCodeError('');
           setEditedOption({ property: property, value: isObject ? {...(option.value as object), value: e.target.value} : e.target.value });
         }}
         onKeyDown={(e) => {
@@ -141,6 +150,7 @@ const EditOption = ({
           }
         }}
       />
+      {optionError && <div className="text-xs text-destructive font-semibold">{optionError}</div>}
       {propertyIsCategory && newPrefixCode !== null && (
         <>
           <Label>Prefix Code</Label>
@@ -173,7 +183,7 @@ const EditOption = ({
       <div className='flex justify-between'>
         <Button
           className='gap-2'
-          disabled={!!prefixCodeError || isUpdatePending}
+          disabled={!!prefixCodeError || !!optionError || isUpdatePending}
           type='button'
           onClick={() => {
             try { 
