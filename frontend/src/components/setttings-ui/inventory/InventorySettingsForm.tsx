@@ -49,7 +49,7 @@ const InventorySettingsForm = ({ defaults }: { defaults: Defaults }) => {
   });
 
   const onSubmit = (data: z.infer<typeof InventorySettingsSchema>) => {
-    const settingsData = {
+    const settingsData: any = {
       ...data,
       inventoryColumns: selectedTags,
     };
