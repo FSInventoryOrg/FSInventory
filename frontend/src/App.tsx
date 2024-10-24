@@ -26,20 +26,71 @@ const App = () => {
             <Route path="/" element={<Loading />} />
           ) : (
             <>
-              <Route path="/" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Landing />} />
+              <Route
+                path="/"
+                element={
+                  isLoggedIn ? (
+                    <Navigate to="/dashboard" replace />
+                  ) : (
+                    <Landing />
+                  )
+                }
+              />
               {isLoggedIn && (
                 <>
-                  <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-                  <Route path="/inventory" element={<Layout><Inventory /></Layout>} />
-                  <Route path="/tracker" element={<Layout><Tracker /></Layout>} />
-                  <Route path="/tracker/:employeeCode" element={<Layout><Tracker /></Layout>} />
-                  <Route path="/profile" element={<Layout><Profile/></Layout>}/>
-                  <Route path="/settings/*" element={<Layout><Settings /></Layout>}/>
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <Layout>
+                        <Dashboard />
+                      </Layout>
+                    }
+                  />
+                  <Route
+                    path="/inventory"
+                    element={
+                      <Layout>
+                        <Inventory />
+                      </Layout>
+                    }
+                  />
+                  <Route
+                    path="/tracker"
+                    element={
+                      <Layout>
+                        <Tracker />
+                      </Layout>
+                    }
+                  />
+                  <Route
+                    path="/tracker/:employeeCode"
+                    element={
+                      <Layout>
+                        <Tracker />
+                      </Layout>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <Layout>
+                        <Profile />
+                      </Layout>
+                    }
+                  />
+                  <Route
+                    path="/settings/*"
+                    element={
+                      <Layout>
+                        <Settings />
+                      </Layout>
+                    }
+                  />
                   {/* <Route path="/requests" element={<Layout>Requests</Layout>} /> */}
                 </>
               )}
-              <Route path="/forgot-password" element={<ForgotPassword/>}/>
-              <Route path="/reset-password" element={<ResetPassword/>}/>
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="*" element={<Navigate to="/" />} />
             </>
           )}
@@ -47,6 +98,6 @@ const App = () => {
       </Router>
     </>
   );
-}
+};
 
 export default App;
