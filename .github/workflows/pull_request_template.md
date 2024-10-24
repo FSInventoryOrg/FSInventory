@@ -70,3 +70,5 @@ Link to [demo video](insert-link-to-demo-video-here).
   - /Options.tsx
     - Added control flow for editing Prefix Code
 -->
+#### Root
+<!-- Include changes in the root directory as well. -->
