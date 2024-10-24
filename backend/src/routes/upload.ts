@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import jwt from "jsonwebtoken";
 import verifyToken from '../middleware/auth';
+import { tokenStatus } from '../utils/rocks';
 import User from '../models/user.schema';
 import mongoose from 'mongoose';
 import { saveFile } from '../utils/common';
@@ -10,15 +11,9 @@ const router = express.Router();
 
 const processUpload = async (req: Request, res: Response, folder: string) => {
     try {
-        const token = req.cookies.auth_token;
-        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-        });
-        const currentUser: any = await User.findOne({ _id: decodedToken.userId });
+        const { auth_token: token, user } = req.cookies;
+        await tokenStatus(token);
+        const currentUser: any = JSON.parse(user);
 
         const { src, filename } = req.body;
         let srcFormat = { data: "", base64: "" };

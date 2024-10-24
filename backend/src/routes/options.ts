@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import Option, { OptionsType, StatusOptions, CategoryOptions } from '../models/options.schema'; // Import your Mongoose model
 import { check, validationResult } from 'express-validator';
 import verifyToken from '../middleware/auth';
+import { tokenStatus } from '../utils/rocks';
 import jwt from "jsonwebtoken";
 import { auditAssets } from '../utils/common';
 
@@ -56,14 +57,8 @@ router.post('/:property', [
       return res.status(400).json({ errors: errors.array() });
     }
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const { auth_token: token } = req.cookies;
+      await tokenStatus(token);
 
       if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
@@ -169,14 +164,8 @@ router.put('/defaults', [
       return res.status(400).json({ errors: errors.array() });
     }
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const { auth_token: token } = req.cookies;
+      await tokenStatus(token);
 
       if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
@@ -381,7 +370,7 @@ router.put('/:property', [
  */
 router.delete('/:property', verifyToken, async (req: Request, res: Response) => {
   try {
-    const token = req.cookies.auth_token;
+    const { auth_token: token } = req.cookies;
     const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
       method: "POST",
       credentials: "include",

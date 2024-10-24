@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import AssetCounter from '../models/asset-counter.schema';
 import { check, validationResult } from 'express-validator'
 import verifyToken from '../middleware/auth';
+import { tokenStatus } from '../utils/rocks';
 import jwt from "jsonwebtoken";
 import User from '../models/user.schema';
 import { getCodeAndIncrement, getAssetIndexes } from '../utils/asset-counter';
@@ -26,19 +27,14 @@ router.post('/', [
             return res.status(400).json({ message: errors.array() })
         }
         try {
-            const token = req.cookies.auth_token;
-            const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            });
+            const {auth_token: token, user} = req.cookies;
+            await tokenStatus(token);
 
             if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
                 return res.status(403).json({ message: "Only users with admin role can perform this action" });
             }
-            const currentUser = await User.findOne({ _id: decodedToken.userId });
+
+            const currentUser = JSON.parse(user);
 
             const data: any = req.body;
             const currentDate = new Date();
@@ -47,8 +43,8 @@ router.post('/', [
             data.updated = currentDate;
 
             if (currentUser) {
-                data.createdBy = `${currentUser.firstName} ${currentUser.lastName}`;
-                data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+                data.createdBy = `${currentUser.first_name} ${currentUser.last_name}`;
+                data.updatedBy = `${currentUser.first_name} ${currentUser.last_name}`;
             }
 
             if (!data.counter) data['counter'] = 0;
@@ -107,14 +103,8 @@ router.put('/:prefixCode', [
             return res.status(400).json({ message: errors.array() })
         }
         try {
-            const token = req.cookies.auth_token;
-            const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            });
+            const {auth_token: token, user} = req.cookies;
+            await tokenStatus(token)
 
             if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
                 return res.status(403).json({ message: "Only users with admin role can perform this action" });
@@ -151,9 +141,9 @@ router.put('/:prefixCode', [
             const ID = `${data._id}`;
             delete data._id;
 
-            const currentUser = await User.findOne({ _id: decodedToken.userId });
+            const currentUser = JSON.parse(user);
             data.updated = new Date()
-            if (currentUser) data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+            if (currentUser) data.updatedBy = `${currentUser.first_name} ${currentUser.last_name}`;
 
             const updatedAsset = await AssetCounter.findOneAndUpdate({ _id: ID }, data, { new: true });
 
@@ -207,13 +197,7 @@ router.get('/:prefixCode', async (req: Request, res: Response) => {
 router.delete('/:prefixCode', verifyToken, async (req: Request, res: Response) => {
     try {
         const token = req.cookies.auth_token;
-        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-        });
+        await tokenStatus(token);
 
         if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
             return res.status(403).json({ message: "Only users with admin role can perform this action" });

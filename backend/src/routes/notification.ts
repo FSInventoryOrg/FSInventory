@@ -1,26 +1,25 @@
 import express, { Request, Response } from 'express';
 import jwt from "jsonwebtoken";
 import verifyToken from '../middleware/auth';
+import { tokenStatus } from '../utils/rocks';
 import Notification, { NotificationType } from '../models/notification.schema';
 import mongoose from 'mongoose';
 
 const router = express.Router();
 
+// NOTIFICATIONS WILL NOT WORK FOR THE FIRST ROLLOUT OF ROCKS AUTH API
+
 router.get('/', verifyToken, async (req: Request, res: Response) => {
     try {
-        const token = req.cookies.auth_token;
-        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-        });
+        const {auth_token: token, user} = req.cookies;
+        await tokenStatus(token)
+
+        const currentUser = JSON.parse(user);
 
         const notifications: any = await Notification.aggregate().match({
             $expr: {
                 $and: [
-                    { $in: [decodedToken.userId, '$target_users'] }
+                    { $in: [currentUser.user_id, '$target_users'] }
                 ]
             }
         }).sort({
@@ -35,7 +34,7 @@ router.get('/', verifyToken, async (req: Request, res: Response) => {
                 openTab: value['openTab'],
                 url: value['url'],
                 date: value['updated'],
-                read: value['seen_users'].includes(decodedToken.userId)
+                read: value['seen_users'].includes(currentUser.user_id)
             };
 
 
@@ -58,15 +57,10 @@ router.get('/', verifyToken, async (req: Request, res: Response) => {
 
 router.patch('/', verifyToken, async (req: Request, res: Response) => {
     try {
-        const token = req.cookies.auth_token;
-        const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-        });
+        const {auth_token: token, user} = req.cookies;
+        await tokenStatus(token)
 
+        const currentUser = JSON.parse(user);
         const requestBody = req.body;
 
         if (!Array.isArray(requestBody)) return res.status(422).json({ message: 'Payload should be arrays of _ids' });
@@ -80,14 +74,14 @@ router.patch('/', verifyToken, async (req: Request, res: Response) => {
         const notifications: any = await Notification.aggregate().match({
             $expr: {
                 $and: [
-                    { $in: [decodedToken.userId, '$target_users'] },
+                    { $in: [currentUser.user_id, '$target_users'] },
                     { $in: ['$_id', mongoIDs] }
                 ]
             }
         });
 
         notifications.forEach(async (notif: any) => {
-            notif['seen_users'].push(decodedToken.userId);
+            notif['seen_users'].push(currentUser.user_id);
             notif['seen_users'] = notif['seen_users'].filter((value: string, index: number, array: any) => { return array.indexOf(value) === index });
 
             await Notification.updateOne({ _id: notif['_id'] }, { seen_users: notif['seen_users'] })

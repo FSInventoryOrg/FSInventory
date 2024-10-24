@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { check, validationResult } from 'express-validator';
 import verifyToken from '../middleware/auth';
+import { tokenStatus } from '../utils/rocks';
 import jwt from "jsonwebtoken";
 import Employee, { AssetsHistory } from '../models/employee.schema';
 import { EmployeeType } from '../models/employee.schema';
@@ -133,14 +134,8 @@ router.post("/", [
       return res.status(400).json({ message: errors.array() })
     }
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const {auth_token: token} = req.cookies;
+      await tokenStatus(token);
 
       if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
@@ -206,14 +201,8 @@ router.put("/history/:code",
       return res.status(400).json({ message: errors.array() })
     }
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const {auth_token: token} = req.cookies;
+      await tokenStatus(token);
 
       if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
@@ -266,14 +255,8 @@ router.put("/:code", [
       return res.status(400).json({ message: errors.array() })
     }
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const {auth_token: token} = req.cookies;
+      await tokenStatus(token);
 
       if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
@@ -351,7 +334,7 @@ router.put("/:code", [
 
 router.delete("/:code", verifyToken, async (req: Request, res: Response) => {
   try {
-    const token = req.cookies.auth_token;
+    const {auth_token: token} = req.cookies;
     const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
       method: "POST",
       credentials: "include",

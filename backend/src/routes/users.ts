@@ -4,6 +4,7 @@ import User from '../models/user.schema';
 import { UserType } from '../models/user.schema';
 import { check, validationResult } from 'express-validator'
 import verifyToken from '../middleware/auth';
+import { tokenStatus } from '../utils/rocks';
 import OTPTransaction from '../models/otptransactions.schema';
 import { compareHash, generateHash, generateOTP, generateRandom6Digits } from '../utils/common';
 import { sendMail } from '../system/mailer';
@@ -61,7 +62,8 @@ router.post("/register", [
 
 router.get("/", verifyToken, async (req: Request, res: Response) => {
   try {
-    const token = req.cookies.auth_token;
+    const { auth_token: token } = req.cookies;
+    await tokenStatus(token);
     const response: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/users/me`, {
       credentials: "include",
       headers: {
@@ -81,7 +83,7 @@ router.get("/", verifyToken, async (req: Request, res: Response) => {
 });
 
 router.put("/", verifyToken, async (req: Request, res: Response) => {
-  const token = req.cookies.auth_token;
+  const { auth_token: token } = req.cookies;
   const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
     method: "POST",
     credentials: "include",
@@ -193,7 +195,7 @@ router.patch('/resetPassword', async (req: Request, res: Response) => {
 
 router.patch('/changePassword', verifyToken, async (req: Request, res: Response) => {
   try {
-    const token = req.cookies.auth_token;
+    const { auth_token: token } = req.cookies;
     const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
       method: "POST",
       credentials: "include",

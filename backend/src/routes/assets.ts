@@ -4,6 +4,7 @@ import Software from '../models/software.schema';
 import Asset from '../models/asset.schema';
 import { check, validationResult } from 'express-validator'
 import verifyToken from '../middleware/auth';
+import {tokenStatus} from '../utils/rocks';
 import jwt from "jsonwebtoken";
 import User from '../models/user.schema';
 import { getCodeAndIncrement } from '../utils/asset-counter';
@@ -108,19 +109,13 @@ router.post('/', [
       return res.status(400).json({ message: errors.array() })
     }
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const { auth_token: token, user } = req.cookies;
+      await tokenStatus(token);
 
       if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
       }
-      const currentUser = await User.findOne({ _id: decodedToken.userId });
+      const currentUser = JSON.parse(user);
 
       const data: any = req.body;
       const currentDate = new Date();
@@ -129,8 +124,8 @@ router.post('/', [
       data.updated = currentDate;
 
       if (currentUser) {
-        data.createdBy = `${currentUser.firstName} ${currentUser.lastName}`;
-        data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+        data.createdBy = `${currentUser.first_name} ${currentUser.last_name}`;
+        data.updatedBy = `${currentUser.first_name} ${currentUser.last_name}`;
       }
 
       const existingAsset = await Asset.findOne({ code: data.code });
@@ -190,14 +185,8 @@ router.put('/deploy/:code', [
       return res.status(400).json({ message: errors.array() })
     }
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const { auth_token: token, user } = req.cookies;
+      await tokenStatus(token);
 
       if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
@@ -220,10 +209,10 @@ router.put('/deploy/:code', [
       }
       data.status = 'Deployed'
 
-      const currentUser = await User.findOne({ _id: decodedToken.userId });
+      const currentUser = JSON.parse(user);
       data.updated = new Date()
       if (currentUser) {
-        data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+        data.updatedBy = `${currentUser.first_name} ${currentUser.last_name}`;
       }
 
       const deploymentRecord = {
@@ -257,14 +246,8 @@ router.put('/retrieve/:code', [
       return res.status(400).json({ message: errors.array() })
     }
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const { auth_token: token, user } = req.cookies;
+      await tokenStatus(token);
 
       if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
@@ -286,10 +269,10 @@ router.put('/retrieve/:code', [
         return res.status(400).json({ message: 'This asset is not deployed' });
       }
 
-      const currentUser = await User.findOne({ _id: decodedToken.userId });
+      const currentUser = JSON.parse(user);
       data.updated = new Date()
       if (currentUser) {
-        data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+        data.updatedBy = `${currentUser.first_name} ${currentUser.last_name}`;
       }
 
       data.assignee = '';
@@ -410,14 +393,8 @@ router.put('/:code', [
       return res.status(400).json({ message: errors.array() })
     }
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const { auth_token: token, user } = req.cookies;
+      await tokenStatus(token);
 
       if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
@@ -444,10 +421,10 @@ router.put('/:code', [
         return res.status(404).json({ message: 'Asset not found' });
       }
 
-      const currentUser = await User.findOne({ _id: decodedToken.userId });
+      const currentUser = JSON.parse(user);
       data.updated = new Date()
       if (currentUser) {
-        data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+        data.updatedBy = `${currentUser.first_name} ${currentUser.last_name}`;
       }
 
       delete data['code'];
@@ -656,14 +633,8 @@ router.put('/:property/:value', [
       return res.status(400).json({ message: errors.array() })
     }
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const { auth_token: token } = req.cookies;
+      await tokenStatus(token);
 
       if (false) { // TODO: UPDATE WHEN ROCKS API IS UPDATED WITH USER ROLES
         return res.status(403).json({ message: "Only users with admin role can perform this action" });
@@ -717,7 +688,7 @@ router.get('/:code', async (req: Request, res: Response) => {
 
 router.delete('/:property/:value', verifyToken, async (req: Request, res: Response) => {
   try {
-    const token = req.cookies.auth_token;
+    const { auth_token: token } = req.cookies;
     const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
       method: "POST",
       credentials: "include",
@@ -750,7 +721,7 @@ router.delete('/:property/:value', verifyToken, async (req: Request, res: Respon
 
 router.delete('/:code', verifyToken, async (req: Request, res: Response) => {
   try {
-    const token = req.cookies.auth_token;
+    const { auth_token: token } = req.cookies;
     const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
       method: "POST",
       credentials: "include",
@@ -781,7 +752,7 @@ router.delete('/:code', verifyToken, async (req: Request, res: Response) => {
 
 router.patch('/bulkDelete', verifyToken, async (req: Request, res: Response) => {
   try {
-    const token = req.cookies.auth_token;
+    const { auth_token: token } = req.cookies;
     const decodedToken: any = await fetch(`${process.env.ROCKS_DEV_API_URL}/auth/check`, {
       method: "POST",
       credentials: "include",
