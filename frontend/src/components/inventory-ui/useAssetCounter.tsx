@@ -32,7 +32,8 @@ const useAssetCounter = (isCategory: boolean, option: OptionType) => {
   return {
     getAssetCounterFromCategory,
     updateAssetCounterInCache,
-    getAssetCounters
+    getAssetCounters,
+    assetCounters
   }
 };
 

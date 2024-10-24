@@ -12,6 +12,7 @@ import { OptionType } from '@/types/options';
 import useOption from './useOptions';
 import useAssetCounter from './useAssetCounter';
 import { AssetCounterType } from '@/types/asset';
+import { useAppContext } from '@/hooks/useAppContext';
 
 interface EditOptionProps {
   option: OptionType;
@@ -40,6 +41,8 @@ const EditOption = ({
   const isObject: boolean = typeof option.value === 'object';
   const propertyIsCategory: boolean = property === 'category';
   const [newPrefixCode, setNewPrefixCode] = propertyIsCategory ? useState('') : [undefined, () => { }];
+  const [prefixCodeError, setPrefixCodeError] = useState('');
+  const { showToast } = useAppContext();
 
   const {
     newOption: editedOption,
@@ -50,7 +53,8 @@ const EditOption = ({
 
   const {
     getAssetCounterFromCategory,
-    updateAssetCounterInCache
+    updateAssetCounterInCache,
+    assetCounters
   } = useAssetCounter(propertyIsCategory, option)
   const assetCounter = getAssetCounterFromCategory() ?? undefined;
   const { prefixCode: oldPrefixCode } = assetCounter ?? { prefixCode: '' };
@@ -62,7 +66,22 @@ const EditOption = ({
 
   const handleUpdate = () => {
     const isPrefixCodeChanged: boolean = !!newPrefixCode && oldPrefixCode !== newPrefixCode;
+    
+    if (newPrefixCode === '') {
+      setPrefixCodeError('Prefix code can not be empty')
+      throw new Error('Prefix code can not be empty')
+    };
+
+    if (assetCounters) {
+      const prefixCodeExists: boolean = !!assetCounters.find((assetCounter: AssetCounterType) => assetCounter.prefixCode === newPrefixCode);
+      if (prefixCodeExists) {
+        setPrefixCodeError('Prefix code already exists')
+        throw new Error(`Prefix code ${newPrefixCode} already exists`)
+      };
+    }
+
     const category: string = typeof editedOption.value === 'object' ? editedOption.value.value : '';
+    
     isPrefixCodeChanged && !!assetCounter && !!newPrefixCode ?
       (() => {
         onUpdate(editedOption, { ...assetCounter, category, prefixCode: newPrefixCode, oldPrefixCode })
@@ -80,6 +99,14 @@ const EditOption = ({
       setNewPrefixCode(oldPrefixCode);
     }
   }, [propertyIsCategory, assetCounter])
+
+  useEffect(() => {
+    if (newPrefixCode === '') {
+      setPrefixCodeError('Prefix code can not be empty')
+    } else {
+      setPrefixCodeError('')
+    }
+  }, [newPrefixCode])
 
   return (
     <>
@@ -104,6 +131,7 @@ const EditOption = ({
         type='input'
         className='focus-visible:ring-0 focus-visible:ring-popover'
         onChange={(e) => {
+          setPrefixCodeError('');
           setEditedOption({ property: property, value: isObject ? {...(option.value as object), value: e.target.value} : e.target.value });
         }}
         onKeyDown={(e) => {
@@ -131,6 +159,7 @@ const EditOption = ({
               }
             }}
           />
+          {prefixCodeError && <div className="text-xs text-destructive font-semibold">{prefixCodeError}</div>}
         </>
       )}
       {colorSelect && (
@@ -144,9 +173,15 @@ const EditOption = ({
       <div className='flex justify-between'>
         <Button
           className='gap-2'
-          disabled={isUpdatePending}
+          disabled={!!prefixCodeError || isUpdatePending}
           type='button'
-          onClick={handleUpdate}
+          onClick={() => {
+            try { 
+              handleUpdate();
+            } catch (err: any) {
+              showToast({ message: err.message, type: "ERROR" })
+            }
+          }}
         >
           {isUpdatePending ? <Spinner size={18} /> : null}
           Save
