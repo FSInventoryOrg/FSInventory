@@ -37,8 +37,16 @@ module.exports = {
       },
     ],
     "react/react-in-jsx-scope": "off",
-    '@typescript-eslint/no-explicit-any': 'off',
+    "@typescript-eslint/no-explicit-any": "warn",
   },
+  overrides: [
+    {
+      files: ["*.ts", "*.tsx"], // Apply rules to both .ts and .tsx files
+      rules: {
+        "@typescript-eslint/no-explicit-any": "warn", // Warn when 'any' type is used
+      },
+    },
+  ],
   settings: {
     react: {
       version: "detect",
