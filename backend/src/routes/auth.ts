@@ -60,6 +60,13 @@ router.post("/login", [
 				secure: process.env.NODE_ENV === "production",
 				maxAge: 86400000,
 			});
+			// ADD USER DETAILS TO COOKIES
+			// TODO: REMOVE AND IMPLEMENT ROCKS API USER RETRIEVAL ONCE AVAILABLE
+			res.cookie("user", JSON.stringify(user_details), {
+				httpOnly: true,
+				secure: process.env.NODE_ENV === "production",
+				maxAge: 86400000,
+			})
 			res.status(200).json({ userId: user_details.user_id })
 		} catch (error: any) {
 			res.status(500).json({ message: error.message });
