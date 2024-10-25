@@ -11,8 +11,8 @@ interface Props {
 
 const WarningAlert = ({ warningMessage }: Props) => {
   return (
-    <Alert variant="warning">
-      <AlertTriangleIcon className="h-4 w-4 " />
+    <Alert className="warning-alert">
+      <AlertTriangleIcon className="h-4 w-4" color="#675211" />
       <AlertTitle>Notice:</AlertTitle>
       <AlertDescription>
         {warningMessage}

@@ -652,15 +652,30 @@ router.put('/:property/:value', [
         return res.status(400).json({ message: `Property '${property}' in URL must match property in request body` });
       }
 
-      const existingAssets = await Asset.find({ [property]: value });
+      const existingAssets = await Asset.find({ [property]: { $regex: new RegExp(`(${value})`) } });
 
       if (!existingAssets || existingAssets.length === 0) {
         return res.status(404).json({ message: `No assets found with { ${property} : ${value} }` });
       }
 
-      if (updateData['code']) delete updateData['code'];
-
-      await Hardware.updateMany({ [property]: value }, updateData);
+      if (updateData['code']) {
+        await Hardware.updateMany(
+          { [property]: { $regex: new RegExp(`(${value})`) } },
+          [{
+            $set: {
+              [property]: {
+                $replaceOne: {
+                  input: `$${property}`,
+                  find: `${value}`,
+                  replacement: updateData.code
+                }
+              }
+            }
+          }]
+        )
+      } else {
+        await Hardware.updateMany({ [property]: value }, updateData);
+      }
       await auditAssets();
       res.status(200).json({ message: 'Assets updated successfully' });
     } catch (error) {

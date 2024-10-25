@@ -126,9 +126,6 @@ router.put('/:prefixCode', [
             const findSameCounter = existingAssetCounter.find(f => { return f['prefixCode'] === data['prefixCode'] && f['_id'].toString() !== data['_id'] });
             if (findSameCounter) return res.status(400).json({ message: "Asset code already exists" });
 
-            const findSameCatType = existingAssetCounter.find(f => { return f['category'] === data['category'] && f['type'] === data['type'] && f['_id'].toString() !== data['_id'] });
-            if (findSameCatType) return res.status(400).json({ message: "Asset Type and Category already have a prefix Code" });
-
             const findCounter = existingAssetCounter.find(f => { return f['_id'].toString() === data['_id'] });
             if (!findCounter) return res.status(404).json({ message: "Asset Counter not found" });
 
