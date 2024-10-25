@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2.19.0](https://connect.zoho.com/portal/intranet/task/623367000000739043) 2024-10-25
+### Added
+- Badge to reflect frontend and backend versions when in non-production mode
+
 ## [2.18.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000745177) 2024-10-18
 - Added field for Prefix Code when editing a category in the New Asset screen
 
