@@ -2,7 +2,17 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2.18.2](https://connect.zoho.com/portal/intranet/task/623367000000795169) 2024-10-25
+### Fixed
+- Category default value to trigger required error when add asset form is submitted
+
+## [2.18.1](https://connect.zoho.com/portal/intranet/task/623367000000795191) 2024-10-25
+### Fixed
+- Category to properly reset when switching tabs
+
 ## [2.18.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000745177) 2024-10-18
+### Added
 - Added field for Prefix Code when editing a category in the New Asset screen
 
 ## [2.17.2](https://connect.zoho.com/portal/intranet/task/623367000000745059) 2024-10-17
