@@ -16,6 +16,15 @@ const directory = path.join(path.resolve(), '../');
 
 let DBCONN: any;
 
+
+export const getAppRootDir = () => {
+  let currentDir = __dirname
+  while(!existsSync(path.join(currentDir, 'package.json'))) {
+    currentDir = path.join(currentDir, '..')
+  }
+  return currentDir
+}
+
 export const setDBGlobal = async (dbconn: Connection) => { DBCONN = dbconn }
 
 // Save file
@@ -40,6 +49,7 @@ export const saveFile = async (folder: string, filename: string, src: any, fullD
 
 export const getFile = async (filepath: string, isFullPath?: boolean) => {
 	const tmpFolder = isFullPath ? filepath : `${directory}${filepath}`.replace(/\/\//g, '/');
+	console.log(tmpFolder)
 	try {
 		return readFileSync(tmpFolder)
 	} catch (err) {
