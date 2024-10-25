@@ -1,12 +1,13 @@
 import express, { Request, Response } from 'express';
 import verifyToken from '../middleware/auth';
-import { getFile } from '../utils/common';
+import { getAppRootDir, getFile } from '../utils/common';
 
 const router = express.Router();
 
 export const getVersion = async() => {
-    const backend: any = await getFile('/package.json');
-    const frontend: any = await getFile('/../frontend/package.json');
+    const rootDir = getAppRootDir()
+    const backend: any = await getFile(`${rootDir}/package.json`, true);
+    const frontend: any = await getFile(`${rootDir}/../frontend/package.json`, true);
 
     if(backend && frontend) {
         try {

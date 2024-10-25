@@ -17,9 +17,11 @@ import {
 import { Gear } from '@phosphor-icons/react';
 import { FullScaleIcon } from './icons/FullScaleIcon';
 import useUserData from '@/hooks/useUserData';
+import VersionBadge from "./VersionBadge";
 
 const NavigationBar = () => {
   const { data: userData } = useUserData();
+  const isDevMode = import.meta.env.DEV
 
   return (
     <section className="flex w-full justify-between py-6 px-6 z-0">
@@ -85,9 +87,10 @@ const NavigationBar = () => {
                   size={36}
                   className="fill-current text-primary"
                 />
-                <span className="text-2xl font-bold tracking-tighter text-secondary-foreground">
+                <span className="text-2xl pr-1 font-bold tracking-tighter text-secondary-foreground">
                   stockpilot
                 </span>
+                {isDevMode && <VersionBadge/>}
               </Link>
             </NavigationMenuItem>
           </NavigationMenuList>

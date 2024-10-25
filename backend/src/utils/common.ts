@@ -19,6 +19,15 @@ const directory = path.join(path.resolve(), '../');
 
 let DBCONN: any;
 
+
+export const getAppRootDir = () => {
+  let currentDir = __dirname
+  while(!existsSync(path.join(currentDir, 'package.json'))) {
+    currentDir = path.join(currentDir, '..')
+  }
+  return currentDir
+}
+
 export const setDBGlobal = async (dbconn: Connection) => { DBCONN = dbconn }
 
 // Save file

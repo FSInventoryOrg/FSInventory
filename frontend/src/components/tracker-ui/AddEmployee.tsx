@@ -308,7 +308,7 @@ const AddEmployee = () => {
                     />
                     <Button type="submit" disabled={(isAddEmployeePending || isAssetEditPending) } className="gap-2">
                       {(isAddEmployeePending || isAssetEditPending) ? <Spinner size={18}/> : null }
-                      Create Employee
+                      Add Employee
                       <ArrowRightIcon />
                     </Button>
                   </div>

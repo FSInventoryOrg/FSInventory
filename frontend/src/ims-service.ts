@@ -679,6 +679,7 @@ export const fetchAssetCounters = async () => {
 
   return response.json();
 };
+
 export const postAssetCounter = async (data: AssetCounterFormData) => {
   const response = await fetch(`${API_BASE_URL}/api/assetcounter/`, {
     method: 'POST',
@@ -695,6 +696,7 @@ export const postAssetCounter = async (data: AssetCounterFormData) => {
 
   return response.json();
 };
+
 export const updateAssetCounter = async ({
   prefixCode,
   updatedAssetCounter,
@@ -895,7 +897,6 @@ export const importBackupFile = async (changes: { [index: string]: MongoResult[]
   }
 }
 
-
 export const updateSoftwareNotif = async (data: NotificationSettingType) => {
   const response = await fetch(`${API_BASE_URL}/api/notification_settings`, {
     method: 'POST',
@@ -921,6 +922,18 @@ export const fetchSoftwareNotif = async () => {
 
   if (!response.ok) {
     throw new Error('Error fetching notification settings');
+  }
+
+  return response.json();
+}
+export const fetchAppVersions = async () => {
+  const response = await fetch(`${API_BASE_URL}/version`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message);
   }
 
   return response.json();
