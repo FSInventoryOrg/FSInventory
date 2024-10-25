@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.3](https://connect.zoho.com/portal/intranet/task/623367000000853206) 2024-10-25
+### Fixed
+- Renamed "Create Employee" to "Add Employee" on Tracker add modal
+
 ## [2.19.2](https://connect.zoho.com/portal/intranet/task/623367000000795169) 2024-10-25
 ### Fixed
 - Category default value to trigger required error when add asset form is submitted
