@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.17.0](https://connect.zoho.com/portal/intranet/task/623367000000718057) 2024-10-2024 
+### Added
+- Endpoint for software notification settings
+- Calls to track or audit software expiration in methods that modify the asset
+
 ## [2.16.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000745177) 2024-10-18
 ### Removed
 - Check for asset counter already having prefix code, preventing changes from happening
