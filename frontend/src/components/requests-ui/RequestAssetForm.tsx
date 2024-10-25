@@ -25,15 +25,22 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import RequestorForm from './RequestorForm';
-import { RequestNewAssetSchema } from '@/schemas/RequestFormSchema';
+import {
+  RequestAssetFormData,
+  RequestNewAssetSchema,
+} from '@/schemas/RequestFormSchema';
 
 interface RequestAssetFormProps {
-  onSubmit: (data: any) => void;
-  onChangeRequestType: (requestType: any) => void;
+  userData: Record<string, string>;
+  setUserData: Dispatch<SetStateAction<Record<string, string>>>;
+  onSubmit: (data: RequestAssetFormData) => void;
+  onChangeRequestType: (requestType: string) => void;
 }
 const RequestAssetForm = ({
+  userData,
+  setUserData,
   onSubmit,
   onChangeRequestType,
 }: RequestAssetFormProps) => {
@@ -42,16 +49,31 @@ const RequestAssetForm = ({
   const requestAssetForm = useForm<z.infer<typeof RequestNewAssetSchema>>({
     resolver: zodResolver(RequestNewAssetSchema),
     defaultValues: {
-      fullName: '',
-      manager: '',
-      contactInfo: '',
+      fullName: userData?.fullName ?? '',
+      manager: userData?.manager ?? '',
+      contactInfo: userData?.contactInfo ?? '',
       requestType: 'Request a New Asset',
     },
     mode: 'onChange',
   });
+
+  useEffect(() => {
+    requestAssetForm.reset({
+      ...requestAssetForm,
+      fullName: userData?.fullName ?? '',
+      manager: userData?.manager ?? '',
+      contactInfo: userData?.contactInfo ?? '',
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userData]);
+
   return (
     <Form {...requestAssetForm}>
-      <form key={2} onSubmit={requestAssetForm.handleSubmit(onSubmit)} className='w-full'>
+      <form
+        key={2}
+        onSubmit={requestAssetForm.handleSubmit(onSubmit)}
+        className="w-full"
+      >
         <RequestorForm />
         <FormField
           control={requestAssetForm.control}
@@ -64,6 +86,9 @@ const RequestAssetForm = ({
                   value={field.value}
                   onValueChange={(value) => {
                     field.onChange(value);
+                    const { fullName, manager, contactInfo } =
+                      requestAssetForm.getValues();
+                    setUserData({ fullName, manager, contactInfo });
                     onChangeRequestType(value);
                   }}
                 >
@@ -189,7 +214,9 @@ const RequestAssetForm = ({
             </FormItem>
           )}
         />
-        <Button className='my-2' type="submit">Submit Request</Button>
+        <Button className="my-2" type="submit">
+          Submit Request
+        </Button>
       </form>
     </Form>
   );

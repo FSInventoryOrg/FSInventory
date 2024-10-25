@@ -9,6 +9,7 @@ import { UploadImage } from './types/user';
 import { AutoMailType } from '@/types/automail';
 import { AssetCounterFormData } from './schemas/AssetCounterSchema';
 import { MongoResult } from './types/backup';
+import { ReportIssueFormData, RequestAssetFormData } from './schemas/RequestFormSchema';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -895,6 +896,7 @@ export const importBackupFile = async (changes: { [index: string]: MongoResult[]
 }
 
 
-export const submitRequestForm = async() => {
-  return true
+export const submitRequestForm = async( data : ReportIssueFormData | RequestAssetFormData) => {
+  if (data) return true;
+  return false;
 }

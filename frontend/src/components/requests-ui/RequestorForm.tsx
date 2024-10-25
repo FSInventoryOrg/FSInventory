@@ -7,23 +7,12 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/form';
-import useUserData from '@/hooks/useUserData';
-import { useEffect } from 'react';
 
 const RequestorForm = () => {
-  const { control, setValue } = useFormContext();
-  const { data: user}  = useUserData();
-
-  useEffect(() => {
-    if (user) {
-      setValue('fullName', user.firstName + ' ' + user.lastName)
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
-  
+  const { control } = useFormContext();
   return (
     <div className="pb-4">
-      {/* Common Fields Section */}
+      {/* Autopopulate if logged in */}
       <FormField
         control={control}
         name="fullName"
@@ -37,8 +26,6 @@ const RequestorForm = () => {
           </FormItem>
         )}
       />
-      {/* autopopulate if logged in */}
-
       <FormField
         control={control}
         name="manager"

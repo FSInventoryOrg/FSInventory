@@ -1,15 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useAppContext } from '@/hooks/useAppContext';
 import * as imsService from '@/ims-service';
 import RequestAssetForm from './RequestAssetForm';
 import ReportIssueForm from './ReportIssueForm';
+import useUserData from '@/hooks/useUserData';
+import { ReportIssueFormData, RequestAssetFormData } from '@/schemas/RequestFormSchema';
 
 const RequestForm = () => {
   const { showToast } = useAppContext();
+  const { data: user}  = useUserData();
   const [requestType, setRequestType] = useState('Report an Issue');
+  const [userData, setUserData] = useState<Record<string, string>>({});
 
-  const onSubmit = (data: any) => {
+  useEffect(() => {
+    if (user) {
+      setUserData({...userData, 'fullName': user.firstName + ' ' + user.lastName})
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
+
+  const onSubmit = (data: RequestAssetFormData | ReportIssueFormData ) => {
     mutate(data);
   };
 
@@ -29,12 +40,16 @@ const RequestForm = () => {
       <div className="flex w-5/12  mx-auto">
         {requestType === 'Report an Issue' && (
           <ReportIssueForm
+            userData={userData}
+            setUserData={setUserData}
             onSubmit={onSubmit}
             onChangeRequestType={setRequestType}
           />
         )}
         {requestType === 'Request a New Asset' && (
           <RequestAssetForm
+            userData={userData}
+            setUserData={setUserData}
             onSubmit={onSubmit}
             onChangeRequestType={setRequestType}
           />
