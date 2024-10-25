@@ -9,6 +9,7 @@ import { UploadImage } from './types/user';
 import { AutoMailType } from '@/types/automail';
 import { AssetCounterFormData } from './schemas/AssetCounterSchema';
 import { MongoResult } from './types/backup';
+import { NotificationSettingType } from './types/notification-setting';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -678,6 +679,7 @@ export const fetchAssetCounters = async () => {
 
   return response.json();
 };
+
 export const postAssetCounter = async (data: AssetCounterFormData) => {
   const response = await fetch(`${API_BASE_URL}/api/assetcounter/`, {
     method: 'POST',
@@ -694,6 +696,7 @@ export const postAssetCounter = async (data: AssetCounterFormData) => {
 
   return response.json();
 };
+
 export const updateAssetCounter = async ({
   prefixCode,
   updatedAssetCounter,
@@ -894,6 +897,35 @@ export const importBackupFile = async (changes: { [index: string]: MongoResult[]
   }
 }
 
+export const updateSoftwareNotif = async (data: NotificationSettingType) => {
+  const response = await fetch(`${API_BASE_URL}/api/notification_settings`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message);
+  }
+
+  return response.json();
+}
+
+export const fetchSoftwareNotif = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/notification_settings`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Error fetching notification settings');
+  }
+
+  return response.json();
+}
 export const fetchAppVersions = async () => {
   const response = await fetch(`${API_BASE_URL}/version`, {
     credentials: 'include',
