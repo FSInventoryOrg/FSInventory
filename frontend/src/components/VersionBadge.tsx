@@ -25,7 +25,6 @@ const VersionBadge = () => {
       </div>
     )
   );
-  //   FE: v10.2.1, BE: v11.2.1
 };
 
 export default VersionBadge;
