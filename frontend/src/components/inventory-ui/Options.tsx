@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ColorOption, OptionType, TagOption } from '@/types/options';
+import { AssetCounterType } from '@/types/asset';
 import AddOption from './AddOption';
 import EditOption from './EditOption';
 
@@ -96,10 +97,6 @@ const Options = ({
         message: `New ${property} added successfully!`,
         type: 'SUCCESS',
       });
-      setOpen(false);
-      setTimeout(() => {
-        setOpen(true);
-      }, 100);
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: 'ERROR' });
@@ -113,10 +110,6 @@ const Options = ({
           message: `${capitalize(format(property))} updated successfully!`,
           type: 'SUCCESS',
         });
-        setOpen(false);
-        setTimeout(() => {
-          setOpen(true);
-        }, 100);
       },
       onError: (error: Error) => {
         showToast({ message: error.message, type: 'ERROR' });
@@ -127,6 +120,12 @@ const Options = ({
     useMutation({
       mutationFn: imsService.updateAssetsByProperty,
     });
+  const { mutate: updateAssetPrefixCodes, isPending: isAssetPrefixEditPending } = useMutation({
+      mutationFn: imsService.updateAssetsByProperty,
+    });
+  const { mutate: updateAssetCounter, isPending: isUpdateAssetCounterPending } = useMutation({
+    mutationFn: imsService.updateAssetCounter
+  })
 
   const findIndexInOptions = (optionVal: string) => {
     if (!optionValues) return -1;
@@ -143,7 +142,7 @@ const Options = ({
   const handleAddOption = (option: OptionType, prefixCode?: string) => {
     addOptionValue({ ...option, prefixCode, type });
   };
-  const handleUpdateOption = (updatedOption: OptionType) => {
+  const handleUpdateOption = (updatedOption: OptionType, updatedAssetCounter?: AssetCounterType & { oldPrefixCode: string}) => {
     const indexOfValueToEdit = findIndexInOptions(optionToEdit);
     updateOptionValue({
       property: updatedOption.property,
@@ -158,7 +157,18 @@ const Options = ({
           ? updatedOption.value.value
           : updatedOption.value,
     });
-
+    if (!!updatedAssetCounter) {
+      const { oldPrefixCode: prefixCode, ...rest } = updatedAssetCounter
+      updateAssetCounter({
+        prefixCode,
+        updatedAssetCounter: rest
+      });
+      updateAssetPrefixCodes({
+      property: 'code',
+      value: prefixCode,
+      newValue: rest.prefixCode
+    });
+    }
     if (indexOfValueToEdit === findIndexInOptions(field.value)) {
       field.onChange(
         typeof updatedOption.value === 'object'
@@ -191,11 +201,7 @@ const Options = ({
           }
         }
       }
-    }
-    setOpen(false);
-    setTimeout(() => {
-      setOpen(true);
-    }, 100);
+    } 
     showToast({ message: `Option deleted successfully!`, type: 'SUCCESS' });
   };
 
@@ -226,6 +232,13 @@ const Options = ({
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, filterValue, optionValues, property, type]);
+
+  React.useEffect(() => {
+    if (open && !isAssetPrefixEditPending && !isUpdateAssetCounterPending) {
+      console.log(isUpdateAssetCounterPending);
+      setOpen(isAssetPrefixEditPending)
+    }
+  }, [isAssetPrefixEditPending, isUpdateAssetCounterPending])
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>
@@ -402,7 +415,7 @@ const Options = ({
               onCancel={() => setIsEditing((prev) => !prev)}
               onDelete={handleDeleteOption}
               onUpdate={handleUpdateOption}
-              isUpdatePending={isOptionEditPending || isAssetEditPending}
+              isUpdatePending={isOptionEditPending || isAssetEditPending || isUpdateAssetCounterPending || isAssetPrefixEditPending}
             />
           </div>
         )}
