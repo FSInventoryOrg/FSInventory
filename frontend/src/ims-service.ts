@@ -893,3 +893,16 @@ export const importBackupFile = async (changes: { [index: string]: MongoResult[]
     throw err;
   }
 }
+
+export const fetchAppVersions = async () => {
+  const response = await fetch(`${API_BASE_URL}/version`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message);
+  }
+
+  return response.json();
+}

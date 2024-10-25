@@ -3,6 +3,15 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.0](https://connect.zoho.com/portal/intranet/task/623367000000739043) 2024-10-25
+### Fixed
+- Access to package.json and get versions
+
+
+## [2.16.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000745177) 2024-10-18
+### Removed
+- Check for asset counter already having prefix code, preventing changes from happening
+
 ## [2.15.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000615263) 2024-09-16 
 ### Added
 - Backend support for system backup file
