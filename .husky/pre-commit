@@ -1,0 +1,2 @@
+echo "Running ESLint..."
+npx lint-staged

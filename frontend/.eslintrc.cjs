@@ -1,18 +1,55 @@
 module.exports = {
   root: true,
-  env: { browser: true, es2020: true },
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:react-hooks/recommended',
-  ],
-  ignorePatterns: ['dist', '.eslintrc.cjs'],
-  parser: '@typescript-eslint/parser',
-  plugins: ['react-refresh'],
-  rules: {
-    'react-refresh/only-export-components': [
-      'warn',
-      { allowConstantExport: true },
-    ],
+  env: {
+    browser: true,
+    es2021: true,
   },
-}
+  extends: [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react-hooks/recommended",
+    "prettier",
+  ],
+  ignorePatterns: ["dist", ".eslintrc.cjs"],
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 12,
+    sourceType: "module",
+  },
+  plugins: ["react", "@typescript-eslint", "prettier"],
+  rules: {
+    indent: ["error", 2],
+    "react/jsx-indent": ["error", 2],
+    "react/jsx-indent-props": ["error", 2],
+    "no-multi-spaces": ["error"],
+    quotes: ["error", "double"],
+    "prettier/prettier": [
+      "error",
+      {
+        singleQuote: false,
+        tabWidth: 2,
+        endOfLine: "auto",
+      },
+    ],
+    "react/react-in-jsx-scope": "off",
+    "@typescript-eslint/no-explicit-any": "warn",
+  },
+  overrides: [
+    {
+      files: ["*.ts", "*.tsx"], // Apply rules to both .ts and .tsx files
+      rules: {
+        "@typescript-eslint/no-explicit-any": "warn", // Warn when 'any' type is used
+      },
+    },
+  ],
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
+};

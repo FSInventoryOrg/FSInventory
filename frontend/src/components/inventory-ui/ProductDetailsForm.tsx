@@ -1,46 +1,46 @@
-import { cn } from '@/lib/utils';
-import { AssetFormData } from '@/schemas/AddAssetSchema';
-import { Calendar } from '@/components/ui/calendar';
+import { cn } from "@/lib/utils";
+import { AssetFormData } from "@/schemas/AddAssetSchema";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { CalendarIcon, XIcon } from 'lucide-react';
-import { useFormContext } from 'react-hook-form';
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { CalendarIcon, XIcon } from "lucide-react";
+import { useFormContext } from "react-hook-form";
 import {
   FormLabel,
   FormField,
   FormItem,
   FormControl,
   FormMessage,
-} from '../ui/form';
-import { Input } from '../ui/input';
-import SuggestiveInput from './SuggestiveInput';
-import { Button } from '../ui/button';
-import { useState } from 'react';
+} from "../ui/form";
+import { Input } from "../ui/input";
+import SuggestiveInput from "./SuggestiveInput";
+import { Button } from "../ui/button";
+import { useState } from "react";
 
 const ProductDetailsForm: React.FC = () => {
   const { control } = useFormContext<AssetFormData>();
   const [openPurchaseDate, setOpenPurchaseDate] = useState(false);
   return (
     <>
-      <FormLabel className='text-md text-secondary-foreground'>
+      <FormLabel className="text-md text-secondary-foreground">
         Product details
       </FormLabel>
-      <div className='flex flex-col sm:flex-row gap-2 w-full mt-2'>
+      <div className="flex flex-col sm:flex-row gap-2 w-full mt-2">
         <FormField
           control={control}
-          name='brand'
+          name="brand"
           render={({ field }) => (
-            <FormItem className='w-full sm:w-1/2'>
+            <FormItem className="w-full sm:w-1/2">
               <FormControl>
                 <SuggestiveInput
-                  property='brand'
-                  placeholder='Brand'
-                  autoComplete='off'
-                  type='input'
+                  property="brand"
+                  placeholder="Brand"
+                  autoComplete="off"
+                  type="input"
                   field={field}
                 />
               </FormControl>
@@ -50,14 +50,14 @@ const ProductDetailsForm: React.FC = () => {
         />
         <FormField
           control={control}
-          name='modelName'
+          name="modelName"
           render={({ field }) => (
-            <FormItem className='w-full sm:w-1/2'>
+            <FormItem className="w-full sm:w-1/2">
               <FormControl>
                 <Input
-                  placeholder='Model name'
-                  autoComplete='off'
-                  type='input'
+                  placeholder="Model name"
+                  autoComplete="off"
+                  type="input"
                   {...field}
                   tabIndex={0}
                 />
@@ -67,17 +67,17 @@ const ProductDetailsForm: React.FC = () => {
           )}
         />
       </div>
-      <div className='flex flex-col sm:flex-row gap-2 w-full'>
+      <div className="flex flex-col sm:flex-row gap-2 w-full">
         <FormField
           control={control}
-          name='modelNo'
+          name="modelNo"
           render={({ field }) => (
-            <FormItem className='w-full sm:w-1/2'>
+            <FormItem className="w-full sm:w-1/2">
               <FormControl>
                 <Input
-                  placeholder='Model number'
-                  autoComplete='off'
-                  type='input'
+                  placeholder="Model number"
+                  autoComplete="off"
+                  type="input"
                   {...field}
                 />
               </FormControl>
@@ -87,14 +87,14 @@ const ProductDetailsForm: React.FC = () => {
         />
         <FormField
           control={control}
-          name='serialNo'
+          name="serialNo"
           render={({ field }) => (
-            <FormItem className='w-full sm:w-1/2'>
+            <FormItem className="w-full sm:w-1/2">
               <FormControl>
                 <Input
-                  placeholder='Serial number'
-                  autoComplete='off'
-                  type='input'
+                  placeholder="Serial number"
+                  autoComplete="off"
+                  type="input"
                   {...field}
                 />
               </FormControl>
@@ -103,18 +103,18 @@ const ProductDetailsForm: React.FC = () => {
           )}
         />
       </div>
-      <div className='flex flex-col sm:flex-row gap-2 w-full'>
+      <div className="flex flex-col sm:flex-row gap-2 w-full">
         <FormField
           control={control}
-          name='supplierVendor'
+          name="supplierVendor"
           render={({ field }) => (
-            <FormItem className='w-full'>
+            <FormItem className="w-full">
               <FormControl>
                 <SuggestiveInput
-                  property='supplierVendor'
-                  placeholder='Supplier or vendor'
-                  autoComplete='off'
-                  type='input'
+                  property="supplierVendor"
+                  placeholder="Supplier or vendor"
+                  autoComplete="off"
+                  type="input"
                   field={field}
                 />
               </FormControl>
@@ -124,10 +124,10 @@ const ProductDetailsForm: React.FC = () => {
         />
         <FormField
           control={control}
-          name='purchaseDate'
+          name="purchaseDate"
           render={({ field }) => (
-            <div className='flex items-center justify-center gap-0'>
-              <FormItem className='flex flex-col w-full sm:w-fit'>
+            <div className="flex items-center justify-center gap-0">
+              <FormItem className="flex flex-col w-full sm:w-fit">
                 <Popover
                   open={openPurchaseDate}
                   onOpenChange={setOpenPurchaseDate}
@@ -135,45 +135,45 @@ const ProductDetailsForm: React.FC = () => {
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
-                        variant={'outline'}
+                        variant={"outline"}
                         className={cn(
-                          'w-full sm:w-[238px] pl-3 text-left font-normal rounded-r-none',
-                          !field.value && 'text-muted-foreground'
+                          "w-full sm:w-[238px] pl-3 text-left font-normal rounded-r-none",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
-                          format(field.value, 'PPP')
+                          format(field.value, "PPP")
                         ) : (
                           <span>Purchase date</span>
                         )}
-                        <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
-                  <PopoverContent className='w-auto p-0' align='start'>
+                  <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
-                      mode='single'
+                      mode="single"
                       selected={field.value ? new Date(field.value) : undefined}
                       onSelect={field.onChange}
                       onDayClick={() => {
                         setOpenPurchaseDate(false);
                       }}
-                      disabled={(date) => date < new Date('1900-01-01')}
+                      disabled={(date) => date < new Date("1900-01-01")}
                     />
                   </PopoverContent>
                 </Popover>
                 <FormMessage />
               </FormItem>
               <Button
-                className='rounded-l-none border-l-0 text-accent-foreground'
-                type='button'
-                variant='outline'
-                size='icon'
+                className="rounded-l-none border-l-0 text-accent-foreground"
+                type="button"
+                variant="outline"
+                size="icon"
                 onClick={() => {
                   field.onChange(null);
                 }}
               >
-                <XIcon className='opacity-50' size={20} />
+                <XIcon className="opacity-50" size={20} />
               </Button>
             </div>
           )}
