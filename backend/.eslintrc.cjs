@@ -16,7 +16,7 @@ module.exports = {
   },
   rules: {
     "no-console": "off",
-    "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+    "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     "no-multi-spaces": ["error"],
     "prefer-const": "error",
     eqeqeq: "error",
@@ -26,6 +26,6 @@ module.exports = {
     indent: ["error", 2],
     "no-mixed-spaces-and-tabs": "error",
     "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/no-unused-vars": ["warn"],
+    "@typescript-eslint/no-unused-vars": ["error"],
   },
 };
