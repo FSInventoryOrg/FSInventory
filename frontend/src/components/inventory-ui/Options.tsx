@@ -69,7 +69,7 @@ const Options = ({
   const [isCreating, setIsCreating] = React.useState<boolean>(false);
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
 
-  const { data: optionValues } = useQuery<
+  const { data: optionValues, refetch } = useQuery<
     string[] | ColorOption[] | TagOption[]
   >({
     queryKey: ["fetchOptionValues", property],
@@ -100,6 +100,7 @@ const Options = ({
         message: `New ${property} added successfully!`,
         type: "SUCCESS",
       });
+      refetch();
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
@@ -116,6 +117,7 @@ const Options = ({
         message: `${capitalize(format(property))} updated successfully!`,
         type: "SUCCESS",
       });
+      refetch();
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
