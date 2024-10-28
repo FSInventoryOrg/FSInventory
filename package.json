@@ -17,7 +17,7 @@
     "lint": "npm run lint:backend && npm run lint:frontend",
     "lint:backend": "cd backend && npx lint-staged",
     "lint:frontend": "cd frontend && npx lint-staged",
-    "prepare": "husky install"
+    "postinstall": "husky install"
   },
   "lint-staged": {
     "backend/**/*.{js,jsx,ts,tsx}": [
