@@ -110,12 +110,12 @@ const Notification = () => {
           </span>
         )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className='mr-[80px]'>
         <DropdownMenuGroup>
           <DropdownMenuLabel>Notifications</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <div className="max-w-[400px] min-w-80 max-h-96 overflow-y-auto overflow-x-hidden">
-            {notifications.map((notification: NotificationType) => (
+            {notifications.length > 0 ? notifications.map((notification: NotificationType) => (
               <DropdownMenuItem
                 key={notification._id}
                 onClick={() => onClickNotification(notification._id)}
@@ -128,7 +128,10 @@ const Notification = () => {
                   updated={notification.date}
                 />
               </DropdownMenuItem>
-            ))}
+            )) : <div className='text-center p-6'>
+                    <label className='font-semibold'>Nothing to see here</label>
+                    <p className='text-muted-foreground'>You currently have no notifications</p>
+              </div>}
           </div>
         </DropdownMenuGroup>
       </DropdownMenuContent>
