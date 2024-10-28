@@ -197,7 +197,7 @@ const NavigationBar = () => {
           </NavigationMenuList>
           <NavigationMenuList className="ml-4">
             <NavigationMenuItem>
-              <UserAvatar image={userData?.avatar} />
+              <UserAvatar userInfo={userData} />
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
