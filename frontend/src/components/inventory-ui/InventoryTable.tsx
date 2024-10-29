@@ -331,7 +331,7 @@ export function InventoryTable<TData, TValue>({
               placeholder="Search asset..."
               value={globalFilter ?? ""}
               onChange={(event) => table.setGlobalFilter(event.target.value)}
-              className="w-full pl-10 h-8 font-light rounded-md text-sm md:w-[700px]"
+              className="pl-10 h-8 font-light rounded-md text-sm"
             />
           </div>
         </div>

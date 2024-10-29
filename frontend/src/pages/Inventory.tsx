@@ -104,8 +104,8 @@ const Inventory = () => {
   return (
     <section
       id="inventory"
-      className="flex flex-col xl:flex-row gap-3 sm:gap-6 w-full px-3 pb-3 sm:px-6 sm:pb-6 pt-3"
-      style={{ height }}
+      className=" flex flex-col xl:flex-row gap-3 sm:gap-6 px-3 pb-3 sm:px-6 sm:pb-6 pt-3"
+      style={{ height, width: "calc(100vw - 10px)" }}
     >
       {isFiltersVisible && (
         <aside className="order-first flex xl:w-80 z-50">
