@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import { ChevronLeftIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { capitalize, format } from '@/lib/utils';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Spinner } from '../Spinner';
-import ColorSelect from './ColorSelect';
-import DeletePropertyDialog from './DeletePropertyDialog';
-import { OptionType } from '@/types/options';
-import useOption from './useOptions';
-import useAssetCounter from './useAssetCounter';
-import { AssetCounterType } from '@/types/asset';
-import { useAppContext } from '@/hooks/useAppContext';
+import { useState, useEffect } from "react";
+import { ChevronLeftIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { capitalize, format } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Spinner } from "../Spinner";
+import ColorSelect from "./ColorSelect";
+import DeletePropertyDialog from "./DeletePropertyDialog";
+import { OptionType } from "@/types/options";
+import useOption from "./useOptions";
+import useAssetCounter from "./useAssetCounter";
+import { AssetCounterType } from "@/types/asset";
+import { useAppContext } from "@/hooks/useAppContext";
 
 interface EditOptionProps {
   option: OptionType;
@@ -22,7 +22,10 @@ interface EditOptionProps {
   className?: string;
   onCancel: () => void;
   onDelete: (optionToDelete: string) => void;
-  onUpdate: (updatedOption: OptionType, updatedAssetCounter?: AssetCounterType & { oldPrefixCode: string}) => void;
+  onUpdate: (
+    updatedOption: OptionType,
+    updatedAssetCounter?: AssetCounterType & { oldPrefixCode: string }
+  ) => void;
   isUpdatePending: boolean;
   onEnterPressed?: () => void;
 }
@@ -38,11 +41,11 @@ const EditOption = ({
   onEnterPressed,
 }: EditOptionProps) => {
   const [openDeleteOptionDialog, setOpenDeleteOptionDialog] = useState(false);
-  const isObject: boolean = typeof option.value === 'object';
-  const propertyIsCategory: boolean = property === 'category';
-  const [newPrefixCode, setNewPrefixCode] = propertyIsCategory ? useState('') : [undefined, () => { }];
-  const [prefixCodeError, setPrefixCodeError] = useState('');
-  const [optionError, setOptionError] = useState('');
+  const isObject: boolean = typeof option.value === "object";
+  const propertyIsCategory: boolean = property === "category";
+  const [newPrefixCode, setNewPrefixCode] = useState("");
+  const [prefixCodeError, setPrefixCodeError] = useState("");
+  const [optionError, setOptionError] = useState("");
   const { showToast } = useAppContext();
 
   const {
@@ -55,121 +58,145 @@ const EditOption = ({
   const {
     getAssetCounterFromCategory,
     updateAssetCounterInCache,
-    assetCounters
-  } = useAssetCounter(propertyIsCategory, option)
+    assetCounters,
+  } = useAssetCounter(propertyIsCategory, option);
   const assetCounter = getAssetCounterFromCategory() ?? undefined;
-  const { prefixCode: oldPrefixCode } = assetCounter ?? { prefixCode: '' };
+  const { prefixCode: oldPrefixCode } = assetCounter ?? { prefixCode: "" };
 
   const handleCancel = () => {
     onCancel();
-    setEditedOption({ property, value: '' });
+    setEditedOption({ property, value: "" });
   };
 
   const handleUpdate = () => {
-    const isPrefixCodeChanged: boolean = !!newPrefixCode && oldPrefixCode !== newPrefixCode;
-    
-    if (newPrefixCode === '') {
-      setPrefixCodeError('Prefix code can not be empty')
-      throw new Error('Prefix code can not be empty')
-    };
+    const isPrefixCodeChanged: boolean =
+      !!newPrefixCode && oldPrefixCode !== newPrefixCode;
+
+    if (newPrefixCode === "") {
+      setPrefixCodeError("Prefix code can not be empty");
+      throw new Error("Prefix code can not be empty");
+    }
 
     if (optionError) {
-      throw new Error(`${capitalize(property)} name can not be empty`)
+      throw new Error(`${capitalize(property)} name can not be empty`);
     }
 
     if (assetCounters) {
-      const prefixCodeExists: boolean = !!assetCounters.find((assetCounter: AssetCounterType) => assetCounter.prefixCode === newPrefixCode);
+      const prefixCodeExists: boolean = !!assetCounters.find(
+        (assetCounter: AssetCounterType) =>
+          assetCounter.prefixCode === newPrefixCode
+      );
       if (prefixCodeExists && isPrefixCodeChanged) {
-        setPrefixCodeError('Prefix code already exists')
-        throw new Error(`Prefix code ${newPrefixCode} already exists`)
-      };
+        setPrefixCodeError("Prefix code already exists");
+        throw new Error(`Prefix code ${newPrefixCode} already exists`);
+      }
     }
 
-    const category: string = typeof editedOption.value === 'object' ? editedOption.value.value : '';
-    
-    isPrefixCodeChanged && !!assetCounter && !!newPrefixCode ?
-      (() => {
-        onUpdate(editedOption, { ...assetCounter, category, prefixCode: newPrefixCode, oldPrefixCode })
-        updateAssetCounterInCache(assetCounter._id!, { prefixCode: newPrefixCode, category })
-      })() :
-      (() => {
-        onUpdate(editedOption)
-      })();
+    const category: string =
+      typeof editedOption.value === "object" ? editedOption.value.value : "";
+
+    if (isPrefixCodeChanged && !!assetCounter && !!newPrefixCode) {
+      onUpdate(editedOption, {
+        ...assetCounter,
+        category,
+        prefixCode: newPrefixCode,
+        oldPrefixCode,
+      });
+      updateAssetCounterInCache(assetCounter._id!, {
+        prefixCode: newPrefixCode,
+        category,
+      });
+    } else {
+      onUpdate(editedOption);
+    }
   };
 
   const optionToEdit = getOptionValue(editedOption.value);
 
   useEffect(() => {
-    if (propertyIsCategory && newPrefixCode === '') {
+    if (propertyIsCategory && newPrefixCode === "") {
       setNewPrefixCode(oldPrefixCode);
     }
-  }, [propertyIsCategory, assetCounter])
+  }, [propertyIsCategory, assetCounter, oldPrefixCode, newPrefixCode]);
 
   useEffect(() => {
-    if (newPrefixCode === '') {
-      setPrefixCodeError('Prefix code can not be empty')
+    if (newPrefixCode === "" || newPrefixCode === undefined) {
+      setPrefixCodeError("Prefix code can not be empty");
     } else {
-      setPrefixCodeError('')
+      setPrefixCodeError("");
     }
-    if (getOptionValue(editedOption.value) === '') {
-      setOptionError(`${capitalize(property)} name can not be empty`)
+    if (getOptionValue(editedOption.value) === "") {
+      setOptionError(`${capitalize(property)} name can not be empty`);
     } else {
-      setOptionError('')
+      setOptionError("");
     }
-  }, [newPrefixCode, getOptionValue(editedOption.value)])
+  }, [newPrefixCode, editedOption.value, property, getOptionValue]);
 
   return (
     <>
-      <div className='items-center flex flex-row'>
+      <div className="items-center flex flex-row">
         {/* Back button  */}
         <Button
-          type='button'
-          size='icon'
-          variant='ghost'
-          className='absolute h-10 w-10'
+          type="button"
+          size="icon"
+          variant="ghost"
+          className="absolute h-10 w-10"
           onClick={handleCancel}
         >
           <ChevronLeftIcon />
         </Button>
-        <h1 className='w-full flex justify-center items-center font-semibold text-sm h-10'>
+        <h1 className="w-full flex justify-center items-center font-semibold text-sm h-10">
           Edit {format(property)}
         </h1>
       </div>
       <Label>{capitalize(property)}</Label>
       <Input
         value={getOptionValue(editedOption.value) as string}
-        type='input'
-        className='focus-visible:ring-0 focus-visible:ring-popover'
+        type="input"
+        className="focus-visible:ring-0 focus-visible:ring-popover"
         onChange={(e) => {
-          setEditedOption({ property: property, value: isObject ? {...(option.value as object), value: e.target.value} : e.target.value });
+          setEditedOption({
+            property: property,
+            value: isObject
+              ? { ...(option.value as object), value: e.target.value }
+              : e.target.value,
+          });
         }}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') {
+          if (e.key === "Enter") {
             e.preventDefault();
             onEnterPressed?.();
           }
         }}
       />
-      {optionError && <div className="text-xs text-destructive font-semibold">{optionError}</div>}
+      {(optionError || newPrefixCode === undefined) && (
+        <div className="text-xs text-destructive font-semibold">
+          {optionError}
+        </div>
+      )}
       {propertyIsCategory && newPrefixCode !== null && (
         <>
           <Label>Prefix Code</Label>
           <Input
             value={newPrefixCode}
-            type='input'
-            className='focus-visible:ring-0 focus-visible:ring-popover'
+            type="input"
+            className="focus-visible:ring-0 focus-visible:ring-popover"
             onChange={(e) => {
               const newValue = e.target.value;
               setNewPrefixCode(newValue.toUpperCase().trim());
             }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 e.preventDefault();
                 onEnterPressed?.();
               }
             }}
           />
-          {prefixCodeError && <div className="text-xs text-destructive font-semibold">{prefixCodeError}</div>}
+          {prefixCodeError && (
+            <div className="text-xs text-destructive font-semibold">
+              {prefixCodeError}
+            </div>
+          )}
         </>
       )}
       {colorSelect && (
@@ -179,17 +206,17 @@ const EditOption = ({
           option={optionToEdit as string}
         />
       )}
-      <Separator className='my-1' />
-      <div className='flex justify-between'>
+      <Separator className="my-1" />
+      <div className="flex justify-between">
         <Button
-          className='gap-2'
+          className="gap-2"
           disabled={!!prefixCodeError || !!optionError || isUpdatePending}
-          type='button'
+          type="button"
           onClick={() => {
-            try { 
+            try {
               handleUpdate();
             } catch (err: any) {
-              showToast({ message: err.message, type: "ERROR" })
+              showToast({ message: err.message, type: "ERROR" });
             }
           }}
         >
@@ -197,10 +224,10 @@ const EditOption = ({
           Save
         </Button>
         <Button
-          className='inline-flex items-center justify-center whitespace-nowrap rounded-md 
+          className="inline-flex items-center justify-center whitespace-nowrap rounded-md 
     text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none 
     focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none 
-    disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2'
+    disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
           onClick={(event) => {
             event.preventDefault();
             setOpenDeleteOptionDialog(true);
