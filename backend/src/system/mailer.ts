@@ -159,8 +159,8 @@ export const sendMail = async (config: any) => {
     const sendingMails = async (mailData: any) => {
       return await new Promise((resolve, reject) => {
         let curlCMD = `curl -X POST https://mail.zoho.com/api/accounts/${ACCOUNTID}/messages`;
-        curlCMD += ' -H "Accept: application/json"';
-        curlCMD += ' -H "Content-Type: application/json"';
+        curlCMD += " -H 'Accept: application/json'";
+        curlCMD += " -H 'Content-Type: application/json'";
         curlCMD += ` -H 'Authorization: Zoho-oauthtoken ${ACCESS_TOKEN}'`;
         curlCMD += ` -d '${mailData}'`;
 
