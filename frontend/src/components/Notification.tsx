@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import DOMPurify from 'dompurify';
-import { Bell } from '@phosphor-icons/react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import DOMPurify from "dompurify";
+import { Bell } from "@phosphor-icons/react";
+import { Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,9 +11,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { NotificationType } from '@/types/notification';
-import * as imsService from '@/ims-service';
+} from "@/components/ui/dropdown-menu";
+import { NotificationType } from "@/types/notification";
+import * as imsService from "@/ims-service";
 
 const NotificationItem = ({
   htmlString,
@@ -29,12 +29,12 @@ const NotificationItem = ({
   updated: Date;
 }) => {
   const sanitizedHtmlString = DOMPurify.sanitize(htmlString);
-  const formattedDate = new Date(updated).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
+  const formattedDate = new Date(updated).toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
     hour12: true,
   });
 
@@ -73,7 +73,7 @@ const Notification = () => {
   const queryClient = useQueryClient();
   const [notifications, setNotifications] = useState([]);
   const { data: notifs, isLoading } = useQuery({
-    queryKey: ['notifications'],
+    queryKey: ["notifications"],
     queryFn: () => imsService.fetchNotifications(),
     refetchInterval: 10000,
   });
@@ -81,7 +81,7 @@ const Notification = () => {
   const { mutate } = useMutation({
     mutationFn: imsService.markNotificationAsRead,
     onSuccess: async () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
   });
 
@@ -110,28 +110,34 @@ const Notification = () => {
           </span>
         )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='mr-[80px]'>
+      <DropdownMenuContent className="mr-[80px]">
         <DropdownMenuGroup>
           <DropdownMenuLabel>Notifications</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <div className="max-w-[400px] min-w-80 max-h-96 overflow-y-auto overflow-x-hidden">
-            {notifications.length > 0 ? notifications.map((notification: NotificationType) => (
-              <DropdownMenuItem
-                key={notification._id}
-                onClick={() => onClickNotification(notification._id)}
-              >
-                <NotificationItem
-                  htmlString={notification.message_html}
-                  url={notification.url}
-                  openTab={notification.openTab}
-                  isRead={notification.read}
-                  updated={notification.date}
-                />
-              </DropdownMenuItem>
-            )) : <div className='text-center p-6'>
-                    <label className='font-semibold'>Nothing to see here</label>
-                    <p className='text-muted-foreground'>You currently have no notifications</p>
-              </div>}
+            {notifications.length > 0 ? (
+              notifications.map((notification: NotificationType) => (
+                <DropdownMenuItem
+                  key={notification._id}
+                  onClick={() => onClickNotification(notification._id)}
+                >
+                  <NotificationItem
+                    htmlString={notification.message_html}
+                    url={notification.url}
+                    openTab={notification.openTab}
+                    isRead={notification.read}
+                    updated={notification.date}
+                  />
+                </DropdownMenuItem>
+              ))
+            ) : (
+              <div className="text-center p-6">
+                <label className="font-semibold">Nothing to see here</label>
+                <p className="text-muted-foreground">
+                  You currently have no notifications
+                </p>
+              </div>
+            )}
           </div>
         </DropdownMenuGroup>
       </DropdownMenuContent>
