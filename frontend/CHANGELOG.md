@@ -4,9 +4,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [2.22.0](https://connect.zoho.com/portal/intranet/task/623367000000860349) 2024-10-29
 ### Added
--  Empty State Notification display when there are no notifications present
+- Empty State Notification display when there are no notifications present
 
-### [2.21.0](ttps://connect.zoho.com/portal/intranet/task/623367000000817053) 2024-10-28
+## [2.21.0](https://connect.zoho.com/portal/intranet/task/623367000000817053) 2024-10-28
 ### Added
 - Updated the user profile dropdown to match latest UI, and removed the profile page and its components
 
