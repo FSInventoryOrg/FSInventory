@@ -126,7 +126,7 @@ const EditOption = ({
       setPrefixCodeError("");
     }
     if (getOptionValue(editedOption.value) === "") {
-      setOptionError(`${capitalize(property)} name can not be empty`);
+      setOptionError(`${capitalize(format(property))} name can not be empty`);
     } else {
       setOptionError("");
     }
@@ -146,7 +146,7 @@ const EditOption = ({
           <ChevronLeftIcon />
         </Button>
         <h1 className="w-full flex justify-center items-center font-semibold text-sm h-10">
-          Edit {format(property)}
+          Edit {capitalize(format(property))}
         </h1>
       </div>
       <Label>{capitalize(property)}</Label>
