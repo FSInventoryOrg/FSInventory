@@ -11,7 +11,6 @@ import Dashboard from "./pages/Dashboard";
 import Inventory from "./pages/Inventory";
 import Loading from "./pages/Loading";
 import Tracker from "./pages/Tracker";
-import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -67,14 +66,6 @@ const App = () => {
                     element={
                       <Layout>
                         <Tracker />
-                      </Layout>
-                    }
-                  />
-                  <Route
-                    path="/profile"
-                    element={
-                      <Layout>
-                        <Profile />
                       </Layout>
                     }
                   />
