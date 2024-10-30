@@ -11,10 +11,22 @@ import bcrypt from 'bcryptjs'
 import Option from "../models/options.schema";
 import excel from 'exceljs';
 import crypto from 'crypto'
+import Software from "../models/software.schema";
+import Employee from "../models/employee.schema";
+import NotificationSettings from "../models/notification-settings.schema";
 
 const directory = path.join(path.resolve(), '../');
 
 let DBCONN: any;
+
+
+export const getAppRootDir = () => {
+  let currentDir = __dirname
+  while(!existsSync(path.join(currentDir, 'package.json'))) {
+    currentDir = path.join(currentDir, '..')
+  }
+  return currentDir
+}
 
 export const setDBGlobal = async (dbconn: Connection) => { DBCONN = dbconn }
 
@@ -173,6 +185,117 @@ export const setGitlabCreds = async (user: string, token: string) => {
 	}
 }
 
+export const trackExpiringSoftwareLicenses = async () => {
+	const notificationSettings = await NotificationSettings.findOne();
+	let bufferTime = 5 * 86400000; // 7 days buffer
+	if (notificationSettings) {
+	  bufferTime = notificationSettings.daysBeforeLicenseExpiration * 86400000;
+	}
+  
+	const bufferedDate = new Date(new Date().getTime() + bufferTime);
+	const dateNow = new Date();
+  
+	const adminUsers = await User.find({ role: 'ADMIN' });
+	const admins = adminUsers.map((f) => {
+	  return f._id.toString();
+	});
+	const employees = await Employee.aggregate().match({});
+  
+	let notifRecords = await Notification.aggregate()
+	  .match({
+		$expr: {
+		  $and: [
+			{
+			  $eq: ['$table', 'assets'],
+			},
+		  ],
+		},
+	  })
+	  .project({
+		uniqueLabel: 1,
+		_id: 0,
+	  });
+  
+	notifRecords = notifRecords.map((d) => d['uniqueLabel']);
+	const assets = await Software.aggregate().match({
+	  $expr: {
+		$and: [
+		  {
+			$lt: ['$licenseExpirationDate', bufferedDate],
+		  },
+		  {
+			$eq: ['$type', 'Software'],
+		  },
+		  {
+			$not: [
+			  {
+				$in: ['$status', ['Damaged', '', 'Unaccounted']],
+			  },
+			],
+		  },
+		],
+	  },
+	});
+  
+	let notifDocs: any[] = [];
+	if (assets.length > 0) {
+	  notifDocs = assets.reduce((accum: any[], value: any) => {
+		let notifValue: any = {
+		  url: `/inventory?code=${value.code}`,
+		  openTab: false,
+		  target_users: admins,
+		  uniqueLabel: `Assets-${value['_id']}`,
+		  updated: new Date(),
+		  countType: 'Days',
+		  table: 'assets',
+		  query: { code: value.code },
+		};
+  
+		const isExpired = dateNow > new Date(value.licenseExpirationDate);
+  
+		if (value?.assignee) {
+		  const findUser = employees.find((f) => f['code'] === value.assignee);
+  
+		  if (findUser) {
+			notifValue['target_users'].push(findUser.email);
+			value.assignee = `${findUser['firstName']} ${findUser['lastName']}`;
+		  }
+  
+		  notifValue['message'] = `Software Asset ${value.code} assigned to ${
+			value.assignee
+		  } is ${isExpired ? 'expired' : 'expiring soon'}`;
+		  notifValue['message_html'] = `<p>Software Asset <strong>${
+			value.code
+		  }</strong> assigned to <strong>${value.assignee}</strong> is ${
+			isExpired ? 'expired' : 'expiring soon'
+		  }`;
+		} else {
+		  notifValue['message'] = `Software Asset ${value.code} is ${
+			isExpired ? 'expired' : 'expiring soon'
+		  }`;
+		  notifValue['message_html'] = `<p>Software Asset <strong>${
+			value.code
+		  }</strong> is ${isExpired ? 'expired' : 'expiring soon'}`;
+		}
+  
+		accum.push(notifValue);
+  
+		return accum;
+	  }, []);
+	}
+  
+	const finalNotifIds = notifDocs.map((f) => f['uniqueLabel']);
+	const toDeleteNotifs = notifRecords.filter((f) => !finalNotifIds.includes(f));
+  
+	if (toDeleteNotifs.length > 0)
+	  await Notification.deleteMany({ uniqueLabel: { $in: toDeleteNotifs } });
+	if (finalNotifIds.length > 0) {
+	  notifDocs.forEach(async (element) => {
+		await triggerNotif(element);
+	  });
+	}
+  };  
+
 export const auditAssets = async () => {
 	const assetIndex = await AssetCounter.find({});
 	const adminUsers = await User.find({ role: 'ADMIN' });
@@ -190,7 +313,6 @@ export const auditAssets = async () => {
 	const assets = await Asset.aggregate().match({
 		$expr: {
 			$and: [
-				{ $eq: ['$type', 'Hardware'] },
 				{ $in: ['$category', categories] },
 				{ $in: ['$status', assetStatueses] }
 			]

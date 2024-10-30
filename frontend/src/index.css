@@ -42,6 +42,7 @@
     --ring: 150 60% 50%;
  
     --radius: 0.5rem;
+    --tab: 0 0% 85%;
   }
  
   .dark {
@@ -81,6 +82,7 @@
     --border: 180 30% 20%;
     --input: 180 30% 20%;
     --ring: 150 60% 50%;
+    --tab: 190 20% 10%;
     /* --ring: 190 20% 30%; */
   }
 }
@@ -272,4 +274,10 @@ html {
   .doc-info.fields {
     @apply flex flex-col gap-x-2 p-2 rounded-b font-mono;
   }
+
+  /* Warning alert component*/
+  .warning-alert {
+    @apply text-[#675211] bg-[#F1EBDF] !important;
+  }
+
 }
