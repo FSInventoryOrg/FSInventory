@@ -125,12 +125,15 @@ const EditOption = ({
     } else {
       setPrefixCodeError("");
     }
+  }, [newPrefixCode]);
+
+  useEffect(() => {
     if (getOptionValue(editedOption.value) === "") {
       setOptionError(`${capitalize(format(property))} name can not be empty`);
     } else {
       setOptionError("");
     }
-  }, [newPrefixCode, editedOption.value, property, getOptionValue]);
+  }, [editedOption.value, property, getOptionValue]);
 
   return (
     <>
