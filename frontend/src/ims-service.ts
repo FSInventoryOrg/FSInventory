@@ -10,6 +10,10 @@ import { AutoMailType } from "@/types/automail";
 import { AssetCounterFormData } from "./schemas/AssetCounterSchema";
 import { MongoResult } from "./types/backup";
 import { NotificationSettingType } from "./types/notification-setting";
+import {
+  ReportIssueFormData,
+  RequestAssetFormData,
+} from "./schemas/RequestFormSchema";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
@@ -930,4 +934,11 @@ export const fetchAppVersions = async () => {
   }
 
   return response.json();
+};
+
+export const submitRequestForm = async (
+  data: ReportIssueFormData | RequestAssetFormData
+) => {
+  if (data) return true;
+  return false;
 };

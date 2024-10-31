@@ -151,14 +151,14 @@ const NavigationBar = () => {
               />
               <span className="hidden lg:inline-block">Tracker</span>
             </Link>
-            <Button
-              disabled
+            <Link
+              to="/requests"
               className={`${
                 location.pathname.startsWith("/requests")
                   ? "bg-secondary"
                   : "bg-none"
-              } rounded-l-none rounded-r-xl xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border-t-2 border-b-2 border-r-2 xl:border-2 font-semibold text-md flex gap-2 items-center`}
-              variant="outline"
+              } rounded-none xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`}
+              style={{ textDecoration: "none" }}
             >
               <FlagIcon
                 className={
@@ -168,11 +168,7 @@ const NavigationBar = () => {
                 }
               />
               <span className="hidden lg:inline-block">Requests</span>
-            </Button>
-            {/* <Link to="/requests" className={`${location.pathname.startsWith('/requests') ? "bg-secondary" : "bg-none"}  rounded-l-none rounded-r-xl xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 border-r    -2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`} style={{ textDecoration: 'none' }}>
-              <FlagIcon className={location.pathname.startsWith('/requests') ? "text-primary" : ""} />
-              <span className="hidden lg:inline-block">Requests</span>
-            </Link>   */}
+            </Link>
           </NavigationMenuList>
         </NavigationMenu>
       </div>
