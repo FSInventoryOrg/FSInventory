@@ -1,4 +1,5 @@
-import { Button } from '../ui/button';
+import { Button } from "../ui/button";
+import { startOfDay } from "date-fns";
 import {
   Select,
   SelectContent,
@@ -6,17 +7,17 @@ import {
   SelectTrigger,
   SelectValue,
   SelectGroup,
-} from '@/components/ui/select';
-import { Input } from '../ui/input';
-import { Textarea } from '../ui/textarea';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { format } from 'date-fns';
-import { Calendar } from '../ui/calendar';
-import { CalendarIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+} from "@/components/ui/select";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { format } from "date-fns";
+import { Calendar } from "../ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -24,13 +25,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import RequestorForm from './RequestorForm';
+} from "@/components/ui/form";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import RequestorForm from "./RequestorForm";
 import {
   RequestAssetFormData,
   RequestNewAssetSchema,
-} from '@/schemas/RequestFormSchema';
+} from "@/schemas/RequestFormSchema";
 
 interface RequestAssetFormProps {
   userData: Record<string, string>;
@@ -49,20 +50,20 @@ const RequestAssetForm = ({
   const requestAssetForm = useForm<z.infer<typeof RequestNewAssetSchema>>({
     resolver: zodResolver(RequestNewAssetSchema),
     defaultValues: {
-      fullName: userData?.fullName ?? '',
-      manager: userData?.manager ?? '',
-      contactInfo: userData?.contactInfo ?? '',
-      requestType: 'Request a New Asset',
+      fullName: userData?.fullName ?? "",
+      manager: userData?.manager ?? "",
+      contactInfo: userData?.contactInfo ?? "",
+      requestType: "Request a New Asset",
     },
-    mode: 'onChange',
+    mode: "onChange",
   });
 
   useEffect(() => {
     requestAssetForm.reset({
       ...requestAssetForm,
-      fullName: userData?.fullName ?? '',
-      manager: userData?.manager ?? '',
-      contactInfo: userData?.contactInfo ?? '',
+      fullName: userData?.fullName ?? "",
+      manager: userData?.manager ?? "",
+      contactInfo: userData?.contactInfo ?? "",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData]);
@@ -183,14 +184,14 @@ const RequestAssetForm = ({
                 >
                   <PopoverTrigger asChild>
                     <Button
-                      variant={'outline'}
+                      variant={"outline"}
                       className={cn(
-                        'w-full pl-3 text-left font-normal',
-                        !field.value && 'text-muted-foreground'
+                        "w-full pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
                       )}
                     >
                       {field.value ? (
-                        format(field.value, 'PPP')
+                        format(field.value, "PPP")
                       ) : (
                         <span>
                           Specify a date by which you need the asset, if
@@ -206,7 +207,7 @@ const RequestAssetForm = ({
                       selected={field.value ? new Date(field.value) : undefined}
                       onSelect={field.onChange}
                       onDayClick={() => setOpenRequestedDate(false)}
-                      disabled={(date) => date < new Date('1900-01-01')}
+                      disabled={(date) => date < startOfDay(new Date())} // Disable past days
                     />
                   </PopoverContent>
                 </Popover>
