@@ -77,7 +77,7 @@ const activateAutoMailing = async (data: any) => {
     subject: `Full Scale Stockpilot: Inventory Report (Date Generated ${dateReference.toLocaleDateString()})`,
     htmlMessage: htmlMessage,
     recipient: recipients,
-    attachments: [tableFile, backupFile],
+    attachments: [tableFile, backupFile.pathFile],
   });
   const rollOut = new Date();
   await AutoMail.updateOne(
@@ -216,11 +216,9 @@ router.post("/", verifyToken, async (req: Request, res: Response) => {
     );
 
     if (decodedToken.role !== "ADMIN") {
-      return res
-        .status(403)
-        .json({
-          message: "Only users with admin role can perform this action",
-        });
+      return res.status(403).json({
+        message: "Only users with admin role can perform this action",
+      });
     }
 
     const currentUser: any = await User.findOne({ _id: decodedToken.userId });
@@ -264,12 +262,10 @@ router.post("/", verifyToken, async (req: Request, res: Response) => {
 
     await renewAutoMailingActivation();
 
-    return res
-      .status(200)
-      .json({
-        message: "Auto generated mail reports configurations has been set",
-        data: newData,
-      });
+    return res.status(200).json({
+      message: "Auto generated mail reports configurations has been set",
+      data: newData,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Something went wrong" });
@@ -285,11 +281,9 @@ router.get("/", verifyToken, async (req: Request, res: Response) => {
     );
 
     if (decodedToken.role !== "ADMIN") {
-      return res
-        .status(403)
-        .json({
-          message: "Only users with admin role can perform this action",
-        });
+      return res.status(403).json({
+        message: "Only users with admin role can perform this action",
+      });
     }
 
     const existingSettings: any = await AutoMail.findOne({});
@@ -315,21 +309,17 @@ router.post(
       );
 
       if (decodedToken.role !== "ADMIN") {
-        return res
-          .status(403)
-          .json({
-            message: "Only users with admin role can perform this action",
-          });
+        return res.status(403).json({
+          message: "Only users with admin role can perform this action",
+        });
       }
 
       const autoMailData = await AutoMail.findOne({});
       await activateAutoMailing(autoMailData);
 
-      return res
-        .status(200)
-        .json({
-          message: "Auto generated mail reports has been manually triggered",
-        });
+      return res.status(200).json({
+        message: "Auto generated mail reports has been manually triggered",
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "Something went wrong" });
