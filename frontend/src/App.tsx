@@ -11,7 +11,6 @@ import Dashboard from "./pages/Dashboard";
 import Inventory from "./pages/Inventory";
 import Loading from "./pages/Loading";
 import Tracker from "./pages/Tracker";
-import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -72,14 +71,6 @@ const App = () => {
                     }
                   />
                   <Route
-                    path="/profile"
-                    element={
-                      <Layout>
-                        <Profile />
-                      </Layout>
-                    }
-                  />
-                  <Route
                     path="/settings/*"
                     element={
                       <Layout>
@@ -87,7 +78,14 @@ const App = () => {
                       </Layout>
                     }
                   />
-                  <Route path="/requests" element={<Layout><Requests/></Layout>} />
+                  <Route
+                    path="/requests"
+                    element={
+                      <Layout>
+                        <Requests />
+                      </Layout>
+                    }
+                  />
                 </>
               )}
               <Route path="/forgot-password" element={<ForgotPassword />} />
