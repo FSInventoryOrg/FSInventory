@@ -1,9 +1,10 @@
-import express, { Request, Response } from 'express';
-import Option, { OptionsType, StatusOptions, CategoryOptions } from '../models/options.schema'; // Import your Mongoose model
-import { check, validationResult } from 'express-validator';
-import verifyToken from '../middleware/auth';
+import express, { Request, Response } from "express";
+import Option, { StatusOptions } from "../models/options.schema"; // Import your Mongoose model
+import { check, validationResult } from "express-validator";
+import verifyToken from "../middleware/auth";
 import jwt from "jsonwebtoken";
-import { auditAssets } from '../utils/common';
+import { auditAssets } from "../utils/common";
+import { format } from "../utils/string-utils";
 
 const router = express.Router();
 
@@ -46,9 +47,9 @@ const router = express.Router();
  *    security:
  *      - bearerAuth: []
  */
-router.post('/:property', [
-    check("value").exists().withMessage("Value is required"),
-  ],
+router.post(
+  "/:property",
+  [check("value").exists().withMessage("Value is required")],
   verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -57,18 +58,23 @@ router.post('/:property', [
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+      const decodedToken: any = jwt.verify(
+        token,
+        process.env.JWT_SECRET_KEY as string
+      );
 
       if (decodedToken.role !== "ADMIN") {
-        return res.status(403).json({ message: "Only users with admin role can perform this action" });
+        return res.status(403).json({
+          message: "Only users with admin role can perform this action",
+        });
       }
 
       const { property } = req.params;
       const { type } = req.query;
       let { value } = req.body;
 
-      if (value === '') {
-        return res.status(400).json({ error: 'Value cannot be empty' });
+      if (value === "") {
+        return res.status(400).json({ error: "Value cannot be empty" });
       }
 
       let option = await Option.findOne();
@@ -79,39 +85,50 @@ router.post('/:property', [
       let isStatusIncluded = false;
 
       // Convert value to object if property is "status" or "category" and value is a string
-      if (property === 'status' || property === 'category') {
-        if (typeof value === 'string') {
+      if (property === "status" || property === "category") {
+        if (typeof value === "string") {
           value = { value, type };
         }
 
-        if(property === 'status') isStatusIncluded = true
+        if (property === "status") isStatusIncluded = true;
       }
 
       const propertyValues = option.get(property) || [];
 
       // Check if the value already exists in the array for the specified property
-      if (typeof value === 'object') {
-        const existingValue = propertyValues.find((val: any) => val.value === value.value);
+      if (typeof value === "object") {
+        const existingValue = propertyValues.find(
+          (val: { value: string }) =>
+            val.value.toLowerCase() === value.value.toLowerCase()
+        );
         if (existingValue) {
-          return res.status(400).json({ error: 'Value already exists for the specified property' });
+          return res.status(400).json({
+            message: `The ${format(property)} '${existingValue.value}' already exists.`,
+          });
         }
       } else {
-        if (propertyValues.includes(value)) {
-          return res.status(400).json({ error: 'Value already exists for the specified property' });
+        const existingValue = propertyValues.find(
+          (propertyVal: string) =>
+            propertyVal.toLowerCase() === value?.toLowerCase()
+        );
+        if (existingValue) {
+          return res.status(400).json({
+            message: `The ${format(property)} '${existingValue}' already exists.`,
+          });
         }
       }
 
       // Append the new value to the array
       option.set(property, [...propertyValues, value]);
-      
+
       await option.save();
 
-      if(isStatusIncluded) await auditAssets();
+      if (isStatusIncluded) await auditAssets();
 
       res.status(200).json(option);
     } catch (error) {
-      console.error('Error adding or updating option:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error("Error adding or updating option:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
   }
 );
@@ -147,7 +164,9 @@ router.post('/:property', [
  *    security:
  *      - bearerAuth: []
  */
-router.put('/defaults', [
+router.put(
+  "/defaults",
+  [
     check("status").optional().isString(),
     check("softwareCategory").optional().isString(),
     check("hardwareCategory").optional().isString(),
@@ -156,7 +175,7 @@ router.put('/defaults', [
     check("retrievableStatus").optional().isString(),
     check("inventoryColumns").optional().isArray(),
   ],
-  verifyToken, 
+  verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -164,12 +183,17 @@ router.put('/defaults', [
     }
     try {
       const token = req.cookies.auth_token;
-      const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+      const decodedToken: any = jwt.verify(
+        token,
+        process.env.JWT_SECRET_KEY as string
+      );
 
       if (decodedToken.role !== "ADMIN") {
-        return res.status(403).json({ message: "Only users with admin role can perform this action" });
+        return res.status(403).json({
+          message: "Only users with admin role can perform this action",
+        });
       }
-      
+
       let option = await Option.findOne();
       if (!option) {
         option = new Option({});
@@ -179,7 +203,15 @@ router.put('/defaults', [
         option.defaults = {};
       }
 
-      const { status, softwareCategory, hardwareCategory, equipmentType, deployableStatus, retrievableStatus, inventoryColumns } = req.body
+      const {
+        status,
+        softwareCategory,
+        hardwareCategory,
+        equipmentType,
+        deployableStatus,
+        retrievableStatus,
+        inventoryColumns,
+      } = req.body;
 
       if (status !== undefined) {
         option.defaults.status = status;
@@ -207,8 +239,8 @@ router.put('/defaults', [
 
       res.status(200).json(option);
     } catch (error) {
-      console.error('Error updating defaults:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error("Error updating defaults:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
   }
 );
@@ -263,10 +295,10 @@ router.put('/defaults', [
  *    security:
  *      - bearerAuth: []
  */
-router.put('/:property', [
-    check("value").exists().withMessage("Value is required"),
-  ],
-  verifyToken, 
+router.put(
+  "/:property",
+  [check("value").exists().withMessage("Value is required")],
+  verifyToken,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -279,32 +311,40 @@ router.put('/:property', [
 
       let isStatusIncluded = false;
 
-      let option = await Option.findOne();
+      const option = await Option.findOne();
       if (!option) {
-        return res.status(404).json({ message: 'Options not found' });
+        return res.status(404).json({ message: "Options not found" });
       }
 
       if (!option.get(property)) {
-        return res.status(404).json({ message: `Option '${property}' not found in options` });
+        return res
+          .status(404)
+          .json({ message: `Option '${property}' not found in options` });
       }
 
-      if (isNaN(updateIndex) || updateIndex < 0 || updateIndex >= option.get(property).length) {
-        return res.status(400).json({ error: 'Invalid update index' });
+      if (
+        isNaN(updateIndex) ||
+        updateIndex < 0 ||
+        updateIndex >= option.get(property).length
+      ) {
+        return res.status(400).json({ error: "Invalid update index" });
       }
 
       // Convert value to object if property is "status" or "category" and value is a string
-      if (property === 'status' || property === 'category') {
-        if (typeof value === 'string') {
+      if (property === "status" || property === "category") {
+        if (typeof value === "string") {
           value = { value };
         }
 
-        if(property === 'status') isStatusIncluded = true
+        if (property === "status") isStatusIncluded = true;
       }
 
       const propertyValues = option.get(property) || [];
       // Check if the value already exists in the array for the specified property
       if (propertyValues.includes(value)) {
-        return res.status(400).json({ error: 'Value already exists for the specified property' });
+        return res
+          .status(400)
+          .json({ error: "Value already exists for the specified property" });
       }
 
       // Update element at the specified index
@@ -312,12 +352,12 @@ router.put('/:property', [
 
       await option.save();
 
-      if(isStatusIncluded) await auditAssets();
+      if (isStatusIncluded) await auditAssets();
 
-      res.status(200).json({ message: 'Option updated successfully' });
+      res.status(200).json({ message: "Option updated successfully" });
     } catch (error) {
-      console.error('Error updating option:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error("Error updating option:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
   }
 );
@@ -367,64 +407,83 @@ router.put('/:property', [
  *    security:
  *      - bearerAuth: []
  */
-router.delete('/:property', verifyToken, async (req: Request, res: Response) => {
-  try {
-    const token = req.cookies.auth_token;
-    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+router.delete(
+  "/:property",
+  verifyToken,
+  async (req: Request, res: Response) => {
+    try {
+      const token = req.cookies.auth_token;
+      const decodedToken: any = jwt.verify(
+        token,
+        process.env.JWT_SECRET_KEY as string
+      );
 
-    if (decodedToken.role !== "ADMIN") {
-      return res.status(403).json({ message: "Only users with admin role can perform this action" });
-    }
-
-    const { property } = req.params;
-    const { value } = req.body;
-
-    let isStatusIncluded = false;
-
-    // Check if the options document exists
-    let option = await Option.findOne();
-    if (!option) {
-      return res.status(404).json({ message: 'Options not found' });
-    }
-
-    // Check if the property exists in the options document
-    if (!option.get(property)) {
-      return res.status(404).json({ message: `Option '${property}' not found in options` });
-    }
-
-    // Remove the specified value from the array property
-    if (property === 'status' || property === 'category') {
-      const propertyValue = option.get(property) as StatusOptions[];
-
-      // Check if the value exists in the array
-      if (!propertyValue.some(option => option.value === value)) {
-        return res.status(400).json({ message: `Value '${value}' does not exist in option '${property}'` });
+      if (decodedToken.role !== "ADMIN") {
+        return res.status(403).json({
+          message: "Only users with admin role can perform this action",
+        });
       }
 
-      const updatedProperty = propertyValue.filter(option => option.value !== value);
-      option.set(property, updatedProperty);
-      if(property === 'status') isStatusIncluded = true
-    } else {
-      const propertyValue: string[] = option.get(property);
-      if (!propertyValue.includes(value)) {
-        return res.status(400).json({ message: `Value '${value}' does not exist in option '${property}'` });
+      const { property } = req.params;
+      const { value } = req.body;
+
+      let isStatusIncluded = false;
+
+      // Check if the options document exists
+      const option = await Option.findOne();
+      if (!option) {
+        return res.status(404).json({ message: "Options not found" });
       }
-      const updatedProperty = propertyValue.filter(item => item !== value);
-      option.set(property, updatedProperty);
+
+      // Check if the property exists in the options document
+      if (!option.get(property)) {
+        return res
+          .status(404)
+          .json({ message: `Option '${property}' not found in options` });
+      }
+
+      // Remove the specified value from the array property
+      if (property === "status" || property === "category") {
+        const propertyValue = option.get(property) as StatusOptions[];
+
+        // Check if the value exists in the array
+        if (!propertyValue.some((option) => option.value === value)) {
+          return res.status(400).json({
+            message: `Value '${value}' does not exist in option '${property}'`,
+          });
+        }
+
+        const updatedProperty = propertyValue.filter(
+          (option) => option.value !== value
+        );
+        option.set(property, updatedProperty);
+        if (property === "status") isStatusIncluded = true;
+      } else {
+        const propertyValue: string[] = option.get(property);
+        if (!propertyValue.includes(value)) {
+          return res.status(400).json({
+            message: `Value '${value}' does not exist in option '${property}'`,
+          });
+        }
+        const updatedProperty = propertyValue.filter((item) => item !== value);
+        option.set(property, updatedProperty);
+      }
+
+      await option.save();
+
+      if (isStatusIncluded) await auditAssets();
+
+      res.status(200).json({
+        message: `Value '${value}' removed from option '${property}' successfully`,
+      });
+    } catch (error) {
+      console.error("Error deleting value from option:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
-
-    await option.save();
-
-    if(isStatusIncluded) await auditAssets();
-
-    res.status(200).json({ message: `Value '${value}' removed from option '${property}' successfully` });
-  } catch (error) {
-    console.error('Error deleting value from option:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
   }
-});
+);
 
-router.get('/:property', async (req: Request, res: Response) => {
+router.get("/:property", async (req: Request, res: Response) => {
   try {
     const { property } = req.params;
 
@@ -433,18 +492,20 @@ router.get('/:property', async (req: Request, res: Response) => {
 
     // Check if the options document exists and if the property exists in it
     if (!option || !option.get(property)) {
-      return res.status(404).json({ message: `property '${property}' not found in options` });
+      return res
+        .status(404)
+        .json({ message: `property '${property}' not found in options` });
     }
 
     // Return the value of the specified property
     res.status(200).json({ value: option.get(property) });
   } catch (error) {
-    console.error('Error fetching option value:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error fetching option value:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-router.get('/', async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
   try {
     // Retrieve all options documents
     const options = await Option.find();
@@ -452,8 +513,8 @@ router.get('/', async (req: Request, res: Response) => {
     // Return the options array
     res.status(200).json(options);
   } catch (error) {
-    console.error('Error fetching options:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error fetching options:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
