@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import * as React from 'react';
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,7 +14,7 @@ import {
   FilterFn,
   useReactTable,
   PaginationState,
-} from '@tanstack/react-table';
+} from "@tanstack/react-table";
 import {
   Table,
   TableBody,
@@ -22,32 +22,32 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { ScrollArea, ScrollBar } from '../ui/scroll-area';
-import { Input } from '@/components/ui/input';
-import { DataTablePagination } from '@/components/DataTablePagination';
-import AddAsset from './AddAsset';
-import { FilterIcon, SearchIcon } from 'lucide-react';
-import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
-import { ColumnVisibility } from './ColumnVisibility';
-import Empty from '../graphics/Empty';
-import { TagOption } from '@/types/options';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import * as imsService from '@/ims-service';
-import { Button } from '../ui/button';
-import { PROPERTIES } from '@/lib/data';
-import { Download } from '@phosphor-icons/react';
-import { exportToExcel } from '@/lib/utils';
-import BulkDelete from './BulkDelete';
-import { useAppContext } from '@/hooks/useAppContext';
+} from "@/components/ui/tooltip";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { DataTablePagination } from "@/components/DataTablePagination";
+import AddAsset from "./AddAsset";
+import { FilterIcon, SearchIcon } from "lucide-react";
+import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
+import { ColumnVisibility } from "./ColumnVisibility";
+import Empty from "../graphics/Empty";
+import { TagOption } from "@/types/options";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as imsService from "@/ims-service";
+import { Button } from "../ui/button";
+import { PROPERTIES } from "@/lib/data";
+import { Download } from "@phosphor-icons/react";
+import { exportToExcel } from "@/lib/utils";
+import BulkDelete from "./BulkDelete";
+import { useAppContext } from "@/hooks/useAppContext";
 
-declare module '@tanstack/table-core' {
+declare module "@tanstack/table-core" {
   interface FilterFns {
     fuzzy: FilterFn<unknown>;
   }
@@ -94,21 +94,27 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed;
 };
 
-const searchColumns: any[] = ["code", "serialNo", "assignee", "modelName"]
+const searchColumns: any[] = ["code", "serialNo", "assignee", "modelName"];
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const exactFilter: FilterFn<any> = (row, _columnId, value) => {
-  const objectValue: string = searchColumns.reduce((accum: any, element: any) => {
-    accum += ` ${row.getValue(element)?.toString().toLowerCase() || ''}`;
+  const objectValue: string = searchColumns.reduce(
+    (accum: any, element: any) => {
+      accum += ` ${row.getValue(element)?.toString().toLowerCase() || ""}`;
 
-    return accum
-  }, "");
+      return accum;
+    },
+    ""
+  );
 
-  const searchTerm: string = value?.toString().toLowerCase() || '';
+  const searchTerm: string = value?.toString().toLowerCase() || "";
   let isFound: boolean = true;
 
-  searchTerm.split(' ').filter(f => f).forEach((element: string) => {
-    if (isFound) isFound = objectValue.includes(element)
-  })
+  searchTerm
+    .split(" ")
+    .filter((f) => f)
+    .forEach((element: string) => {
+      if (isFound) isFound = objectValue.includes(element);
+    });
 
   return isFound;
 };
@@ -123,13 +129,13 @@ export function InventoryTable<TData, TValue>({
   selectedCategory,
 }: InventoryTableProps<TData, TValue>) {
   const { showToast } = useAppContext();
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const [isXL, setIsXL] = React.useState(false);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [globalFilter, setGlobalFilter] = React.useState('');
+  const [globalFilter, setGlobalFilter] = React.useState("");
   const [pagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
@@ -138,31 +144,31 @@ export function InventoryTable<TData, TValue>({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
 
   const { data: optionValues } = useQuery<TagOption[]>({
-    queryKey: ['fetchOptionValues', 'category'],
-    queryFn: () => imsService.fetchOptionValues('category'),
+    queryKey: ["fetchOptionValues", "category"],
+    queryFn: () => imsService.fetchOptionValues("category"),
     enabled: !!selectedCategory,
   });
 
-  const mutation = useMutation( {
+  const mutation = useMutation({
     mutationFn: imsService.bulkDeleteAssets,
     onSuccess: async () => {
-      showToast({ message: 'Asset(s) deleted successfully!', type: 'SUCCESS'})
-      Promise.all(
-        [ 
-          queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] }),
-          queryClient.invalidateQueries({
-            queryKey: ['fetchAllAssetsByStatusAndCategory']})
-        ])
+      showToast({ message: "Asset(s) deleted successfully!", type: "SUCCESS" });
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["fetchAllAssetsByStatusAndCategory"],
+        }),
+      ]);
       table.resetRowSelection();
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
       setTimeout(() => {
         setIsDeleteDialogOpen(false);
       }, 100);
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
-    }
-  })
+    },
+  });
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>(
@@ -253,10 +259,10 @@ export function InventoryTable<TData, TValue>({
     };
 
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
 
     return () => {
-      window.removeEventListener('resize', checkScreenSize);
+      window.removeEventListener("resize", checkScreenSize);
     };
   }, []);
 
@@ -283,15 +289,15 @@ export function InventoryTable<TData, TValue>({
       }
       return { ...asset, serviceInYears };
     });
-    await exportToExcel(columns, withServiceInYears, 'Inventory_Report');
+    await exportToExcel(columns, withServiceInYears, "Inventory_Report");
     setIsDownloading(false);
   };
 
   const handleBulkDelete = (assetIds: string[]) => {
-    mutation.mutate(assetIds)
+    mutation.mutate(assetIds);
   };
 
-  const filteredSelectedRows = table?.getFilteredSelectedRowModel()
+  const filteredSelectedRows = table?.getFilteredSelectedRowModel();
 
   return (
     <div className="w-full flex flex-col h-full">
@@ -323,9 +329,9 @@ export function InventoryTable<TData, TValue>({
             <SearchIcon className="absolute translate-x-3 h-4 w-4" />
             <Input
               placeholder="Search asset..."
-              value={globalFilter ?? ''}
+              value={globalFilter ?? ""}
               onChange={(event) => table.setGlobalFilter(event.target.value)}
-              className="w-full pl-10 h-8 font-light rounded-md text-sm md:w-[700px]"
+              className="pl-10 h-8 font-light rounded-md text-sm"
             />
           </div>
         </div>
@@ -356,19 +362,19 @@ export function InventoryTable<TData, TValue>({
             <BulkDelete
               open={isDeleteDialogOpen}
               setOpen={setIsDeleteDialogOpen}
-              onDelete={handleBulkDelete} 
-              selectedAssets={filteredSelectedRows?.rows} 
+              onDelete={handleBulkDelete}
+              selectedAssets={filteredSelectedRows?.rows}
               isLoading={mutation.isPending}
-              />
+            />
           )}
           {defaultOptions && <AddAsset defaultValues={defaultOptions} />}
         </div>
       </div>
       <ScrollArea
         className={`rounded-md border h-full ${
-          isFiltersVisible ? 'xl:w-[calc(100vw-25rem)]' : 'w-full'
+          isFiltersVisible ? "xl:w-[calc(100vw-25rem)]" : "w-full"
         }`}
-        style={isXL ? { maxHeight: '' } : {}}
+        style={isXL ? { maxHeight: "" } : {}}
       >
         <Table className="text-xs relative">
           <TableHeader className="sticky top-0 bg-accent z-10 border-b">
@@ -377,12 +383,11 @@ export function InventoryTable<TData, TValue>({
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                      {!header.isPlaceholder &&
+                        flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}
@@ -394,7 +399,7 @@ export function InventoryTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
+                  data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
