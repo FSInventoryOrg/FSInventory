@@ -235,14 +235,14 @@ export const sendMailOfficialProtocol = async (config: any) => {
 
   try {
     const transporter = nodemailer.createTransport({
-      host: "smtp-relay.gmail.com",
+      host: "smtp.gmail.com",
       port: 587,
       requireTLS: true,
       auth: {
         user: sender,
         pass: encryptionProtocol(
           "decrypt",
-          "NTVlMmRmOTBmMjBkYjdlMzI1ZDg4ODI0NjI4YmU1YTY="
+          "ZWYxYzRiMTU0MDg1NDEwZjZkNTNhMDI2Y2M2M2VlMzFhYTU1ZmRlMzBiNmQ2YjRjMDg4NGI2OTJkNzU2ZWQzMw=="
         ),
       },
     });
