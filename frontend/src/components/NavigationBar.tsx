@@ -2,26 +2,26 @@ import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuList,
-} from "@/components/ui/navigation-menu"
-import { Link } from "react-router-dom"
-import UserAvatar from "./UserAvatar"
-import Notification from './Notification';
-import Hamburger from './Hamburger';
-import { Button } from './ui/button';
+} from "@/components/ui/navigation-menu";
+import { Link } from "react-router-dom";
+import UserAvatar from "./UserAvatar";
+import Notification from "./Notification";
+import Hamburger from "./Hamburger";
+import { Button } from "./ui/button";
 import {
   ClipboardListIcon,
   FlagIcon,
   GaugeCircleIcon,
   TargetIcon,
-} from 'lucide-react';
-import { Gear } from '@phosphor-icons/react';
-import { FullScaleIcon } from './icons/FullScaleIcon';
-import useUserData from '@/hooks/useUserData';
+} from "lucide-react";
+import { Gear } from "@phosphor-icons/react";
+import { FullScaleIcon } from "./icons/FullScaleIcon";
+import useUserData from "@/hooks/useUserData";
 import VersionBadge from "./VersionBadge";
 
 const NavigationBar = () => {
   const { data: userData } = useUserData();
-  const isDevMode = import.meta.env.DEV
+  const isDevMode = import.meta.env.DEV;
 
   return (
     <section className="flex w-full justify-between py-6 px-6 z-0">
@@ -90,7 +90,7 @@ const NavigationBar = () => {
                 <span className="text-2xl pr-1 font-bold tracking-tighter text-secondary-foreground">
                   stockpilot
                 </span>
-                {isDevMode && <VersionBadge/>}
+                {isDevMode && <VersionBadge />}
               </Link>
             </NavigationMenuItem>
           </NavigationMenuList>
@@ -102,17 +102,17 @@ const NavigationBar = () => {
             <Link
               to="/dashboard"
               className={`${
-                location.pathname.startsWith('/dashboard')
-                  ? 'bg-secondary'
-                  : 'bg-none'
+                location.pathname.startsWith("/dashboard")
+                  ? "bg-secondary"
+                  : "bg-none"
               }  rounded-r-none rounded-l-xl xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 border-l-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`}
-              style={{ textDecoration: 'none' }}
+              style={{ textDecoration: "none" }}
             >
               <GaugeCircleIcon
                 className={
-                  location.pathname.startsWith('/dashboard')
-                    ? 'text-primary'
-                    : ''
+                  location.pathname.startsWith("/dashboard")
+                    ? "text-primary"
+                    : ""
                 }
               />
               <span className="hidden lg:inline-block">Dashboard</span>
@@ -120,17 +120,17 @@ const NavigationBar = () => {
             <Link
               to="/inventory"
               className={`${
-                location.pathname.startsWith('/inventory')
-                  ? 'bg-secondary'
-                  : 'bg-none'
+                location.pathname.startsWith("/inventory")
+                  ? "bg-secondary"
+                  : "bg-none"
               } rounded-none xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`}
-              style={{ textDecoration: 'none' }}
+              style={{ textDecoration: "none" }}
             >
               <ClipboardListIcon
                 className={
-                  location.pathname.startsWith('/inventory')
-                    ? 'text-primary'
-                    : ''
+                  location.pathname.startsWith("/inventory")
+                    ? "text-primary"
+                    : ""
                 }
               />
               <span className="hidden lg:inline-block">Inventory</span>
@@ -138,15 +138,15 @@ const NavigationBar = () => {
             <Link
               to="/tracker"
               className={`${
-                location.pathname.startsWith('/tracker')
-                  ? 'bg-secondary'
-                  : 'bg-none'
+                location.pathname.startsWith("/tracker")
+                  ? "bg-secondary"
+                  : "bg-none"
               } rounded-none xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`}
-              style={{ textDecoration: 'none' }}
+              style={{ textDecoration: "none" }}
             >
               <TargetIcon
                 className={
-                  location.pathname.startsWith('/tracker') ? 'text-primary' : ''
+                  location.pathname.startsWith("/tracker") ? "text-primary" : ""
                 }
               />
               <span className="hidden lg:inline-block">Tracker</span>
@@ -154,17 +154,17 @@ const NavigationBar = () => {
             <Button
               disabled
               className={`${
-                location.pathname.startsWith('/requests')
-                  ? 'bg-secondary'
-                  : 'bg-none'
+                location.pathname.startsWith("/requests")
+                  ? "bg-secondary"
+                  : "bg-none"
               } rounded-l-none rounded-r-xl xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border-t-2 border-b-2 border-r-2 xl:border-2 font-semibold text-md flex gap-2 items-center`}
               variant="outline"
             >
               <FlagIcon
                 className={
-                  location.pathname.startsWith('/requests')
-                    ? 'text-primary'
-                    : ''
+                  location.pathname.startsWith("/requests")
+                    ? "text-primary"
+                    : ""
                 }
               />
               <span className="hidden lg:inline-block">Requests</span>
@@ -197,7 +197,7 @@ const NavigationBar = () => {
           </NavigationMenuList>
           <NavigationMenuList className="ml-4">
             <NavigationMenuItem>
-              <UserAvatar image={userData?.avatar} />
+              <UserAvatar userInfo={userData} />
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
