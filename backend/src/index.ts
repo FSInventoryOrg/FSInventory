@@ -38,8 +38,8 @@ import versionRoutes from "./system/version";
 const DEFAULT_PORT = 3000;
 const port = Number(process.env.PORT) || DEFAULT_PORT;
 
-const HOST = (process.env.HOST as string) || `localhost`;
-const FRONTENDLOC = `../../frontend/dist`;
+const HOST = (process.env.HOST as string) || "localhost";
+const FRONTENDLOC = "../../frontend/dist";
 
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string);
 const db = mongoose.connection;

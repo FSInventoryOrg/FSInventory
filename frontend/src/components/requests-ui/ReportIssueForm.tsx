@@ -5,17 +5,17 @@ import {
   SelectTrigger,
   SelectValue,
   SelectGroup,
-} from '@/components/ui/select';
-import { Input } from '../ui/input';
-import { Textarea } from '../ui/textarea';
-import { FileUploader } from '../ui/file-uploader';
+} from "@/components/ui/select";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { FileUploader } from "../ui/file-uploader";
 import {
   ReportIssueFormData,
   ReportIssueSchema,
-} from '@/schemas/RequestFormSchema';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+} from "@/schemas/RequestFormSchema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -23,10 +23,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import RequestorForm from './RequestorForm';
-import { Button } from '../ui/button';
-import { Dispatch, SetStateAction, useEffect } from 'react';
+} from "@/components/ui/form";
+import RequestorForm from "./RequestorForm";
+import { Button } from "../ui/button";
+import { Dispatch, SetStateAction, useEffect } from "react";
 
 interface ReportIssueFormProps {
   userData: Record<string, string>;
@@ -43,53 +43,56 @@ const ReportIssueForm = ({
   const reportIssueForm = useForm<z.infer<typeof ReportIssueSchema>>({
     resolver: zodResolver(ReportIssueSchema),
     defaultValues: {
-      fullName: userData?.fullName ?? '',
-      manager: userData?.manager ?? '',
-      contactInfo: userData?.contactInfo ?? '',
-      issueCategory: '',
-      problemDescription: '',
-      requestType: 'Report an Issue',
+      fullName: userData?.fullName ?? "",
+      manager: userData?.manager ?? "",
+      contactInfo: userData?.contactInfo ?? "",
+      issueCategory: "",
+      problemDescription: "",
+      requestType: "Report an Issue",
     },
-    mode: 'onChange',
+    mode: "onChange",
   });
 
   useEffect(() => {
     reportIssueForm.reset({
       ...reportIssueForm,
-      fullName: userData?.fullName ?? '',
-      manager: userData?.manager ?? '',
-      contactInfo: userData?.contactInfo ?? '',
+      fullName: userData?.fullName ?? "",
+      manager: userData?.manager ?? "",
+      contactInfo: userData?.contactInfo ?? "",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData]);
 
   const issueCategories = [
     {
-      value: 'hardware',
-      label: 'Hardware Issue',
-      caption: 'Laptop, Printer, Monitor, etc.',
+      value: "hardware",
+      label: "Hardware Issue",
+      caption: "Laptop, Printer, Monitor, etc.",
     },
     {
-      value: 'software',
-      label: 'Software Issue',
-      caption: 'Microsoft Office, Internal App, etc.',
+      value: "software",
+      label: "Software Issue",
+      caption: "Microsoft Office, Internal App, etc.",
     },
-    { value: 'network', label: 'Network Issue', caption: 'Wi-Fi, VPN, etc.' },
+    { value: "network", label: "Network Issue", caption: "Wi-Fi, VPN, etc." },
     {
-      value: 'emailOrComm',
-      label: 'Email or Communication Issue',
-      caption: 'Email, Cliq, etc.',
+      value: "emailOrComm",
+      label: "Email or Communication Issue",
+      caption: "Email, Cliq, etc.",
     },
     {
-      value: 'security',
-      label: 'Security Issue',
-      caption: 'Unauthorized access, etc.',
+      value: "security",
+      label: "Security Issue",
+      caption: "Unauthorized access, etc.",
     },
   ];
 
   const allowedTypes =
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/pdf';
-  const allowedExtensions = '.pdf,.doc,.docx,.jpg,.jpeg,.png';
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/pdf";
+  const allowedExtensions = ".pdf,.doc,.docx,.jpg,.jpeg,.png";
+
+  const findIssueCategoryByValue = (value: string) =>
+    issueCategories.find((issueCat) => issueCat.value === value);
 
   return (
     <Form {...reportIssueForm}>
@@ -150,10 +153,8 @@ const ReportIssueForm = ({
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Select Issue Category">
                         {field.value
-                          ? issueCategories.find(
-                              (issueCat) => issueCat.value === field.value
-                            )?.label
-                          : 'Select Issue Category'}
+                          ? findIssueCategoryByValue(field.value)?.label
+                          : "Select Issue Category"}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -221,7 +222,7 @@ const ReportIssueForm = ({
                   <FileUploader
                     handleFile={field.onChange}
                     uploadedFile={field.value}
-                    accept={allowedTypes + ',' + allowedExtensions}
+                    accept={allowedTypes + "," + allowedExtensions}
                     wildcard="image/"
                     maxFileSize={10 * 1024 * 1024}
                   />

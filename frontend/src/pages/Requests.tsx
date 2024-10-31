@@ -1,7 +1,7 @@
-import RequestForm from "@/components/requests-ui/RequestForm"
+import RequestForm from "@/components/requests-ui/RequestForm";
 
 const Requests = () => {
-    return <RequestForm/>
-}
+  return <RequestForm />;
+};
 
 export default Requests;
