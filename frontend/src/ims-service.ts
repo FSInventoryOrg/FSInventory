@@ -321,48 +321,44 @@ export const addOptionValue = async ({
   prefixCode?: string;
   type?: "Hardware" | "Software";
 }) => {
-  try {
-    if (!value) throw new Error(`Value for ${property} is required.`);
+  if (!value) throw new Error(`Value for ${property} is required.`);
 
-    const propertyBeingChangedIsCategory: boolean = property === "category";
-    if (propertyBeingChangedIsCategory) {
-      if (!prefixCode) throw new Error("Prefix code is required.");
-      const { status } = await fetch(
-        `${API_BASE_URL}/api/assetcounter/${prefixCode}`
+  const propertyBeingChangedIsCategory: boolean = property === "category";
+  if (propertyBeingChangedIsCategory) {
+    if (!prefixCode) throw new Error("Prefix code is required.");
+    const { status } = await fetch(
+      `${API_BASE_URL}/api/assetcounter/${prefixCode}`
+    );
+    if (status !== 404)
+      throw new Error(
+        `${property} with prefix code ${prefixCode} already exists.`
       );
-      if (status !== 404)
-        throw new Error(
-          `${property} with prefix code ${prefixCode} already exists.`
-        );
-    }
-
-    let url = `${API_BASE_URL}/api/options/${property}/`;
-    if (type) {
-      url += `?type=${type}`;
-    }
-    const response = await fetch(url, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ value }),
-    });
-
-    if (propertyBeingChangedIsCategory) {
-      await postAssetCounter({
-        category: value as string,
-        prefixCode: prefixCode as string,
-        threshold: 1,
-        counter: 0,
-        type: type ?? "Hardware",
-      });
-    }
-
-    return response.json();
-  } catch (err: any) {
-    throw new Error(err.message);
   }
+
+  let url = `${API_BASE_URL}/api/options/${property}/`;
+  if (type) {
+    url += `?type=${type}`;
+  }
+  const response = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ value }),
+  });
+
+  if (propertyBeingChangedIsCategory) {
+    await postAssetCounter({
+      category: value as string,
+      prefixCode: prefixCode as string,
+      threshold: 1,
+      counter: 0,
+      type: type ?? "Hardware",
+    });
+  }
+
+  return response.json();
 };
 
 export const updateOptionDefaults = async (defaults: Defaults) => {
@@ -709,7 +705,7 @@ export const updateAssetCounter = async ({
   updatedAssetCounter: AssetCounterFormData & { _id?: string };
 }) => {
   if (!updatedAssetCounter._id) {
-    return postAssetCounter(updatedAssetCounter);
+    return postAssetCounter({ ...updatedAssetCounter, threshold: 1 });
   }
 
   const response = await fetch(
@@ -871,39 +867,31 @@ export const sendAutoMailNow = async () => {
 
 /* BACKUP FILE IMPORT/EXPORT */
 export const validateBackupFile = async (fileAsBase64: { src: string }) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/backup/validate`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(fileAsBase64),
-    });
+  const response = await fetch(`${API_BASE_URL}/backup/validate`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(fileAsBase64),
+  });
 
-    return response.json();
-  } catch (err) {
-    throw err;
-  }
+  return response.json();
 };
 
 export const importBackupFile = async (
   changes: { [index: string]: MongoResult[] } | undefined = undefined
 ) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/backup/import`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(changes),
-    });
+  const response = await fetch(`${API_BASE_URL}/backup/import`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(changes),
+  });
 
-    return response.json();
-  } catch (err) {
-    throw err;
-  }
+  return response.json();
 };
 
 export const updateSoftwareNotif = async (data: NotificationSettingType) => {

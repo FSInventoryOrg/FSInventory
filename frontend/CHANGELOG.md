@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - IT services request form with validations (UI design to follow)
 
+## [2.22.2](https://connect.zoho.com/portal/intranet/task/623367000000878101) 2024-10-29
+### Fixed
+- Updated width of the Inventory Page's section to be independent of the parent component
+
+## [2.22.1](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000893151) 2024-10-28
+### Fixed
+- After finishing creating/editing a category, the user is now shown the list of avilable categories instead of staying in the creation spopover (in the case of creating) or closing the popover (in the case of editing).
+
 ## [2.22.0](https://connect.zoho.com/portal/intranet/task/623367000000860349) 2024-10-29
 ### Added
 - Empty State Notification display when there are no notifications present
