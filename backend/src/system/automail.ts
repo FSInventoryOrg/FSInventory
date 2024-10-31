@@ -15,10 +15,9 @@ import { extractDocuments } from "./backup";
 const router = express.Router();
 let activationTimeout: string | number | NodeJS.Timeout | undefined;
 
-const activateAutoMailing = async (data: any) => {
-  const dateReference = data["nextRoll"]
-    ? new Date(data["nextRoll"])
-    : new Date();
+const activateAutoMailing = async (data: any, now?: boolean) => {
+  const dateReference =
+    data["nextRoll"] && !now ? new Date(data["nextRoll"]) : new Date();
   const recipients = data["recipient"];
 
   const allEmployees = await Employee.aggregate().match({});
@@ -315,7 +314,7 @@ router.post(
       }
 
       const autoMailData = await AutoMail.findOne({});
-      await activateAutoMailing(autoMailData);
+      await activateAutoMailing(autoMailData, true);
 
       return res.status(200).json({
         message: "Auto generated mail reports has been manually triggered",
