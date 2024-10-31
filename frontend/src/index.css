@@ -43,6 +43,11 @@
  
     --radius: 0.5rem;
     --tab: 0 0% 85%;
+
+    --brand-green: 150, 99%, 31%, 1;
+    
+    --tracker-gradient-from: 150, 43%, 85%, 1;
+    --tracker-gradient-to: 156, 45%, 98%, 1;
   }
  
   .dark {
@@ -84,6 +89,9 @@
     --ring: 150 60% 50%;
     --tab: 190 20% 10%;
     /* --ring: 190 20% 30%; */
+
+    --tracker-gradient-from: 227, 21%, 16%, 1;
+    --tracker-gradient-to: 151, 38%, 33%, 1;
   }
 }
  

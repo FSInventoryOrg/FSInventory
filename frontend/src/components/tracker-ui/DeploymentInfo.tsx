@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import * as imsService from '@/ims-service';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { AssetsHistory, EmployeeType } from '@/types/employee';
+import { useState, useEffect } from "react";
+import * as imsService from "@/ims-service";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AssetsHistory, EmployeeType } from "@/types/employee";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -11,13 +11,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from "@/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -26,20 +26,20 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '../ui/button';
-import { AlertCircleIcon, CheckCheckIcon, TrashIcon } from 'lucide-react';
-import TrashCan from '../graphics/TrashCan';
-import EditEmployee from './EditEmployee';
-import { EmployeeAssetsTable } from './EmployeeAssetsTable';
-import { EmployeeAssetsColumns } from './EmployeeAssetsColumns';
-import { HardwareType } from '@/types/asset';
-import { Spinner } from '../Spinner';
-import { AssetsHistoryTable } from './AssetsHistoryTable';
-import { AssetsHistoryColumns } from './AssetsHistoryColumns';
-import { Info } from '@phosphor-icons/react';
-import AssetsCount from './AssetCounts';
-import { Skeleton } from '../ui/skeleton';
+} from "@/components/ui/select";
+import { Button } from "../ui/button";
+import { AlertCircleIcon, CheckCheckIcon, TrashIcon } from "lucide-react";
+import TrashCan from "../graphics/TrashCan";
+import EditEmployee from "./EditEmployee";
+import { EmployeeAssetsTable } from "./EmployeeAssetsTable";
+import { EmployeeAssetsColumns } from "./EmployeeAssetsColumns";
+import { HardwareType } from "@/types/asset";
+import { Spinner } from "../Spinner";
+import { AssetsHistoryTable } from "./AssetsHistoryTable";
+import { AssetsHistoryColumns } from "./AssetsHistoryColumns";
+import { Info } from "@phosphor-icons/react";
+import AssetsCount from "./AssetCounts";
+import { Skeleton } from "../ui/skeleton";
 // import { Skeleton } from '../ui/skeleton';
 
 interface DeploymentInfoProps {
@@ -50,7 +50,7 @@ interface DeploymentInfoProps {
 const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
   const currentDate = new Date();
   const [isSM, setIsSM] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState('current');
+  const [selectedFilter, setSelectedFilter] = useState("current");
   const [assetsCurrent, setAssetsCurrent] = useState<HardwareType[] | null>(
     null
   );
@@ -62,14 +62,14 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
   }>();
 
   const { data: allAssets } = useQuery({
-    queryKey: ['fetchAllAssets'],
+    queryKey: ["fetchAllAssets"],
     queryFn: () => imsService.fetchAllAssets(),
     enabled: !!employee.code,
   });
 
   const { data: currentAssets } = useQuery({
-    queryKey: ['fetchAssetsByProperty', 'assignee', assignee],
-    queryFn: () => imsService.fetchAssetsByProperty('assignee', assignee),
+    queryKey: ["fetchAssetsByProperty", "assignee", assignee],
+    queryFn: () => imsService.fetchAssetsByProperty("assignee", assignee),
     enabled: !!employee,
   });
 
@@ -107,10 +107,10 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
   }, [currentAssets]);
 
   useEffect(() => {
-    if (selectedFilter === 'current' && assetsCurrent) {
+    if (selectedFilter === "current" && assetsCurrent) {
       const counts = countAssetsByCategory(assetsCurrent);
       setAssetCounts(counts);
-    } else if (selectedFilter === 'history' && assetsHistory) {
+    } else if (selectedFilter === "history" && assetsHistory) {
       const counts = countAssetsByCategory(assetsHistory);
       setAssetCounts(counts);
     }
@@ -122,10 +122,10 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
     };
 
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
 
     return () => {
-      window.removeEventListener('resize', checkScreenSize);
+      window.removeEventListener("resize", checkScreenSize);
     };
   }, []);
 
@@ -134,7 +134,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
       <div className="flex flex-col gap-2 pb-2">
         <div
           id="banner"
-          className="bg-gradient-to-br from-[#1d2436] to-[#006e54] h-40 rounded-lg p-4 justify-between flex flex-col text-white"
+          className="dark:bg-gradient-120 bg-gradient-302 from-tracker-from to-tracker-to h-40 rounded-lg p-4 justify-between flex flex-col text-white border border-solid border-border-brandgreen"
         >
           <div className="flex justify-between ">
             <div className="flex flex-col w-[50%] sm:w-full">
@@ -143,11 +143,11 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
                   <Tooltip>
                     <TooltipTrigger className="w-fit overflow-hidden text-ellipsis">
                       <span className="whitespace-nowrap">
-                        {employee.firstName + ' ' + employee.lastName}
+                        {employee.firstName + " " + employee.lastName}
                       </span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      {employee.firstName + ' ' + employee.lastName}
+                      {employee.firstName + " " + employee.lastName}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -157,10 +157,10 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
               </span>
               <span
                 className={`font-bold text-sm ${
-                  employee.isRegistered ? '' : 'text-destructive text-sm'
+                  employee.isRegistered ? "" : "text-destructive text-sm"
                 }`}
               >
-                {employee.isRegistered ? employee.code : 'UNREGISTERED'}
+                {employee.isRegistered ? employee.code : "UNREGISTERED"}
               </span>
             </div>
             <div className="flex gap-1 sm:gap-2 lg:gap-3 items-start">
@@ -169,8 +169,8 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
               <Button
                 className={`px-3 sm:px-4 gap-2 text-white ${
                   employee.isActive
-                    ? 'bg-[#33CC80]'
-                    : 'bg-[#ffa333] hover:bg-[#ffa333]/95'
+                    ? "bg-[#33CC80]"
+                    : "bg-[#ffa333] hover:bg-[#ffa333]/95"
                 }`}
               >
                 {employee.isActive ? (
@@ -242,7 +242,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
             </TooltipTrigger>
             <TooltipContent>
               <p className="max-w-[200px]">
-                Assets history for{' '}
+                Assets history for{" "}
                 <span className="text-destructive">unregistered</span> users is
                 not available.
               </p>
@@ -250,7 +250,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
           </Tooltip>
         </TooltipProvider>
       </div>
-      {selectedFilter === 'current' ? (
+      {selectedFilter === "current" ? (
         assetsCurrent !== null ? (
           <EmployeeAssetsTable
             columns={EmployeeAssetsColumns}
@@ -284,16 +284,16 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
   const [isSM, setIsSM] = useState(false);
 
   const { data: employeeAssets } = useQuery<string[]>({
-    queryKey: ['fetchAssetsByProperty'],
-    queryFn: () => imsService.fetchAssetsByProperty('assignee', employee.code),
+    queryKey: ["fetchAssetsByProperty"],
+    queryFn: () => imsService.fetchAssetsByProperty("assignee", employee.code),
     enabled: !!employee.code,
   });
 
   const handleDeleteEmployee = async () => {
     await imsService.deleteEmployeeByCode(employee.code);
-    queryClient.invalidateQueries({ queryKey: ['fetchEmployees'] });
+    queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] });
 
-    window.location.replace('/tracker');
+    window.location.replace("/tracker");
     setTimeout(() => {
       setOpen(false);
     }, 100);
@@ -305,10 +305,10 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
     };
 
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
 
     return () => {
-      window.removeEventListener('resize', checkScreenSize);
+      window.removeEventListener("resize", checkScreenSize);
     };
   }, []);
 
@@ -347,8 +347,8 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <Button onClick={handleDeleteEmployee} variant="destructive">
-                Yes, I want to remove{' '}
-                {employee.firstName + ' ' + employee.lastName}
+                Yes, I want to remove{" "}
+                {employee.firstName + " " + employee.lastName}
               </Button>
             </AlertDialogFooter>
           </>
@@ -357,8 +357,8 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
             <AlertDialogHeader>
               <AlertDialogTitle>Cannot remove this employee</AlertDialogTitle>
               <AlertDialogDescription>
-                There are {employeeAssets?.length || 0} assets deployed to{' '}
-                {employee.firstName + ' ' + employee.lastName}. Recover these
+                There are {employeeAssets?.length || 0} assets deployed to{" "}
+                {employee.firstName + " " + employee.lastName}. Recover these
                 assets and try again.
               </AlertDialogDescription>
             </AlertDialogHeader>
