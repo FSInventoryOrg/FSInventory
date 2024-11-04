@@ -218,6 +218,7 @@ const Options = ({
       }
     }
     showToast({ message: "Option deleted successfully!", type: "SUCCESS" });
+    refetch();
   };
 
   const reset = () => {
