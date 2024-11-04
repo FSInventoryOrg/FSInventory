@@ -2,6 +2,30 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.23.1](https://connect.zoho.com/portal/intranet/task/623367000000860057) 2024-10-29 
+### Fixed
+-  Column Visibility resetting everytime category is changed / browser is resized.
+
+## [2.23.0](https://connect.zoho.com/portal/intranet/task/623367000000701233) 2024-10-25
+### Added
+- IT services request form with validations (UI design to follow)
+
+## [2.22.2](https://connect.zoho.com/portal/intranet/task/623367000000878101) 2024-10-29
+### Fixed
+- Updated width of the Inventory Page's section to be independent of the parent component
+
+## [2.22.1](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000893151) 2024-10-28
+### Fixed
+- After finishing creating/editing a category, the user is now shown the list of avilable categories instead of staying in the creation spopover (in the case of creating) or closing the popover (in the case of editing).
+
+## [2.22.0](https://connect.zoho.com/portal/intranet/task/623367000000860349) 2024-10-29
+### Added
+- Empty State Notification display when there are no notifications present
+
+## [2.21.0](https://connect.zoho.com/portal/intranet/task/623367000000817053) 2024-10-28
+### Added
+- Updated the user profile dropdown to match latest UI, and removed the profile page and its components
+
 ## [2.20.0](https://connect.zoho.com/portal/intranet/task/623367000000718057) 2024-10-25 
 ### Added
 -  Software notification setting to allow users to configure the number of days before they are notified of an upcoming software license expiration
