@@ -46,6 +46,7 @@ import { Download } from "@phosphor-icons/react";
 import { exportToExcel } from "@/lib/utils";
 import BulkDelete from "./BulkDelete";
 import { useAppContext } from "@/hooks/useAppContext";
+import { AssetUnionType } from "@/types/asset";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -58,32 +59,14 @@ declare module "@tanstack/table-core" {
 
 interface InventoryTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+  data: AssetUnionType[];
   defaultOptions: any;
   DEFAULT_HIDDEN_COLUMNS: string[];
   onToggleFilters: (visible: boolean) => void;
   isFiltersVisible: boolean;
   selectedCategory: string;
+  selectedType: "Hardware" | "Software" | "";
 }
-
-// const DEFAULT_HIDDEN_COLUMNS = [
-//   'category',
-//   'processor',
-//   'memory',
-//   'storage',
-//   'assignee',
-//   'serviceInYears',
-//   'supplierVendor',
-//   'pezaForm8105',
-//   'pezaForm8106',
-//   'isRGE',
-//   'equipmentType',
-//   'remarks',
-//   'deploymentDate',
-//   'recoveredFrom',
-//   'recoveryDate',
-//   'client'
-// ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -127,6 +110,7 @@ export function InventoryTable<TData, TValue>({
   onToggleFilters,
   isFiltersVisible,
   selectedCategory,
+  selectedType,
 }: InventoryTableProps<TData, TValue>) {
   const { showToast } = useAppContext();
   const queryClient = useQueryClient();
@@ -275,10 +259,25 @@ export function InventoryTable<TData, TValue>({
     const columns = table
       .getHeaderGroups()[0]
       .headers.filter((header) => visibleColumns.includes(header.id))
-      .map((header) => header.id);
+      .map((header) => {
+        if (selectedType === "Software" && header.id === "modelName") {
+          return "softwareName"; // because in softwareSchema, modelName is called softwareName
+        }
 
-    const withServiceInYears = data.map((asset: any) => {
-      let serviceInYears = null;
+        return header.id;
+      });
+
+    // If type is neither Software nor Hardware, add "softwareName" column
+    // after the modelName, if it exists
+    if (selectedType === "") {
+      const modelIndex = columns.indexOf("modelName");
+      if (modelIndex !== -1) {
+        columns.splice(modelIndex + 1, 0, "softwareName");
+      }
+    }
+
+    const withServiceInYears = data.map((asset: AssetUnionType) => {
+      let serviceInYears = 0;
       if (asset?.purchaseDate !== null) {
         const currentDate = new Date();
         const purchaseDate = new Date(asset?.purchaseDate);
@@ -287,6 +286,16 @@ export function InventoryTable<TData, TValue>({
             (1000 * 60 * 60 * 24 * 365)
         );
       }
+
+      // KLUDGE - This condition is not needed if both softwareSchema and hardwareSchema
+      // follow the same name for the supplierVendor column.
+      if (selectedType !== "Hardware" && asset.type === "Software") {
+        // Exclude `vendor` from software asset, and rename it to supplierVendor
+        // to be consistent with the hardwareSchema
+        const { vendor, ...rest } = asset;
+        return { ...rest, supplierVendor: vendor, serviceInYears };
+      }
+
       return { ...asset, serviceInYears };
     });
     await exportToExcel(columns, withServiceInYears, "Inventory_Report");
