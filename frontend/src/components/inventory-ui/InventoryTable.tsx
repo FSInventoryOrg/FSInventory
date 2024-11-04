@@ -278,12 +278,12 @@ export function InventoryTable<TData, TValue>({
 
     const withServiceInYears = data.map((asset: AssetUnionType) => {
       let serviceInYears = 0;
-      if (asset?.purchaseDate !== null) {
-        const currentDate = new Date();
-        const purchaseDate = new Date(asset?.purchaseDate);
+      const purchaseDate = new Date(asset?.purchaseDate).getTime();
+      const isValidPurchaseDate = !isNaN(purchaseDate);
+      if (isValidPurchaseDate) {
+        const currentDate = new Date().getTime();
         serviceInYears = Math.round(
-          (currentDate.getTime() - purchaseDate.getTime()) /
-            (1000 * 60 * 60 * 24 * 365)
+          (currentDate - purchaseDate) / (1000 * 60 * 60 * 24 * 365)
         );
       }
 
