@@ -10,7 +10,7 @@ import StatusBadge from "./StatusBadge";
 import AssetCode from "./AssetCode";
 import DeployRetrieveAsset from "./DeployRetrieveAsset";
 
-export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
+export const InventoryColumns: ColumnDef<HardwareType | SoftwareType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -60,7 +60,12 @@ export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
   {
     accessorKey: "modelName",
     header: "Model/Software Name",
-    accessorFn: (row) => row.modelName || row.softwareName || "",
+    accessorFn: (row) => {
+      if (row.type === "Software") {
+        return row.softwareName;
+      }
+      return row.modelName || "";
+    },
   },
   {
     accessorKey: "modelNo",
@@ -149,6 +154,12 @@ export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
   {
     accessorKey: "supplierVendor",
     header: "Supplier/Vendor",
+    accessorFn: (row) => {
+      if (row.type === "Software") {
+        return row.vendor;
+      }
+      return row.supplierVendor || "";
+    },
   },
   {
     accessorKey: "pezaForm8105",
@@ -161,7 +172,12 @@ export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
   {
     accessorKey: "isRGE",
     header: "Is RGE",
-    cell: ({ row }) => (row.original.isRGE ? "YES" : "NO"),
+    cell: ({ row }) => {
+      if (row.original.type === "Software") {
+        return "NO";
+      }
+      return row.original.isRGE ? "YES" : "NO";
+    },
   },
   {
     accessorKey: "equipmentType",
