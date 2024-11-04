@@ -20,30 +20,13 @@ const DeleteAssetIndex = ({ data }: DeleteProps) => {
     });
   };
 
-  // const { mutate: deleteAssetCounter, isPending } = useMutation({
-  //   mutationFn: imsService.deleteAssetCounter,
-  //   onSuccess: async () => {
-  //     onDeleteSuccess();
-  //   },
-  //   onError: (error: Error) => {
-  //     showToast({ message: error.message, type: "ERROR" });
-  //   },
-  // });
-
   const handleDelete = () => {
-    // if (!data._id) {
-    //   // Deleted category has no existing asset counter. Occurs for new categories not yet
-    //   // configured with asset index or counter
-    //   return onDeleteSuccess()
-    // }
-    // deleteAssetCounter(data.prefixCode as string);
     onDeleteSuccess();
   };
 
   return (
     <>
       <Button
-        // disabled={isPending}
         variant="ghost"
         size="icon"
         className="text-destructive"
