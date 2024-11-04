@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.xx.x](https://connect.zoho.com/portal/intranet/task/623367000000718041) 2024-11-04
+### Fixed
+- Fixed downloading of assets to accommodate software assets
+- Fixed service in years calculations for invalid date formats when downloading assets
+
 ## [2.23.0](https://connect.zoho.com/portal/intranet/task/623367000000701233) 2024-10-25
 ### Added
 - IT services request form with validations (UI design to follow)
