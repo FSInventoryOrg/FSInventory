@@ -47,6 +47,7 @@ import { exportToExcel } from "@/lib/utils";
 import BulkDelete from "./BulkDelete";
 import { useAppContext } from "@/hooks/useAppContext";
 import { AssetUnionType } from "@/types/asset";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -102,6 +103,8 @@ const exactFilter: FilterFn<any> = (row, _columnId, value) => {
   return isFound;
 };
 
+const COLUMN_VISIBILITY_KEY = "column-visibility";
+
 export function InventoryTable<TData, TValue>({
   columns,
   data,
@@ -154,26 +157,19 @@ export function InventoryTable<TData, TValue>({
     },
   });
 
+  const [storedColumnVisibility, setStoredColumnVisibility] = useLocalStorage(
+    COLUMN_VISIBILITY_KEY,
+    DEFAULT_HIDDEN_COLUMNS.reduce((acc, column) => {
+      acc[column] = false;
+      return acc;
+    }, {} as VisibilityState)
+  );
+
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>(
-      // Initialize column visibility state
-      DEFAULT_HIDDEN_COLUMNS.reduce((acc, column) => {
-        acc[column] = false; // Set all default columns to visible
-        return acc;
-      }, {} as VisibilityState)
-    );
+    React.useState<VisibilityState>(storedColumnVisibility);
 
   React.useEffect(() => {
-    if (!selectedCategory || !optionValues || optionValues.length === 0) {
-      // Scenario 1: Default
-      setColumnVisibility((prevVisibility) => ({
-        ...prevVisibility,
-        ...PROPERTIES.reduce((acc, column) => {
-          acc[column.id] = !DEFAULT_HIDDEN_COLUMNS.includes(column.id); // Set visibility based on properties
-          return acc;
-        }, {} as VisibilityState),
-      }));
-    } else {
+    if (selectedCategory && optionValues && optionValues.length !== 0) {
       const categoryOption = optionValues.find(
         (option) => option.value === selectedCategory
       );
@@ -206,6 +202,11 @@ export function InventoryTable<TData, TValue>({
       }
     }
   }, [selectedCategory, optionValues, DEFAULT_HIDDEN_COLUMNS]);
+
+  React.useEffect(() => {
+    // Persist the columnVisibility state in localStorage whenever it changes
+    setStoredColumnVisibility(JSON.stringify(columnVisibility));
+  }, [columnVisibility, setStoredColumnVisibility]);
 
   const [rowSelection, setRowSelection] = React.useState({});
 

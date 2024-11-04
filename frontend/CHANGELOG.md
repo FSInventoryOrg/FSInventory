@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed downloading of assets to accommodate software assets
 - Fixed service in years calculations for invalid date formats when downloading assets
 
+## [2.23.1](https://connect.zoho.com/portal/intranet/task/623367000000860057) 2024-10-29 
+### Fixed
+-  Column Visibility resetting everytime category is changed / browser is resized.
+
 ## [2.23.0](https://connect.zoho.com/portal/intranet/task/623367000000701233) 2024-10-25
 ### Added
 - IT services request form with validations (UI design to follow)
