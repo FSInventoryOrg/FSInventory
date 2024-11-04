@@ -2,6 +2,13 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.23.2](https://connect.zoho.com/portal/intranet/task/623367000000878021) 2024-11-04
+### Removed
+-  Logic in asset counter setting to call delete asset counter endpoint since this is already done in the backend 
+
+### Fixed
+-  Previously deleted category may be re-added
+
 ## [2.23.1](https://connect.zoho.com/portal/intranet/task/623367000000860057) 2024-10-29 
 ### Fixed
 -  Column Visibility resetting everytime category is changed / browser is resized.
