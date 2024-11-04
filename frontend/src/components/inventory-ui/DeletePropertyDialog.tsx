@@ -39,19 +39,19 @@ const DeletePropertyDialog = ({
     queryFn: () => imsService.fetchAssetCount(property, value),
   });
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const { mutate: deleteOption, isPending: isOptionDeletePending } =
     useMutation({
       mutationFn: () => imsService.deleteOption(property, value),
-      onSuccess: async()=> {
-        queryClient.invalidateQueries({ queryKey: ["fetchAssetCounters"] })
-      }
+      onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: ["fetchAssetCounters"] });
+        await onDelete?.();
+      },
     });
 
   const handleDelete = async () => {
     await deleteOption();
-    await onDelete?.();
     setOpen(false);
   };
 
