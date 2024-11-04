@@ -98,18 +98,22 @@ router.post(
       // Check if the value already exists in the array for the specified property
       if (typeof value === "object") {
         const existingValue = propertyValues.find(
-          (val: any) => val.value === value.value
+          (val: any) => val.value.toLowerCase() === value.value.toLowerCase()
         );
         if (existingValue) {
-          return res
-            .status(400)
-            .json({ error: "Value already exists for the specified property" });
+          return res.status(400).json({
+            message: "Value already exists for the specified property",
+          });
         }
       } else {
-        if (propertyValues.includes(value)) {
-          return res
-            .status(400)
-            .json({ error: "Value already exists for the specified property" });
+        const existingValue = propertyValues.find(
+          (propertyVal: string) =>
+            propertyVal.toLowerCase() === value?.toLowerCase()
+        );
+        if (existingValue) {
+          return res.status(400).json({
+            message: "Value already exists for the specified property",
+          });
         }
       }
 
@@ -336,10 +340,26 @@ router.put(
 
       const propertyValues = option.get(property) || [];
       // Check if the value already exists in the array for the specified property
-      if (propertyValues.includes(value)) {
-        return res
-          .status(400)
-          .json({ error: "Value already exists for the specified property" });
+      // Check if the value already exists in the array for the specified property
+      if (typeof value === "object") {
+        const existingValue = propertyValues.find(
+          (val: any) => val.value.toLowerCase() === value.value.toLowerCase()
+        );
+        if (existingValue) {
+          return res.status(400).json({
+            message: "Value already exists for the specified property",
+          });
+        }
+      } else {
+        const existingValue = propertyValues.find(
+          (propertyVal: string) =>
+            propertyVal.toLowerCase() === value?.toLowerCase()
+        );
+        if (existingValue) {
+          return res.status(400).json({
+            message: "Value already exists for the specified property",
+          });
+        }
       }
 
       // Update element at the specified index
