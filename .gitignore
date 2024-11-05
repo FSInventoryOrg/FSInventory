@@ -57,3 +57,5 @@ yarn-error.log*
 
 /frontend/package.json
 /frontend/package-lock.json
+
+/backend/mongo-keyfile
