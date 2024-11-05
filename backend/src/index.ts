@@ -27,6 +27,7 @@ import {
   convertStatusToUnaccounted,
   getVersions,
   removeStatus,
+  rotateLogs,
   setDefaults,
   softwareExpirationMonitoring,
 } from "./system/jobs";
@@ -101,9 +102,13 @@ if (process.env.NODE_ENV !== "development") {
   });
 }
 
+const isAtlasDB = () => {
+  return process.env.MONGODB_CONNECTION_STRING?.startsWith("mongodb+srv://");
+};
+
 const onStartupJobs = async () => {
   await getVersions();
-  // rotateLogs()
+  if (!isAtlasDB()) rotateLogs();
   await removeStatus();
   await setDefaults();
   await convertStatusToStorage();
