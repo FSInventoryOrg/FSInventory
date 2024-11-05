@@ -299,12 +299,11 @@ const Options = ({
           </h1>
           <div className="flex items-center">
             <Input
-              value={field.value}
+              value={filterValue}
               type="input"
               className="focus-visible:ring-0 focus-visible:ring-popover"
               onChange={(e) => {
                 setFilterValue(e.target.value);
-                field.onChange(e.target.value); // Set the value of the field
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
