@@ -207,7 +207,6 @@ export const sendMail = async (config: any) => {
 };
 
 export const sendMailOfficialProtocol = async (config: any) => {
-  // const mailsender = encryptionProtocol('decrypt', 'M2QzYzVjYjBlZDI4NWYyYzYyZDEyNDIwNWI4ZDllMzI2YmZjNDE0ZmU0ZjZlNDJmYTIxZDA0MDgzZWFmODI4ZQ==')
   const mailOptions: any = {
     from: sender,
     to: config["recipient"],
