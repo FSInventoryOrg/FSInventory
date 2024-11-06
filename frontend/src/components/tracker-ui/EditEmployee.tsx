@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   FormControl,
   FormField,
@@ -12,23 +12,23 @@ import {
   FormLabel,
   FormMessage,
   Form,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import * as imsService from '@/ims-service'
-import { useAppContext } from '@/hooks/useAppContext'
-import { Spinner } from '../Spinner'
-import { Calendar } from "@/components/ui/calendar"
+import * as imsService from "@/ims-service";
+import { useAppContext } from "@/hooks/useAppContext";
+import { Spinner } from "../Spinner";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { format } from "date-fns"
-import { cn } from "@/lib/utils"
-import { ArrowRightIcon, PencilIcon, CalendarIcon, XIcon } from "lucide-react"
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { ArrowRightIcon, PencilIcon, CalendarIcon, XIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { EmployeeFormData, EmployeeSchema } from "@/schemas/AddEmployeeSchema";
@@ -45,9 +45,9 @@ interface EditEmployeeProps {
 }
 
 const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
-  const queryClient = useQueryClient()
-  const [open, setOpen] = useState(false); 
-  const [newEmployeeCode, setNewEmployeeCode] = useState('');
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [newEmployeeCode, setNewEmployeeCode] = useState("");
   const { showToast } = useAppContext();
   const navigate = useNavigate();
 
@@ -59,9 +59,11 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
       middleName: employeeData.middleName,
       lastName: employeeData.lastName,
       position: employeeData.position,
-      startDate: employeeData.startDate ? new Date(employeeData.startDate) : undefined,
+      startDate: employeeData.startDate
+        ? new Date(employeeData.startDate)
+        : undefined,
       isActive: employeeData.isActive,
-    }
+    },
   });
 
   const { mutate, isPending: isEditEmployeePending } = useMutation({
@@ -69,14 +71,14 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
     onSuccess: async () => {
       showToast({ message: "Employee updated successfully!", type: "SUCCESS" });
 
-      queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] })
-      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] })
-      
-      navigate(`/tracker/${newEmployeeCode}`)
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] });
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] });
+
+      navigate(`/tracker/${newEmployeeCode}`);
 
       setTimeout(() => {
         setOpen(false);
-      }, 100)
+      }, 100);
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
@@ -87,94 +89,152 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
     const updatedEmployee: EmployeeFormData & { _id: string } = {
       ...data,
       _id: employeeData._id,
-    }
-    setNewEmployeeCode(updatedEmployee.code)
+    };
+    setNewEmployeeCode(updatedEmployee.code);
     mutate({ code: employeeData.code, updatedEmployee: updatedEmployee });
-  }
+  };
 
   useEffect(() => {
     if (open) {
-      form.reset({...employeeData, 
-        startDate: employeeData.startDate 
-          ? new Date(employeeData.startDate) 
-          : undefined
+      form.reset({
+        ...employeeData,
+        startDate: employeeData.startDate
+          ? new Date(employeeData.startDate)
+          : undefined,
       });
     }
-  }, [open, form, employeeData])
-
+  }, [open, form, employeeData]);
 
   const [isMD, setIsMD] = useState(false);
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMD(window.innerWidth >= 768); 
+      setIsMD(window.innerWidth >= 768);
     };
 
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
 
     return () => {
-      window.removeEventListener('resize', checkScreenSize);
+      window.removeEventListener("resize", checkScreenSize);
     };
   }, []);
 
   const [isSM, setIsSM] = useState(false);
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsSM(window.innerWidth >= 640); 
+      setIsSM(window.innerWidth >= 640);
     };
 
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
 
     return () => {
-      window.removeEventListener('resize', checkScreenSize);
+      window.removeEventListener("resize", checkScreenSize);
     };
   }, []);
-  
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild className="hover:cursor-pointer text-white bg-transparent dark:hover:bg-muted-foreground/20 hover:bg-muted border-0 w-full">
-        <div className={cn(buttonText && "flex justify-start items-center px-[5px] text-[16px] bg-white dark:bg-inherit text-[#1A1A1A]")}>
-        <Button 
-          size={buttonText ? 'sm' : 'icon'}
-          className={cn('text-white flex justify-center items-center rounded-full h-8 w-8 sm:h-10 sm:w-10 bg-transparent hover:bg-muted-foreground/20  border-0', buttonText && 'w-full justify-start rounded-none hover:bg-transparent')}>
-          {isSM ? <PencilIcon className="text-[#1A1A1A] dark:text-white" size={20} /> : <PencilIcon className="text-[#1A1A1A] dark:text-white" size={16} />}
-        </Button>
-     <span className="text-[16px] text-[#1A1A1A] dark:text-white">   {buttonText}</span>
-
-            </div>
+      <DialogTrigger
+        asChild
+        className="hover:cursor-pointer text-white bg-transparent dark:hover:bg-muted-foreground/20 hover:bg-muted border-0 w-full"
+      >
+        <div
+          className={cn(
+            buttonText &&
+              "flex justify-start items-center px-[5px] text-[16px] bg-white dark:bg-inherit text-[#1A1A1A]"
+          )}
+        >
+          <Button
+            size={buttonText ? "sm" : "icon"}
+            className={cn(
+              "text-white flex justify-center items-center rounded-full h-8 w-8 sm:h-10 sm:w-10 bg-transparent hover:bg-muted-foreground/20  border-0",
+              buttonText &&
+                "w-full justify-start rounded-none hover:bg-transparent"
+            )}
+          >
+            {isSM ? (
+              <PencilIcon
+                className="text-[#1A1A1A] dark:text-white"
+                size={20}
+              />
+            ) : (
+              <PencilIcon
+                className="text-[#1A1A1A] dark:text-white"
+                size={16}
+              />
+            )}
+          </Button>
+          <span className="text-[16px] text-[#1A1A1A] dark:text-white">
+            {" "}
+            {buttonText}
+          </span>
+        </div>
       </DialogTrigger>
-      <DialogContent tabIndex={-1} className="sm:max-w-[800px] bg-card p-0 rounded-md">
+      <DialogContent
+        tabIndex={-1}
+        className="sm:max-w-[800px] bg-card p-0 rounded-md"
+      >
         <div className="">
           <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
             <XIcon className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </DialogClose>
           <Form {...form}>
-            <form className="flex flex-col md:flex-row w-full" onSubmit={form.handleSubmit(onSubmit)}>
-              <div id='side' className="flex flex-col justify-center items-center md:items-start gap-4 bg-accent rounded-md py-4 md:px-4">
-                {!isMD && <FullScaleIcon size={80} className="fill-current text-primary"/>}  
+            <form
+              className="flex flex-col md:flex-row w-full"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <div
+                id="side"
+                className="flex flex-col justify-center items-center md:items-start gap-4 bg-accent rounded-md py-4 md:px-4"
+              >
+                {!isMD && (
+                  <FullScaleIcon
+                    size={80}
+                    className="fill-current text-primary"
+                  />
+                )}
                 <div className="h-56 w-56 bg-muted border-border border rounded-full justify-center items-center flex">
-                  <UserIcon size={220} className="fill-current text-secondary" />
+                  <UserIcon
+                    size={220}
+                    className="fill-current text-secondary"
+                  />
                 </div>
                 <div className="flex gap-1 justify-center items-center bg-border pl-2 rounded-md">
-                  <FormLabel className='text-sm text-secondary-foreground text-nowrap'>ID No.</FormLabel>
+                  <FormLabel className="text-sm text-secondary-foreground text-nowrap">
+                    ID No.
+                  </FormLabel>
                   <FormField
                     control={form.control}
                     name="code"
                     render={({ field }) => (
                       <FormItem className="w-full">
                         <FormControl>
-                          <Input className="h-8 w-full text-sm border-border" placeholder="FS-XXXX" autoComplete="off" type="input" {...field} />
+                          <Input
+                            className="h-8 w-full text-sm border-border"
+                            placeholder="FS-XXXX"
+                            autoComplete="off"
+                            type="input"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
-                  />  
+                  />
                 </div>
-              </div>          
-              <div id='main' className="w-full flex flex-col justify-between items-center gap-4 p-4">
-                {isMD && <FullScaleIcon size={80} className="fill-current text-primary"/>}  
+              </div>
+              <div
+                id="main"
+                className="w-full flex flex-col justify-between items-center gap-4 p-4"
+              >
+                {isMD && (
+                  <FullScaleIcon
+                    size={80}
+                    className="fill-current text-primary"
+                  />
+                )}
                 <div className="flex w-full flex-col gap-2 items-start">
                   <div className="flex w-full gap-2 justify-center items-center">
                     <FormField
@@ -183,36 +243,54 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <FormControl>
-                            <Input className="text-sm" placeholder="First name" autoComplete="off" type="input" {...field} />
+                            <Input
+                              className="text-sm"
+                              placeholder="First name"
+                              autoComplete="off"
+                              type="input"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
-                    />  
+                    />
                     <FormField
                       control={form.control}
                       name="middleName"
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <FormControl>
-                            <Input className="text-sm" placeholder="Middle name" autoComplete="off" type="input" {...field} />
+                            <Input
+                              className="text-sm"
+                              placeholder="Middle name"
+                              autoComplete="off"
+                              type="input"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
-                    />  
+                    />
                     <FormField
                       control={form.control}
                       name="lastName"
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <FormControl>
-                            <Input className="text-sm" placeholder="Last name" autoComplete="off" type="input" {...field} />
+                            <Input
+                              className="text-sm"
+                              placeholder="Last name"
+                              autoComplete="off"
+                              type="input"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
-                    />  
+                    />
                   </div>
                   <div className="flex w-full justify-center items-center">
                     <FormField
@@ -221,16 +299,24 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <FormControl>
-                            <Input className="text-sm" placeholder="Position" autoComplete="off" type="input" {...field} />
+                            <Input
+                              className="text-sm"
+                              placeholder="Position"
+                              autoComplete="off"
+                              type="input"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
-                    />  
+                    />
                   </div>
                   <Separator className="my-4" />
                   <div className="flex w-full gap-2 justify-center items-center bg-border rounded-md pl-2">
-                    <FormLabel className='text-sm text-accent-foreground text-nowrap'>Start Date</FormLabel>
+                    <FormLabel className="text-sm text-accent-foreground text-nowrap">
+                      Start Date
+                    </FormLabel>
                     <FormField
                       control={form.control}
                       name="startDate"
@@ -255,7 +341,10 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0 z-10" align="end">
+                            <PopoverContent
+                              className="w-auto p-0 z-10"
+                              align="end"
+                            >
                               <Calendar
                                 mode="single"
                                 onSelect={field.onChange}
@@ -268,7 +357,7 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
                           <FormMessage />
                         </FormItem>
                       )}
-                    />  
+                    />
                   </div>
                 </div>
                 <div className="self-end flex flex-row justify-center items-center gap-2">
@@ -284,15 +373,17 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none text-accent-foreground">
-                          <FormLabel>
-                            Is employee active?
-                          </FormLabel>
+                          <FormLabel>Is employee active?</FormLabel>
                         </div>
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" disabled={isEditEmployeePending} className="gap-2">
-                    {isEditEmployeePending ? <Spinner size={18}/> : null }
+                  <Button
+                    type="submit"
+                    disabled={isEditEmployeePending}
+                    className="gap-2"
+                  >
+                    {isEditEmployeePending ? <Spinner size={18} /> : null}
                     Save Employee
                     <ArrowRightIcon />
                   </Button>
@@ -303,7 +394,7 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
         </div>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
 export default EditEmployee;
