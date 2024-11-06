@@ -64,8 +64,8 @@ module.exports = {
           foreground: "hsl(var(--card-foreground))",
         },
         tracker: {
-          from: "hsla(var(--tracker-gradient-from))",
-          to: "hsla(var(--tracker-gradient-to))",
+          from: "var(--tracker-gradient-from)",
+          to: "var(--tracker-gradient-to)",
         },
       },
       borderRadius: {
