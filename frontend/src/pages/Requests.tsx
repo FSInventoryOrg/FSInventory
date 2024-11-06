@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import RequestForm from "@/components/requests-ui/RequestForm";
 import { Separator } from "@/components/ui/separator";
 import { Flag } from "lucide-react";
 
@@ -26,7 +26,7 @@ const Requests = () => {
               below.
             </span>
           </div>
-          <Button className="bg-primary">Create a Ticket</Button>
+          <RequestForm />
         </div>
       </div>
     </section>
