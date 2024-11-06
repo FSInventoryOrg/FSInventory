@@ -167,7 +167,7 @@ const NavigationBar = () => {
                     : ""
                 }
               />
-              <span className="hidden lg:inline-block">Requests</span>
+              <span className="hidden lg:inline-block">Tickets</span>
             </Link>
           </NavigationMenuList>
         </NavigationMenu>
