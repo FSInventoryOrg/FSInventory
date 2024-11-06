@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Using the searchbar in add/edit asset form's category, status, and equipment type is now only for searching. It will no longer update the value of the dropdown, respectively.
 
+## [2.23.1](https://connect.zoho.com/portal/intranet/task/623367000000860057) 2024-10-29 
+### Fixed
+-  Column Visibility resetting everytime category is changed / browser is resized.
+
 ## [2.23.0](https://connect.zoho.com/portal/intranet/task/623367000000701233) 2024-10-25
 ### Added
 - IT services request form with validations (UI design to follow)
