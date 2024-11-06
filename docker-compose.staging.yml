@@ -3,15 +3,16 @@ version: "3.8"
 services:
   mongodb:
     image: mongo
-    container_name: mongodb
-    command: ["/bin/sh", "-c", "mongod --replSet rs0 --bind_ip_all --port 27017"]
+    container_name: mongodb-staging
+    command: ["mongod", "--auth", "--replSet", "rs0", "--bind_ip_all", "--port", "27017", "--keyFile", "/data/configdb/mongo-keyfile"]
     volumes:
       - mongo_data:/data/db
       - mongo_config:/data/config
       - ./backend/restore.sh:/docker-entrypoint-initdb.d/restore.sh
       - ./backend/inventory:/dump
+      - ./backend/mongo-keyfile:/data/configdb/mongo-keyfile
     env_file:
-      - ./backend/.env
+      - ./backend/.env.staging
     restart: always
     ports:
       - 27017:27017
@@ -26,19 +27,18 @@ services:
       - app-network
 
   api:
-    image: inventory-api
+    image: inventory-api-staging
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: api
+    container_name: api-staging
     volumes:
       - ./backend:/usr/src/app
-      - /usr/src/app/public
       - /usr/src/app/node_modules
     ports:
       - 8080:8080
     env_file:
-      - ./backend/.env
+      - ./backend/.env.staging
     environment:
       HOST: ${HOST:-0.0.0.0}
     depends_on:
@@ -48,11 +48,11 @@ services:
       - app-network
 
   app:
-    image: inventory-app
+    image: inventory-app-staging
     build:
       context: ./frontend 
       dockerfile: Dockerfile
-    container_name: app
+    container_name: app-staging
     volumes:
       - ./frontend:/app
       - /app/node_modules

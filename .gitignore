@@ -40,7 +40,7 @@ node_modules/
 /public/*
 
 # Environment variables
-.env
+.env*
 
 # Logs and data files
 *.log
