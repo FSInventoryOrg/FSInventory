@@ -2,6 +2,10 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.23.2](https://connect.zoho.com/portal/intranet/task/623367000000888079) 2024-11-5 
+### Fixed
+-  Redesigned Tracker UI for active / inactive / unregistered employees
+
 ## [2.23.1](https://connect.zoho.com/portal/intranet/task/623367000000860057) 2024-10-29 
 ### Fixed
 -  Column Visibility resetting everytime category is changed / browser is resized.
