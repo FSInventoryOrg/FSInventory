@@ -5,13 +5,14 @@ import { Flag } from "lucide-react";
 const Requests = () => {
   return (
     <section
-      id="settings"
+      id="supportTickets"
       className="flex flex-col w-full px-6 pb-3 md:px-24 sm:pb-6 pt-3"
     >
       <div className="space-y-0.5">
-        <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
+        <h2 className="text-2xl font-bold tracking-tight">Support Tickets</h2>
         <p className="text-muted-foreground">
-          Manage your settings and preferences.
+          View and manage all support tickets from your team members or submit a
+          new one.
         </p>
       </div>
       <Separator className="my-6" />
