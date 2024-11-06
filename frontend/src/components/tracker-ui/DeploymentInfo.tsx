@@ -168,12 +168,12 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
               <span
                 className={cn(
                   "font-bold text-primary-foreground text-sm",
-                  !employee.isRegistered
+                  employee.isRegistered
                     ? "dark:text-white text-primary-foreground"
                     : "text-destructive text-sm"
                 )}
               >
-                {!employee.isRegistered ? employee.code : <UnregisteredBadge />}
+                {employee.isRegistered ? employee.code : <UnregisteredBadge />}
               </span>
             </div>
             <div className="flex gap-1 sm:gap-2 lg:gap-3 items-start pt-2">
