@@ -41,9 +41,10 @@ import { useNavigate } from "react-router-dom";
 
 interface EditEmployeeProps {
   employeeData: EmployeeType;
+  buttonText?: string;
 }
 
-const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
+const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false); 
   const [newEmployeeCode, setNewEmployeeCode] = useState('');
@@ -132,12 +133,16 @@ const EditEmployee = ({ employeeData }: EditEmployeeProps) => {
   
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger asChild className="hover:cursor-pointer text-white bg-transparent dark:hover:bg-muted-foreground/20 hover:bg-muted border-0 w-full">
+        <div className={cn(buttonText && "flex justify-start items-center px-[5px] text-[16px] bg-white dark:bg-inherit text-[#1A1A1A]")}>
         <Button 
-          size="icon"
-          className="text-white flex justify-center items-center rounded-full h-8 w-8 sm:h-10 sm:w-10 bg-transparent hover:bg-muted-foreground/20 border-0">
-          {isSM ? <PencilIcon size={20} /> : <PencilIcon size={16} />}
+          size={buttonText ? 'sm' : 'icon'}
+          className={cn('text-white flex justify-center items-center rounded-full h-8 w-8 sm:h-10 sm:w-10 bg-transparent hover:bg-muted-foreground/20  border-0', buttonText && 'w-full justify-start rounded-none hover:bg-transparent')}>
+          {isSM ? <PencilIcon className="text-[#1A1A1A] dark:text-white" size={20} /> : <PencilIcon className="text-[#1A1A1A] dark:text-white" size={16} />}
         </Button>
+     <span className="text-[16px] text-[#1A1A1A] dark:text-white">   {buttonText}</span>
+
+            </div>
       </DialogTrigger>
       <DialogContent tabIndex={-1} className="sm:max-w-[800px] bg-card p-0 rounded-md">
         <div className="">

@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "../ui/button";
-import { AlertCircleIcon, CheckCheckIcon, TrashIcon } from "lucide-react";
+import { Check, X, XIcon } from "lucide-react";
 import TrashCan from "../graphics/TrashCan";
 import EditEmployee from "./EditEmployee";
 import { EmployeeAssetsTable } from "./EmployeeAssetsTable";
@@ -40,12 +40,24 @@ import { AssetsHistoryColumns } from "./AssetsHistoryColumns";
 import { Info } from "@phosphor-icons/react";
 import AssetsCount from "./AssetCounts";
 import { Skeleton } from "../ui/skeleton";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { cn } from "@/lib/utils";
+import { EmployeeDropdownMenu } from "./EmployeeDropdownMenu";
+import { DropdownMenuItem } from "../ui/dropdown-menu";
 // import { Skeleton } from '../ui/skeleton';
 
 interface DeploymentInfoProps {
   employee: EmployeeType;
   assignee: string;
 }
+
+const UnregisteredBadge = () => {
+  return (
+    <div className="py-[2px] px-2 bg-destructive rounded-[8px] w-fit">
+      <Label className="text-sm font-semibold text-white">UNREGISTERED</Label>
+    </div>
+  );
+};
 
 const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
   const currentDate = new Date();
@@ -60,6 +72,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
   const [assetCounts, setAssetCounts] = useState<{
     [category: string]: number;
   }>();
+  const [showEmployeeDropdown, setShowEmployeeDropdown] = useState(false);
 
   const { data: allAssets } = useQuery({
     queryKey: ["fetchAllAssets"],
@@ -131,18 +144,18 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex flex-col gap-2 pb-2">
+      <div className="flex flex-col lg:flex-row gap-2 pb-2">
         <div
           id="banner"
-          className="dark:bg-gradient-120 bg-gradient-302 from-tracker-from to-tracker-to h-40 rounded-lg p-4 justify-between flex flex-col text-white border border-solid border-border-brandgreen"
+          className="max-w-[70%] flex-grow dark:bg-gradient-120 bg-gradient-302 from-tracker-from to-tracker-to h-40 rounded-lg p-4 justify-between flex flex-col text-white border border-solid border-border-brandgreen"
         >
           <div className="flex justify-between ">
-            <div className="flex flex-col w-[50%] sm:w-full">
+            <div className="flex flex-col w-[50%] sm:w-full gap-1">
               <span className="font-bold text-xl sm:text-3xl gap-2 flex">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger className="w-fit overflow-hidden text-ellipsis">
-                      <span className="whitespace-nowrap">
+                      <span className="whitespace-nowrap text-primary-foreground">
                         {employee.firstName + " " + employee.lastName}
                       </span>
                     </TooltipTrigger>
@@ -151,40 +164,66 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                {employee.isRegistered && isSM && (
-                  <EditEmployee employeeData={employee} />
-                )}
               </span>
               <span
-                className={`font-bold text-sm ${
-                  employee.isRegistered ? "" : "text-destructive text-sm"
-                }`}
+                className={cn(
+                  "font-bold text-primary-foreground text-sm",
+                  !employee.isRegistered
+                    ? "dark:text-white text-primary-foreground"
+                    : "text-destructive text-sm"
+                )}
               >
-                {employee.isRegistered ? employee.code : "UNREGISTERED"}
+                {!employee.isRegistered ? employee.code : <UnregisteredBadge />}
               </span>
             </div>
-            <div className="flex gap-1 sm:gap-2 lg:gap-3 items-start">
+            <div className="flex gap-1 sm:gap-2 lg:gap-3 items-start pt-2">
               {!isSM && <EditEmployee employeeData={employee} />}
-              <DeleteEmployee employee={employee} />
               <Button
-                className={`px-3 sm:px-4 gap-2 text-white ${
+                className={cn(
+                  "py-[2px] px-2 gap-1 text-white rounded-[20px] h-[28px]",
                   employee.isActive
-                    ? "bg-[#33CC80]"
-                    : "bg-[#ffa333] hover:bg-[#ffa333]/95"
-                }`}
+                    ? "dark:bg-[#036F39] bg-[#CAEADA]"
+                    : "dark:bg-[#54575A] hover:bg-[#54575A]/95 bg-[#DBDCDC]"
+                )}
               >
                 {employee.isActive ? (
                   <>
-                    <CheckCheckIcon size={16} />
-                    <span className="hidden sm:block">Active</span>
+                    <Check
+                      size={16}
+                      className="text-border-brandgreen dark:text-white"
+                    />
+                    <span className="hidden sm:block text-[16px] dark:text-white text-border-brandgreen">
+                      ACTIVE
+                    </span>
                   </>
                 ) : (
                   <>
-                    <AlertCircleIcon size={16} />
-                    <span className="hidden sm:block">Inactive</span>
+                    <X size={16} className="dark:text-white text-[#54575A]" />
+                    <span className="hidden sm:block text-[16px] dark:text-white text-[#54575A]">
+                      INACTIVE
+                    </span>
                   </>
                 )}
               </Button>
+              <EmployeeDropdownMenu
+                open={showEmployeeDropdown}
+                setOpen={setShowEmployeeDropdown}
+              >
+                <DropdownMenuItem
+                  className="dark:bg-[#141D1E] bg-white p-0"
+                  asChild
+                >
+                  {employee.isRegistered && isSM && (
+                    <EditEmployee
+                      employeeData={employee}
+                      buttonText="Edit Employee"
+                    />
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuItem className="bg-[#141D1E] w-full p-0" asChild>
+                  <DeleteEmployee employee={employee} />
+                </DropdownMenuItem>
+              </EmployeeDropdownMenu>
             </div>
           </div>
           <div className="flex sm:flex-row flex-col justify-between">
@@ -207,7 +246,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
             </div>
           </div>
         </div>
-        <div id="statistics" className="relative">
+        <div id="statistics" className="relative flex-grow ">
           {assetCounts ? (
             <AssetsCount assetCounts={assetCounts} />
           ) : (
@@ -318,18 +357,17 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
         {isSM ? (
           <Button
             disabled={!employee.isRegistered}
-            className="px-3 sm:px-4 gap-2 bg-destructive/20 border-destructive border text-destructive hover:text-destructive-foreground"
-            variant="destructive"
+            className="px-3 sm:px-4 gap-2 bg-transparent text-destructive hover:text-white hover:bg-destructive/80"
           >
-            <TrashIcon size={16} />
-            <span className="hidden sm:block">Remove Employee</span>
+            <XIcon size={21} />
+            <span className="hidden sm:block text-[16px]">Remove Employee</span>
           </Button>
         ) : (
           <Button
             size="icon"
             className="text-white flex justify-center items-center rounded-full h-8 w-8 sm:h-10 sm:w-10 bg-transparent hover:bg-muted-foreground/20 border-0"
           >
-            <TrashIcon size={16} />
+            <XIcon size={21} />
           </Button>
         )}
       </AlertDialogTrigger>
