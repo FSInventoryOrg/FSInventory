@@ -6,15 +6,18 @@ import {
 import { Button } from "../ui/button";
 import { DotsThreeVertical } from "@phosphor-icons/react";
 import { Dispatch, ReactNode, SetStateAction } from "react";
+import { cn } from "@/lib/utils";
 
 export const EmployeeDropdownMenu = ({
   children,
   open,
   setOpen,
+  dropdownMenuContentClassName,
 }: {
   children: ReactNode;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  dropdownMenuContentClassName: string;
 }) => {
   return (
     <DropdownMenu modal={false} open={open} onOpenChange={setOpen}>
@@ -23,7 +26,12 @@ export const EmployeeDropdownMenu = ({
           <DotsThreeVertical size={32} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="mr-[200px] dark:bg-[#141D1E] bg-white rounded-[4px]">
+      <DropdownMenuContent
+        className={cn(
+          "dark:bg-[#141D1E] bg-white rounded-[4px] mr-[40px]",
+          dropdownMenuContentClassName
+        )}
+      >
         {children}
       </DropdownMenuContent>
     </DropdownMenu>

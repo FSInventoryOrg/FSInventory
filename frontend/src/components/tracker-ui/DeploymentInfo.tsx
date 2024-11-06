@@ -147,7 +147,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
       <div className="flex flex-col lg:flex-row gap-2 pb-2">
         <div
           id="banner"
-          className="w-[50%] flex-shrink flex-grow dark:bg-gradient-120 bg-gradient-302 from-tracker-from to-tracker-to h-40 rounded-lg p-4 justify-between flex flex-col text-white border border-solid border-border-brandgreen"
+          className="w-full pr-2 md:w-[95%] lg:w-[50%] flex-shrink flex-grow dark:bg-gradient-120 bg-gradient-302 from-tracker-from to-tracker-to h-40 rounded-lg p-4 justify-between flex flex-col text-white border border-solid border-border-brandgreen"
         >
           <div className="flex justify-between ">
             <div className="flex flex-col w-[50%] sm:w-full gap-1">
@@ -207,12 +207,13 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
               <EmployeeDropdownMenu
                 open={showEmployeeDropdown}
                 setOpen={setShowEmployeeDropdown}
+                dropdownMenuContentClassName={isSM ? "lg:mr-[200px] " : ""}
               >
                 <DropdownMenuItem
                   className="dark:bg-[#141D1E] bg-white p-0"
                   asChild
                 >
-                  {employee.isRegistered && isSM && (
+                  {employee.isRegistered && (
                     <EditEmployee
                       employeeData={employee}
                       buttonText="Edit Employee"
@@ -229,7 +230,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
             <div className="flex flex-row text-white w-full sm:w-[50%]">
               <TooltipProvider>
                 <Tooltip>
-                  <TooltipTrigger className="w-fit text-xl sm:text-4xl font-bold text-primary/50 overflow-hidden text-ellipsis">
+                  <TooltipTrigger className="w-fit text-xl sm:text-4xl font-bold text-primary/50 text-ellipsis">
                     <span className="whitespace-nowrap">
                       {employee.position}
                     </span>
@@ -353,22 +354,13 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        {isSM ? (
-          <Button
-            disabled={!employee.isRegistered}
-            className="px-3 sm:px-4 gap-2 bg-transparent text-destructive hover:text-white hover:bg-destructive/80"
-          >
-            <XIcon size={21} />
-            <span className="hidden sm:block text-[16px]">Remove Employee</span>
-          </Button>
-        ) : (
-          <Button
-            size="icon"
-            className="text-white flex justify-center items-center rounded-full h-8 w-8 sm:h-10 sm:w-10 bg-transparent hover:bg-muted-foreground/20 border-0"
-          >
-            <XIcon size={21} />
-          </Button>
-        )}
+        <Button
+          disabled={!employee.isRegistered}
+          className="px-3 sm:px-4 gap-2 bg-transparent text-destructive hover:text-white hover:bg-destructive/80"
+        >
+          <XIcon size={isSM ? 20 : 16} />
+          <span className="text-[16px]">Remove Employee</span>
+        </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="border-none">
         {!(employeeAssets && employeeAssets.length > 0) ? (

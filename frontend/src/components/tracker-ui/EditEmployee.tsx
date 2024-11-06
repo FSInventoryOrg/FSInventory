@@ -150,7 +150,7 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
             className={cn(
               "text-white flex justify-center items-center rounded-full h-8 w-8 sm:h-10 sm:w-10 bg-transparent hover:bg-muted-foreground/20  border-0",
               buttonText &&
-                "w-full justify-start rounded-none hover:bg-transparent"
+                "justify-start rounded-none hover:bg-transparent w-10"
             )}
           >
             {isSM ? (
