@@ -340,7 +340,6 @@ router.put(
 
       const propertyValues = option.get(property) || [];
       // Check if the value already exists in the array for the specified property
-      // Check if the value already exists in the array for the specified property
       if (typeof value === "object") {
         const existingValue = propertyValues.find(
           (val: any) => val.value.toLowerCase() === value.value.toLowerCase()
@@ -442,7 +441,6 @@ router.delete(
       const { property } = req.params;
       const { value } = req.body;
 
-      // let isStatusIncluded = false;
       let shouldAuditAssets = false;
 
       // Check if the options document exists
