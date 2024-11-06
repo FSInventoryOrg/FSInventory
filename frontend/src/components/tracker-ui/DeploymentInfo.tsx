@@ -147,7 +147,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
       <div className="flex flex-col lg:flex-row gap-2 pb-2">
         <div
           id="banner"
-          className="max-w-[70%] flex-grow dark:bg-gradient-120 bg-gradient-302 from-tracker-from to-tracker-to h-40 rounded-lg p-4 justify-between flex flex-col text-white border border-solid border-border-brandgreen"
+          className="w-[50%] flex-shrink flex-grow dark:bg-gradient-120 bg-gradient-302 from-tracker-from to-tracker-to h-40 rounded-lg p-4 justify-between flex flex-col text-white border border-solid border-border-brandgreen"
         >
           <div className="flex justify-between ">
             <div className="flex flex-col w-[50%] sm:w-full gap-1">
@@ -177,7 +177,6 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
               </span>
             </div>
             <div className="flex gap-1 sm:gap-2 lg:gap-3 items-start pt-2">
-              {!isSM && <EditEmployee employeeData={employee} />}
               <Button
                 className={cn(
                   "py-[2px] px-2 gap-1 text-white rounded-[20px] h-[28px]",
