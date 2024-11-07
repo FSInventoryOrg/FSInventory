@@ -200,7 +200,6 @@ export const deleteAllFilesInDir = (folder: string): Promise<void> => {
               reject(`Unable to get stats for file: ${err}`);
               return;
             }
-
             // Delete if a file
             if (stats.isFile() && file !== ".gitkeep") {
               unlink(filePath, (err) => {

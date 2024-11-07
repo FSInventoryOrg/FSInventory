@@ -86,8 +86,9 @@ export const getUploadFormat = (folder: string) => {
   try {
     const folderDir = `${directory}${folder}`;
     // Read all files and directories in the specified folder
-    const files = readdirSync(folderDir).filter((file) =>
-      statSync(path.join(folderDir, file)).isFile()
+    const files = readdirSync(folderDir).filter(
+      (file) =>
+        statSync(path.join(folderDir, file)).isFile() && file !== ".gitkeep"
     ); // Filter out directories
 
     // Sort files (optional, to ensure consistent ordering)
