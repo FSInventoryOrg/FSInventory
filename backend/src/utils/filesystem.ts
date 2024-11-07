@@ -176,8 +176,7 @@ export const readJSONDataFromCSVFile = async (
  * @description deletes all the files from specific directory
  */
 export const deleteAllFilesInDir = (folder: string): Promise<void> => {
-  const folderDir = `${directory}${folder}`;
-
+  const folderDir = `${directory}${directory.includes("\\backend") ? "\\.." : ""}${folder}`;
   if (!existsSync(folderDir)) {
     return Promise.reject("Folder does not exist");
   }
@@ -203,7 +202,7 @@ export const deleteAllFilesInDir = (folder: string): Promise<void> => {
             }
 
             // Delete if a file
-            if (stats.isFile()) {
+            if (stats.isFile() && file !== ".gitkeep") {
               unlink(filePath, (err) => {
                 if (err) {
                   reject(`Unable to delete file: ${err}`);
