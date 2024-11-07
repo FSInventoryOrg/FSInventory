@@ -342,7 +342,9 @@ router.put(
       // Check if the value already exists in the array for the specified property
       if (typeof value === "object") {
         const existingValue = propertyValues.find(
-          (val: any) => val.value.toLowerCase() === value.value.toLowerCase()
+          (val: any, index: number) =>
+            val.value.toLowerCase() === value.value.toLowerCase() &&
+            index !== updateIndex
         );
         if (existingValue) {
           return res.status(400).json({
@@ -351,8 +353,9 @@ router.put(
         }
       } else {
         const existingValue = propertyValues.find(
-          (propertyVal: string) =>
-            propertyVal.toLowerCase() === value?.toLowerCase()
+          (propertyVal: string, index: number) =>
+            propertyVal.toLowerCase() === value?.toLowerCase() &&
+            index !== updateIndex
         );
         if (existingValue) {
           return res.status(400).json({
