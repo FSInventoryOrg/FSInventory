@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import TrashCan from "../graphics/TrashCan";
+import { Spinner } from "../Spinner";
 
 interface DeletePropertyProps {
   open: boolean;
@@ -47,12 +48,12 @@ const DeletePropertyDialog = ({
       onSuccess: async () => {
         queryClient.invalidateQueries({ queryKey: ["fetchAssetCounters"] });
         await onDelete?.();
+        setOpen(false);
       },
     });
 
   const handleDelete = async () => {
     await deleteOption();
-    setOpen(false);
   };
 
   return (
@@ -87,6 +88,7 @@ const DeletePropertyDialog = ({
               onClick={handleDelete}
               disabled={isOptionDeletePending}
             >
+              {isOptionDeletePending ? <Spinner size={18} /> : null}
               Delete {value}
             </Button>
           )}
