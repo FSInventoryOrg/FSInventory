@@ -509,9 +509,6 @@ const EditOptions = ({
                       return false; // Filter out undefined or other non-matching types
                     }
                   );
-                  // console.log(indexOfValueToEdit)
-                  // console.log(newOption.property)
-                  // console.log(newOption.value)
                   updateOptionValue({
                     property: newOption.property,
                     value: newOption.value,
