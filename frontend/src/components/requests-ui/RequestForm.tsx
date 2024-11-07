@@ -32,40 +32,34 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import RequestTypeOptions from "./RequestTypeOptions";
 
 const RequestForm = () => {
   const [open, setOpen] = useState(false);
 
   const { showToast } = useAppContext();
   const { data: user } = useUserData();
-  const [requestType, setRequestType] = useState("Report an Issue");
+  // const [requestType, setRequestType] = useState("Report an Issue");
 
   const requestForm = useForm<RequestFormData>({
     resolver: zodResolver(RequestFormSchema),
     defaultValues: {
-      // fullName: user?.fullName ?? "",
-      // manager: user?.manager ?? "",
-      // contactInfo: user?.contactInfo ?? "",
+      requestType: "Report an Issue",
     },
     mode: "onChange",
   });
 
+  const requestType = requestForm.watch("requestType", "Report an Issue");
   useEffect(() => {
     if (user) {
-      requestForm.reset({
-        ...requestForm,
-        fullName: user.firstName + " " + user.lastName,
-        manager: "",
-        contactInfo: "",
-      });
+      requestForm.reset(
+        {
+          fullName: user.firstName + " " + user.lastName,
+          manager: "",
+          contactInfo: "",
+        },
+        { keepDefaultValues: true }
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
@@ -103,7 +97,9 @@ const RequestForm = () => {
         </DialogHeader>
         <Form {...requestForm}>
           <form onSubmit={requestForm.handleSubmit(onSubmit)}>
-            <RequestorForm />
+            <div className="sm:w-1/2 pr-2">
+              <RequestorForm />
+            </div>
             <FormField
               control={requestForm.control}
               name="requestType"
@@ -111,27 +107,10 @@ const RequestForm = () => {
                 <FormItem>
                   <FormLabel>Request Type</FormLabel>
                   <FormControl>
-                    <Select
+                    <RequestTypeOptions
                       value={field.value}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        setRequestType(value);
-                      }}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select Request Type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectItem value="Report an Issue">
-                            Report an Issue
-                          </SelectItem>
-                          <SelectItem value="Request a New Asset">
-                            Request a New Asset
-                          </SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+                      onChange={field.onChange}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
