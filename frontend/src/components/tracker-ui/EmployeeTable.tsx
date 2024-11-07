@@ -143,7 +143,9 @@ export function EmployeeTable<TData, TValue>({
   const handleFilters = (filters: string[]) => {
     onFilter(filters)
   }
-  
+  const dataCount = React.useMemo(() => {
+    return data ? data.length : 0;
+  }, [data]);
   return (
     <div className="w-full flex flex-col" >
       <div className="flex items-center pb-2 gap-2">
@@ -156,7 +158,7 @@ export function EmployeeTable<TData, TValue>({
             className="max-w-sm w-full pl-10 h-8 font-light rounded-md text-sm"
           />
         </div>
-        <EmployeeFilter onFilter={handleFilters} />
+        <EmployeeFilter onFilter={handleFilters} dataCount={dataCount} />
         <AddEmployee />
       </div>
       <EmployeePagination table={table}/>
