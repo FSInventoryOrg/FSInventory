@@ -154,8 +154,8 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
               <span className="font-bold text-xl sm:text-3xl gap-2 flex">
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger className="w-fit overflow-hidden text-ellipsis">
-                      <span className="whitespace-nowrap text-primary-foreground">
+                    <TooltipTrigger className="w-fit text-ellipsis">
+                      <span className="whitespace-nowrap text-primary-foreground text-4xl">
                         {employee.firstName + " " + employee.lastName}
                       </span>
                     </TooltipTrigger>
@@ -167,10 +167,10 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
               </span>
               <span
                 className={cn(
-                  "font-bold text-primary-foreground text-sm",
+                  "text-primary-foreground text-[16px]",
                   employee.isRegistered
                     ? "dark:text-white text-primary-foreground"
-                    : "text-destructive text-sm"
+                    : "text-destructive text-[16px]"
                 )}
               >
                 {employee.isRegistered ? employee.code : <UnregisteredBadge />}
@@ -179,10 +179,10 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
             <div className="flex gap-1 sm:gap-2 lg:gap-3 items-start pt-2">
               <Button
                 className={cn(
-                  "py-[2px] px-2 gap-1 text-white rounded-[20px] h-[28px]",
+                  "py-[2px] px-2 gap-1 text-white rounded-[20px] h-[28px] hover:cursor-auto",
                   employee.isActive
-                    ? "dark:bg-[#036F39] bg-[#CAEADA]"
-                    : "dark:bg-[#54575A] hover:bg-[#54575A]/95 bg-[#DBDCDC]"
+                    ? "dark:bg-[#036F39] bg-[#CAEADA] hover:bg-[#CAEADA]"
+                    : "dark:bg-[#54575A] hover:bg-[#DBDCDC]/95 bg-[#DBDCDC]"
                 )}
               >
                 {employee.isActive ? (
@@ -231,7 +231,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger className="w-fit text-xl sm:text-4xl font-bold text-primary/50 text-ellipsis">
-                    <span className="whitespace-nowrap">
+                    <span className="whitespace-nowrap dark:text-primary/50 text-primary text-xl">
                       {employee.position}
                     </span>
                   </TooltipTrigger>
