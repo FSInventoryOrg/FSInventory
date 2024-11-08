@@ -1,35 +1,55 @@
 /* eslint-disable react/prop-types */
-import { useRef, useState } from "react";
-import { Upload, FileSpreadsheet } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { Upload, FileSpreadsheet, X } from "lucide-react";
 import { FileInput } from "@/components/ui/file-input";
 import ErrorAlert from "../ErrorAlert";
+import { cn } from "@/lib/utils";
 
 interface FileUploaderProps {
-  handleFile: (file: File | undefined) => void;
-  uploadedFile: File | undefined;
+  handleFiles: (files: File[]) => void;
+  uploadedFiles: File[];
   accept: string;
   maxFileSize?: number;
   wildcard?: string;
+  multiple?: boolean;
+  uploadText?: React.ReactNode;
+  borderStyle?: string;
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({
-  handleFile,
-  uploadedFile,
+  handleFiles,
+  uploadedFiles,
   accept,
   maxFileSize,
   wildcard,
+  multiple = false,
+  uploadText,
+  borderStyle,
 }) => {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
 
   const [errorMessage, setErrorMessage] = useState("");
+  const [files, setFiles] = useState(uploadedFiles || []);
 
   const handleClick = () => {
     hiddenFileInput.current?.click();
   };
 
+  // const handleFileAdd = (newFile: File) => {
+  // setErrorMessage("");
+  // setFiles((addedFiles) => [...addedFiles, newFile]);
+  // handleFiles([...files, newFile]);
+  // };
+
+  const handleFileRemove = (indexToRemove: number) => {
+    const updatedFiles = files.filter((_, index) => index !== indexToRemove);
+    setFiles(updatedFiles);
+  };
+
   const handleChange = (file: File) => {
     setErrorMessage("");
-    handleFile(file);
+    setFiles((addedFiles) => [...addedFiles, file]);
+    handleFiles([...files, file]);
   };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
@@ -40,6 +60,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         checkFileType(fileUploaded);
         checkFileSize(fileUploaded);
         handleChange(fileUploaded);
+        // handleFileAdd(fileUploaded);
       } catch (err: any) {
         handleUploadError(err);
       }
@@ -77,7 +98,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   };
 
   const checkFileSize = (file: File) => {
-    if (maxFileSize && file.size > maxFileSize) {
+    console.log(file);
+    const totalFilesSize = files.reduce((total, f) => total + f.size, 0);
+    if (maxFileSize && totalFilesSize > maxFileSize) {
       const maxFileSizeInMB = maxFileSize / (1024 * 1024);
       throw Error(`File size exceeds ${maxFileSizeInMB} MB`);
     }
@@ -85,7 +108,12 @@ const FileUploader: React.FC<FileUploaderProps> = ({
 
   return (
     <>
-      <div className="w-full flex flex-col items-center border-[1px] rounded p-4">
+      <div
+        className={cn(
+          "w-full flex flex-col items-center  rounded p-4 border-[1px]",
+          borderStyle
+        )}
+      >
         <div
           className="w-full flex flex-col cursor-pointer items-center gap-y-2"
           onClick={handleClick}
@@ -93,15 +121,15 @@ const FileUploader: React.FC<FileUploaderProps> = ({
           onDragOver={handleDragOver}
         >
           {errorMessage ? <ErrorAlert errorMessage={errorMessage} /> : null}
-          {uploadedFile ? (
+          {uploadedFiles?.length === 1 && !multiple ? (
             <>
               <FileSpreadsheet />
-              File selected: {`${uploadedFile.name}`}
+              File selected: {`${uploadedFiles[0].name}`}
             </>
           ) : (
             <>
               <Upload />
-              Upload a file
+              {uploadText ?? "Upload a file"}
             </>
           )}
           <p className="text-sm text-muted-foreground">
@@ -116,6 +144,24 @@ const FileUploader: React.FC<FileUploaderProps> = ({
             maxFileSize={maxFileSize}
           />
         </div>
+      </div>
+      <div className="mt-4">
+        {files.map((file, index) => (
+          <div key={file.name} className="flex items-center mb-2">
+            <img
+              src={URL.createObjectURL(file)}
+              alt={file.name}
+              className="w-16 h-16 object-cover mr-2"
+            />
+            <span>{file.name}</span>
+            <button
+              onClick={() => handleFileRemove(index)}
+              className="ml-2 text-red-500"
+            >
+              <X size={18} />
+            </button>
+          </div>
+        ))}
       </div>
     </>
   );
