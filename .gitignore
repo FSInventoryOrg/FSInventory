@@ -37,7 +37,7 @@ node_modules/
 /frontend/dist/
 /backend/public/
 /build/
-/public/*
+/public/**
 
 # Environment variables
 .env
@@ -57,3 +57,6 @@ yarn-error.log*
 
 /frontend/package.json
 /frontend/package-lock.json
+
+!/public/**/
+!/public/**/.gitkeep
