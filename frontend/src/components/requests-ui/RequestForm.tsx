@@ -51,8 +51,8 @@ const RequestForm = () => {
     if (user) {
       const userDetails = {
         fullName: user.firstName + " " + user.lastName,
-        manager: "",
-        contactInfo: "",
+        manager: "John Doe",
+        contactInfo: user.email,
       };
       requestForm.reset(userDetails, { keepDefaultValues: true });
     } else {
