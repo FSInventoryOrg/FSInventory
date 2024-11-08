@@ -135,6 +135,32 @@ const EditOptions = ({
     }
   };
 
+  const handleUpdate = () => {
+    if (newOption && optionValues && optionToEdit) {
+      const indexOfValueToEdit = optionValues.findIndex((option) => {
+        if (typeof option === "string") {
+          return option === optionToEdit;
+        } else if (typeof option === "object" && option.value) {
+          return option.value === optionToEdit;
+        }
+        return false; // Filter out undefined or other non-matching types
+      });
+      updateOptionValue({
+        property: newOption.property,
+        value: newOption.value,
+        index: indexOfValueToEdit,
+      });
+      updateAssetsByProperty({
+        property: newOption.property,
+        value: optionToEdit,
+        newValue:
+          typeof newOption.value === "object"
+            ? newOption.value.value
+            : newOption.value,
+      });
+    }
+  };
+
   const { mutate: addOptionValue, isPending: isAddPending } = useMutation({
     mutationFn: imsService.addOptionValue,
     onSuccess: async () => {
@@ -590,33 +616,7 @@ const EditOptions = ({
                 newOption.value === optionToEdit
               }
               type="button"
-              onClick={() => {
-                if (newOption && optionValues && optionToEdit) {
-                  const indexOfValueToEdit = optionValues.findIndex(
-                    (option) => {
-                      if (typeof option === "string") {
-                        return option === optionToEdit;
-                      } else if (typeof option === "object" && option.value) {
-                        return option.value === optionToEdit;
-                      }
-                      return false; // Filter out undefined or other non-matching types
-                    }
-                  );
-                  updateOptionValue({
-                    property: newOption.property,
-                    value: newOption.value,
-                    index: indexOfValueToEdit,
-                  });
-                  updateAssetsByProperty({
-                    property: newOption.property,
-                    value: optionToEdit,
-                    newValue:
-                      typeof newOption.value === "object"
-                        ? newOption.value.value
-                        : newOption.value,
-                  });
-                }
-              }}
+              onClick={handleUpdate}
             >
               {isOptionEditPending || isAssetEditPending ? (
                 <Spinner size={18} />
