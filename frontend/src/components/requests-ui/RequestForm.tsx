@@ -146,9 +146,12 @@ const RequestForm = () => {
                   <RequestAssetForm />
                 </>
               )}
-              <Button className="my-2" type="submit">
-                Submit Request
-              </Button>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline">Cancel</Button>
+                <Button className="bg-primary text-white" type="submit">
+                  Submit Ticket
+                </Button>
+              </div>
             </form>
           </Form>
         </div>
