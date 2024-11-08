@@ -29,17 +29,15 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "../ui/form";
 import RequestTypeOptions from "./RequestTypeOptions";
+import { Separator } from "../ui/separator";
 
 const RequestForm = () => {
   const [open, setOpen] = useState(false);
-
   const { showToast } = useAppContext();
   const { data: user } = useUserData();
-  // const [requestType, setRequestType] = useState("Report an Issue");
 
   const requestForm = useForm<RequestFormData>({
     resolver: zodResolver(RequestFormSchema),
@@ -49,20 +47,27 @@ const RequestForm = () => {
     mode: "onChange",
   });
 
-  const requestType = requestForm.watch("requestType", "Report an Issue");
-  useEffect(() => {
+  const reset = () => {
     if (user) {
-      requestForm.reset(
-        {
-          fullName: user.firstName + " " + user.lastName,
-          manager: "",
-          contactInfo: "",
-        },
-        { keepDefaultValues: true }
-      );
+      const userDetails = {
+        fullName: user.firstName + " " + user.lastName,
+        manager: "",
+        contactInfo: "",
+      };
+      requestForm.reset(userDetails, { keepDefaultValues: true });
+    } else {
+      requestForm.reset();
+    }
+  };
+
+  const requestType = requestForm.watch("requestType", "Report an Issue");
+
+  useEffect(() => {
+    if (open && user) {
+      reset();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [open, requestForm, user]);
 
   const onSubmit = (data: RequestAssetFormData | ReportIssueFormData) => {
     mutate(data);
@@ -86,43 +91,67 @@ const RequestForm = () => {
       </DialogTrigger>
       <DialogContent
         tabIndex={-1}
-        className="overflow-y-auto  sm:max-w-[800px] bg-card h-full p-3 sm:p-6 rounded-lg"
+        className="min-w-full overflow-y-auto h-full bg-transparent justify-center flex border-none px-0 py-0 sm:py-16"
       >
-        <DialogHeader className="relative">
-          <DialogClose className="absolute right-0 top-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-            <XIcon className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </DialogClose>
-          <DialogTitle>Create Support Ticket</DialogTitle>
-        </DialogHeader>
-        <Form {...requestForm}>
-          <form onSubmit={requestForm.handleSubmit(onSubmit)}>
-            <div className="sm:w-1/2 pr-2">
-              <RequestorForm />
-            </div>
-            <FormField
-              control={requestForm.control}
-              name="requestType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Request Type</FormLabel>
-                  <FormControl>
-                    <RequestTypeOptions
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+        <div className="sm:max-w-[800px] bg-card h-fit  rounded-lg">
+          <DialogHeader className="relative sm:p-5">
+            <DialogClose className="absolute right-2 top-2 p-5 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              {/* <span> */}
+              <XIcon className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+              {/* </span> */}
+            </DialogClose>
+            <DialogTitle className="text-xl font-semibold mt-0">
+              Create Support Ticket
+            </DialogTitle>
+          </DialogHeader>
+          <Form {...requestForm}>
+            <form
+              onSubmit={requestForm.handleSubmit(onSubmit)}
+              className="p-3 sm:p-5 sm:pt-0 flex flex-col gap-3"
+            >
+              <h2 className="text-lg font-semibold">Employee Information</h2>
+              <div className="sm:w-1/2 pr-2">
+                <RequestorForm />
+              </div>
+              <Separator />
+              <h2 className="text-lg font-semibold">Ticket Type</h2>
+              <FormField
+                control={requestForm.control}
+                name="requestType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <RequestTypeOptions
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Separator />
+              {requestType === "Report an Issue" && (
+                <>
+                  <h2 className="text-lg font-semibold">Report an Issue</h2>
+                  {/* <div className="sm:w-1/2 pr-2"> */}
+                  <ReportIssueForm />
+                  {/* </div> */}
+                </>
               )}
-            />
-            {requestType === "Report an Issue" && <ReportIssueForm />}
-            {requestType === "Request a New Asset" && <RequestAssetForm />}
-            <Button className="my-2" type="submit">
-              Submit Request
-            </Button>
-          </form>
-        </Form>
+              {requestType === "Request a New Asset" && (
+                <>
+                  <h2 className="text-lg font-semibold">Report a New Asset</h2>
+                  <RequestAssetForm />
+                </>
+              )}
+              <Button className="my-2" type="submit">
+                Submit Request
+              </Button>
+            </form>
+          </Form>
+        </div>
       </DialogContent>
     </Dialog>
   );

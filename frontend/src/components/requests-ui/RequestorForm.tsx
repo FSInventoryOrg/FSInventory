@@ -11,14 +11,16 @@ import {
 const RequestorForm = () => {
   const { control } = useFormContext();
   return (
-    <div className="pb-4">
+    <div className="flex flex-col gap-2">
       {/* Autopopulate if logged in */}
       <FormField
         control={control}
         name="fullName"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Full Name</FormLabel>
+            <FormLabel className="text-secondary-foreground font-normal text-base">
+              Full Name
+            </FormLabel>
             <FormControl>
               <Input {...field} placeholder="John Doe" />
             </FormControl>
@@ -31,7 +33,9 @@ const RequestorForm = () => {
         name="manager"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Manager</FormLabel>
+            <FormLabel className="text-secondary-foreground font-normal text-base">
+              Manager
+            </FormLabel>
             <FormControl>
               <Input {...field} />
             </FormControl>
@@ -44,7 +48,9 @@ const RequestorForm = () => {
         name="contactInfo"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Contact Information</FormLabel>
+            <FormLabel className="text-secondary-foreground font-normal text-base">
+              Contact Information
+            </FormLabel>
             <FormControl>
               <Input
                 {...field}

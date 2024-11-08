@@ -14,9 +14,9 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import CustomFormLabel from "./CustomFormLabel";
 
 const ReportIssueForm = () => {
   const reportIssueForm = useFormContext();
@@ -53,97 +53,89 @@ const ReportIssueForm = () => {
     issueCategories.find((issueCat) => issueCat.value === value);
 
   return (
-    <div>
-      <div className="flex flex-col ">
-        <FormField
-          control={reportIssueForm.control}
-          name="issueCategory"
-          render={({ field }) => (
-            <FormItem className="w-full">
-              <FormLabel className="">Issue Category</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select Issue Category">
-                      {field.value
-                        ? findIssueCategoryByValue(field.value)?.label
-                        : "Select Issue Category"}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {issueCategories.map((issueCat) => (
-                        <SelectItem key={issueCat.value} value={issueCat.value}>
-                          <div className="flex flex-col">
-                            <span>{issueCat.label}</span>
-                            <span className="text-sm text-gray-500">
-                              {issueCat.caption}
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={reportIssueForm.control}
-          name="assetAffected"
-          render={({ field }) => (
-            <FormItem className="w-full">
-              <FormLabel className="">Asset Affected</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder="Enter serial number, device ID, or select from a list of company assets"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={reportIssueForm.control}
-          name="problemDescription"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Detailed Description of the Problem</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  placeholder="Provide a detailed explanation of the issue, including any steps taken before the issue occurred"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={reportIssueForm.control}
-          name="supportingFiles"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Upload Supporting Files</FormLabel>
-              <FormControl>
-                <FileUploader
-                  handleFile={field.onChange}
-                  uploadedFile={field.value}
-                  accept={allowedTypes + "," + allowedExtensions}
-                  wildcard="image/"
-                  maxFileSize={10 * 1024 * 1024}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-      </div>
+    <div className="flex flex-col gap-3">
+      <FormField
+        control={reportIssueForm.control}
+        name="issueCategory"
+        render={({ field }) => (
+          <FormItem className="sm:w-1/2 pr-2">
+            <CustomFormLabel required>Issue Category</CustomFormLabel>
+            <FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Issue Category">
+                    {field.value
+                      ? findIssueCategoryByValue(field.value)?.label
+                      : "Select Issue Category"}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {issueCategories.map((issueCat) => (
+                      <SelectItem key={issueCat.value} value={issueCat.value}>
+                        <div className="flex flex-col">
+                          <span>{issueCat.label}</span>
+                          <span className="text-sm text-gray-500">
+                            {issueCat.caption}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={reportIssueForm.control}
+        name="assetAffected"
+        render={({ field }) => (
+          <FormItem className="sm:w-1/2 pr-2">
+            <CustomFormLabel>Asset Affected</CustomFormLabel>
+            <FormControl>
+              <Input {...field} placeholder="Enter serial number, device ID" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={reportIssueForm.control}
+        name="problemDescription"
+        render={({ field }) => (
+          <FormItem>
+            <CustomFormLabel required>Description of Issue</CustomFormLabel>
+            <FormControl>
+              <Textarea {...field} placeholder="Enter description" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={reportIssueForm.control}
+        name="supportingFiles"
+        render={({ field }) => (
+          <FormItem>
+            <CustomFormLabel>Upload Supporting Files</CustomFormLabel>
+            <FormControl>
+              <FileUploader
+                handleFiles={field.onChange}
+                uploadedFiles={field.value}
+                accept={allowedTypes + "," + allowedExtensions}
+                wildcard="image/"
+                maxFileSize={10 * 1024 * 1024}
+                multiple
+                uploadText="Click to Upload or Drag and Drop a File"
+                borderStyle="border-[2px] border-dashed"
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
     </div>
   );
 };

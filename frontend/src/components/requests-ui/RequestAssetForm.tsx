@@ -20,10 +20,10 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { useState } from "react";
+import CustomFormLabel from "./CustomFormLabel";
 
 const RequestAssetForm = () => {
   const [openRequestedDate, setOpenRequestedDate] = useState(false);
@@ -31,13 +31,13 @@ const RequestAssetForm = () => {
   const requestAssetForm = useFormContext();
 
   return (
-    <div>
+    <div className="flex flex-col gap-3">
       <FormField
         control={requestAssetForm.control}
         name="assetType"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Asset Type</FormLabel>
+            <CustomFormLabel required>Asset Type</CustomFormLabel>
             <FormControl>
               <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger className="w-[180px]">
@@ -63,8 +63,7 @@ const RequestAssetForm = () => {
         name="assetSpecification"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Asset Specifications or Model</FormLabel>
-
+            <CustomFormLabel required>Asset Specs or Model</CustomFormLabel>
             <FormControl>
               <Input
                 {...field}
@@ -80,7 +79,9 @@ const RequestAssetForm = () => {
         name="requestJustification"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Justification for Request</FormLabel>
+            <CustomFormLabel required>
+              Justification for Request
+            </CustomFormLabel>
             <FormControl>
               <Textarea
                 {...field}
@@ -96,7 +97,7 @@ const RequestAssetForm = () => {
         name="requestDate"
         render={({ field }) => (
           <FormItem className="w-full sm:w-fit">
-            <FormLabel>Requested Date for Asset</FormLabel>
+            <CustomFormLabel>Requested Date for Asset</CustomFormLabel>
             <FormControl>
               <Popover
                 open={openRequestedDate}
