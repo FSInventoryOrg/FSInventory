@@ -34,6 +34,8 @@ import { Spinner } from "../Spinner";
 import TrashCan from "../graphics/TrashCan";
 import ColorSelect from "./ColorSelect";
 import { ColorOption, OptionType, TagOption } from "@/types/options";
+import { AssetCounterType } from "@/types/asset";
+import useAssetCounter from "./useAssetCounter";
 
 interface OptionsProps {
   property: string;
@@ -77,6 +79,13 @@ const EditOptions = ({
   const [isCreating, setIsCreating] = React.useState<boolean>(false);
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
   const [prefixCode, setPrefixCode] = React.useState<string>("");
+  const [assetCounter, setAssetCounter] = React.useState<
+    AssetCounterType | undefined
+  >(undefined);
+  const [newPrefixCode, setNewPrefixCode] = React.useState<string | null>(null);
+  const [prefixCodeError, setPrefixCodeError] = React.useState<string>("");
+  const [optionError, setOptionError] = React.useState<string>("");
+  const propertyIsCategory: boolean = property === "category";
 
   const { data: optionValues } = useQuery<
     string[] | ColorOption[] | TagOption[]
@@ -85,6 +94,11 @@ const EditOptions = ({
     queryFn: () => imsService.fetchOptionValues(property),
     enabled: open,
   });
+
+  const { getAssetCounterFromCategory } = useAssetCounter(
+    propertyIsCategory,
+    newOption
+  );
 
   const [filterValue, setFilterValue] = React.useState("");
   const [filteredData, setFilteredData] = React.useState<ColorOption[]>([]);
@@ -248,6 +262,47 @@ const EditOptions = ({
       setPrefixCode("");
     }
   }, [open, filterValue, optionValues, property, type]);
+
+  React.useEffect(() => {
+    if (isEditing && propertyIsCategory && newOption) {
+      const _assetCounter = getAssetCounterFromCategory() ?? undefined;
+      if (_assetCounter) {
+        setAssetCounter(_assetCounter);
+        console.log(assetCounter);
+      }
+      const { prefixCode: oldPrefixCode } = assetCounter ?? { prefixCode: "" };
+      setPrefixCode(oldPrefixCode);
+      if (oldPrefixCode && newPrefixCode === null) {
+        setNewPrefixCode(oldPrefixCode);
+      }
+    }
+  }, [
+    newOption,
+    isEditing,
+    propertyIsCategory,
+    getAssetCounterFromCategory,
+    newPrefixCode,
+    assetCounter,
+  ]);
+
+  React.useEffect(() => {
+    if (newPrefixCode === "" || newPrefixCode === undefined) {
+      setPrefixCodeError("Prefix code can not be empty");
+    } else {
+      setPrefixCodeError("");
+    }
+    if (newOption.value === "" || newOption.value === undefined) {
+      setOptionError(`${capitalize(property)} name can not be empty`);
+    } else {
+      setOptionError("");
+    }
+  }, [
+    setPrefixCodeError,
+    setOptionError,
+    newPrefixCode,
+    newOption.value,
+    property,
+  ]);
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>
@@ -484,6 +539,37 @@ const EditOptions = ({
               }
             }}
           />
+          <>
+            {optionError && (
+              <div className="text-xs text-destructive font-semibold">
+                {optionError}
+              </div>
+            )}
+          </>
+          {propertyIsCategory && newPrefixCode !== null && (
+            <>
+              <Label>Prefix Code</Label>
+              <Input
+                value={newPrefixCode}
+                type="input"
+                className="focus-visible:ring-0 focus-visible:ring-popover"
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  setNewPrefixCode(newValue.toUpperCase().trim());
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                  }
+                }}
+              />
+              {prefixCodeError && (
+                <div className="text-xs text-destructive font-semibold">
+                  {prefixCodeError}
+                </div>
+              )}
+            </>
+          )}
           {colorSelect && (
             <ColorSelect
               onColorSelect={handleColorSelect}
@@ -495,7 +581,14 @@ const EditOptions = ({
           <div className="flex justify-between">
             <Button
               className="gap-2"
-              disabled={isOptionEditPending || isAssetEditPending}
+              disabled={
+                isOptionEditPending ||
+                isAssetEditPending ||
+                !newPrefixCode ||
+                newPrefixCode === prefixCode ||
+                !newOption.value ||
+                newOption.value === optionToEdit
+              }
               type="button"
               onClick={() => {
                 if (newOption && optionValues && optionToEdit) {
