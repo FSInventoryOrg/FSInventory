@@ -182,7 +182,13 @@ export function InventoryTable<TData, TValue>({
   );
 
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>(storedColumnVisibility);
+    React.useState<VisibilityState>({
+      ...PROPERTIES.reduce((acc, column) => {
+        acc[column.id] = !DEFAULT_HIDDEN_COLUMNS.includes(column.id);
+        return acc;
+      }, {} as VisibilityState),
+      ...storedColumnVisibility,
+    });
 
   React.useEffect(() => {
     if (selectedCategory && optionValues && optionValues.length !== 0) {
