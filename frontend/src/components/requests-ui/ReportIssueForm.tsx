@@ -12,6 +12,7 @@ import { FileUploader } from "../ui/file-uploader";
 import { useFormContext } from "react-hook-form";
 import {
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormMessage,
@@ -63,10 +64,16 @@ const ReportIssueForm = () => {
             <FormControl>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select Issue Category">
+                  <SelectValue
+                    placeholder={
+                      <p className="font-normal text-muted-foreground">
+                        Select a category
+                      </p>
+                    }
+                  >
                     {field.value
                       ? findIssueCategoryByValue(field.value)?.label
-                      : "Select Issue Category"}
+                      : "Select a category"}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
@@ -108,6 +115,10 @@ const ReportIssueForm = () => {
         render={({ field }) => (
           <FormItem>
             <CustomFormLabel required>Description of Issue</CustomFormLabel>
+            <FormDescription>
+              Provide a detailed explanation of the issue, including any steps
+              taken before the issue occurs
+            </FormDescription>
             <FormControl>
               <Textarea {...field} placeholder="Enter description" />
             </FormControl>
