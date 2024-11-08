@@ -97,15 +97,19 @@ const FileUploader: React.FC<FileUploaderProps> = ({
       );
   };
 
+  const sizeInMB = (fileSize: number) => {
+    return fileSize / (1024 * 1024);
+  };
   const checkFileSize = (file: File) => {
     console.log(file);
     const totalFilesSize = files.reduce((total, f) => total + f.size, 0);
     if (maxFileSize && totalFilesSize > maxFileSize) {
-      const maxFileSizeInMB = maxFileSize / (1024 * 1024);
+      const maxFileSizeInMB = sizeInMB(maxFileSize);
       throw Error(`File size exceeds ${maxFileSizeInMB} MB`);
     }
   };
 
+  const isSingleUpload = !multiple && uploadedFiles?.length === 1;
   return (
     <>
       <div
@@ -121,7 +125,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
           onDragOver={handleDragOver}
         >
           {errorMessage ? <ErrorAlert errorMessage={errorMessage} /> : null}
-          {uploadedFiles?.length === 1 && !multiple ? (
+          {isSingleUpload ? (
             <>
               <FileSpreadsheet />
               File selected: {`${uploadedFiles[0].name}`}
@@ -147,13 +151,21 @@ const FileUploader: React.FC<FileUploaderProps> = ({
       </div>
       <div className="mt-4">
         {files.map((file, index) => (
-          <div key={file.name} className="flex items-center mb-2">
+          <div
+            key={file.name}
+            className="flex w-full items-center  mb-2  border-[1px] p-2 px-4 rounded-lg"
+          >
             <img
               src={URL.createObjectURL(file)}
               alt={file.name}
-              className="w-16 h-16 object-cover mr-2"
+              className="w-12 h-12 object-cover mr-2"
             />
-            <span>{file.name}</span>
+            <div className="flex flex-grow flex-col">
+              <span className="font-semibold">{file.name}</span>
+              <span className="text-sm text-muted-foreground">
+                {sizeInMB(file.size).toFixed(2)} MB
+              </span>
+            </div>
             <button
               onClick={() => handleFileRemove(index)}
               className="ml-2 text-red-500"
