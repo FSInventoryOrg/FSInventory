@@ -81,9 +81,18 @@ const FileUploader: React.FC<FileUploaderProps> = ({
     .filter((type: string) => type[0] === ".")
     .join(", ");
 
+  const getFileExtension = (name: string) => ".".concat(name.split(".")[1]);
+  const getThumbnailSrc = (file: File) => {
+    const { name } = file;
+    const extension = getFileExtension(name);
+    if (extension === ".pdf") return "/src/assets/pdf.png";
+    if (extension === ".doc" || extension === ".docx")
+      return "/src/assets/doc.png";
+    return URL.createObjectURL(file);
+  };
   const checkFileType = (file: File) => {
     const { type, name } = file;
-    const extension = ".".concat(name.split(".")[1]);
+    const extension = getFileExtension(name);
     const typeMatchesWildcard =
       wildcard && type.toLowerCase().includes(wildcard);
     const typeIsValid = typeMatchesWildcard
@@ -156,7 +165,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
             className="flex w-full items-center  mb-2  border-[1px] p-2 px-4 rounded-lg"
           >
             <img
-              src={URL.createObjectURL(file)}
+              src={getThumbnailSrc(file)}
               alt={file.name}
               className="w-12 h-12 object-cover mr-2"
             />
