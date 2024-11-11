@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
-import mongoose from "mongoose";
+import mongoose, { ConnectOptions } from "mongoose";
 import cookieParser from "cookie-parser";
 
 import userRoutes from "./routes/users";
@@ -40,8 +40,23 @@ const port = Number(process.env.PORT) || DEFAULT_PORT;
 
 const HOST = (process.env.HOST as string) || "localhost";
 const FRONTENDLOC = "../../frontend/dist";
+const NODE_ENV = process.env.NODE_ENV || "development";
 
-mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string);
+const connectOptions = {
+  development: {},
+  staging: {
+    authSource: process.env.MONGODB_AUTH_SOURCE,
+    user: process.env.MONGODB_USERNAME,
+    pass: process.env.MONGODB_PASSWORD,
+    replicaSet: "rs0",
+  },
+  production: {},
+}[NODE_ENV] as ConnectOptions;
+
+mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string, {
+  dbName: process.env.MONGODB_NAME,
+  ...connectOptions,
+});
 const db = mongoose.connection;
 
 db.on("connected", () => {
