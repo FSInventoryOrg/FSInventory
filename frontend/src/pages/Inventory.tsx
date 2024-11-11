@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { InventoryTableSuspense } from "@/components/inventory-ui/InventoryTableSuspense";
 import { Defaults } from "@/types/options";
 import { PROPERTIES } from "@/lib/data";
+import { AssetType } from "@/types/asset";
 
 const Inventory = () => {
   const [selectedType, setSelectedType] = React.useState<string>("");
@@ -136,6 +137,7 @@ const Inventory = () => {
             onToggleFilters={handleToggleFilters}
             isFiltersVisible={isFiltersVisible}
             selectedCategory={selectedCategory}
+            selectedType={selectedType as AssetType["type"]}
           />
         ) : (
           <InventoryTableSuspense
