@@ -43,6 +43,11 @@
  
     --radius: 0.5rem;
     --tab: 0 0% 85%;
+
+    --brand-green: 150, 99%, 31%, 1;
+    
+    --tracker-gradient-from:#CAEADA -46.58%;
+    --tracker-gradient-to:#F7FCFA 61.77%;
   }
  
   .dark {
@@ -84,6 +89,9 @@
     --ring: 150 60% 50%;
     --tab: 190 20% 10%;
     /* --ring: 190 20% 30%; */
+
+    --tracker-gradient-from: #212533 17.84%;
+    --tracker-gradient-to: #347355 128.66%;
   }
 }
  
