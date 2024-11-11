@@ -72,16 +72,18 @@ const SidebarFilters = ({
     const memorySet = new Set<string>();
     const storageSet = new Set<string>();
     
-    data.forEach((asset: HardwareType & SoftwareType) => {      
+    data.forEach((asset: HardwareType | SoftwareType) => {      
       statusCounts[asset.status] = (statusCounts[asset.status] || 0) + 1;
 
       asset.type === 'Software' && softwareCategories.add(asset.category);
       asset.type === 'Hardware' && hardwareCategories.add(asset.category);
       categoriesCounts[asset.category] = (categoriesCounts[asset.category] || 0) + 1;
       
-      asset.processor && processorSet.add(asset.processor);
-      asset.memory && memorySet.add(asset.memory);
-      asset.storage && storageSet.add(asset.storage)
+      if (asset.type === "Hardware") {
+        asset.processor && processorSet.add(asset.processor);
+        asset.memory && memorySet.add(asset.memory);
+        asset.storage && storageSet.add(asset.storage);
+      }
     });
     processors.push(...processorSet);
     processors.sort((a, b) => a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase()));

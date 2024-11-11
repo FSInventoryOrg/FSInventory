@@ -21,7 +21,7 @@ export interface AssetType {
   _addonData_recoveredFrom?: string;
   purchaseDate: Date;
   remarks: string;
-  notifyRemarks?: boolean
+  notifyRemarks?: boolean;
 }
 
 export type DeploymentHistory = {
@@ -29,9 +29,10 @@ export type DeploymentHistory = {
   deploymentDate: Date;
   recoveryDate?: Date;
   assignee: string;
-}
+};
 
 export interface HardwareType extends AssetType {
+  type: "Hardware";
   processor: string;
   memory: string;
   storage: string;
@@ -44,6 +45,7 @@ export interface HardwareType extends AssetType {
 }
 
 export interface SoftwareType extends AssetType {
+  type: "Software";
   license: string;
   licenseType: string;
   licenseCost: number;
@@ -64,5 +66,4 @@ export type AssetCounterType = {
   type: "Hardware" | "Software";
 };
 
-export type AssetUnionType = HardwareType | SoftwareType
-
+export type AssetUnionType = HardwareType | SoftwareType;
