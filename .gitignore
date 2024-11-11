@@ -37,7 +37,7 @@ node_modules/
 /frontend/dist/
 /backend/public/
 /build/
-/public/*
+/public/**
 
 # Environment variables
 .env*
@@ -60,3 +60,5 @@ yarn-error.log*
 
 /backend/mongo-keyfile
 /backend/inventory
+!/public/**/
+!/public/**/.gitkeep

@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { HardwareType, SoftwareType } from "@/types/asset";
-import ActionCell from './InventoryAction';
+import ActionCell from "./InventoryAction";
 import StatusBadge from "./StatusBadge";
-import AssetCode from './AssetCode';
+import AssetCode from "./AssetCode";
 import DeployRetrieveAsset from "./DeployRetrieveAsset";
 
-export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
+export const InventoryColumns: ColumnDef<HardwareType | SoftwareType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -19,7 +19,9 @@ export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
-        onCheckedChange={(value: boolean) => table.toggleAllPageRowsSelected(!!value)}
+        onCheckedChange={(value: boolean) =>
+          table.toggleAllPageRowsSelected(!!value)
+        }
         aria-label="Select all"
       />
     ),
@@ -41,14 +43,11 @@ export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          
           <ArrowUpDown className="h-4 w-4" />
         </Button>
-      )
+      );
     },
-    cell: ({ row }) => (
-      <AssetCode asset={row.original}/>
-    ),
+    cell: ({ row }) => <AssetCode asset={row.original} />,
   },
   {
     accessorKey: "category",
@@ -61,7 +60,12 @@ export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
   {
     accessorKey: "modelName",
     header: "Model/Software Name",
-    accessorFn: (row) => row.modelName || row.softwareName || '',
+    accessorFn: (row) => {
+      if (row.type === "Software") {
+        return row.softwareName;
+      }
+      return row.modelName || "";
+    },
   },
   {
     accessorKey: "modelNo",
@@ -87,16 +91,14 @@ export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
     accessorKey: "status",
     header: () => {
       return (
-        <div className="text-xs whitespace-normal text-start px-2 w-fit" >
+        <div className="text-xs whitespace-normal text-start px-2 w-fit">
           Status
         </div>
-      )
+      );
     },
     cell: ({ row }) => {
       const status = row.original.status;
-      return (
-        <StatusBadge status={status} style="flat" />
-      );
+      return <StatusBadge status={status} style="flat" />;
     },
   },
   {
@@ -105,7 +107,7 @@ export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
   },
   {
     accessorKey: "assignee",
-    accessorFn: row => row._addonData_assignee,
+    accessorFn: (row) => row._addonData_assignee,
     header: "Assignee",
   },
   {
@@ -120,37 +122,44 @@ export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
           Purchase Date
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => {
       if (row.original.purchaseDate) {
-        const formattedDate = new Date(row.getValue("purchaseDate")).toLocaleDateString("en-US");
+        const formattedDate = new Date(
+          row.getValue("purchaseDate")
+        ).toLocaleDateString("en-US");
         return <div className="translate-x-4 w-fit">{formattedDate}</div>;
       } else {
         return <></>;
       }
-    }
+    },
   },
   {
     accessorKey: "serviceInYears",
     header: "Service In Years",
     cell: ({ row }) => {
-      let serviceInYears = null
+      let serviceInYears = null;
       if (row.original.purchaseDate !== null) {
         const currentDate = new Date(); // Get current date
         const purchaseDate = new Date(row.getValue("purchaseDate"));
-        serviceInYears = Math.round((currentDate.getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24 * 365)); 
-      } 
-      return (
-        <div className="text-center">
-          {serviceInYears}
-        </div>
-      )
-    }
+        serviceInYears = Math.round(
+          (currentDate.getTime() - purchaseDate.getTime()) /
+            (1000 * 60 * 60 * 24 * 365)
+        );
+      }
+      return <div className="text-center">{serviceInYears}</div>;
+    },
   },
   {
     accessorKey: "supplierVendor",
     header: "Supplier/Vendor",
+    accessorFn: (row) => {
+      if (row.type === "Software") {
+        return row.vendor;
+      }
+      return row.supplierVendor || "";
+    },
   },
   {
     accessorKey: "pezaForm8105",
@@ -163,7 +172,12 @@ export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
   {
     accessorKey: "isRGE",
     header: "Is RGE",
-    cell: ({ row }) => (row.original.isRGE ? "YES" : "NO")
+    cell: ({ row }) => {
+      if (row.original.type === "Software") {
+        return "NO";
+      }
+      return row.original.isRGE ? "YES" : "NO";
+    },
   },
   {
     accessorKey: "equipmentType",
@@ -185,20 +199,22 @@ export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
           Deployment Date
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => {
       if (row.original.deploymentDate) {
-        const formattedDate = new Date(row.getValue("deploymentDate")).toLocaleDateString("en-US");
+        const formattedDate = new Date(
+          row.getValue("deploymentDate")
+        ).toLocaleDateString("en-US");
         return <>{formattedDate}</>;
       } else {
         return <></>;
       }
-    }
+    },
   },
   {
     accessorKey: "recoveredFrom",
-    accessorFn: row => row._addonData_recoveredFrom,
+    accessorFn: (row) => row._addonData_recoveredFrom,
     header: "Recovered From",
   },
   {
@@ -213,23 +229,25 @@ export const InventoryColumns: ColumnDef<HardwareType & SoftwareType>[] = [
           Recovery Date
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => {
       if (row.original.recoveryDate) {
-        const formattedDate = new Date(row.getValue("recoveryDate")).toLocaleDateString("en-US");
+        const formattedDate = new Date(
+          row.getValue("recoveryDate")
+        ).toLocaleDateString("en-US");
         return <>{formattedDate}</>;
       } else {
         return <></>;
       }
-    }
+    },
   },
   {
     id: "deployment",
-    cell: ({row}) => <DeployRetrieveAsset assetData={row.original} />
+    cell: ({ row }) => <DeployRetrieveAsset assetData={row.original} />,
   },
   {
     id: "actions",
-    cell: ({ row }) => <ActionCell row={row} />
+    cell: ({ row }) => <ActionCell row={row} />,
   },
-]
+];

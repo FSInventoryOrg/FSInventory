@@ -2,6 +2,19 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.23.4](https://connect.zoho.com/portal/intranet/task/623367000000718041) 2024-11-04
+### Fixed
+- Fixed downloading of assets to accommodate software assets
+- Fixed service in years calculations for invalid date formats when downloading assets
+
+## [2.23.3](https://connect.zoho.com/portal/intranet/task/623367000000910167) 2024-11-06
+### Fixed
+- Using the searchbar in add/edit asset form's category, status, and equipment type is now only for searching. It will no longer update the value of the dropdown, respectively.
+
+## [2.23.2](https://connect.zoho.com/portal/intranet/task/623367000000860057) 2024-10-29 
+### Fixed
+-  Fixed export bug where the persisted column visibility options are not visibile upon export.
+
 ## [2.23.1](https://connect.zoho.com/portal/intranet/task/623367000000860057) 2024-10-29 
 ### Fixed
 -  Column Visibility resetting everytime category is changed / browser is resized.

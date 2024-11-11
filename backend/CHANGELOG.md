@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.19.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000605021) 2024-11-04
+## Fixed
+- Fixed how backups are accessed when sending emails
+- Updated credentials for email sending
+
 ## [2.18.0](https://connect.zoho.com/portal/intranet/task/623367000000718057) 2024-10-25 
 ### Added
 - Endpoint for software notification settings
