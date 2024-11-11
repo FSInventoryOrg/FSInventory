@@ -5,6 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.23.5](https://connect.zoho.com/portal/intranet/task/623367000000888079) 2024-11-5 
 ### Fixed
 -  Redesigned Tracker UI for active / inactive / unregistered employees
+
 ## [2.23.4](https://connect.zoho.com/portal/intranet/task/623367000000718041) 2024-11-04
 ### Fixed
 - Fixed downloading of assets to accommodate software assets
