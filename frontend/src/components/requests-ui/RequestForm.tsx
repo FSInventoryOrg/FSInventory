@@ -4,12 +4,12 @@ import { useAppContext } from "@/hooks/useAppContext";
 import * as imsService from "@/ims-service";
 import RequestAssetForm from "./RequestAssetForm";
 import ReportIssueForm from "./ReportIssueForm";
-import useUserData from "@/hooks/useUserData";
 import {
   ReportIssueFormData,
   RequestAssetFormData,
   RequestFormData,
   RequestFormSchema,
+  RequestType,
 } from "@/schemas/RequestFormSchema";
 import {
   Dialog,
@@ -34,44 +34,26 @@ import {
 import RequestTypeOptions from "./RequestTypeOptions";
 import { Separator } from "../ui/separator";
 
-const RequestForm = () => {
+const defaultReportIssueValues = {
+  issueCategory: "",
+  assetAffected: "",
+  problemDescription: "",
+  supportingFiles: undefined,
+};
+
+const defaultRequestAssetValues = {
+  assetType: "",
+  assetModel: "",
+  justification: "",
+  requestedDate: undefined,
+};
+
+interface RequestFormProps {
+  userData: Record<string, string>;
+}
+const RequestForm = ({ userData }: RequestFormProps) => {
   const [open, setOpen] = useState(false);
   const { showToast } = useAppContext();
-  const { data: user } = useUserData();
-
-  const requestForm = useForm<RequestFormData>({
-    resolver: zodResolver(RequestFormSchema),
-    defaultValues: {
-      requestType: "Report an Issue",
-    },
-    mode: "onChange",
-  });
-
-  const reset = () => {
-    if (user) {
-      const userDetails = {
-        fullName: user.firstName + " " + user.lastName,
-        manager: "John Doe",
-        contactInfo: user.email,
-      };
-      requestForm.reset(userDetails, { keepDefaultValues: true });
-    } else {
-      requestForm.reset();
-    }
-  };
-
-  const requestType = requestForm.watch("requestType", "Report an Issue");
-
-  useEffect(() => {
-    if (open && user) {
-      reset();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, requestForm, user]);
-
-  const onSubmit = (data: RequestAssetFormData | ReportIssueFormData) => {
-    mutate(data);
-  };
 
   const { mutate } = useMutation({
     mutationFn: imsService.submitRequestForm,
@@ -81,8 +63,61 @@ const RequestForm = () => {
           "Thank you for your request! Your request has been submitted, and you will receive a confirmation email with a tracking number shortly.",
         type: "SUCCESS",
       });
+      setOpen(false);
     },
   });
+
+  const requestForm = useForm<RequestFormData>({
+    resolver: zodResolver(RequestFormSchema),
+    defaultValues: {
+      requestType: "Report an Issue",
+      ...userData,
+      ...defaultReportIssueValues,
+    },
+    mode: "onChange",
+  });
+
+  const requestType = requestForm.watch(
+    "requestType",
+    "Report an Issue" as RequestType
+  );
+
+  const resetForm = (type: RequestType) => {
+    requestForm.reset({
+      ...requestForm.getValues(),
+      ...(type === "Report an Issue"
+        ? defaultReportIssueValues
+        : defaultRequestAssetValues),
+    });
+  };
+
+  useEffect(() => {
+    if (!open) {
+      requestForm.reset({ requestType: "Report an Issue" });
+    }
+  }, [requestForm, open]);
+
+  useEffect(() => {
+    // When user selects another ticket type, clear fields from the other form
+    if (requestType === "Report an Issue") {
+      resetForm("Request a New Asset");
+    } else {
+      resetForm("Report an Issue");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestType]);
+
+  useEffect(() => {
+    // Load user data within support ticket form when it is available
+    if (userData) {
+      requestForm.reset({ ...userData }, { keepValues: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userData]);
+
+  const onSubmit = (data: RequestAssetFormData | ReportIssueFormData) => {
+    mutate(data);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -96,10 +131,8 @@ const RequestForm = () => {
         <div className="sm:max-w-[800px] bg-card h-fit  rounded-lg">
           <DialogHeader className="relative sm:p-5">
             <DialogClose className="absolute right-2 top-2 p-5 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-              {/* <span> */}
               <XIcon className="h-4 w-4" />
               <span className="sr-only">Close</span>
-              {/* </span> */}
             </DialogClose>
             <DialogTitle className="text-xl font-semibold mt-0">
               Create Support Ticket
