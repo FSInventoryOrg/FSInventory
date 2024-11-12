@@ -373,6 +373,10 @@ const EditOptions = ({
         setNewPrefixCode(oldPrefixCode);
       }
     }
+    if (!isEditing && propertyIsCategory && newOption) {
+      setNewPrefixCode(null);
+      setAssetCounter(undefined);
+    }
   }, [
     newOption,
     isEditing,
