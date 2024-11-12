@@ -171,9 +171,10 @@ router.put(
     check("softwareCategory").optional().isString(),
     check("hardwareCategory").optional().isString(),
     check("equipmentType").optional().isString(),
-    check("deployableStatus").isArray(),
+    check("deployableStatus").optional().isArray(),
     check("retrievableStatus").optional().isString(),
     check("inventoryColumns").optional().isArray(),
+    check("supportTicketType").optional().isString(),
   ],
   verifyToken,
   async (req: Request, res: Response) => {
@@ -211,6 +212,7 @@ router.put(
         deployableStatus,
         retrievableStatus,
         inventoryColumns,
+        supportTicketType,
       } = req.body;
 
       if (status !== undefined) {
@@ -233,6 +235,9 @@ router.put(
       }
       if (inventoryColumns !== undefined) {
         option.defaults.inventoryColumns = inventoryColumns;
+      }
+      if (supportTicketType !== undefined) {
+        option.defaults.supportTicketType = supportTicketType;
       }
 
       await option.save();
