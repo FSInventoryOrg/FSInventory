@@ -1,7 +1,7 @@
 {
   "name": "stockpilot-frontend",
   "private": true,
-  "version": "2.23.1",
+  "version": "2.23.7",
   "type": "module",
   "scripts": {
     "dev": "vite --port 3000",
