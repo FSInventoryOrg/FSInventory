@@ -95,13 +95,16 @@ const EditOptions = ({
     enabled: open,
   });
 
-  const { getAssetCounterFromCategory } = useAssetCounter(
-    propertyIsCategory,
-    newOption
-  );
+  const {
+    getAssetCounterFromCategory,
+    updateAssetCounterInCache,
+    getAssetCounters,
+  } = useAssetCounter(propertyIsCategory, newOption);
 
   const [filterValue, setFilterValue] = React.useState("");
   const [filteredData, setFilteredData] = React.useState<ColorOption[]>([]);
+
+  const { data: assetCounters } = getAssetCounters();
 
   const getOptionValue = (option: ColorOption | TagOption | string) => {
     if (typeof option === "string") {
@@ -158,6 +161,52 @@ const EditOptions = ({
             ? newOption.value.value
             : newOption.value,
       });
+      if (assetCounter && typeof newOption.value !== "string") {
+        if (
+          newOption.value.value !== assetCounter.category &&
+          newPrefixCode &&
+          assetCounter.prefixCode !== newPrefixCode
+        ) {
+          updateAssetCounter({
+            prefixCode,
+            updatedAssetCounter: {
+              ...assetCounter,
+              prefixCode: newPrefixCode,
+              category: newOption.value.value,
+            },
+          });
+          updateAssetPrefixCodes({
+            property: "code",
+            value: prefixCode,
+            newValue: newPrefixCode,
+          });
+        } else if (newOption.value.value !== assetCounter.category) {
+          updateAssetCounter({
+            prefixCode,
+            updatedAssetCounter: {
+              ...assetCounter,
+              category: newOption.value.value,
+            },
+          });
+        } else if (newPrefixCode && assetCounter.prefixCode !== newPrefixCode) {
+          updateAssetCounter({
+            prefixCode,
+            updatedAssetCounter: {
+              ...assetCounter,
+              prefixCode: newPrefixCode,
+            },
+          });
+          updateAssetPrefixCodes({
+            property: "code",
+            value: prefixCode,
+            newValue: newPrefixCode,
+          });
+        }
+        updateAssetCounterInCache(assetCounter._id!, {
+          prefixCode: newPrefixCode!,
+          category: newOption.value.value,
+        });
+      }
     }
   };
 
@@ -199,6 +248,17 @@ const EditOptions = ({
     useMutation({
       mutationFn: imsService.updateAssetsByProperty,
     });
+
+  const { mutate: updateAssetCounter, isPending: isUpdateAssetCounterPending } =
+    useMutation({
+      mutationFn: imsService.updateAssetCounter,
+    });
+  const {
+    mutate: updateAssetPrefixCodes,
+    isPending: isAssetPrefixEditPending,
+  } = useMutation({
+    mutationFn: imsService.updateAssetsByProperty,
+  });
 
   const DeleteOption = () => {
     const { data: assetCount } = useQuery<number>({
@@ -294,7 +354,6 @@ const EditOptions = ({
       const _assetCounter = getAssetCounterFromCategory() ?? undefined;
       if (_assetCounter) {
         setAssetCounter(_assetCounter);
-        console.log(assetCounter);
       }
       const { prefixCode: oldPrefixCode } = assetCounter ?? { prefixCode: "" };
       setPrefixCode(oldPrefixCode);
@@ -314,10 +373,18 @@ const EditOptions = ({
   React.useEffect(() => {
     if (newPrefixCode === "" || newPrefixCode === undefined) {
       setPrefixCodeError("Prefix code can not be empty");
-    } else {
-      setPrefixCodeError("");
+    } else if (assetCounters && assetCounter) {
+      const existing = assetCounters.find(
+        (assetCounter) => assetCounter.prefixCode === newPrefixCode
+      );
+      console.log(existing);
+      if (!!existing && existing._id !== assetCounter._id) {
+        setPrefixCodeError(`Prefix code ${newPrefixCode} is already assigned`);
+      } else {
+        setPrefixCodeError("");
+      }
     }
-    if (newOption.value === "" || newOption.value === undefined) {
+    if (typeof newOption.value !== "string" && newOption.value.value === "") {
       setOptionError(`${capitalize(property)} name can not be empty`);
     } else {
       setOptionError("");
@@ -328,6 +395,8 @@ const EditOptions = ({
     newPrefixCode,
     newOption.value,
     property,
+    assetCounters,
+    assetCounter,
   ]);
 
   return (
@@ -556,7 +625,18 @@ const EditOptions = ({
             type="input"
             className="focus-visible:ring-0 focus-visible:ring-popover"
             onChange={(e) => {
-              setNewOption({ property: property, value: e.target.value });
+              const newValue = e.target.value;
+              if (typeof newOption === "object") {
+                setNewOption((prevOption) => {
+                  const updatedValue =
+                    typeof prevOption.value === "object"
+                      ? { ...prevOption.value, value: newValue }
+                      : newValue;
+                  return { ...prevOption, value: updatedValue };
+                });
+              } else {
+                setNewOption({ property: property, value: newValue });
+              }
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -610,17 +690,19 @@ const EditOptions = ({
               disabled={
                 isOptionEditPending ||
                 isAssetEditPending ||
-                !newPrefixCode ||
-                newPrefixCode === prefixCode ||
-                !newOption.value ||
-                newOption.value === optionToEdit
+                (newPrefixCode === prefixCode &&
+                  typeof newOption.value !== "string" &&
+                  newOption.value.value === optionToEdit) ||
+                !!optionError ||
+                !!prefixCodeError
               }
               type="button"
               onClick={handleUpdate}
             >
-              {isOptionEditPending || isAssetEditPending ? (
-                <Spinner size={18} />
-              ) : null}
+              {(isOptionEditPending ||
+                isAssetEditPending ||
+                isUpdateAssetCounterPending ||
+                isAssetPrefixEditPending) && <Spinner size={18} />}
               Save
             </Button>
             <DeleteOption />
