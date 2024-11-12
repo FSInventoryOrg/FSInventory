@@ -162,6 +162,14 @@ const EditOptions = ({
             : newOption.value,
       });
       if (assetCounter && typeof newOption.value !== "string") {
+        // CHECK IF BOTH CATEGORY NAME AND PREFIX CODE ARE CHANGED
+        /**
+         * These checks need to be done separately.
+         * Ideally, the top-level if-statement should be removed and only the two
+         * else-if statements should be their own independent if-statements.
+         * When done that way, the updateAssetCounter function does not save the changes
+         * properly in the case of both the category name and the prefix code being updated.
+         */
         if (
           newOption.value.value !== assetCounter.category &&
           newPrefixCode &&
@@ -180,7 +188,9 @@ const EditOptions = ({
             value: prefixCode,
             newValue: newPrefixCode,
           });
-        } else if (newOption.value.value !== assetCounter.category) {
+        }
+        // CHECK IF ONLY THE CATEGORY NAME IS CHANGED
+        else if (newOption.value.value !== assetCounter.category) {
           updateAssetCounter({
             prefixCode,
             updatedAssetCounter: {
@@ -188,7 +198,9 @@ const EditOptions = ({
               category: newOption.value.value,
             },
           });
-        } else if (newPrefixCode && assetCounter.prefixCode !== newPrefixCode) {
+        }
+        // CHECK IF ONLY THE PREFIX CODE IS CHANGED
+        else if (newPrefixCode && assetCounter.prefixCode !== newPrefixCode) {
           updateAssetCounter({
             prefixCode,
             updatedAssetCounter: {
