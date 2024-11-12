@@ -28,6 +28,7 @@ enum IssueCategory {
 
 // Interface for the base Support Ticket
 interface ISupportTicket {
+  ticketId: string;
   type: TicketType;
   employeeName: string;
   employeeEmail: string;

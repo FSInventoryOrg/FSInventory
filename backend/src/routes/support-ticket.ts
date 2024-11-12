@@ -27,6 +27,7 @@ router.post("/", [], async (req: Request, res: Response) => {
   }
 
   const _supportTicketModel = new AssetRequestTicketModel<IAssetRequestTicket>({
+    ticketId: "TEST-0001",
     type: TicketType.AssetRequest,
     assetSpecsModel: "Macbook M3",
     assetType: AssetType.Hardware,
