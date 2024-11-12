@@ -51,7 +51,7 @@ interface IIssueReportTicket extends ISupportTicket {
 interface IAssetRequestTicket extends ISupportTicket {
   type: TicketType.AssetRequest; // Set the specific enum value
   assetType: AssetType;
-  assetSpecsModel: string; // should be assetInfo
+  assetSpecsModel: string;
   justification: string;
   requestedDate?: Date;
 }
@@ -106,7 +106,7 @@ const supportTicketSchema: Schema<ISupportTicket> = new Schema<ISupportTicket>(
 );
 
 // Model for the base Support Ticket
-const SupportTicket = mongoose.model<ISupportTicket>(
+const SupportTicketModel = mongoose.model<ISupportTicket>(
   "SupportTicket",
   supportTicketSchema
 );
@@ -130,10 +130,11 @@ const issueReportSchema: Schema<IIssueReportTicket> =
   });
 
 // Model for Issue Report Ticket
-const IssueReportTicket = SupportTicket.discriminator<IIssueReportTicket>(
-  TicketType.IssueReport,
-  issueReportSchema
-);
+const IssueReportTicketModel =
+  SupportTicketModel.discriminator<IIssueReportTicket>(
+    TicketType.IssueReport,
+    issueReportSchema
+  );
 
 // Schema for Asset Request Ticket
 const assetRequestSchema: Schema<IAssetRequestTicket> =
@@ -158,15 +159,16 @@ const assetRequestSchema: Schema<IAssetRequestTicket> =
   });
 
 // Model for Asset Request Ticket
-const AssetRequestTicket = SupportTicket.discriminator<IAssetRequestTicket>(
-  TicketType.AssetRequest,
-  assetRequestSchema
-);
+const AssetRequestTicketModel =
+  SupportTicketModel.discriminator<IAssetRequestTicket>(
+    TicketType.AssetRequest,
+    assetRequestSchema
+  );
 
 export {
-  SupportTicket, // Support Ticket Base Model
-  AssetRequestTicket, // Asset Request Model
-  IssueReportTicket, // Issue Report Model
+  SupportTicketModel, // Support Ticket Base Model
+  AssetRequestTicketModel, // Asset Request Model
+  IssueReportTicketModel, // Issue Report Model
   TicketType, // enum
   TicketStatus, // enum
   AssetType, // enum

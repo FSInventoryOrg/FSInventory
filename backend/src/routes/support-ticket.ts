@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import {
-  SupportTicket,
-  AssetRequestTicket,
+  SupportTicketModel,
+  AssetRequestTicketModel,
   TicketStatus,
   TicketType,
   AssetType,
@@ -12,7 +12,7 @@ import {
 const router = express.Router();
 
 router.get("/", [], async (req: Request, res: Response) => {
-  const tickets = await SupportTicket.find();
+  const tickets = await SupportTicketModel.find();
   return res.status(200).json({
     message: "Hello World",
     status: "OK",
@@ -26,7 +26,7 @@ router.post("/", [], async (req: Request, res: Response) => {
     return res.status(400).json({ message: errors.array() });
   }
 
-  const _supportTicket = new AssetRequestTicket<IAssetRequestTicket>({
+  const _supportTicketModel = new AssetRequestTicketModel<IAssetRequestTicket>({
     type: TicketType.AssetRequest,
     assetSpecsModel: "Macbook M3",
     assetType: AssetType.Hardware,
@@ -39,7 +39,7 @@ router.post("/", [], async (req: Request, res: Response) => {
     managerName: "My Manager",
     status: TicketStatus.PendingManager,
   });
-  const saved = await _supportTicket.save();
+  const saved = await _supportTicketModel.save();
 
   return res.status(200).json({
     json: "POST Success",
