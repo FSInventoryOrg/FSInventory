@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 enum TicketType {
   IssueReport = "Issue Report",
@@ -27,7 +27,7 @@ enum IssueCategory {
 }
 
 // Interface for the base Support Ticket
-interface ISupportTicket extends Document {
+interface ISupportTicket {
   type: TicketType;
   employeeName: string;
   employeeEmail: string;
@@ -84,6 +84,11 @@ const supportTicketSchema: Schema<ISupportTicket> = new Schema<ISupportTicket>(
       type: [String], // Array of file URLs
       required: false,
       default: [],
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: Object.values(TicketStatus),
     },
     createdBy: {
       type: String,
