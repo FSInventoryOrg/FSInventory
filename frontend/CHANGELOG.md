@@ -2,6 +2,10 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.24.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000860293) 2024-11-12
+## Added
+- Prefix Code is now editable when editing a category in the Settings/Inventory page
+
 ## [2.23.7](https://connect.zoho.com/portal/intranet/task/623367000000878039) 2024-10-29
 ### Fixed
 - Display error message from response if request to add option fails
