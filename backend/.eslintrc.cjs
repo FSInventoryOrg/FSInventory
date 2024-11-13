@@ -16,11 +16,7 @@ module.exports = {
   },
   rules: {
     "no-console": "off",
-    "no-unused-vars": [
-      "error",
-      { argsIgnorePattern: "^_" },
-      { varsIgnorePattern: "Enum" },
-    ],
+    "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     "no-multi-spaces": ["error"],
     "prefer-const": "error",
     eqeqeq: "error",
