@@ -5,8 +5,6 @@ import * as imsService from "@/ims-service";
 import RequestAssetForm from "./RequestAssetForm";
 import ReportIssueForm from "./ReportIssueForm";
 import {
-  ReportIssueFormData,
-  RequestAssetFormData,
   RequestFormData,
   RequestFormSchema,
   RequestType,
@@ -56,7 +54,7 @@ const RequestForm = ({ userData }: RequestFormProps) => {
   const { showToast } = useAppContext();
 
   const { mutate } = useMutation({
-    mutationFn: imsService.submitRequestForm,
+    mutationFn: imsService.submitTicket,
     onSuccess: async () => {
       showToast({
         message:
@@ -115,7 +113,7 @@ const RequestForm = ({ userData }: RequestFormProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData]);
 
-  const onSubmit = (data: RequestAssetFormData | ReportIssueFormData) => {
+  const onSubmit = (data: RequestFormData) => {
     mutate(data);
   };
 
