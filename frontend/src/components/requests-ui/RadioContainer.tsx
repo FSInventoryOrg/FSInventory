@@ -22,7 +22,7 @@ const RadioContainer: React.FC<RadioContainerProps> = ({
       className={cn(
         `flex flex-1 flex-row items-center p-4 pl-2 border rounded-lg cursor-pointer ${
           selectedValue === value
-            ? "border-[#019C4E] bg-[#E6FAF0]"
+            ? "border-[#019C4E] bg-[#E6FAF0] dark:bg-secondary dark:border-secondary"
             : "border-secondary bg-transparent"
         }`,
         className
