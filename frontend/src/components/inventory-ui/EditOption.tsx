@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ChevronLeftIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { capitalize, format } from "@/lib/utils";
@@ -48,6 +48,8 @@ const EditOption = ({
   const [optionError, setOptionError] = useState("");
   const { showToast } = useAppContext();
 
+  const isCategoryType = useMemo(() => property === "category", [property]);
+
   const {
     newOption: editedOption,
     setNewOption: setEditedOption,
@@ -72,7 +74,7 @@ const EditOption = ({
     const isPrefixCodeChanged: boolean =
       !!newPrefixCode && oldPrefixCode !== newPrefixCode;
 
-    if (newPrefixCode === "") {
+    if (newPrefixCode === "" && isCategoryType) {
       setPrefixCodeError("Prefix code can not be empty");
       throw new Error("Prefix code can not be empty");
     }
@@ -86,7 +88,7 @@ const EditOption = ({
         (assetCounter: AssetCounterType) =>
           assetCounter.prefixCode === newPrefixCode
       );
-      if (prefixCodeExists && isPrefixCodeChanged) {
+      if (prefixCodeExists && isPrefixCodeChanged && isCategoryType) {
         setPrefixCodeError("Prefix code already exists");
         throw new Error(`Prefix code ${newPrefixCode} already exists`);
       }
@@ -120,7 +122,10 @@ const EditOption = ({
   }, [propertyIsCategory, assetCounter, oldPrefixCode, newPrefixCode]);
 
   useEffect(() => {
-    if (newPrefixCode === "" || newPrefixCode === undefined) {
+    if (
+      (newPrefixCode === "" || newPrefixCode === undefined) &&
+      isCategoryType
+    ) {
       setPrefixCodeError("Prefix code can not be empty");
     } else {
       setPrefixCodeError("");
