@@ -142,7 +142,7 @@ const Hamburger = () => {
                   location.pathname === "/requests" ? "text-primary" : ""
                 }
               />
-              <span>Requests</span>
+              <span>Tickets</span>
             </Link>
           </SheetPrimitive.Close>
         </div>
