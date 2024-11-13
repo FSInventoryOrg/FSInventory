@@ -18,7 +18,7 @@ interface RequestTypeOptionsProps {
 const RequestTypeOptions = ({ value, onChange }: RequestTypeOptionsProps) => {
   return (
     <RadioGroup value={value} onValueChange={onChange}>
-      <div className="flex flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-4">
         <RadioContainer
           id="reportIssue"
           value="Report an Issue"
