@@ -87,7 +87,7 @@ const EditOptions = ({
   const [optionError, setOptionError] = React.useState<string>("");
   const propertyIsCategory: boolean = property === "category";
 
-  const { data: optionValues } = useQuery<
+  const { data: optionValues, refetch: refetchOptions } = useQuery<
     string[] | ColorOption[] | TagOption[]
   >({
     queryKey: ["fetchOptionValues", property],
@@ -104,7 +104,8 @@ const EditOptions = ({
   const [filterValue, setFilterValue] = React.useState("");
   const [filteredData, setFilteredData] = React.useState<ColorOption[]>([]);
 
-  const { data: assetCounters } = getAssetCounters();
+  const { data: assetCounters, refetch: refetchAssetCounters } =
+    getAssetCounters();
 
   const getOptionValue = (option: ColorOption | TagOption | string) => {
     if (typeof option === "string") {
@@ -238,38 +239,54 @@ const EditOptions = ({
       showToast({ message: error.message, type: "ERROR" });
     },
   });
-  const { mutate: updateOptionValue, isPending: isOptionEditPending } =
-    useMutation({
-      mutationFn: imsService.updateOptionValue,
-      onSuccess: async () => {
-        showToast({
-          message: `${capitalize(format(property))} updated successfully!`,
-          type: "SUCCESS",
-        });
-        setOpen(false);
-        setTimeout(() => {
-          setOpen(true);
-        }, 100);
-      },
-      onError: (error: Error) => {
-        showToast({ message: error.message, type: "ERROR" });
-      },
-    });
+  const {
+    mutate: updateOptionValue,
+    isPending: isOptionEditPending,
+    isSuccess: isOptionEditSuccess,
+    reset: resetUpdateOptionValue,
+  } = useMutation({
+    mutationFn: imsService.updateOptionValue,
+    onSuccess: async () => {
+      showToast({
+        message: `${capitalize(format(property))} updated successfully!`,
+        type: "SUCCESS",
+      });
+    },
+    onError: (error: Error) => {
+      showToast({ message: error.message, type: "ERROR" });
+    },
+  });
 
-  const { mutate: updateAssetsByProperty, isPending: isAssetEditPending } =
-    useMutation({
-      mutationFn: imsService.updateAssetsByProperty,
-    });
+  const {
+    mutate: updateAssetsByProperty,
+    isPending: isAssetEditPending,
+    isSuccess: isAssetEditSuccess,
+    reset: resetUpdateAssetsByProperty,
+  } = useMutation({
+    mutationFn: imsService.updateAssetsByProperty,
+  });
 
-  const { mutate: updateAssetCounter, isPending: isUpdateAssetCounterPending } =
-    useMutation({
-      mutationFn: imsService.updateAssetCounter,
-    });
+  const {
+    mutate: updateAssetCounter,
+    isPending: isUpdateAssetCounterPending,
+    isSuccess: isUpdateAssetCounterSuccess,
+    reset: resetUpdateAssetCounter,
+  } = useMutation({
+    mutationFn: imsService.updateAssetCounter,
+  });
   const {
     mutate: updateAssetPrefixCodes,
     isPending: isAssetPrefixEditPending,
+    isSuccess: isAssetPrefixEditSuccess,
+    reset: resetUpdateAssetPrefixCodes,
   } = useMutation({
     mutationFn: imsService.updateAssetsByProperty,
+    onSuccess: () => {
+      showToast({
+        message: "Affected assets successfully updated!",
+        type: "SUCCESS",
+      });
+    },
   });
 
   const DeleteOption = () => {
@@ -337,6 +354,13 @@ const EditOptions = ({
     );
   };
 
+  const resetUpdateMutations = () => {
+    resetUpdateOptionValue();
+    resetUpdateAssetsByProperty();
+    resetUpdateAssetCounter();
+    resetUpdateAssetPrefixCodes();
+  };
+
   React.useEffect(() => {
     if (open) {
       setFilteredData(
@@ -393,7 +417,6 @@ const EditOptions = ({
       const existing = assetCounters.find(
         (assetCounter) => assetCounter.prefixCode === newPrefixCode
       );
-      console.log(existing);
       if (!!existing && existing._id !== assetCounter._id) {
         setPrefixCodeError(`Prefix code ${newPrefixCode} is already assigned`);
       } else {
@@ -413,6 +436,62 @@ const EditOptions = ({
     property,
     assetCounters,
     assetCounter,
+  ]);
+
+  React.useEffect(() => {
+    if (!propertyIsCategory && typeof newOption.value === "string") {
+      if (!isOptionEditPending && isOptionEditSuccess) {
+        resetUpdateMutations();
+        refetchOptions();
+        setIsEditing(false);
+      }
+    } else if (
+      propertyIsCategory &&
+      typeof newOption.value !== "string" &&
+      assetCounter
+    ) {
+      const { prefixCode: scopedPrefixCode, category } = assetCounter;
+      const { value: oldCategory } = newOption.value;
+      if (!isOptionEditPending && isOptionEditSuccess) {
+        if (
+          (scopedPrefixCode === newPrefixCode && oldCategory === category) ||
+          scopedPrefixCode === newPrefixCode
+        ) {
+          if (
+            !isUpdateAssetCounterPending &&
+            isUpdateAssetCounterSuccess &&
+            !isAssetPrefixEditPending &&
+            isAssetPrefixEditSuccess &&
+            !isAssetEditPending &&
+            isAssetEditSuccess
+          ) {
+            resetUpdateMutations();
+            refetchOptions();
+            refetchAssetCounters();
+            setIsEditing(false);
+          }
+        } else if (oldCategory !== category) {
+          if (!isUpdateAssetCounterPending && isUpdateAssetCounterSuccess) {
+            resetUpdateMutations();
+            refetchOptions();
+            refetchAssetCounters();
+            setIsEditing(false);
+          }
+        }
+      }
+    }
+  }, [
+    isOptionEditPending,
+    isOptionEditSuccess,
+    isAssetEditPending,
+    isAssetEditSuccess,
+    isUpdateAssetCounterPending,
+    isUpdateAssetCounterSuccess,
+    isAssetPrefixEditPending,
+    isAssetPrefixEditSuccess,
+    assetCounter,
+    newPrefixCode,
+    newOption.value,
   ]);
 
   return (
@@ -710,7 +789,9 @@ const EditOptions = ({
                   typeof newOption.value !== "string" &&
                   newOption.value.value === optionToEdit) ||
                 !!optionError ||
-                !!prefixCodeError
+                !!prefixCodeError ||
+                isUpdateAssetCounterPending ||
+                isAssetPrefixEditPending
               }
               type="button"
               onClick={handleUpdate}
@@ -719,7 +800,13 @@ const EditOptions = ({
                 isAssetEditPending ||
                 isUpdateAssetCounterPending ||
                 isAssetPrefixEditPending) && <Spinner size={18} />}
-              Save
+              {
+                <>
+                  {isAssetEditPending && !isOptionEditPending
+                    ? " Updating assets"
+                    : "Save"}
+                </>
+              }
             </Button>
             <DeleteOption />
           </div>
