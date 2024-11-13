@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { validationResult } from "express-validator";
+import { ValidationChain, validationResult } from "express-validator";
 import {
   SupportTicketModel,
   AssetRequestTicketModel,
@@ -7,7 +7,12 @@ import {
   TicketType,
   AssetType,
   IAssetRequestTicket,
+  IssueReportTicketModel,
 } from "../models/support-ticket.schema";
+import {
+  validateExtraFields,
+  validateSupportTicket,
+} from "../middleware/support-ticket";
 
 const router = express.Router();
 
@@ -20,33 +25,34 @@ router.get("/", [], async (req: Request, res: Response) => {
   });
 });
 
-router.post("/", [], async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ message: errors.array() });
+router.post(
+  "/",
+  validateExtraFields,
+  validateSupportTicket,
+  async (req: Request, res: Response) => {
+    const ticketInfo = req.body;
+
+    try {
+      let _ticket;
+      if (ticketInfo.type === TicketType.IssueReport) {
+        _ticket = new IssueReportTicketModel(ticketInfo);
+      } else {
+        _ticket = new AssetRequestTicketModel(ticketInfo);
+      }
+
+      const saved = await _ticket.save();
+      return res.status(201).json({
+        status: 201,
+        data: saved,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 500,
+        message: "Error creating a ticket.",
+        error: error,
+      });
+    }
   }
-
-  const _supportTicketModel = new AssetRequestTicketModel<IAssetRequestTicket>({
-    ticketId: "TEST-0001",
-    type: TicketType.AssetRequest,
-    assetSpecsModel: "Macbook M3",
-    assetType: AssetType.Hardware,
-    employeeEmail: "katarinayu@gmail.com",
-    employeeName: "Katarina Yu",
-    createdBy: "Katarina Yu",
-    updatedBy: "Katarina Yu",
-    justification: "I need a Macbook, pls",
-    managerEmail: "manager@gmail.com",
-    managerName: "My Manager",
-    status: TicketStatus.PendingManager,
-  });
-  const saved = await _supportTicketModel.save();
-
-  return res.status(200).json({
-    json: "POST Success",
-    status: "OK",
-    item: saved,
-  });
-});
+);
 
 export default router;

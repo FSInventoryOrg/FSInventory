@@ -193,4 +193,7 @@ export {
   ISupportTicket, // interfaces
   IIssueReportTicket, // interfaces
   IAssetRequestTicket, // interfaces
+  supportTicketSchema, // schema
+  issueReportSchema, // schema
+  assetRequestSchema, // schema
 };
