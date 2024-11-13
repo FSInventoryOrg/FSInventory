@@ -21,7 +21,8 @@ export type TicketTypeMap = {
 };
 
 // Type for the request body based on the ticket type
-export type TicketRequestBody<T extends TicketType> = TicketTypeMap[T];
+export type TicketRequestBody<T extends TicketType = TicketType> =
+  TicketTypeMap[T];
 
 // Middleware to apply correct validation based on ticket type
 const validateSupportTicket = <T extends TicketType>(
