@@ -40,7 +40,7 @@ node_modules/
 /public/**
 
 # Environment variables
-.env
+.env*
 
 # Logs and data files
 *.log
@@ -58,5 +58,7 @@ yarn-error.log*
 /frontend/package.json
 /frontend/package-lock.json
 
+/backend/mongo-keyfile
+/backend/inventory
 !/public/**/
 !/public/**/.gitkeep
