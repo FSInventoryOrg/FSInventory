@@ -11,9 +11,18 @@ import {
   requestNewAssetValidation,
 } from "../validation/support-ticket";
 
+// Define a mapping from ticket type to its corresponding interface
+type TicketTypeMap = {
+  [TicketType.IssueReport]: IIssueReportTicket;
+  [TicketType.AssetRequest]: IAssetRequestTicket;
+};
+
+// Type for the request body based on the ticket type
+type TicketRequestBody<T extends TicketType> = TicketTypeMap[T];
+
 // Middleware to apply correct validation based on ticket type
-const validateSupportTicket = (
-  req: Request,
+const validateSupportTicket = <T extends TicketType>(
+  req: Request<{}, {}, TicketRequestBody<T>>,
   res: Response,
   next: NextFunction
 ) => {
@@ -41,8 +50,8 @@ const validateSupportTicket = (
 };
 
 // Middleware to apply validation for extra fields for support ticket
-const validateExtraFields = (
-  req: Request,
+const validateExtraFields = <T extends TicketType>(
+  req: Request<{}, {}, TicketRequestBody<T>>,
   res: Response,
   next: NextFunction
 ) => {
@@ -56,8 +65,8 @@ const validateExtraFields = (
     });
   }
 
-  const allowedFieldsForType =
-    allowedFieldsMap[type as keyof typeof allowedFieldsMap];
+  const allowedFieldsForType = allowedFieldsMap[type];
+  // This isnt actually needed, but it's better to be safe
   if (!allowedFieldsForType) {
     return res.status(400).json({
       status: 400,
