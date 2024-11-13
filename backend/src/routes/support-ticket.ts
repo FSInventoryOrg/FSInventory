@@ -26,7 +26,7 @@ router.get("/", [], async (req: Request, res: Response) => {
 router.post(
   "/",
   verifyToken,
-  validateExtraFields,
+  validateExtraFields(),
   validateSupportTicket,
   async <T extends TicketType>(
     req: Request<object, object, TicketRequestBody<T>>,
@@ -62,6 +62,7 @@ router.put(
   "/",
   verifyToken,
   verifyRole("ADMIN"),
+  validateExtraFields([]), // no restrictedFields for ADMINS
   async (req: Request, res: Response) => {
     return res.status(200).json({
       message: "HELLO WORLD",

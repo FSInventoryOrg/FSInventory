@@ -1,11 +1,4 @@
 import { body, ValidationChain } from "express-validator";
-import { getAllowedFields } from "../utils/support-ticket";
-import {
-  assetRequestSchema,
-  issueReportSchema,
-  supportTicketSchema,
-  TicketType,
-} from "../models/support-ticket.schema";
 
 // validation rules for creating all ticket types
 const supportTicketValidation: ValidationChain[] = [
@@ -57,7 +50,7 @@ const issueReportValidation: ValidationChain[] = [
 ];
 
 // Additional validation for Asset Request tickets
-const requestNewAssetValidation: ValidationChain[] = [
+const assetRequestValidation: ValidationChain[] = [
   ...supportTicketValidation,
   body("assetType")
     .notEmpty()
@@ -77,27 +70,8 @@ const requestNewAssetValidation: ValidationChain[] = [
     .withMessage("Requested date must be a valid date in ISO format."),
 ];
 
-// Fields that are part of the base interface
-const supportTicketSchemaFields = Object.keys(supportTicketSchema.paths);
-const adminOnlyFields = ["priority", "notes"];
-
-// Fields that are allowed in the create ticket API for each ticket type
-const allowedFieldsMap = {
-  [TicketType.IssueReport]: getAllowedFields(
-    issueReportSchema,
-    supportTicketSchemaFields,
-    adminOnlyFields
-  ),
-  [TicketType.AssetRequest]: getAllowedFields(
-    assetRequestSchema,
-    supportTicketSchemaFields,
-    adminOnlyFields
-  ),
-};
-
 export {
   supportTicketValidation,
   issueReportValidation,
-  requestNewAssetValidation,
-  allowedFieldsMap,
+  assetRequestValidation,
 };

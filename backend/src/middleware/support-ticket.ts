@@ -1,15 +1,18 @@
 import { Request, Response, NextFunction } from "express";
 import { ValidationChain, validationResult } from "express-validator";
 import {
+  assetRequestSchema,
   IAssetRequestTicket,
   IIssueReportTicket,
+  issueReportSchema,
+  supportTicketSchema,
   TicketType,
 } from "../models/support-ticket.schema";
 import {
-  allowedFieldsMap,
   issueReportValidation,
-  requestNewAssetValidation,
+  assetRequestValidation,
 } from "../validation/support-ticket";
+import { getAllowedFields } from "../utils/support-ticket";
 
 // Define a mapping from ticket type to its corresponding interface
 export type TicketTypeMap = {
@@ -32,7 +35,7 @@ const validateSupportTicket = <T extends TicketType>(
   if (type === TicketType.IssueReport) {
     validations = issueReportValidation;
   } else if (type === TicketType.AssetRequest) {
-    validations = requestNewAssetValidation;
+    validations = assetRequestValidation;
   } else {
     return res.status(400).json({
       status: 400,
@@ -49,45 +52,66 @@ const validateSupportTicket = <T extends TicketType>(
   });
 };
 
-// Middleware to apply validation for extra fields for support ticket
-const validateExtraFields = <T extends TicketType>(
-  req: Request<object, object, TicketRequestBody<T>>,
-  res: Response,
-  next: NextFunction
+// Middleware wrapper to apply validations for extra fields for support tickets
+const validateExtraFields = (
+  restrictedFields = ["priority", "notes", "status"]
 ) => {
-  const { type } = req.body;
+  // Fields that are part of the base interface
+  const supportTicketSchemaFields = Object.keys(supportTicketSchema.paths);
 
-  // Enforce the use of the TicketType enum to validate the type
-  if (!Object.values(TicketType).includes(type)) {
-    return res.status(400).json({
-      status: 400,
-      message: "Invalid ticket type",
-    });
-  }
+  // Fields that are allowed in the POST and PUT endpoints
+  const allowedFieldsMap = {
+    [TicketType.IssueReport]: getAllowedFields(
+      issueReportSchema,
+      supportTicketSchemaFields,
+      restrictedFields
+    ),
+    [TicketType.AssetRequest]: getAllowedFields(
+      assetRequestSchema,
+      supportTicketSchemaFields,
+      restrictedFields
+    ),
+  };
 
-  const allowedFieldsForType = allowedFieldsMap[type];
-  // This isnt actually needed, but it's better to be safe
-  if (!allowedFieldsForType) {
-    return res.status(400).json({
-      status: 400,
-      message: "Invalid ticket type.",
-    });
-  }
+  return <T extends TicketType>(
+    req: Request<object, object, TicketRequestBody<T>>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const { type } = req.body;
 
-  // Check if any field in the request body is not allowed
-  const extraFields = Object.keys(req.body).filter(
-    (field) => !allowedFieldsForType.includes(field)
-  );
+    // Enforce the use of the TicketType enum to validate the type
+    if (!Object.values(TicketType).includes(type)) {
+      return res.status(400).json({
+        status: 400,
+        message: "Invalid ticket type",
+      });
+    }
 
-  if (extraFields.length > 0) {
-    return res.status(400).json({
-      status: 400,
-      message: "Unexpected fields in the request are found.",
-      extraFields: extraFields,
-    });
-  }
+    const allowedFieldsForType = allowedFieldsMap[type];
+    // This isnt actually needed, but it's better to be safe
+    if (!allowedFieldsForType) {
+      return res.status(400).json({
+        status: 400,
+        message: "Invalid ticket type.",
+      });
+    }
 
-  next();
+    // Check if any field in the request body is not allowed
+    const extraFields = Object.keys(req.body).filter(
+      (field) => !allowedFieldsForType.includes(field)
+    );
+
+    if (extraFields.length > 0) {
+      return res.status(400).json({
+        status: 400,
+        message: "Unexpected fields in the request are found.",
+        extraFields: extraFields,
+      });
+    }
+
+    next();
+  };
 };
 
 export { validateSupportTicket, validateExtraFields };
