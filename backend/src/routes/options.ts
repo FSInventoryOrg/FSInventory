@@ -5,6 +5,7 @@ import verifyToken from "../middleware/auth";
 import jwt from "jsonwebtoken";
 import { auditAssets, deleteNotif } from "../utils/common";
 import AssetCounter from "../models/asset-counter.schema";
+import { format } from "../utils/string-utils";
 
 const router = express.Router();
 
@@ -98,11 +99,12 @@ router.post(
       // Check if the value already exists in the array for the specified property
       if (typeof value === "object") {
         const existingValue = propertyValues.find(
-          (val: any) => val.value.toLowerCase() === value.value.toLowerCase()
+          (val: { value: string }) =>
+            val.value.toLowerCase() === value.value.toLowerCase()
         );
         if (existingValue) {
           return res.status(400).json({
-            message: "Value already exists for the specified property",
+            message: `The ${format(property)} '${existingValue.value}' already exists.`,
           });
         }
       } else {
@@ -112,7 +114,7 @@ router.post(
         );
         if (existingValue) {
           return res.status(400).json({
-            message: "Value already exists for the specified property",
+            message: `The ${format(property)} '${existingValue}' already exists.`,
           });
         }
       }
@@ -463,6 +465,12 @@ router.delete(
       if (property === "status" || property === "category") {
         const propertyValue = option.get(property) as StatusOptions[];
 
+        // Check if the value exists in the array
+        if (!propertyValue.some((option) => option.value === value)) {
+          return res.status(400).json({
+            message: `Value '${value}' does not exist in option '${property}'`,
+          });
+        }
         // Check if the value exists in the array
         if (!propertyValue.some((option) => option.value === value)) {
           return res.status(400).json({
