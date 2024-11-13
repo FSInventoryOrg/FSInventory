@@ -1,26 +1,37 @@
-import { ClipboardListIcon, FlagIcon, GaugeCircleIcon, MenuIcon, TargetIcon } from "lucide-react";
 import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet"
-import { Link } from "react-router-dom"
-import * as SheetPrimitive from "@radix-ui/react-dialog"
+  ClipboardListIcon,
+  FlagIcon,
+  GaugeCircleIcon,
+  MenuIcon,
+  TargetIcon,
+} from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Link } from "react-router-dom";
+import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { FullScaleIcon } from "./icons/FullScaleIcon";
 
 const Hamburger = () => {
   return (
     <Sheet>
-      <SheetTrigger className='rounded-full h-10 w-10 flex justify-center items-center'>
-        <MenuIcon className='' />
+      <SheetTrigger className="rounded-full h-10 w-10 flex justify-center items-center">
+        <MenuIcon className="" />
       </SheetTrigger>
-      <SheetContent closeIcon={false} side="left" className='px-2 py-4 w-64 border-none flex flex-col justify-start' >
-        <div className='flex gap-3 mb-4 px-2 items-center'>
-          <SheetPrimitive.Close className='h-fit p-1.5 rounded-full flex justify-center items-center'>
-            <MenuIcon className='h-[1.2rem] w-[1.2rem]' />
+      <SheetContent
+        closeIcon={false}
+        side="left"
+        className="px-2 py-4 w-64 border-none flex flex-col justify-start"
+      >
+        <div className="flex gap-3 mb-4 px-2 items-center">
+          <SheetPrimitive.Close className="h-fit p-1.5 rounded-full flex justify-center items-center">
+            <MenuIcon className="h-[1.2rem] w-[1.2rem]" />
           </SheetPrimitive.Close>
           <SheetPrimitive.Close className="w-full">
-            <Link className="flex items-center justify-center gap-1 text-primary" to="/" reloadDocument tabIndex={-1}>
+            <Link
+              className="flex items-center justify-center gap-1 text-primary"
+              to="/"
+              reloadDocument
+              tabIndex={-1}
+            >
               {/* <svg fill="currentColor" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="36px" height="36px" viewBox="0 0 425.178 425.178" xmlSpace="preserve">
                 <g>
                   <g>
@@ -67,39 +78,77 @@ const Hamburger = () => {
                 </g>
               </svg> */}
               <FullScaleIcon size={36} className="fill-current text-primary" />
-              <span className="text-2xl font-bold tracking-tighter text-secondary-foreground">stockpilot</span>
+              <span className="text-2xl font-bold tracking-tighter text-secondary-foreground">
+                stockpilot
+              </span>
             </Link>
           </SheetPrimitive.Close>
         </div>
         <div className="w-full flex flex-col gap-2 items-center">
           <SheetPrimitive.Close className="w-full" tabIndex={-1}>
-            <Link to="/dashboard" className="w-full flex gap-4 text-xl justify-start px-3 py-3 items-center hover:bg-accent hover:text-accent-foreground rounded-md font-medium" reloadDocument>
-              <GaugeCircleIcon size={24} className={location.pathname === '/dashboard' ? "text-primary" : ""} />
-              <span>Dashboard</span>            
+            <Link
+              to="/dashboard"
+              className="w-full flex gap-4 text-xl justify-start px-3 py-3 items-center hover:bg-accent hover:text-accent-foreground rounded-md font-medium"
+              reloadDocument
+            >
+              <GaugeCircleIcon
+                size={24}
+                className={
+                  location.pathname === "/dashboard" ? "text-primary" : ""
+                }
+              />
+              <span>Dashboard</span>
             </Link>
           </SheetPrimitive.Close>
           <SheetPrimitive.Close className="w-full" tabIndex={-1}>
-            <Link to="/inventory" className="w-full flex gap-4 text-xl justify-start px-3 py-3 items-center hover:bg-accent hover:text-accent-foreground rounded-md font-medium" reloadDocument>
-              <ClipboardListIcon size={24} className={location.pathname === '/inventory' ? "text-primary" : ""} />
-              <span>Inventory</span>            
+            <Link
+              to="/inventory"
+              className="w-full flex gap-4 text-xl justify-start px-3 py-3 items-center hover:bg-accent hover:text-accent-foreground rounded-md font-medium"
+              reloadDocument
+            >
+              <ClipboardListIcon
+                size={24}
+                className={
+                  location.pathname === "/inventory" ? "text-primary" : ""
+                }
+              />
+              <span>Inventory</span>
             </Link>
           </SheetPrimitive.Close>
           <SheetPrimitive.Close className="w-full" tabIndex={-1}>
-            <Link to="/tracker" className="w-full flex gap-4 text-xl justify-start px-3 py-3 items-center hover:bg-accent hover:text-accent-foreground rounded-md font-medium" reloadDocument>
-              <TargetIcon size={24} className={location.pathname === '/tracker' ? "text-primary" : ""} />
-              <span>Tracker</span>            
+            <Link
+              to="/tracker"
+              className="w-full flex gap-4 text-xl justify-start px-3 py-3 items-center hover:bg-accent hover:text-accent-foreground rounded-md font-medium"
+              reloadDocument
+            >
+              <TargetIcon
+                size={24}
+                className={
+                  location.pathname === "/tracker" ? "text-primary" : ""
+                }
+              />
+              <span>Tracker</span>
             </Link>
           </SheetPrimitive.Close>
           <SheetPrimitive.Close className="w-full" tabIndex={-1}>
-            <Link to="/requests" className="w-full flex gap-4 text-xl justify-start px-3 py-3 items-center hover:bg-accent hover:text-accent-foreground rounded-md font-medium" reloadDocument>
-              <FlagIcon size={24} className={location.pathname === '/requests' ? "text-primary" : ""} />
-              <span>Requests</span>            
+            <Link
+              to="/requests"
+              className="w-full flex gap-4 text-xl justify-start px-3 py-3 items-center hover:bg-accent hover:text-accent-foreground rounded-md font-medium"
+              reloadDocument
+            >
+              <FlagIcon
+                size={24}
+                className={
+                  location.pathname === "/requests" ? "text-primary" : ""
+                }
+              />
+              <span>Requests</span>
             </Link>
           </SheetPrimitive.Close>
         </div>
       </SheetContent>
     </Sheet>
-  )
-}
+  );
+};
 
 export default Hamburger;
