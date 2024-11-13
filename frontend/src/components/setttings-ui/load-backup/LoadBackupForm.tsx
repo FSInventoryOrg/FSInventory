@@ -12,6 +12,7 @@ import { FileUploader } from "@/components/ui/file-uploader";
 import { BackupValidationModal } from "./BackupValidationModal";
 import { validateBackupFile } from "@/ims-service";
 import { ValidationResult } from "@/types/backup";
+import { Accept } from "react-dropzone";
 
 const SystemBackup = () => {
   const form = useForm({
@@ -29,10 +30,15 @@ const SystemBackup = () => {
     null
   );
 
-  const acceptedFileTypes: string =
-    ".zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed";
+  const acceptedFileTypes: Accept = {
+    "application/octet-stream": [],
+    "application/zip": [".zip"],
+    "application/x-zip": [],
+    "application/x-zip-compressed": [],
+  };
 
-  const handleFile = (file: File | undefined) => {
+  const handleFile = (files: File[] | undefined) => {
+    const file = files?.[0];
     setUploadedFile(file);
 
     if (file !== undefined) {
@@ -82,8 +88,8 @@ const SystemBackup = () => {
               <FormItem className="pb-4">
                 <FormControl className="pb-4">
                   <FileUploader
-                    handleFile={handleFile}
-                    uploadedFile={uploadedFile}
+                    handleFiles={handleFile}
+                    uploadedFiles={uploadedFile ? [uploadedFile] : []}
                     accept={acceptedFileTypes}
                     {...field}
                   />
