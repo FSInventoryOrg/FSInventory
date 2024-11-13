@@ -157,7 +157,7 @@ const NavigationBar = () => {
                 location.pathname.startsWith("/requests")
                   ? "bg-secondary"
                   : "bg-none"
-              } rounded-none xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`}
+              } rounded-l-none rounded-r-xl xl:rounded-full hover:bg-secondary hover:text-secondary-foreground text-secondary-foreground border border-t-2 border-b-2 xl:border-2 font-semibold text-md flex gap-2 items-center focus-visible:outline outline-offset-2 outline-2 outline-primary px-3.5 py-1.5`}
               style={{ textDecoration: "none" }}
             >
               <FlagIcon
