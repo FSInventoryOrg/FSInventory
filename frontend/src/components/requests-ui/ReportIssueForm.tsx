@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import CustomFormLabel from "./CustomFormLabel";
+import { Accept } from "react-dropzone";
 
 const ReportIssueForm = () => {
   const reportIssueForm = useFormContext();
@@ -46,9 +47,14 @@ const ReportIssueForm = () => {
     },
   ];
 
-  const allowedTypes =
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/pdf";
-  const allowedExtensions = ".pdf,.doc,.docx,.jpg,.jpeg,.png";
+  const accept: Accept = {
+    "application/pdf": [".pdf"],
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
+      ".docx",
+    ],
+    "application/msword": [".doc"],
+    "image/*": [".jpg", ".jpeg", ".png"],
+  };
 
   const findIssueCategoryByValue = (value: string) =>
     issueCategories.find((issueCat) => issueCat.value === value);
@@ -66,9 +72,9 @@ const ReportIssueForm = () => {
                 <SelectTrigger className="w-full">
                   <SelectValue
                     placeholder={
-                      <p className="font-normal text-muted-foreground">
+                      <span className="font-normal text-muted-foreground">
                         Select a category
-                      </p>
+                      </span>
                     }
                   >
                     {field.value
@@ -117,7 +123,7 @@ const ReportIssueForm = () => {
             <CustomFormLabel required>Description of Issue</CustomFormLabel>
             <FormDescription>
               Provide a detailed explanation of the issue, including any steps
-              taken before the issue occurs
+              taken before the issue occured.
             </FormDescription>
             <FormControl>
               <Textarea {...field} placeholder="Enter description" />
@@ -132,16 +138,18 @@ const ReportIssueForm = () => {
         render={({ field }) => (
           <FormItem>
             <CustomFormLabel>Upload Supporting Files</CustomFormLabel>
+            <FormDescription>Max. file size: 10 MB.</FormDescription>
             <FormControl>
               <FileUploader
                 handleFiles={field.onChange}
                 uploadedFiles={field.value}
-                accept={allowedTypes + "," + allowedExtensions}
+                accept={accept}
                 wildcard="image/"
                 maxFileSize={10 * 1024 * 1024}
                 multiple
+                maxFiles={5}
                 uploadText="Click to Upload or Drag and Drop a File"
-                borderStyle="border-[2px] border-dashed"
+                borderStyle="border-[2px] border-dashed text-accent-foreground"
               />
             </FormControl>
           </FormItem>
