@@ -56,10 +56,10 @@ router.post(
 
 // status, priority???, add notes?????
 router.put(
-  "/:ticketId", // specifies which support ticket is needed to be updated
+  "/:ticketId",
   verifyToken,
   verifyRole("ADMIN"),
-  validateExtraFields([]), // no restrictedFields for ADMINS
+  validateExtraFields(["ticketId"], { overwriteRestrictedFields: true }),
   async (req: Request<object, object, TicketRequestBody>, res: Response) => {
     return res.status(200).json({
       message: "HELLO WORLD",
