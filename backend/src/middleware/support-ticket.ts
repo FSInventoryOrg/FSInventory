@@ -12,13 +12,13 @@ import {
 } from "../validation/support-ticket";
 
 // Define a mapping from ticket type to its corresponding interface
-type TicketTypeMap = {
+export type TicketTypeMap = {
   [TicketType.IssueReport]: IIssueReportTicket;
   [TicketType.AssetRequest]: IAssetRequestTicket;
 };
 
 // Type for the request body based on the ticket type
-type TicketRequestBody<T extends TicketType> = TicketTypeMap[T];
+export type TicketRequestBody<T extends TicketType> = TicketTypeMap[T];
 
 // Middleware to apply correct validation based on ticket type
 const validateSupportTicket = <T extends TicketType>(

@@ -10,9 +10,11 @@ import {
   IssueReportTicketModel,
 } from "../models/support-ticket.schema";
 import {
+  TicketRequestBody,
   validateExtraFields,
   validateSupportTicket,
 } from "../middleware/support-ticket";
+import verifyToken from "../middleware/auth";
 
 const router = express.Router();
 
@@ -29,7 +31,10 @@ router.post(
   "/",
   validateExtraFields,
   validateSupportTicket,
-  async (req: Request, res: Response) => {
+  async <T extends TicketType>(
+    req: Request<{}, {}, TicketRequestBody<T>>,
+    res: Response
+  ) => {
     const ticketInfo = req.body;
 
     try {
@@ -54,5 +59,13 @@ router.post(
     }
   }
 );
+
+// status, priority???, add notes?????
+router.put("/", [verifyToken], async (req: Request, res: Response) => {
+  return res.status(200).json({
+    message: "HELLO WORLD",
+    status: 200,
+  });
+});
 
 export default router;
