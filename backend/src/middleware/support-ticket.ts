@@ -22,7 +22,7 @@ export type TicketRequestBody<T extends TicketType> = TicketTypeMap[T];
 
 // Middleware to apply correct validation based on ticket type
 const validateSupportTicket = <T extends TicketType>(
-  req: Request<{}, {}, TicketRequestBody<T>>,
+  req: Request<object, object, TicketRequestBody<T>>,
   res: Response,
   next: NextFunction
 ) => {
@@ -51,7 +51,7 @@ const validateSupportTicket = <T extends TicketType>(
 
 // Middleware to apply validation for extra fields for support ticket
 const validateExtraFields = <T extends TicketType>(
-  req: Request<{}, {}, TicketRequestBody<T>>,
+  req: Request<object, object, TicketRequestBody<T>>,
   res: Response,
   next: NextFunction
 ) => {

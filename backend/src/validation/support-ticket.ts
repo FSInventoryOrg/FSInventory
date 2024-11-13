@@ -79,16 +79,19 @@ const requestNewAssetValidation: ValidationChain[] = [
 
 // Fields that are part of the base interface
 const supportTicketSchemaFields = Object.keys(supportTicketSchema.paths);
+const adminOnlyFields = ["priority", "notes"];
 
-// Fields that are allowed in the API for each ticket type
+// Fields that are allowed in the create ticket API for each ticket type
 const allowedFieldsMap = {
   [TicketType.IssueReport]: getAllowedFields(
     issueReportSchema,
-    supportTicketSchemaFields
+    supportTicketSchemaFields,
+    adminOnlyFields
   ),
   [TicketType.AssetRequest]: getAllowedFields(
     assetRequestSchema,
-    supportTicketSchemaFields
+    supportTicketSchemaFields,
+    adminOnlyFields
   ),
 };
 

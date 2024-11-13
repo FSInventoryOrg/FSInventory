@@ -1,12 +1,8 @@
 import express, { Request, Response } from "express";
-import { ValidationChain, validationResult } from "express-validator";
 import {
   SupportTicketModel,
   AssetRequestTicketModel,
-  TicketStatus,
   TicketType,
-  AssetType,
-  IAssetRequestTicket,
   IssueReportTicketModel,
 } from "../models/support-ticket.schema";
 import {
@@ -14,7 +10,7 @@ import {
   validateExtraFields,
   validateSupportTicket,
 } from "../middleware/support-ticket";
-import verifyToken from "../middleware/auth";
+import verifyToken, { verifyRole } from "../middleware/auth";
 
 const router = express.Router();
 
@@ -29,10 +25,11 @@ router.get("/", [], async (req: Request, res: Response) => {
 
 router.post(
   "/",
+  verifyToken,
   validateExtraFields,
   validateSupportTicket,
   async <T extends TicketType>(
-    req: Request<{}, {}, TicketRequestBody<T>>,
+    req: Request<object, object, TicketRequestBody<T>>,
     res: Response
   ) => {
     const ticketInfo = req.body;
@@ -61,11 +58,16 @@ router.post(
 );
 
 // status, priority???, add notes?????
-router.put("/", [verifyToken], async (req: Request, res: Response) => {
-  return res.status(200).json({
-    message: "HELLO WORLD",
-    status: 200,
-  });
-});
+router.put(
+  "/",
+  verifyToken,
+  verifyRole("ADMIN"),
+  async (req: Request, res: Response) => {
+    return res.status(200).json({
+      message: "HELLO WORLD",
+      status: 200,
+    });
+  }
+);
 
 export default router;

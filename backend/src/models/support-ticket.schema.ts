@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import mongoose, { Schema } from "mongoose";
 import crypto from "crypto";
 
@@ -11,6 +12,12 @@ enum TicketStatus {
   Rejected = "Rejected",
   PendingIT = "Pending IT Action",
   Resolved = "Resolved",
+}
+
+enum TicketPriority {
+  Low = "Low",
+  Medium = "Medium",
+  High = "High",
 }
 
 enum AssetType {
@@ -39,6 +46,8 @@ interface ISupportTicket {
   status: TicketStatus;
   createdBy: string;
   updatedBy: string;
+  notes?: string[];
+  priority?: TicketPriority;
 }
 
 // Interface for Issue Report Ticket
@@ -104,6 +113,17 @@ const supportTicketSchema: Schema<ISupportTicket> = new Schema<ISupportTicket>(
     updatedBy: {
       type: String,
       required: true,
+    },
+    notes: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    priority: {
+      type: String,
+      required: false,
+      default: TicketPriority.Low,
+      enum: Object.values(TicketPriority),
     },
   },
   {
@@ -188,6 +208,7 @@ export {
   IssueReportTicketModel, // Issue Report Model
   TicketType, // enum
   TicketStatus, // enum
+  TicketPriority, // enum
   AssetType, // enum
   IssueCategory, // enum
   ISupportTicket, // interfaces
