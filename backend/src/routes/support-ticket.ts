@@ -9,6 +9,7 @@ import {
   TicketRequestBody,
   validateExtraFields,
   validateSupportTicket,
+  validateUpdaterFields,
 } from "../middleware/support-ticket";
 import verifyToken, { verifyRole } from "../middleware/auth";
 
@@ -59,12 +60,43 @@ router.put(
   "/:ticketId",
   verifyToken,
   verifyRole("ADMIN"),
-  validateExtraFields(["ticketId"], { overwriteRestrictedFields: true }),
-  async (req: Request<object, object, TicketRequestBody>, res: Response) => {
-    return res.status(200).json({
-      message: "HELLO WORLD",
-      status: 200,
-    });
+  validateUpdaterFields,
+  async (
+    req: Request<
+      { ticketId: string; type: TicketType },
+      object,
+      TicketRequestBody
+    >,
+    res: Response
+  ) => {
+    const { ticketId } = req.params;
+    const ticketInfo = req.body;
+
+    try {
+      const updatedTicket = await SupportTicketModel.findOneAndUpdate(
+        { ticketId: ticketId },
+        { $set: ticketInfo },
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedTicket) {
+        return res.status(404).json({
+          status: 404,
+          message: "Support Ticket not found.",
+        });
+      }
+
+      return res.status(200).json({
+        status: 200,
+        data: updatedTicket,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: "Error updating the support ticket.",
+        error: error,
+      });
+    }
   }
 );
 

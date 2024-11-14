@@ -11,6 +11,7 @@ import {
 import {
   issueReportValidation,
   assetRequestValidation,
+  updaterFieldValidation,
 } from "../validation/support-ticket";
 import { getAllowedFields } from "../utils/support-ticket";
 
@@ -124,4 +125,19 @@ const validateExtraFields = (
   };
 };
 
-export { validateSupportTicket, validateExtraFields };
+const validateUpdaterFields = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const validations = updaterFieldValidation;
+  Promise.all(validations.map((validation) => validation.run(req))).then(() => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  });
+};
+
+export { validateSupportTicket, validateExtraFields, validateUpdaterFields };

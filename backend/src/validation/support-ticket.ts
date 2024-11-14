@@ -1,4 +1,5 @@
 import { body, ValidationChain } from "express-validator";
+import { TicketPriority, TicketStatus } from "../models/support-ticket.schema";
 
 // validation rules for creating all ticket types
 const supportTicketValidation: ValidationChain[] = [
@@ -71,8 +72,32 @@ const assetRequestValidation: ValidationChain[] = [
     .withMessage("Requested date must be a valid date in ISO format."),
 ];
 
+const updaterFieldValidation = [
+  body("*").custom((_, { location, path }) => {
+    const allowedFields = ["status", "priority", "notes"];
+    if (location === "body" && !allowedFields.includes(path)) {
+      throw new Error(`Field '${path}' is not allowed.`);
+    }
+    return true;
+  }),
+  body("status")
+    .optional()
+    .isIn(Object.values(TicketStatus))
+    .withMessage(
+      `Status must be either ${Object.values(TicketStatus).join(", ")}.`
+    ),
+  body("priority")
+    .optional()
+    .isIn(Object.values(TicketPriority))
+    .withMessage(
+      `Priority must be either ${Object.values(TicketPriority).join(", ")}`
+    ),
+  body("notes").optional().isString().withMessage("Notes must be a string."),
+];
+
 export {
   supportTicketValidation,
   issueReportValidation,
   assetRequestValidation,
+  updaterFieldValidation,
 };
