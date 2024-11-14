@@ -4,6 +4,9 @@ import {
   AssetRequestTicketModel,
   TicketType,
   IssueReportTicketModel,
+  TicketPriority,
+  SupportTicketLog,
+  TicketStatus,
 } from "../models/support-ticket.schema";
 import {
   TicketRequestBody,
@@ -31,13 +34,25 @@ router.post(
   validateSupportTicket,
   async (req: Request<object, object, TicketRequestBody>, res: Response) => {
     const ticketInfo = req.body;
-
     try {
+      const initialLog: SupportTicketLog = {
+        activityInformation: `${ticketInfo.createdBy} submitted a support ticket.`,
+        status: ticketInfo.status || TicketStatus.PendingManager,
+        notes: ticketInfo.notes || "",
+        priority: TicketPriority.Low,
+        updatedAt: new Date(),
+        updatedBy: ticketInfo.createdBy,
+      };
+      const newTicketData = {
+        ...ticketInfo,
+        activityLog: [initialLog],
+      };
+
       let _ticket;
       if (ticketInfo.type === TicketType.IssueReport) {
-        _ticket = new IssueReportTicketModel(ticketInfo);
+        _ticket = new IssueReportTicketModel(newTicketData);
       } else {
-        _ticket = new AssetRequestTicketModel(ticketInfo);
+        _ticket = new AssetRequestTicketModel(newTicketData);
       }
 
       const saved = await _ticket.save();
@@ -68,19 +83,33 @@ router.put(
     const ticketInfo = req.body;
 
     try {
-      const updatedTicket = await SupportTicketModel.findOneAndUpdate(
-        { ticketId: ticketId },
-        { $set: ticketInfo },
-        { new: true, runValidators: true }
-      );
-
-      if (!updatedTicket) {
+      const currentTicket = await SupportTicketModel.findOne({
+        ticketId: ticketId,
+      });
+      if (!currentTicket) {
         return res.status(404).json({
           status: 404,
           message: "Support Ticket not found.",
         });
       }
 
+      const newLogEntry: SupportTicketLog = {
+        activityInformation: `${ticketInfo.updatedBy} updated this support ticket.`,
+        status: ticketInfo.status || currentTicket.status,
+        notes: ticketInfo.notes || currentTicket.notes,
+        priority: ticketInfo.priority || currentTicket.priority,
+        updatedAt: new Date(),
+        updatedBy: ticketInfo.updatedBy,
+      };
+
+      const updatedTicket = await SupportTicketModel.findOneAndUpdate(
+        { ticketId: ticketId },
+        {
+          $set: ticketInfo,
+          $push: { activityLog: newLogEntry },
+        },
+        { new: true, runValidators: true }
+      );
       return res.status(200).json({
         status: 200,
         data: updatedTicket,

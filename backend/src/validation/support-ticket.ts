@@ -29,11 +29,7 @@ const supportTicketValidation: ValidationChain[] = [
     .withMessage(
       "Status must be either Pending Manager Approval, Rejected, Pending IT Action, or Resolved."
     ),
-  body("createdBy")
-    .notEmpty()
-    .withMessage(
-      "You must provide the person who created this support ticket."
-    ),
+  body("createdBy").notEmpty().withMessage("Created by is required."),
 ];
 
 // Additional validatiton for Issue Report Ticket
@@ -74,7 +70,7 @@ const assetRequestValidation: ValidationChain[] = [
 
 const updaterFieldValidation = [
   body("*").custom((_, { location, path }) => {
-    const allowedFields = ["status", "priority", "notes"];
+    const allowedFields = ["status", "priority", "notes", "updatedBy"];
     if (location === "body" && !allowedFields.includes(path)) {
       throw new Error(`Field '${path}' is not allowed.`);
     }
@@ -93,6 +89,7 @@ const updaterFieldValidation = [
       `Priority must be either ${Object.values(TicketPriority).join(", ")}`
     ),
   body("notes").optional().isString().withMessage("Notes must be a string."),
+  body("updatedBy").notEmpty().withMessage("Updated by is required."),
 ];
 
 export {
