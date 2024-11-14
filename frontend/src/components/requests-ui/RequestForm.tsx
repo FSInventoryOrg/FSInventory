@@ -68,7 +68,7 @@ const RequestForm = ({ userData }: RequestFormProps) => {
   const requestForm = useForm<RequestFormData>({
     resolver: zodResolver(RequestFormSchema),
     defaultValues: {
-      requestType: "Report an Issue",
+      requestType: "Issue Report",
       ...userData,
       ...defaultReportIssueValues,
     },
@@ -77,13 +77,13 @@ const RequestForm = ({ userData }: RequestFormProps) => {
 
   const requestType = requestForm.watch(
     "requestType",
-    "Report an Issue" as RequestType
+    "Issue Report" as RequestType
   );
 
   const resetForm = (type: RequestType) => {
     requestForm.reset({
       ...requestForm.getValues(),
-      ...(type === "Report an Issue"
+      ...(type === "Issue Report"
         ? defaultReportIssueValues
         : defaultRequestAssetValues),
     });
@@ -91,16 +91,16 @@ const RequestForm = ({ userData }: RequestFormProps) => {
 
   useEffect(() => {
     if (!open) {
-      requestForm.reset({ requestType: "Report an Issue" });
+      requestForm.reset({ requestType: "Issue Report" });
     }
   }, [requestForm, open]);
 
   useEffect(() => {
     // When user selects another ticket type, clear fields from the other form
-    if (requestType === "Report an Issue") {
-      resetForm("Request a New Asset");
+    if (requestType === "Issue Report") {
+      resetForm("Asset Request");
     } else {
-      resetForm("Report an Issue");
+      resetForm("Issue Report");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestType]);
@@ -163,7 +163,7 @@ const RequestForm = ({ userData }: RequestFormProps) => {
                 )}
               />
               <Separator />
-              {requestType === "Report an Issue" && (
+              {requestType === "Issue Report" && (
                 <>
                   <h2 className="text-lg font-semibold">Report an Issue</h2>
                   {/* <div className="sm:w-1/2 pr-2"> */}
@@ -171,7 +171,7 @@ const RequestForm = ({ userData }: RequestFormProps) => {
                   {/* </div> */}
                 </>
               )}
-              {requestType === "Request a New Asset" && (
+              {requestType === "Asset Request" && (
                 <>
                   <h2 className="text-lg font-semibold">Report a New Asset</h2>
                   <RequestAssetForm />

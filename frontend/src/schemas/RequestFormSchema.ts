@@ -7,7 +7,7 @@ export const RequestorFormSchema = z.object({
 });
 
 export const ReportIssueSchema = z.object({
-  requestType: z.literal("Report an Issue"),
+  requestType: z.literal("Issue Report"),
   issueCategory: z.string().trim().min(1, "Issue category is required"),
   assetAffected: z.string().optional(),
   problemDescription: z
@@ -18,7 +18,7 @@ export const ReportIssueSchema = z.object({
 });
 
 export const RequestNewAssetSchema = z.object({
-  requestType: z.literal("Request a New Asset"),
+  requestType: z.literal("Asset Request"),
   assetType: z.string().min(1, "Asset type is required"),
   assetSpecification: z
     .string()
@@ -30,7 +30,7 @@ export const RequestNewAssetSchema = z.object({
     .min(1, "Justification for request is required"),
   requestDate: z.date().nullable().optional(),
 });
-const REQUEST_TYPES = ["Report an Issue", "Request a New Asset"] as const;
+const REQUEST_TYPES = ["Issue Report", "Asset Request"] as const;
 export const RequestFormSchema = z
   .object({
     requestType: z.enum(REQUEST_TYPES, {
