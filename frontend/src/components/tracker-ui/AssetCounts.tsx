@@ -7,7 +7,7 @@ interface AssesCountProps {
 
 const AssetCounts = ({ assetCounts }: AssesCountProps) => {
   return (
-    <div className="flex flex-col border border-solid [#244242] p-4 h-full max-h-[160px] rounded-[8px]">
+    <div className="flex flex-col border border-solid p-4 h-full max-h-[160px] rounded-[8px]">
       <div className="flex justify-between px-2">
         <span className="text-[16px] font-regular sm:font-bold dark:text-white text-muted-foreground self-end overflow-ellipsis whitespace-nowrap">
           TOTAL ASSETS

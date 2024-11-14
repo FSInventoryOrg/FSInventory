@@ -253,7 +253,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2 pb-2 px-1">
         <div className="flex">
-          <span className="darK:text-[#D9F2F2] font-medium text-xs sm:text-sm self-end text-ellipsis overflow-hidden whitespace-nowrap">
+          <span className="dark:text-[#D9F2F2] font-medium text-xs sm:text-sm self-end text-ellipsis overflow-hidden whitespace-nowrap">
             As of {currentDate.toLocaleString()}
           </span>
         </div>
@@ -287,7 +287,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
                 <p className="max-w-[200px]">
                   Assets history for{" "}
                   <span className="text-destructive">unregistered</span> users
-                  is is not available.
+                  is not available.
                 </p>
               </TooltipContent>
             </Tooltip>
