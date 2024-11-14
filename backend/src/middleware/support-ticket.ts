@@ -54,34 +54,24 @@ const validateSupportTicket = <T extends TicketType>(
   });
 };
 
-// Middleware wrapper to apply validations for extra fields for support tickets
-const validateExtraFields = (
-  restrictedFields: string[] = [],
-  options?: {
-    overwriteRestrictedFields: boolean;
-  }
-) => {
+// Middleware wrapper that compares the fields in the request body to the
+// allowed fields and rejects any unexpected fields based on the ticket type
+const validateCreateFields = () => {
   // Fields that are part of the base interface
   const supportTicketSchemaFields = Object.keys(supportTicketSchema.paths);
-  const defaultRestrictedFields = ["priority", "notes", "status"];
-
-  // Combine or overwrite restricted fields based on options
-  let _restricted: string[] = defaultRestrictedFields.concat(restrictedFields);
-  if (options?.overwriteRestrictedFields) {
-    _restricted = restrictedFields;
-  }
+  const restrictedFields = ["priority", "notes", "status"];
 
   // Fields that are allowed in the POST and PUT endpoints
   const allowedFieldsMap = {
     [TicketType.IssueReport]: getAllowedFields(
       issueReportSchema,
       supportTicketSchemaFields,
-      _restricted
+      restrictedFields
     ),
     [TicketType.AssetRequest]: getAllowedFields(
       assetRequestSchema,
       supportTicketSchemaFields,
-      _restricted
+      restrictedFields
     ),
   };
 
@@ -125,6 +115,7 @@ const validateExtraFields = (
   };
 };
 
+// Middleware to apply validations to the request data for PUT request
 const validateUpdaterFields = (
   req: Request,
   res: Response,
@@ -140,4 +131,4 @@ const validateUpdaterFields = (
   });
 };
 
-export { validateSupportTicket, validateExtraFields, validateUpdaterFields };
+export { validateSupportTicket, validateCreateFields, validateUpdaterFields };

@@ -7,7 +7,7 @@ import {
 } from "../models/support-ticket.schema";
 import {
   TicketRequestBody,
-  validateExtraFields,
+  validateCreateFields,
   validateSupportTicket,
   validateUpdaterFields,
 } from "../middleware/support-ticket";
@@ -27,7 +27,7 @@ router.get("/", [], async (req: Request, res: Response) => {
 router.post(
   "/",
   verifyToken,
-  validateExtraFields(),
+  validateCreateFields(),
   validateSupportTicket,
   async (req: Request<object, object, TicketRequestBody>, res: Response) => {
     const ticketInfo = req.body;
@@ -55,18 +55,13 @@ router.post(
   }
 );
 
-// status, priority???, add notes?????
 router.put(
   "/:ticketId",
   verifyToken,
   verifyRole("ADMIN"),
   validateUpdaterFields,
   async (
-    req: Request<
-      { ticketId: string; type: TicketType },
-      object,
-      TicketRequestBody
-    >,
+    req: Request<{ ticketId: string }, object, TicketRequestBody>,
     res: Response
   ) => {
     const { ticketId } = req.params;
