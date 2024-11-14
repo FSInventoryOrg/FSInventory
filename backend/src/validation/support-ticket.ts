@@ -18,6 +18,7 @@ const supportTicketValidation: ValidationChain[] = [
     .isIn(["Issue Report", "Asset Request"])
     .withMessage("Ticket type must be either Issue Report or Asset Request."),
   body("status")
+    .optional()
     .isIn([
       "Pending Manager Approval",
       "Rejected",

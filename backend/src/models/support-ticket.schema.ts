@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import mongoose, { Schema } from "mongoose";
-import crypto from "crypto";
+import { SupportTicketCounterModel } from "./support-ticket-counter.schema";
 
 enum TicketType {
   IssueReport = "Issue Report",
@@ -43,7 +43,7 @@ interface ISupportTicket {
   managerName: string;
   managerEmail: string;
   supportingFiles?: string[];
-  status: TicketStatus;
+  status?: TicketStatus;
   createdBy: string;
   updatedBy: string;
   notes?: string[];
@@ -103,8 +103,9 @@ const supportTicketSchema: Schema<ISupportTicket> = new Schema<ISupportTicket>(
     },
     status: {
       type: String,
-      required: true,
+      required: false,
       enum: Object.values(TicketStatus),
+      default: TicketStatus.PendingManager,
     },
     createdBy: {
       type: String,
@@ -136,8 +137,25 @@ const supportTicketSchema: Schema<ISupportTicket> = new Schema<ISupportTicket>(
 supportTicketSchema.pre("save", async function (next) {
   if (this.isNew) {
     const prefix = this.type === TicketType.IssueReport ? "IR" : "AR";
-    const randomId = crypto.randomBytes(3).toString("hex"); // Generates 6 random hex characters
-    this.ticketId = `${prefix}-${randomId}`; // Example: "IR-5f2c3a"
+
+    try {
+      // findOneAndUpdate guarantees atomicity :)
+      const ticketCounter = await SupportTicketCounterModel.findOneAndUpdate(
+        { prefix: prefix },
+        { $inc: { sequence: 1 } },
+        { new: true, upsert: true }
+      );
+      if (!ticketCounter) {
+        throw new Error(
+          `Support Ticket Counter update failed for prefix: ${prefix}`
+        );
+      }
+
+      const nextSequence = String(ticketCounter.sequence).padStart(4, "0");
+      this.ticketId = `${prefix}-${nextSequence}`;
+    } catch (error) {
+      return next(error as mongoose.CallbackError);
+    }
   }
   next();
 });
