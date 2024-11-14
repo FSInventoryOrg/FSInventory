@@ -7,25 +7,76 @@ import {
   TicketPriority,
   SupportTicketLog,
   TicketStatus,
+  supportTicketSchema,
+  assetRequestSchema,
+  issueReportSchema,
+  ISupportTicket,
 } from "../models/support-ticket.schema";
 import {
-  TicketRequestBody,
   validateCreateFields,
   validateSupportTicket,
   validateUpdaterFields,
 } from "../middleware/support-ticket";
 import verifyToken, { verifyRole } from "../middleware/auth";
+import { TicketQueryParams, TicketRequestBody } from "../types/support-ticket";
+import { getSearchableFields } from "../utils/support-ticket";
+import { FilterQuery } from "mongoose";
 
 const router = express.Router();
 
-router.get("/", [], async (req: Request, res: Response) => {
-  const tickets = await SupportTicketModel.find();
-  return res.status(200).json({
-    message: "Hello World",
-    status: "OK",
-    items: tickets,
-  });
-});
+router.get(
+  "/",
+  verifyToken,
+  async (
+    req: Request<object, object, object, TicketQueryParams>,
+    res: Response
+  ) => {
+    const { page = 1, limit = 10, type, status, query } = req.query;
+
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const filters: FilterQuery<ISupportTicket> = {};
+    if (type) filters.type = type;
+    if (status) filters.status = status;
+    if (query) {
+      const searchableFields = [
+        ...getSearchableFields(supportTicketSchema),
+        ...getSearchableFields(assetRequestSchema),
+        ...getSearchableFields(issueReportSchema),
+      ];
+      filters.$or = searchableFields.map((field) => ({
+        [field]: { $regex: query, $options: "i" },
+      }));
+    }
+
+    try {
+      // the number of tickets that match the filters
+      const totalTickets = await SupportTicketModel.countDocuments(filters);
+      const tickets = await SupportTicketModel.find(filters)
+        .skip((pageNumber - 1) * limitNumber)
+        .limit(limitNumber);
+
+      const totalPages = Math.ceil(totalTickets / limitNumber);
+      return res.status(200).json({
+        status: 200,
+        data: tickets,
+        pagination: {
+          totalTickets: totalTickets,
+          totalPages: totalPages,
+          currentPage: pageNumber,
+          limit: limitNumber,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        status: 500,
+        message: "Error retrieving the support tickets.",
+        error: error,
+      });
+    }
+  }
+);
 
 router.get(
   "/:ticketId",

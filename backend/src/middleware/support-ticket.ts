@@ -2,8 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { ValidationChain, validationResult } from "express-validator";
 import {
   assetRequestSchema,
-  IAssetRequestTicket,
-  IIssueReportTicket,
   issueReportSchema,
   supportTicketSchema,
   TicketType,
@@ -14,16 +12,7 @@ import {
   updaterFieldValidation,
 } from "../validation/support-ticket";
 import { getAllowedFields } from "../utils/support-ticket";
-
-// Define a mapping from ticket type to its corresponding interface
-export type TicketTypeMap = {
-  [TicketType.IssueReport]: IIssueReportTicket;
-  [TicketType.AssetRequest]: IAssetRequestTicket;
-};
-
-// Type for the request body based on the ticket type
-export type TicketRequestBody<T extends TicketType = TicketType> =
-  TicketTypeMap[T];
+import { TicketRequestBody } from "../types/support-ticket";
 
 // Middleware to apply correct validation based on ticket type
 const validateSupportTicket = <T extends TicketType>(
