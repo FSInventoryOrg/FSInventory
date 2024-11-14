@@ -414,7 +414,7 @@ export const updateOptionValue = async ({
 
   if (!response.ok) {
     const responseBody = await response.json();
-    throw new Error(responseBody.error || "Failed to update option");
+    throw new Error(responseBody.message || "Failed to update option");
   }
 
   return true;
