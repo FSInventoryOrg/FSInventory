@@ -27,6 +27,36 @@ router.get("/", [], async (req: Request, res: Response) => {
   });
 });
 
+router.get(
+  "/:ticketId",
+  verifyToken,
+  async (req: Request<{ ticketId: string }>, res: Response) => {
+    const { ticketId } = req.params;
+    try {
+      const supportTicket = await SupportTicketModel.findOne({
+        ticketId: ticketId,
+      });
+      if (!supportTicket) {
+        return res.status(404).json({
+          status: 404,
+          message: "Support Ticket not found.",
+        });
+      }
+
+      return res.status(200).json({
+        status: 200,
+        data: supportTicket,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 500,
+        message: "Error retrieving the ticket.",
+        error: error,
+      });
+    }
+  }
+);
+
 router.post(
   "/",
   verifyToken,
