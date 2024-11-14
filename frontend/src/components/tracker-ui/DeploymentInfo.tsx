@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import * as imsService from '@/ims-service';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { AssetsHistory, EmployeeType } from '@/types/employee';
+import { useState, useEffect } from "react";
+import * as imsService from "@/ims-service";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AssetsHistory, EmployeeType } from "@/types/employee";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -11,13 +11,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from "@/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -26,20 +26,24 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '../ui/button';
-import { AlertCircleIcon, CheckCheckIcon, TrashIcon } from 'lucide-react';
-import TrashCan from '../graphics/TrashCan';
-import EditEmployee from './EditEmployee';
-import { EmployeeAssetsTable } from './EmployeeAssetsTable';
-import { EmployeeAssetsColumns } from './EmployeeAssetsColumns';
-import { HardwareType } from '@/types/asset';
-import { Spinner } from '../Spinner';
-import { AssetsHistoryTable } from './AssetsHistoryTable';
-import { AssetsHistoryColumns } from './AssetsHistoryColumns';
-import { Info } from '@phosphor-icons/react';
-import AssetsCount from './AssetCounts';
-import { Skeleton } from '../ui/skeleton';
+} from "@/components/ui/select";
+import { Button } from "../ui/button";
+import { Check, X, XIcon } from "lucide-react";
+import TrashCan from "../graphics/TrashCan";
+import EditEmployee from "./EditEmployee";
+import { EmployeeAssetsTable } from "./EmployeeAssetsTable";
+import { EmployeeAssetsColumns } from "./EmployeeAssetsColumns";
+import { HardwareType } from "@/types/asset";
+import { Spinner } from "../Spinner";
+import { AssetsHistoryTable } from "./AssetsHistoryTable";
+import { AssetsHistoryColumns } from "./AssetsHistoryColumns";
+import { Info } from "@phosphor-icons/react";
+import AssetsCount from "./AssetCounts";
+import { Skeleton } from "../ui/skeleton";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { cn } from "@/lib/utils";
+import { EmployeeDropdownMenu } from "./EmployeeDropdownMenu";
+import { DropdownMenuItem } from "../ui/dropdown-menu";
 // import { Skeleton } from '../ui/skeleton';
 
 interface DeploymentInfoProps {
@@ -47,10 +51,18 @@ interface DeploymentInfoProps {
   assignee: string;
 }
 
+const UnregisteredBadge = () => {
+  return (
+    <div className="py-[2px] px-2 bg-destructive rounded-[8px] w-fit">
+      <Label className="text-sm font-semibold text-white">UNREGISTERED</Label>
+    </div>
+  );
+};
+
 const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
   const currentDate = new Date();
   const [isSM, setIsSM] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState('current');
+  const [selectedFilter, setSelectedFilter] = useState("current");
   const [assetsCurrent, setAssetsCurrent] = useState<HardwareType[] | null>(
     null
   );
@@ -60,16 +72,17 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
   const [assetCounts, setAssetCounts] = useState<{
     [category: string]: number;
   }>();
+  const [showEmployeeDropdown, setShowEmployeeDropdown] = useState(false);
 
   const { data: allAssets } = useQuery({
-    queryKey: ['fetchAllAssets'],
+    queryKey: ["fetchAllAssets"],
     queryFn: () => imsService.fetchAllAssets(),
     enabled: !!employee.code,
   });
 
   const { data: currentAssets } = useQuery({
-    queryKey: ['fetchAssetsByProperty', 'assignee', assignee],
-    queryFn: () => imsService.fetchAssetsByProperty('assignee', assignee),
+    queryKey: ["fetchAssetsByProperty", "assignee", assignee],
+    queryFn: () => imsService.fetchAssetsByProperty("assignee", assignee),
     enabled: !!employee,
   });
 
@@ -107,10 +120,10 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
   }, [currentAssets]);
 
   useEffect(() => {
-    if (selectedFilter === 'current' && assetsCurrent) {
+    if (selectedFilter === "current" && assetsCurrent) {
       const counts = countAssetsByCategory(assetsCurrent);
       setAssetCounts(counts);
-    } else if (selectedFilter === 'history' && assetsHistory) {
+    } else if (selectedFilter === "history" && assetsHistory) {
       const counts = countAssetsByCategory(assetsHistory);
       setAssetCounts(counts);
     }
@@ -122,77 +135,103 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
     };
 
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
 
     return () => {
-      window.removeEventListener('resize', checkScreenSize);
+      window.removeEventListener("resize", checkScreenSize);
     };
   }, []);
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex flex-col gap-2 pb-2">
+      <div className="flex flex-col lg:flex-row gap-2 pb-2">
         <div
           id="banner"
-          className="bg-gradient-to-br from-[#1d2436] to-[#006e54] h-40 rounded-lg p-4 justify-between flex flex-col text-white"
+          className="w-full pr-2 md:w-[95%] lg:w-[50%] flex-shrink flex-grow dark:bg-gradient-120 bg-gradient-302 from-tracker-from to-tracker-to h-40 rounded-lg p-4 justify-between flex flex-col text-white border border-solid border-border-brandgreen"
         >
           <div className="flex justify-between ">
-            <div className="flex flex-col w-[50%] sm:w-full">
+            <div className="flex flex-col w-[50%] sm:w-full gap-1">
               <span className="font-bold text-xl sm:text-3xl gap-2 flex">
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger className="w-fit overflow-hidden text-ellipsis">
-                      <span className="whitespace-nowrap">
-                        {employee.firstName + ' ' + employee.lastName}
+                    <TooltipTrigger className="w-fit text-ellipsis">
+                      <span className="whitespace-nowrap text-primary-foreground text-4xl">
+                        {employee.firstName + " " + employee.lastName}
                       </span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      {employee.firstName + ' ' + employee.lastName}
+                      {employee.firstName + " " + employee.lastName}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                {employee.isRegistered && isSM && (
-                  <EditEmployee employeeData={employee} />
-                )}
               </span>
               <span
-                className={`font-bold text-sm ${
-                  employee.isRegistered ? '' : 'text-destructive text-sm'
-                }`}
+                className={cn(
+                  "text-primary-foreground text-[16px]",
+                  employee.isRegistered
+                    ? "dark:text-white text-primary-foreground"
+                    : "text-destructive text-[16px]"
+                )}
               >
-                {employee.isRegistered ? employee.code : 'UNREGISTERED'}
+                {employee.isRegistered ? employee.code : <UnregisteredBadge />}
               </span>
             </div>
-            <div className="flex gap-1 sm:gap-2 lg:gap-3 items-start">
-              {!isSM && <EditEmployee employeeData={employee} />}
-              <DeleteEmployee employee={employee} />
+            <div className="flex gap-1 sm:gap-2 lg:gap-3 items-start pt-2">
               <Button
-                className={`px-3 sm:px-4 gap-2 text-white ${
+                className={cn(
+                  "py-[2px] px-2 gap-1 text-white rounded-[20px] h-[28px] hover:cursor-auto",
                   employee.isActive
-                    ? 'bg-[#33CC80]'
-                    : 'bg-[#ffa333] hover:bg-[#ffa333]/95'
-                }`}
+                    ? "dark:bg-[#036F39] bg-[#CAEADA] hover:bg-[#CAEADA]"
+                    : "dark:bg-[#54575A] hover:bg-[#DBDCDC]/95 bg-[#DBDCDC]"
+                )}
               >
                 {employee.isActive ? (
                   <>
-                    <CheckCheckIcon size={16} />
-                    <span className="hidden sm:block">Active</span>
+                    <Check
+                      size={16}
+                      className="text-border-brandgreen dark:text-white"
+                    />
+                    <span className="hidden sm:block text-[16px] dark:text-white text-border-brandgreen">
+                      ACTIVE
+                    </span>
                   </>
                 ) : (
                   <>
-                    <AlertCircleIcon size={16} />
-                    <span className="hidden sm:block">Inactive</span>
+                    <X size={16} className="dark:text-white text-[#54575A]" />
+                    <span className="hidden sm:block text-[16px] dark:text-white text-[#54575A]">
+                      INACTIVE
+                    </span>
                   </>
                 )}
               </Button>
+              <EmployeeDropdownMenu
+                open={showEmployeeDropdown}
+                setOpen={setShowEmployeeDropdown}
+                dropdownMenuContentClassName={isSM ? "lg:mr-[200px] " : ""}
+              >
+                <DropdownMenuItem
+                  className="dark:bg-[#141D1E] bg-white p-0"
+                  asChild
+                >
+                  {employee.isRegistered && (
+                    <EditEmployee
+                      employeeData={employee}
+                      buttonText="Edit Employee"
+                    />
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuItem className="bg-[#141D1E] w-full p-0" asChild>
+                  <DeleteEmployee employee={employee} />
+                </DropdownMenuItem>
+              </EmployeeDropdownMenu>
             </div>
           </div>
           <div className="flex sm:flex-row flex-col justify-between">
             <div className="flex flex-row text-white w-full sm:w-[50%]">
               <TooltipProvider>
                 <Tooltip>
-                  <TooltipTrigger className="w-fit text-xl sm:text-4xl font-bold text-primary/50 overflow-hidden text-ellipsis">
-                    <span className="whitespace-nowrap">
+                  <TooltipTrigger className="w-fit text-xl sm:text-4xl font-bold text-primary/50 text-ellipsis">
+                    <span className="whitespace-nowrap dark:text-primary/50 text-primary text-xl">
                       {employee.position}
                     </span>
                   </TooltipTrigger>
@@ -200,14 +239,9 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <div className="flex">
-              <span className="text-muted-foreground font-medium text-xs sm:text-sm self-end text-ellipsis overflow-hidden whitespace-nowrap">
-                As of {currentDate.toLocaleString()}
-              </span>
-            </div>
           </div>
         </div>
-        <div id="statistics" className="relative">
+        <div id="statistics" className="relative flex-grow ">
           {assetCounts ? (
             <AssetsCount assetCounts={assetCounts} />
           ) : (
@@ -217,40 +251,50 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
           )}
         </div>
       </div>
-      <div className="flex items-center gap-2 pb-2">
-        <Select
-          value={selectedFilter}
-          onValueChange={(value) => setSelectedFilter(value)}
-        >
-          <SelectTrigger className="w-[250px]">
-            <SelectValue defaultValue="current" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Filter by</SelectLabel>
-              <SelectItem value="current">Current deployed assets</SelectItem>
-              <SelectItem value="history" disabled={!employee.code}>
-                History of deployed assets
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-        <TooltipProvider delayDuration={100}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Info size={20} className="text-border cursor-pointer" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="max-w-[200px]">
-                Assets history for{' '}
-                <span className="text-destructive">unregistered</span> users is
-                not available.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-2 px-1">
+        <div className="flex">
+          <span className="dark:text-[#D9F2F2] font-medium text-xs sm:text-sm self-end text-ellipsis overflow-hidden whitespace-nowrap">
+            As of {currentDate.toLocaleString()}
+          </span>
+        </div>
+        <div className="flex justify-center items-center gap-4">
+          <Select
+            value={selectedFilter}
+            onValueChange={(value) => setSelectedFilter(value)}
+          >
+            <SelectTrigger className="w-[250px]">
+              <SelectValue defaultValue="current" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Filter by</SelectLabel>
+                <SelectItem value="current">Current deployed assets</SelectItem>
+                <SelectItem value="history" disabled={!employee.code}>
+                  History of deployed assets
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info
+                  size={24}
+                  className="dark:text-[#D9F2F2] cursor-pointer"
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-[200px]">
+                  Assets history for{" "}
+                  <span className="text-destructive">unregistered</span> users
+                  is not available.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
-      {selectedFilter === 'current' ? (
+      {selectedFilter === "current" ? (
         assetsCurrent !== null ? (
           <EmployeeAssetsTable
             columns={EmployeeAssetsColumns}
@@ -284,16 +328,16 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
   const [isSM, setIsSM] = useState(false);
 
   const { data: employeeAssets } = useQuery<string[]>({
-    queryKey: ['fetchAssetsByProperty'],
-    queryFn: () => imsService.fetchAssetsByProperty('assignee', employee.code),
+    queryKey: ["fetchAssetsByProperty"],
+    queryFn: () => imsService.fetchAssetsByProperty("assignee", employee.code),
     enabled: !!employee.code,
   });
 
   const handleDeleteEmployee = async () => {
     await imsService.deleteEmployeeByCode(employee.code);
-    queryClient.invalidateQueries({ queryKey: ['fetchEmployees'] });
+    queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] });
 
-    window.location.replace('/tracker');
+    window.location.replace("/tracker");
     setTimeout(() => {
       setOpen(false);
     }, 100);
@@ -305,33 +349,23 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
     };
 
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
 
     return () => {
-      window.removeEventListener('resize', checkScreenSize);
+      window.removeEventListener("resize", checkScreenSize);
     };
   }, []);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        {isSM ? (
-          <Button
-            disabled={!employee.isRegistered}
-            className="px-3 sm:px-4 gap-2 bg-destructive/20 border-destructive border text-destructive hover:text-destructive-foreground"
-            variant="destructive"
-          >
-            <TrashIcon size={16} />
-            <span className="hidden sm:block">Remove Employee</span>
-          </Button>
-        ) : (
-          <Button
-            size="icon"
-            className="text-white flex justify-center items-center rounded-full h-8 w-8 sm:h-10 sm:w-10 bg-transparent hover:bg-muted-foreground/20 border-0"
-          >
-            <TrashIcon size={16} />
-          </Button>
-        )}
+        <Button
+          disabled={!employee.isRegistered}
+          className="px-3 sm:px-4 gap-2 bg-transparent text-destructive hover:text-white hover:bg-destructive/80"
+        >
+          <XIcon size={isSM ? 20 : 16} />
+          <span className="text-[16px]">Remove Employee</span>
+        </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="border-none">
         {!(employeeAssets && employeeAssets.length > 0) ? (
@@ -347,8 +381,8 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <Button onClick={handleDeleteEmployee} variant="destructive">
-                Yes, I want to remove{' '}
-                {employee.firstName + ' ' + employee.lastName}
+                Yes, I want to remove{" "}
+                {employee.firstName + " " + employee.lastName}
               </Button>
             </AlertDialogFooter>
           </>
@@ -357,8 +391,8 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
             <AlertDialogHeader>
               <AlertDialogTitle>Cannot remove this employee</AlertDialogTitle>
               <AlertDialogDescription>
-                There are {employeeAssets?.length || 0} assets deployed to{' '}
-                {employee.firstName + ' ' + employee.lastName}. Recover these
+                There are {employeeAssets?.length || 0} assets deployed to{" "}
+                {employee.firstName + " " + employee.lastName}. Recover these
                 assets and try again.
               </AlertDialogDescription>
             </AlertDialogHeader>

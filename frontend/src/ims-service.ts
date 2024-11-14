@@ -14,6 +14,7 @@ import {
   ReportIssueFormData,
   RequestAssetFormData,
 } from "./schemas/RequestFormSchema";
+import { capitalize, format } from "./lib/utils";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
@@ -331,7 +332,7 @@ export const addOptionValue = async ({
     );
     if (status !== 404)
       throw new Error(
-        `${property} with prefix code ${prefixCode} already exists.`
+        `${capitalize(format(property))} with prefix code ${prefixCode} already exists.`
       );
   }
 
@@ -348,6 +349,12 @@ export const addOptionValue = async ({
     body: JSON.stringify({ value }),
   });
 
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(
+      responseBody.message || `Failed to add ${format(property)}`
+    );
+  }
   if (propertyBeingChangedIsCategory) {
     await postAssetCounter({
       category: value as string,
@@ -407,7 +414,7 @@ export const updateOptionValue = async ({
 
   if (!response.ok) {
     const responseBody = await response.json();
-    throw new Error(responseBody.error || "Failed to update option");
+    throw new Error(responseBody.message || "Failed to update option");
   }
 
   return true;
@@ -923,6 +930,7 @@ export const fetchSoftwareNotif = async () => {
 
   return response.json();
 };
+
 export const fetchAppVersions = async () => {
   const response = await fetch(`${API_BASE_URL}/version`, {
     credentials: "include",

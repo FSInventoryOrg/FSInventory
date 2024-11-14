@@ -2,6 +2,17 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.19.2](https://connect.zoho.com/portal/intranet/task/623367000000878021) 2024-11-04
+### Changed
+-  Delete category option logic to also delete associated asset counter
+
+## [2.19.1](https://connect.zoho.com/portal/intranet/task/623367000000878039) 2024-10-29
+### Fixed
+- Case insensitve checking for existing option value
+
+### Changed
+- Error message when a duplicate option value is found
+
 ## [2.19.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000605021) 2024-11-04
 ## Fixed
 - Fixed how backups are accessed when sending emails
