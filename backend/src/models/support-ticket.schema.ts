@@ -45,7 +45,7 @@ interface ISupportTicket {
   supportingFiles?: string[];
   status?: TicketStatus;
   createdBy: string;
-  updatedBy: string;
+  updatedBy?: string;
   notes?: string[];
   priority?: TicketPriority;
 }
@@ -113,7 +113,7 @@ const supportTicketSchema: Schema<ISupportTicket> = new Schema<ISupportTicket>(
     },
     updatedBy: {
       type: String,
-      required: true,
+      required: false,
     },
     notes: {
       type: String,
@@ -153,6 +153,7 @@ supportTicketSchema.pre("save", async function (next) {
 
       const nextSequence = String(ticketCounter.sequence).padStart(4, "0");
       this.ticketId = `${prefix}-${nextSequence}`;
+      this.updatedBy = this.createdBy;
     } catch (error) {
       return next(error as mongoose.CallbackError);
     }
