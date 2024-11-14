@@ -100,11 +100,10 @@ const validateExtraFields = (
     }
 
     const allowedFieldsForType = allowedFieldsMap[type];
-    // This isnt actually needed, but it's better to be safe
     if (!allowedFieldsForType) {
       return res.status(400).json({
         status: 400,
-        message: "Invalid ticket type.",
+        message: "No mapping found for the specified type.",
       });
     }
 
