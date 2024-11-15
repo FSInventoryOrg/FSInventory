@@ -57,12 +57,9 @@ const EditOption = ({
     getOptionValue,
   } = useOption(option);
 
-  const {
-    getAssetCounterFromCategory,
-    updateAssetCounterInCache,
-    assetCounters,
-  } = useAssetCounter(propertyIsCategory, option);
-  const assetCounter = getAssetCounterFromCategory() ?? undefined;
+  const { updateAssetCounterInCache, assetCounters, assetCounter } =
+    useAssetCounter(propertyIsCategory, option);
+
   const { prefixCode: oldPrefixCode } = assetCounter ?? { prefixCode: "" };
 
   const handleCancel = () => {
@@ -70,44 +67,50 @@ const EditOption = ({
     setEditedOption({ property, value: "" });
   };
 
-  const handleUpdate = () => {
-    const isPrefixCodeChanged: boolean =
-      !!newPrefixCode && oldPrefixCode !== newPrefixCode;
-
-    if (newPrefixCode === "" && isCategoryType) {
-      setPrefixCodeError("Prefix code can not be empty");
-      throw new Error("Prefix code can not be empty");
-    }
-
-    if (optionError) {
-      throw new Error(`${capitalize(property)} name can not be empty`);
-    }
-
-    if (assetCounters) {
-      const prefixCodeExists: boolean = !!assetCounters.find(
-        (assetCounter: AssetCounterType) =>
-          assetCounter.prefixCode === newPrefixCode
-      );
-      if (prefixCodeExists && isPrefixCodeChanged && isCategoryType) {
-        setPrefixCodeError("Prefix code already exists");
-        throw new Error(`Prefix code ${newPrefixCode} already exists`);
-      }
-    }
-
+  const handleCategoryUpdate = () => {
     const category: string =
       typeof editedOption.value === "object" ? editedOption.value.value : "";
 
-    if (isPrefixCodeChanged && !!assetCounter && !!newPrefixCode) {
-      onUpdate(editedOption, {
-        ...assetCounter,
-        category,
-        prefixCode: newPrefixCode,
-        oldPrefixCode,
-      });
+    if (assetCounter && category) {
+      const isCategoryNameChanged = category !== assetCounter.category;
+      const isPrefixCodeChanged: boolean =
+        !!newPrefixCode && oldPrefixCode !== newPrefixCode;
+
+      if (isPrefixCodeChanged && isCategoryNameChanged) {
+        onUpdate(editedOption, {
+          ...assetCounter,
+          category,
+          prefixCode: newPrefixCode,
+          oldPrefixCode,
+        });
+        // CHECK IF ONLY THE CATEGORY NAME IS CHANGED
+      } else if (isCategoryNameChanged) {
+        onUpdate(editedOption, {
+          ...assetCounter,
+          category,
+          oldPrefixCode,
+        });
+        // CHECK IF ONLY THE PREFIX CODE IS CHANGED
+      } else if (isPrefixCodeChanged) {
+        onUpdate(editedOption, {
+          ...assetCounter,
+          prefixCode: newPrefixCode,
+          oldPrefixCode,
+        });
+      }
       updateAssetCounterInCache(assetCounter._id!, {
         prefixCode: newPrefixCode,
         category,
       });
+    }
+  };
+
+  const handleUpdate = () => {
+    if (optionError) {
+      throw new Error(`${capitalize(property)} name can not be empty`);
+    }
+    if (isCategoryType) {
+      handleCategoryUpdate();
     } else {
       onUpdate(editedOption);
     }
@@ -122,15 +125,31 @@ const EditOption = ({
   }, [propertyIsCategory, assetCounter, oldPrefixCode, newPrefixCode]);
 
   useEffect(() => {
-    if (
-      (newPrefixCode === "" || newPrefixCode === undefined) &&
-      isCategoryType
-    ) {
+    if (!isCategoryType) return;
+    // if (isAssetCounterLoading) return;
+
+    if (newPrefixCode === "" || newPrefixCode === undefined) {
       setPrefixCodeError("Prefix code can not be empty");
+    } else if (assetCounters && assetCounter) {
+      const isDuplicatePrefixCode = assetCounters.find(
+        (ac: AssetCounterType) =>
+          ac.prefixCode === newPrefixCode && ac._id !== assetCounter._id
+      );
+      if (isDuplicatePrefixCode) {
+        setPrefixCodeError(`Prefix code ${newPrefixCode} is already assigned`);
+      } else {
+        setPrefixCodeError("");
+      }
     } else {
       setPrefixCodeError("");
     }
-  }, [newPrefixCode]);
+  }, [
+    newPrefixCode,
+    isCategoryType,
+    assetCounters,
+    assetCounter,
+    // isAssetCounterLoading,
+  ]);
 
   useEffect(() => {
     if (getOptionValue(editedOption.value) === "") {
@@ -138,7 +157,8 @@ const EditOption = ({
     } else {
       setOptionError("");
     }
-  }, [editedOption.value, property, getOptionValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editedOption.value, property]);
 
   return (
     <>

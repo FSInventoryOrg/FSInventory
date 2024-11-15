@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogClose,
   DialogTitle,
@@ -11,6 +10,12 @@ import { NotebookPenIcon, XIcon } from "lucide-react";
 import { AssetUnionType } from "@/types/asset";
 import { Button } from "../ui/button";
 import { format } from "date-fns";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 interface AssetCodeProps {
   asset: AssetUnionType;
@@ -19,15 +24,29 @@ const RemarksIndicator = ({ asset }: AssetCodeProps) => {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   return (
     <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="px-2 py-0"
-        >
-          <NotebookPenIcon size={16} className="text-primary cursor-pointer " />
-        </Button>
-      </DialogTrigger>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="px-2 py-0"
+              onClick={() => setIsViewDialogOpen(true)}
+            >
+              <span>
+                <span className="sr-only">View Remarks</span>
+                <NotebookPenIcon
+                  size={16}
+                  className="text-primary cursor-pointer"
+                />
+              </span>
+              <TooltipContent side="right">
+                <p className="text-xs">View Remarks</p>
+              </TooltipContent>
+            </Button>
+          </TooltipTrigger>
+        </Tooltip>
+      </TooltipProvider>
       <DialogContent className="flex flex-col">
         <DialogHeader>
           <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
@@ -41,10 +60,10 @@ const RemarksIndicator = ({ asset }: AssetCodeProps) => {
             <NotebookPenIcon size={16} className="text-primary" />
             Remarks
           </h1>
-          <span className="pt-2 pl-2">
-            {asset.remarks}
+          <span className="pt-2 pl-2">{asset.remarks}</span>
+          <span className="pb-2 pl-2 font-extralight text-accent-foreground text-xs text-start italic">
+            {format(asset.updated, "PP")}
           </span>
-          <span className='pb-2 pl-2 font-extralight text-accent-foreground text-xs text-start italic'>{format(asset.updated, "PP")}</span>
         </div>
       </DialogContent>
     </Dialog>
