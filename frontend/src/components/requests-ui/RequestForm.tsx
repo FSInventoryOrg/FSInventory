@@ -7,6 +7,7 @@ import ReportIssueForm from "./ReportIssueForm";
 import {
   RequestFormData,
   RequestFormSchema,
+  RequestorFormData,
   RequestType,
 } from "@/schemas/RequestFormSchema";
 import {
@@ -47,8 +48,9 @@ const defaultRequestAssetValues = {
 };
 
 interface RequestFormProps {
-  userData: Record<string, string>;
+  userData: RequestorFormData;
 }
+
 const RequestForm = ({ userData }: RequestFormProps) => {
   const [open, setOpen] = useState(false);
   const { showToast } = useAppContext();
