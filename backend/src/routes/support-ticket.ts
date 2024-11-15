@@ -7,9 +7,6 @@ import {
   TicketPriority,
   SupportTicketLog,
   TicketStatus,
-  supportTicketSchema,
-  assetRequestSchema,
-  issueReportSchema,
   ISupportTicket,
 } from "../models/support-ticket.schema";
 import {
@@ -19,7 +16,6 @@ import {
 } from "../middleware/support-ticket";
 import verifyToken, { verifyRole } from "../middleware/auth";
 import { TicketQueryParams, TicketRequestBody } from "../types/support-ticket";
-import { getSearchableFields } from "../utils/support-ticket";
 import { FilterQuery } from "mongoose";
 
 const router = express.Router();
@@ -39,12 +35,14 @@ router.get(
     if (type) filters.type = type;
     if (status) filters.status = status;
     if (query) {
-      const searchableFields = [
-        ...getSearchableFields(supportTicketSchema),
-        ...getSearchableFields(assetRequestSchema),
-        ...getSearchableFields(issueReportSchema),
-      ];
-      filters.$or = searchableFields.map((field) => ({
+      filters.$or = [
+        "ticketId",
+        "createdBy",
+        "employeeName",
+        "employeeEmail",
+        "assetSpecsModel",
+        "assettAffected",
+      ].map((field) => ({
         [field]: { $regex: query, $options: "i" },
       }));
     }
@@ -130,7 +128,7 @@ router.post(
       };
 
       let _ticket;
-      if (ticketInfo.type === TicketType.IssueReport) {
+      if (newTicketData.type === TicketType.IssueReport) {
         _ticket = new IssueReportTicketModel(newTicketData);
       } else {
         _ticket = new AssetRequestTicketModel(newTicketData);
@@ -174,6 +172,10 @@ router.put(
         });
       }
 
+      // activity information should be descriptive:
+      // __ changed the priority from A to B
+      // __ changed the status from A to B
+      // __ added the notes/remarks
       const newLogEntry: SupportTicketLog = {
         activityInformation: `${ticketInfo.updatedBy} updated this support ticket.`,
         status: ticketInfo.status || currentTicket.status,
