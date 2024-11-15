@@ -17,6 +17,7 @@ import {
 import verifyToken, { verifyRole } from "../middleware/auth";
 import { TicketQueryParams, TicketRequestBody } from "../types/support-ticket";
 import { FilterQuery } from "mongoose";
+import { generateActivityLogDetails } from "../utils/support-ticket";
 
 const router = express.Router();
 
@@ -172,19 +173,7 @@ router.put(
         });
       }
 
-      // activity information should be descriptive:
-      // __ changed the priority from A to B
-      // __ changed the status from A to B
-      // __ added the notes/remarks
-      const newLogEntry: SupportTicketLog = {
-        activityInformation: `${ticketInfo.updatedBy} updated this support ticket.`,
-        status: ticketInfo.status || currentTicket.status,
-        notes: ticketInfo.notes || currentTicket.notes,
-        priority: ticketInfo.priority || currentTicket.priority,
-        updatedAt: new Date(),
-        updatedBy: ticketInfo.updatedBy,
-      };
-
+      const newLogEntry = generateActivityLogDetails(currentTicket, ticketInfo);
       const updatedTicket = await SupportTicketModel.findOneAndUpdate(
         { ticketId: ticketId },
         {
