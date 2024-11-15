@@ -1,16 +1,16 @@
 import { z } from "zod";
 
 export const RequestorFormSchema = z.object({
-  fullName: z.string().trim().min(1, "Full name is required"),
-  manager: z.string().trim().min(1, "Manager is required"),
-  contactInfo: z.string().min(1, "Contact information is required"),
+  employeeName: z.string().trim().min(1, "Full name is required"),
+  managerName: z.string().trim().min(1, "Manager is required"),
+  employeeEmail: z.string().min(1, "Contact information is required"),
 });
 
 export const ReportIssueSchema = z.object({
-  requestType: z.literal("Issue Report"),
+  type: z.literal("Issue Report"),
   issueCategory: z.string().trim().min(1, "Issue category is required"),
   assetAffected: z.string().optional(),
-  problemDescription: z
+  issueDescription: z
     .string()
     .trim()
     .min(1, "Detailed description is required"),
@@ -18,31 +18,30 @@ export const ReportIssueSchema = z.object({
 });
 
 export const RequestNewAssetSchema = z.object({
-  requestType: z.literal("Asset Request"),
+  type: z.literal("Asset Request"),
   assetType: z.string().min(1, "Asset type is required"),
-  assetSpecification: z
+  assetSpecsModel: z
     .string()
     .trim()
     .min(1, "Asset specifications or model is required"),
-  requestJustification: z
+  justification: z
     .string()
     .trim()
     .min(1, "Justification for request is required"),
-  requestDate: z.date().nullable().optional(),
+  requestedDate: z.date().nullable().optional(),
 });
+
 const REQUEST_TYPES = ["Issue Report", "Asset Request"] as const;
+
 export const RequestFormSchema = z
   .object({
-    requestType: z.enum(REQUEST_TYPES, {
+    type: z.enum(REQUEST_TYPES, {
       required_error: "Request Type is required",
     }),
   })
   .and(RequestorFormSchema)
   .and(
-    z.discriminatedUnion("requestType", [
-      ReportIssueSchema,
-      RequestNewAssetSchema,
-    ])
+    z.discriminatedUnion("type", [ReportIssueSchema, RequestNewAssetSchema])
   );
 
 export type ReportIssueFormData = z.infer<typeof ReportIssueSchema>;

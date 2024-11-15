@@ -117,7 +117,7 @@ const ReportIssueForm = () => {
       />
       <FormField
         control={reportIssueForm.control}
-        name="problemDescription"
+        name="issueDescription"
         render={({ field }) => (
           <FormItem>
             <CustomFormLabel required>Description of Issue</CustomFormLabel>

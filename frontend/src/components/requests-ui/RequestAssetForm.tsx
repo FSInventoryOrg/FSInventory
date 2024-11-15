@@ -26,32 +26,31 @@ import {
 import { useState } from "react";
 import CustomFormLabel from "./CustomFormLabel";
 
+const ASSET_TYPES = [
+  {
+    value: "Hardware",
+    label: "Hardware Asset",
+    caption: "Test device, mouse, laptop, monitor, etc.",
+  },
+  {
+    value: "Software",
+    label: "Software Asset",
+    caption: "Office 365, Adobe Suite, VPN software",
+  },
+  {
+    value: "Network",
+    label: "Network Equipment",
+    caption: "Router, switch, etc.",
+  },
+];
+
 const RequestAssetForm = () => {
   const [openRequestedDate, setOpenRequestedDate] = useState(false);
 
   const requestAssetForm = useFormContext();
-  const assetTypes = [
-    {
-      value: "hardware",
-      label: "Hardware Asset",
-      caption: "Test device, mouse, laptop, monitor, etc.",
-    },
-    {
-      value: "software",
-      label: "Software Asset",
-      caption: "Office 365, Adobe Suite, VPN software",
-    },
-    {
-      value: "network",
-      label: "Network Equipment",
-      caption: "Router, switch, etc.",
-    },
-  ];
 
-  const findOptionByValue = (
-    options: Record<string, string>[],
-    value: string
-  ) => options.find((option) => option.value === value);
+  const findOptionByValue = (options: typeof ASSET_TYPES, value: string) =>
+    options.find((option) => option.value === value);
 
   return (
     <div className="flex flex-col gap-3">
@@ -72,13 +71,13 @@ const RequestAssetForm = () => {
                     }
                   >
                     {field.value
-                      ? findOptionByValue(assetTypes, field.value)?.label
+                      ? findOptionByValue(ASSET_TYPES, field.value)?.label
                       : "Select a category"}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {assetTypes.map((assetType) => (
+                    {ASSET_TYPES.map((assetType) => (
                       <SelectItem key={assetType.value} value={assetType.value}>
                         <div className="flex flex-col">
                           <span>{assetType.label}</span>
@@ -98,7 +97,7 @@ const RequestAssetForm = () => {
       />
       <FormField
         control={requestAssetForm.control}
-        name="assetSpecification"
+        name="assetSpecsModel"
         render={({ field }) => (
           <FormItem className="sm:w-1/2 pr-2">
             <CustomFormLabel required>Asset Specs or Model</CustomFormLabel>
@@ -114,7 +113,7 @@ const RequestAssetForm = () => {
       />
       <FormField
         control={requestAssetForm.control}
-        name="requestJustification"
+        name="justification"
         render={({ field }) => (
           <FormItem>
             <CustomFormLabel required>
@@ -133,7 +132,7 @@ const RequestAssetForm = () => {
       />
       <FormField
         control={requestAssetForm.control}
-        name="requestDate"
+        name="requestedDate"
         render={({ field }) => (
           <FormItem className="w-full">
             <CustomFormLabel>Requested Date for Asset</CustomFormLabel>

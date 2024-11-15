@@ -68,17 +68,14 @@ const RequestForm = ({ userData }: RequestFormProps) => {
   const requestForm = useForm<RequestFormData>({
     resolver: zodResolver(RequestFormSchema),
     defaultValues: {
-      requestType: "Issue Report",
+      type: "Issue Report",
       ...userData,
       ...defaultReportIssueValues,
     },
     mode: "onChange",
   });
 
-  const requestType = requestForm.watch(
-    "requestType",
-    "Issue Report" as RequestType
-  );
+  const requestType = requestForm.watch("type", "Issue Report" as RequestType);
 
   const resetForm = (type: RequestType) => {
     requestForm.reset({
@@ -91,7 +88,7 @@ const RequestForm = ({ userData }: RequestFormProps) => {
 
   useEffect(() => {
     if (!open) {
-      requestForm.reset({ requestType: "Issue Report" });
+      requestForm.reset({ type: "Issue Report" });
     }
   }, [requestForm, open]);
 
@@ -149,7 +146,7 @@ const RequestForm = ({ userData }: RequestFormProps) => {
               <h2 className="text-lg font-semibold">Ticket Type</h2>
               <FormField
                 control={requestForm.control}
-                name="requestType"
+                name="type"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
