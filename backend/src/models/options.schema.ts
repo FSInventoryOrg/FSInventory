@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { AssetType, IssueCategory, TicketType } from "./support-ticket.schema";
 
 export type StatusOptions = {
   value: string;
@@ -22,7 +21,6 @@ export type Defaults = {
   deployableStatus?: string[];
   retrievableStatus?: string;
   inventoryColumns?: string[];
-  supportTicketType?: TicketType.IssueReport;
 };
 
 export interface OptionsType extends Document {
@@ -33,9 +31,6 @@ export interface OptionsType extends Document {
   defaults: Defaults;
   adminLists?: string[];
   licenseType: string[];
-  supportTicketType: TicketType[];
-  supportTicketAssetType: AssetType[];
-  supportTicketIssueCategory: IssueCategory[];
 }
 
 const optionsSchema: Schema<OptionsType> = new Schema<OptionsType>({
@@ -71,25 +66,9 @@ const optionsSchema: Schema<OptionsType> = new Schema<OptionsType>({
       deployableStatus: { type: [String], required: false },
       retrievableStatus: { type: String, required: false },
       inventoryColumns: { type: [String], required: false },
-      supportTicketType: { type: String, required: false },
     },
   },
   adminLists: { type: [String], required: false },
-  supportTicketType: {
-    type: [String],
-    required: true,
-    enum: Object.values(TicketType),
-  },
-  supportTicketAssetType: {
-    type: [String],
-    required: true,
-    enum: Object.values(AssetType),
-  },
-  supportTicketIssueCategory: {
-    type: [String],
-    required: true,
-    enum: Object.values(IssueCategory),
-  },
 });
 
 const Option = mongoose.model<OptionsType>("Options", optionsSchema);
