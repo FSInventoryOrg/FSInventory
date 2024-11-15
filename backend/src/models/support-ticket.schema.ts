@@ -1,48 +1,13 @@
-/* eslint-disable no-unused-vars */
 import mongoose, { Schema } from "mongoose";
 import { SupportTicketCounterModel } from "./support-ticket-counter.schema";
-
-enum TicketType {
-  IssueReport = "Issue Report",
-  AssetRequest = "Asset Request",
-}
-
-enum TicketStatus {
-  PendingManager = "Pending Manager Approval",
-  Rejected = "Rejected",
-  PendingIT = "Pending IT Action",
-  Resolved = "Resolved",
-}
-
-enum TicketPriority {
-  Low = "Low",
-  Medium = "Medium",
-  High = "High",
-}
-
-enum AssetType {
-  Hardware = "Hardware",
-  Software = "Software",
-  Network = "Network",
-}
-
-enum IssueCategory {
-  Hardware = "Hardware",
-  Software = "Software",
-  Network = "Network",
-  Communication = "Communication",
-  Security = "Security",
-}
-
-// TODO: Update and implement activity log
-type SupportTicketLog = {
-  activityInformation?: string;
-  status?: TicketStatus;
-  priority?: TicketPriority;
-  notes?: string;
-  updatedBy?: string;
-  updatedAt: Date;
-};
+import {
+  AssetType,
+  IssueCategory,
+  SupportTicketLog,
+  TicketPriority,
+  TicketStatus,
+  TicketType,
+} from "../types/support-ticket";
 
 // Interface for the base Support Ticket
 interface ISupportTicket {
@@ -63,7 +28,7 @@ interface ISupportTicket {
 
 // Interface for Issue Report Ticket
 interface IIssueReportTicket extends ISupportTicket {
-  type: TicketType.IssueReport; // Set the specific enum value
+  type: TicketType.IssueReport;
   issueCategory: IssueCategory;
   assetAffected?: string;
   issueDescription: string;
@@ -71,7 +36,7 @@ interface IIssueReportTicket extends ISupportTicket {
 
 // Interface for Asset Request Ticket
 interface IAssetRequestTicket extends ISupportTicket {
-  type: TicketType.AssetRequest; // Set the specific enum value
+  type: TicketType.AssetRequest;
   assetType: AssetType;
   assetSpecsModel: string;
   justification: string;
@@ -240,15 +205,9 @@ export {
   SupportTicketModel, // Support Ticket Base Model
   AssetRequestTicketModel, // Asset Request Model
   IssueReportTicketModel, // Issue Report Model
-  TicketType, // enum
-  TicketStatus, // enum
-  TicketPriority, // enum
-  AssetType, // enum
-  IssueCategory, // enum
   ISupportTicket, // interfaces
   IIssueReportTicket, // interfaces
   IAssetRequestTicket, // interfaces
-  SupportTicketLog, // type
   supportTicketSchema, // schema
   issueReportSchema, // schema
   assetRequestSchema, // schema

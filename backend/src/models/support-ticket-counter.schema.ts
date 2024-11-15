@@ -1,10 +1,5 @@
-/* eslint-disable no-unused-vars */
 import mongoose, { Schema } from "mongoose";
-
-enum SupportTicketPrefix {
-  IssueReport = "IR",
-  AssetRequest = "AR",
-}
+import { SupportTicketPrefix } from "../types/support-ticket";
 
 interface ISupportTicketCounter {
   prefix: SupportTicketPrefix;
@@ -32,7 +27,6 @@ const SupportTicketCounterModel = mongoose.model<ISupportTicketCounter>(
 
 export {
   SupportTicketCounterModel, // model
-  SupportTicketPrefix, // enum
   ISupportTicketCounter, // interface
   supportTicketCounterSchema, // schema
 };

@@ -2,11 +2,7 @@ import express, { Request, Response } from "express";
 import {
   SupportTicketModel,
   AssetRequestTicketModel,
-  TicketType,
   IssueReportTicketModel,
-  TicketPriority,
-  SupportTicketLog,
-  TicketStatus,
   ISupportTicket,
 } from "../models/support-ticket.schema";
 import {
@@ -14,9 +10,16 @@ import {
   validateSupportTicket,
   validateUpdaterFields,
 } from "../middleware/support-ticket";
-import verifyToken, { verifyRole } from "../middleware/auth";
-import { TicketQueryParams, TicketRequestBody } from "../types/support-ticket";
+import {
+  TicketQueryParams,
+  TicketRequestBody,
+  TicketType,
+  TicketPriority,
+  SupportTicketLog,
+  TicketStatus,
+} from "../types/support-ticket";
 import { FilterQuery } from "mongoose";
+import verifyToken, { verifyRole } from "../middleware/auth";
 import { generateActivityLogDetails } from "../utils/support-ticket";
 
 const router = express.Router();

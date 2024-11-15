@@ -1,7 +1,7 @@
 import { body, ValidationChain } from "express-validator";
-import { TicketPriority, TicketStatus } from "../models/support-ticket.schema";
+import { TicketPriority, TicketStatus } from "../types/support-ticket";
 
-// validation rules for creating all ticket types
+// Base validation rules for the POST endpoint
 const supportTicketValidation: ValidationChain[] = [
   body("employeeName").notEmpty().withMessage("Employee name is required."),
   body("employeeEmail").isEmail().withMessage("Employee email must be valid."),
@@ -32,7 +32,7 @@ const supportTicketValidation: ValidationChain[] = [
   body("createdBy").notEmpty().withMessage("Created by is required."),
 ];
 
-// Additional validatiton for Issue Report Ticket
+// Additional Validation for Issue Report Ticket
 const issueReportValidation: ValidationChain[] = [
   ...supportTicketValidation,
   body("issueCategory")
@@ -47,7 +47,7 @@ const issueReportValidation: ValidationChain[] = [
     .withMessage("Issue description is required for Issue Report tickets."),
 ];
 
-// Additional validation for Asset Request tickets
+// Additional Validation for Asset Request tickets
 const assetRequestValidation: ValidationChain[] = [
   ...supportTicketValidation,
   body("assetType")
@@ -68,6 +68,7 @@ const assetRequestValidation: ValidationChain[] = [
     .withMessage("Requested date must be a valid date in ISO format."),
 ];
 
+// validation for the PUT endpoint
 const updaterFieldValidation = [
   body("*").custom((_, { location, path }) => {
     const allowedFields = ["status", "priority", "notes", "updatedBy"];

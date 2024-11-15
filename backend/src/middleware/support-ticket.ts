@@ -4,7 +4,6 @@ import {
   assetRequestSchema,
   issueReportSchema,
   supportTicketSchema,
-  TicketType,
 } from "../models/support-ticket.schema";
 import {
   issueReportValidation,
@@ -12,7 +11,7 @@ import {
   updaterFieldValidation,
 } from "../validation/support-ticket";
 import { getAllowedFields } from "../utils/support-ticket";
-import { TicketRequestBody } from "../types/support-ticket";
+import { TicketRequestBody, TicketType } from "../types/support-ticket";
 
 // Middleware to apply correct validation based on ticket type
 const validateSupportTicket = <T extends TicketType>(
@@ -50,7 +49,7 @@ const validateCreateFields = () => {
   const supportTicketSchemaFields = Object.keys(supportTicketSchema.paths);
   const restrictedFields = ["priority", "notes", "status"];
 
-  // Fields that are allowed in the POST and PUT endpoints
+  // Fields that are allowed in the POST endpoints
   const allowedFieldsMap = {
     [TicketType.IssueReport]: getAllowedFields(
       issueReportSchema,
