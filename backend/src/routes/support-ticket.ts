@@ -42,7 +42,7 @@ router.get(
         "employeeName",
         "employeeEmail",
         "assetSpecsModel",
-        "assettAffected",
+        "assetAffected",
       ].map((field) => ({
         [field]: { $regex: query, $options: "i" },
       }));
