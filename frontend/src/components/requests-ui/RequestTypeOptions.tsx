@@ -15,30 +15,35 @@ interface RequestTypeOptionsProps {
   value: string;
   onChange: (value: string) => void;
 }
+
+const REQUEST_TYPES = [
+  {
+    id: "Issue Report",
+    title: "Report an Issue",
+    details: "For issues with hardware, software, and your network",
+  },
+  {
+    id: "Asset Request",
+    title: "Request a New Asset",
+    details: "For requesting new hardware or software assets",
+  },
+];
+
 const RequestTypeOptions = ({ value, onChange }: RequestTypeOptionsProps) => {
   return (
     <RadioGroup value={value} onValueChange={onChange}>
       <div className="flex flex-col sm:flex-row gap-4">
-        <RadioContainer
-          id="reportIssue"
-          value="Report an Issue"
-          selectedValue={value}
-        >
-          <RequestTypeTitle>Report an Issue</RequestTypeTitle>
-          <RequestTypeDetails>
-            For issues with hardware, software, and your network
-          </RequestTypeDetails>
-        </RadioContainer>
-        <RadioContainer
-          id="requestAsset"
-          value="Request a New Asset"
-          selectedValue={value}
-        >
-          <RequestTypeTitle>Request a New Asset</RequestTypeTitle>
-          <RequestTypeDetails>
-            For requesting new hardware or software assets
-          </RequestTypeDetails>
-        </RadioContainer>
+        {REQUEST_TYPES.map((requestType) => (
+          <RadioContainer
+            id={requestType.id}
+            key={requestType.id}
+            value={requestType.id}
+            selectedValue={value}
+          >
+            <RequestTypeTitle>{requestType.title}</RequestTypeTitle>
+            <RequestTypeDetails>{requestType.details}</RequestTypeDetails>
+          </RadioContainer>
+        ))}
       </div>
     </RadioGroup>
   );
