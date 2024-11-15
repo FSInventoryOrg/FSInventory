@@ -1,33 +1,27 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const alertVariants = cva(
-  "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
-  {
-    variants: {
-      variant: {
-        default: "bg-background text-foreground",
-        destructive:
-          "border-none text-destructive [&>svg]:text-destructive bg-destructive/10",
-        destructiveOutline:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
-        warning:
-          "border-none text-warning [&>svg]:text-warning bg-warning/10",
-        warningOutline:
-          "border-warning/50 text-warning dark:border-warning [&>svg]:text-warning",
-        success: 
-          "border-primary bg-primary/10 text-primary"
-
-        },
-
+const alertVariants = cva("relative w-full rounded-lg border p-4", {
+  variants: {
+    variant: {
+      default: "bg-background text-foreground",
+      destructive:
+        "border-none text-destructive [&>svg]:text-destructive bg-destructive/10",
+      destructiveOutline:
+        "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+      warning: "border-none text-warning [&>svg]:text-warning bg-warning/10",
+      warningOutline:
+        "border-warning/50 text-warning dark:border-warning [&>svg]:text-warning",
+      success: "border-primary bg-primary/10 text-primary",
+      error: "border-none text-error bg-error-bg",
     },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+});
 
 const Alert = React.forwardRef<
   HTMLDivElement,
@@ -39,8 +33,8 @@ const Alert = React.forwardRef<
     className={cn(alertVariants({ variant }), className)}
     {...props}
   />
-))
-Alert.displayName = "Alert"
+));
+Alert.displayName = "Alert";
 
 const AlertTitle = React.forwardRef<
   HTMLParagraphElement,
@@ -51,8 +45,8 @@ const AlertTitle = React.forwardRef<
     className={cn("mb-1 font-medium leading-none tracking-tight", className)}
     {...props}
   />
-))
-AlertTitle.displayName = "AlertTitle"
+));
+AlertTitle.displayName = "AlertTitle";
 
 const AlertDescription = React.forwardRef<
   HTMLParagraphElement,
@@ -60,10 +54,10 @@ const AlertDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    className={cn("text-xs [&_p]:leading-relaxed", className)}
     {...props}
   />
-))
-AlertDescription.displayName = "AlertDescription"
+));
+AlertDescription.displayName = "AlertDescription";
 
-export { Alert, AlertTitle, AlertDescription }
+export { Alert, AlertTitle, AlertDescription };
