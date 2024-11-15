@@ -60,5 +60,6 @@ yarn-error.log*
 
 /backend/mongo-keyfile
 /backend/inventory
+/backend/frontend
 !/public/**/
 !/public/**/.gitkeep
