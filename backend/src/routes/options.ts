@@ -172,7 +172,7 @@ router.put(
     check("softwareCategory").optional().isString(),
     check("hardwareCategory").optional().isString(),
     check("equipmentType").optional().isString(),
-    check("deployableStatus").isArray(),
+    check("deployableStatus").optional().isArray(),
     check("retrievableStatus").optional().isString(),
     check("inventoryColumns").optional().isArray(),
   ],
