@@ -79,10 +79,7 @@ const RequestorForm = () => {
               Contact Information
             </FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                placeholder="johndoe@fullscale.ph or +63 912 345 6789"
-              />
+              <Input {...field} placeholder="johndoe@fullscale.ph" />
             </FormControl>
             <FormMessage />
           </FormItem>
