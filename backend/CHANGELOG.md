@@ -2,6 +2,12 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.xx.x](https://connect.zoho.com/portal/intranet/task/623367000000992200) 2024-11-15
+### Added
+- Added the endpoints for the support ticket feature
+- Added the models for the support ticket feature
+- Added the validation for the support ticket feature
+
 ## [2.19.1](https://connect.zoho.com/portal/intranet/task/623367000000878039) 2024-10-29
 ### Fixed
 - Case insensitve checking for existing option value
