@@ -21,6 +21,8 @@ import {
 import { FilterQuery } from "mongoose";
 import verifyToken, { verifyRole } from "../middleware/auth";
 import { generateActivityLogDetails } from "../utils/support-ticket";
+import { supportTicketHtml } from "../templates/support-ticket/support-ticket-mail";
+import { sendMail } from "../system/mailer";
 
 const router = express.Router();
 
@@ -198,5 +200,29 @@ router.put(
     }
   }
 );
+
+router.post("/test", async (req: Request, res: Response) => {
+  //
+  const htmlMessage = await supportTicketHtml();
+  try {
+    await sendMail({
+      subject: "An employee has submitted an IT Support Ticket",
+      htmlMessage: htmlMessage,
+      recipient: "hcesa@fullscale.ph",
+      attachments: [],
+    });
+
+    return res.status(200).json({
+      status: 200,
+      message: "Email sent successfully",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong",
+      error: err,
+    });
+  }
+});
 
 export default router;
