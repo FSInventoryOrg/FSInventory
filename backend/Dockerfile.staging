@@ -6,8 +6,6 @@ COPY package.json ./
 
 RUN npm install
 
-RUN npm run build || tail -n 20 /root/.npm/_logs/*
-
 RUN \
     mkdir -p public/attachments && \
     mkdir -p public/backup/archive && \
@@ -18,6 +16,8 @@ RUN \
     chmod -R 775 public
 
 COPY . .
+
+RUN npm run build || tail -n 20 /root/.npm/_logs/*
 
 EXPOSE 8080
 

@@ -6,9 +6,9 @@ COPY package.json ./
 
 RUN npm install
 
-RUN npm run build || tail -n 20 /root/.npm/_logs/*
-
 COPY . .
+
+RUN npm run build || tail -n 20 /root/.npm/_logs/*
 
 FROM nginx:1.24.0-alpine
 
