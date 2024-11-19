@@ -21,6 +21,16 @@ export const generateSupportTicketHTML = async (data: T) => {
     const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
     return imageExtensions.some((ext) => fileUrl.toLowerCase().endsWith(ext));
   });
+  Handlebars.registerHelper("getInitial", (text: string) => {
+    const splittedText = text.split(" ");
+    if (splittedText.length <= 1) {
+      return splittedText[0].charAt(0).toUpperCase();
+    }
+    const firstWord = splittedText[0];
+    const lastWord = splittedText[splittedText.length - 1];
+    return firstWord.charAt(0).toUpperCase() + lastWord.charAt(0).toUpperCase();
+  });
+
   const template = Handlebars.compile(templateContent?.toString());
   const urls = generateRejectApproveUrl({
     ticketId: data.ticketId ?? "",
@@ -32,9 +42,7 @@ export const generateSupportTicketHTML = async (data: T) => {
     employeeName: data.employeeName,
     employeeEmail: data.employeeEmail,
     employeeRole: data.employeeRole || "Full Scale Employee (Default)",
-    employeeProfile:
-      data.employeeProfile ||
-      "https://d1gvpl8cjqq6t6.cloudfront.net/overlays/_public/886b29e1-bf72-40eb-9873-3bb725a30688.jpg",
+    employeeProfile: data.employeeProfile,
     supportingFiles: data.supportingFiles,
     status: data.status,
     approveUrl: urls.approveUrl || "",
