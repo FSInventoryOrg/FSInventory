@@ -8,19 +8,13 @@ services:
       dockerfile: Dockerfile.staging
     container_name: api-staging
     volumes:
-      - ./backend:/usr/src/app
-      - /usr/src/app/node_modules
-      - /usr/src/app/public
       - ./frontend/package.json:/usr/src/app/frontend/package.json
-      - ./frontend/dist:/usr/src/app/frontend/dist
     ports:
       - 8080:8080
     env_file:
       - ./backend/.env.staging
     environment:
       HOST: ${HOST:-0.0.0.0}
-    networks:
-      - app-network
 
   app:
     image: inventory-app-staging
@@ -32,9 +26,3 @@ services:
       - 3000:80
     env_file:
       - ./frontend/.env.staging
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
