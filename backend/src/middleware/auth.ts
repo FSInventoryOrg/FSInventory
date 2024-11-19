@@ -55,9 +55,8 @@ declare global {
 
 const { ROCKS_DEV_API_URL, ROCKS_PRODUCTION_API_URL, NODE_ENV } = process.env;
 
-const API_URL: string = NODE_ENV
-  ? ROCKS_PRODUCTION_API_URL!
-  : ROCKS_DEV_API_URL!;
+const API_URL: string =
+  NODE_ENV === "PRODUCTION" ? ROCKS_PRODUCTION_API_URL! : ROCKS_DEV_API_URL!;
 
 const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies["auth_token"];
@@ -68,7 +67,7 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     const user: RocksUser = await (await fetch(`${API_URL}/users/me`)).json();
     req.user = {
       userId: user.id,
-      role: user.role, // TEMPORARY FIX UNTIL ROCKS API RETURNS ROLES
+      role: user.role,
     } as UserAuth;
     next();
   } catch (error) {
