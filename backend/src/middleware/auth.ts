@@ -106,5 +106,20 @@ const tokenStatus = async (token: string) => {
   return status;
 };
 
+const currentUser = async (token: string) => {
+  const status = await fetch(`${API_URL}/users/me`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!status.ok) throw Error("Token expired");
+
+  return status;
+};
+
 export default verifyToken;
-export { verifyRole, tokenStatus };
+export { verifyRole, tokenStatus, currentUser };
