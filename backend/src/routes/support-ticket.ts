@@ -21,7 +21,7 @@ import {
 import { FilterQuery } from "mongoose";
 import verifyToken, { verifyRole } from "../middleware/auth";
 import { generateActivityLogDetails } from "../utils/support-ticket";
-import { supportTicketHtml } from "../templates/support-ticket/support-ticket-mail";
+import { generateSupportTicketHTML } from "../templates/support-ticket/support-ticket-mail";
 import { sendMail } from "../system/mailer";
 
 const router = express.Router();
@@ -141,10 +141,26 @@ router.post(
       }
 
       const saved = await _ticket.save();
-      return res.status(201).json({
+      // respond to the client as soon as the ticket is saved :)
+      res.status(201).json({
         status: 201,
         data: saved,
       });
+
+      // send an email. This is better handled in a webhook or in a separate process
+      // so an error regarding email sending is handled separately.
+      try {
+        const htmlMessage = await generateSupportTicketHTML(saved);
+        await sendMail({
+          subject: "An employee has submitted an IT Support Ticket",
+          htmlMessage: htmlMessage,
+          recipient: ticketInfo.managerEmail,
+          attachments: [],
+        });
+      } catch (emailError) {
+        // Should log this event separately
+        console.log("Error sending an email:", emailError);
+      }
     } catch (error) {
       return res.status(500).json({
         status: 500,
@@ -203,18 +219,19 @@ router.put(
 
 router.post("/test", async (req: Request, res: Response) => {
   //
-  const htmlMessage = await supportTicketHtml();
+  // const htmlMessage = await generateSupportTicketHTML();
   try {
-    await sendMail({
-      subject: "An employee has submitted an IT Support Ticket",
-      htmlMessage: htmlMessage,
-      recipient: "hcesa@fullscale.ph",
-      attachments: [],
-    });
+    // await sendMail({
+    //   subject: "An employee has submitted an IT Support Ticket",
+    //   htmlMessage: htmlMessage,
+    //   recipient: "hcesa@fullscale.ph",
+    //   attachments: [],
+    // });
 
     return res.status(200).json({
       status: 200,
       message: "Email sent successfully",
+      // htmlMessage: htmlMessage,
     });
   } catch (err) {
     return res.status(500).json({
