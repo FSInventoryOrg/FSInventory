@@ -24,7 +24,7 @@ import Software from "../models/software.schema";
 import Employee from "../models/employee.schema";
 import NotificationSettings from "../models/notification-settings.schema";
 
-const directory = path.join(path.resolve(), "../");
+const directory = path.join(path.resolve());
 
 let DBCONN: any;
 
@@ -107,7 +107,7 @@ export const getUploadFormat = (folder: string) => {
 };
 
 export const getParentDirectory = () => {
-  return path.join(directory, "../");
+  return path.join(directory);
 };
 
 export const setFSEnvironment = async (data: any) => {
