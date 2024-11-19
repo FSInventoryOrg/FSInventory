@@ -17,12 +17,14 @@ import {
   TicketPriority,
   SupportTicketLog,
   TicketStatus,
+  ApprovalQueryParams,
 } from "../types/support-ticket";
 import { FilterQuery } from "mongoose";
 import verifyToken, { verifyRole } from "../middleware/auth";
 import { generateActivityLogDetails } from "../utils/support-ticket";
 import { generateSupportTicketHTML } from "../templates/support-ticket/support-ticket-mail";
 import { sendMail } from "../system/mailer";
+import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -212,6 +214,99 @@ router.put(
         status: 500,
         message: "Error updating the support ticket.",
         error: error,
+      });
+    }
+  }
+);
+
+router.get(
+  "/:ticketId/approve",
+  async (
+    req: Request<{ ticketId: string }, object, object, { token: string }>,
+    res: Response
+  ) => {
+    const { ticketId } = req.params;
+    const { token } = req.query;
+
+    try {
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET_KEY as string
+      ) as ApprovalQueryParams;
+
+      // Ensure that the ticketId param is not modified
+      if (ticketId !== decoded.ticketId) {
+        return res.status(403).json({
+          status: 403,
+          message: "Unauthorized: Invalid Support Ticket.",
+        });
+      }
+
+      const ticket = await SupportTicketModel.findOne({ ticketId });
+      if (!ticket) {
+        return res.status(404).json({
+          status: 404,
+          message: "Support Ticket not found.",
+        });
+      }
+
+      // Ensure the manager email matches
+      if (ticket.managerEmail !== decoded.managerEmail) {
+        return res.status(403).json({
+          status: 403,
+          message:
+            "Unauthorized: You are not the manager assigned to this ticket.",
+        });
+      }
+
+      if (ticket.status !== TicketStatus.PendingManager) {
+        return res.status(400).json({
+          status: 400,
+          message: "This support ticket has already been processed.",
+        });
+      }
+
+      // Update the ticket status and who updated the ticket; and also
+      // create an activity log for the support ticket
+      const updatedFields = {
+        status: TicketStatus.PendingIT,
+        updatedBy: ticket.managerName,
+      };
+      const newLogEntry = generateActivityLogDetails(ticket, updatedFields);
+      const updatedTicket = await SupportTicketModel.findOneAndUpdate(
+        { ticketId: ticketId },
+        {
+          $set: updatedFields,
+          $push: { activityLog: newLogEntry },
+        },
+        { new: true, runValidators: true }
+      );
+
+      // Instead of a JSON object, we can show a UI or some sort to the user
+      return res.status(200).json({
+        status: 200,
+        message: "Support Ticket is approved by the manager.",
+        data: updatedTicket,
+      });
+    } catch (error) {
+      console.error("Error approving ticket:", error);
+      if ((error as JsonWebTokenError).name === "JsonWebTokenError") {
+        return res.status(401).json({
+          status: 401,
+          message: "Unauthorized: Invalid Token.",
+        });
+      }
+
+      if ((error as TokenExpiredError).name === "TokenExpiredError") {
+        return res.status(401).json({
+          status: 401,
+          message: "Unauthorized: Token expired.",
+        });
+      }
+
+      return res.status(500).json({
+        status: 500,
+        message: "An error occured while approving the ticket.",
       });
     }
   }
