@@ -312,29 +312,4 @@ router.get(
   }
 );
 
-router.post("/test", async (req: Request, res: Response) => {
-  //
-  // const htmlMessage = await generateSupportTicketHTML();
-  try {
-    // await sendMail({
-    //   subject: "An employee has submitted an IT Support Ticket",
-    //   htmlMessage: htmlMessage,
-    //   recipient: "hcesa@fullscale.ph",
-    //   attachments: [],
-    // });
-
-    return res.status(200).json({
-      status: 200,
-      message: "Email sent successfully",
-      // htmlMessage: htmlMessage,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      status: 500,
-      message: "Something went wrong",
-      error: err,
-    });
-  }
-});
-
 export default router;
