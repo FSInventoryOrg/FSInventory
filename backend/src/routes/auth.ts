@@ -61,8 +61,14 @@ router.post(
       }
 
       const { access_token: token, user_details } = responseBody;
+      const { first_name: firstName, last_name: lastName } = user_details;
 
       res.cookie("auth_token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 86400000,
+      });
+      res.cookie("user", JSON.stringify({ firstName, lastName }), {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         maxAge: 86400000,
@@ -80,6 +86,9 @@ router.get("/validate-token", verifyToken, (req: Request, res: Response) => {
 
 router.post("/logout", (req: Request, res: Response) => {
   res.cookie("auth_token", "", {
+    expires: new Date(0),
+  });
+  res.cookie("user", "", {
     expires: new Date(0),
   });
   res.send();
