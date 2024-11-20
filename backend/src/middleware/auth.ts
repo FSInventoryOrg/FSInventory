@@ -63,6 +63,24 @@ const ADMIN_ERROR: string =
   "Only users with admin role can perform this action";
 const { IT_MANAGER } = process.env;
 
+/*
+  Note for future devs:
+  In case the IT team grows to more than just the IT manager, you can add a
+  collection to the database which contains the emails of the IT team's members.
+  For which you should also need endpoints to add/delete entries to the collection.
+
+  The email of the current IT Manager should, understandably, always be in the list of
+  members in the IT team. It is also possible to check the job position of the currently
+  logged in user if it equals "IT Manager". This is done by accessing the endpoint through
+  ${API_URL}/employees/:employee_id (API_URL, of course, being the Rocks Dev/Prod API URL).
+
+  The data for the job position should be accessible in the data.projects.data.emplyee.job_position
+  property (super nested, I know). For the first implementation, the IT Manager is recognized
+  by their email, which is stored in the environment file in order to keep it secret and safe.
+  Feel free to modify this implementation should the need arise.
+*/
+const IT_TEAM: string[] = [IT_MANAGER!];
+
 const API_URL: string =
   NODE_ENV === "PRODUCTION" ? ROCKS_PRODUCTION_API_URL! : ROCKS_DEV_API_URL!;
 
@@ -100,7 +118,7 @@ const verifyRole = (req: Request, res: Response, next: NextFunction) => {
     return res.status(401).json({ message: UNAUTHORIZED_ACCESS });
   }
   const { email } = req.user;
-  if (email !== IT_MANAGER) {
+  if (!IT_TEAM.includes(email)) {
     return res.status(403).json({ message: ADMIN_ERROR });
   }
   next();
@@ -137,4 +155,4 @@ const tokenUser = async (token: string) => {
 };
 
 export default verifyToken;
-export { verifyRole, tokenStatus, tokenUser, ADMIN, IT_MANAGER };
+export { verifyRole, tokenStatus, tokenUser, IT_MANAGER };
