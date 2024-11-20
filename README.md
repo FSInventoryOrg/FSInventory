@@ -17,30 +17,46 @@ VITE_API_BASE_URL=http://localhost:8080
 ```
 
 ### Setup MongoDB
-4. Install docker, if haven't yet. https://docs.docker.com/engine/install/
-5. Download the backup zip from this [zoho drive](https://workdrive.zoho.com/folder/1ue723c141a8c57c64317a9025efae6a89d26?layout=list). Unzip somewhere.
-6. Add the path to the `inventory` folder to `backend/.env`
+1. Install docker, if haven't yet. https://docs.docker.com/engine/install/
+2. Download the backup zip from this [zoho drive](https://workdrive.zoho.com/folder/1ue723c141a8c57c64317a9025efae6a89d26?layout=list). Unzip somewhere.
+3. Add the path to the `inventory` folder to `backend/.env`
 ```sh
 DUMP_DIRECTORY=<path to inventory folder>
 ```
-7. Due to running a replicat set, we need to make sure that the `host.docker.internal` hostname can be resolved to the host machine's IP address. 
+4. Due to running a replicat set, we need to make sure that the `host.docker.internal` hostname can be resolved to the host machine's IP address. 
 > On Windows, there is a [setting](https://docs.docker.com/desktop/settings/) to automatically add the `*.docker.internal` hostnames in the hosts file. 
 
 > If `host.docker.internal` cannot be resolved on Linux, you must add a line in your /etc/hosts file to map `host.docker.internal` to the IP address 127.17.0.1.
 
-8. Run mongodb replica set. This automatically restores the dump files.
+5. Run mongodb replica set. This automatically restores the dump files.
 ```sh
 cd backend
 docker compose up
 ```
 
-9. Install mongodb compass (or any mongodb client/gui that you like). Connect using this connecting string: `mongodb://127.0.0.1:27017?replicaSet=rs0`. Test that you can connect and the inventory database was populated.
-10. Add/modify your mongodb connection string in `backend/.env`:
+6. Install mongodb compass (or any mongodb client/gui that you like). Connect using this connecting string: `mongodb://127.0.0.1:27017?replicaSet=rs0`. Test that you can connect and the inventory database was populated.
+7. Add/modify your mongodb connection string in `backend/.env`:
 ```sh
-MONGODB_CONNECTION_STRING=mongodb://127.0.0.1:27017/inventory?replicaSet=rs0
+MONGODB_CONNECTION_STRING=mongodb://127.0.0.1:27017/inventory?replicaSet=rs0 # not using docker compose
+MONGODB_CONNECTION_STRING=mongodb://mongodb:27017/inventory?replicaSet=rs0 # using docker compose, use the mongodb service name as the host
 ```
-### Running/Debugging
-11. Add `.vscode/launch.json` config for running always with debugging enabled:
+## Running Locally
+
+### Option 1: Using docker-compose.yml
+1. Install [docker-compose](https://docs.docker.com/desktop/settings/) command
+2. Go to the root directory, where docker-compose.yml is located
+3. Run the command below
+```sh
+docker compose up --build -d
+```
+4. Ensure that all the services is up, you can check using the docker desktop container GUI or through docker command
+```sh
+docker ps
+```
+5. Visit `http://localhost:3000`
+
+### Option 2: Running/Debugging
+1. Add `.vscode/launch.json` config for running always with debugging enabled:
 ```json
 {
     "version": "0.2.0",
@@ -64,11 +80,11 @@ MONGODB_CONNECTION_STRING=mongodb://127.0.0.1:27017/inventory?replicaSet=rs0
     ]
 }
 ```
-12. Go to `Run and Debug`, CTRL+SHIFT+D, Run both `Run backend` and `Run frontend`. Add breakpoints and debug.
+2. Go to `Run and Debug`, CTRL+SHIFT+D, Run both `Run backend` and `Run frontend`. Add breakpoints and debug.
 
 ![running](docs/images/debugging.png)
 
-13. Visit `http://localhost:3000`
+3. Visit `http://localhost:3000`
 
 ![running](docs/images/running.png)
 

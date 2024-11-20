@@ -1,71 +1,28 @@
 version: "3.8"
 
 services:
-  mongodb:
-    image: mongo
-    container_name: mongodb-staging
-    command: ["mongod", "--auth", "--replSet", "rs0", "--bind_ip_all", "--port", "27017", "--keyFile", "/data/configdb/mongo-keyfile"]
-    volumes:
-      - mongo_data:/data/db
-      - mongo_config:/data/config
-      - ./backend/restore.sh:/docker-entrypoint-initdb.d/restore.sh
-      - ./backend/inventory:/dump
-      - ./backend/mongo-keyfile:/data/configdb/mongo-keyfile
-    env_file:
-      - ./backend/.env.staging
-    restart: always
-    ports:
-      - 27017:27017
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    healthcheck:
-      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017'}]}) }" | mongosh --port 27017 --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - app-network
-
   api:
     image: inventory-api-staging
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.staging
     container_name: api-staging
     volumes:
-      - ./backend:/usr/src/app
-      - /usr/src/app/node_modules
+      - ./frontend/package.json:/usr/src/app/frontend/package.json
     ports:
       - 8080:8080
     env_file:
       - ./backend/.env.staging
     environment:
       HOST: ${HOST:-0.0.0.0}
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    networks:
-      - app-network
 
   app:
     image: inventory-app-staging
     build:
       context: ./frontend 
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.staging
     container_name: app-staging
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     ports:
-      - 3000:3000
+      - 3000:80
     env_file:
-      - ./frontend/.env
-    networks:
-      - app-network
-
-volumes:
-  mongo_data:
-  mongo_config:
-networks:
-  app-network:
-    driver: bridge
+      - ./frontend/.env.staging

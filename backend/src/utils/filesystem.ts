@@ -12,7 +12,7 @@ import {
 import { getJSONFromExcelFile } from "./excel";
 import { getJSONFromCSVFile } from "./csv";
 
-const directory = path.join(path.resolve(), "../");
+const directory = path.join(path.resolve());
 
 /**
  *
