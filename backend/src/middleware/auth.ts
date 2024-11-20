@@ -19,29 +19,31 @@ type RocksRoles =
   | "contentwriter";
 
 export interface RocksUser {
-  id: number;
-  employee_id: number;
-  name: string;
-  email: string;
-  user_name: string;
-  role: RocksRoles;
-  role_is_active: number;
-  can_login: number;
-  is_verified: number;
-  created_at: string;
-  updated_at: string;
-  updated_by: string | null;
-  clients: null;
-  deleted_at: string | null;
-  roles: {
-    data: [
-      {
-        id: number;
-        is_enabled: number;
-        role_id: number;
-        user_id: number;
-      },
-    ];
+  data: {
+    id: number;
+    employee_id: number;
+    name: string;
+    email: string;
+    user_name: string;
+    role: RocksRoles;
+    role_is_active: number;
+    can_login: number;
+    is_verified: number;
+    created_at: string;
+    updated_at: string;
+    updated_by: string | null;
+    clients: null;
+    deleted_at: string | null;
+    roles: {
+      data: [
+        {
+          id: number;
+          is_enabled: number;
+          role_id: number;
+          user_id: number;
+        },
+      ];
+    };
   };
 }
 
@@ -71,11 +73,21 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     return res.status(401).json({ message: UNAUTHORIZED_ACCESS });
   }
   try {
-    const user: RocksUser = await (await fetch(`${API_URL}/users/me`)).json();
+    const user: RocksUser = await (
+      await fetch(`${API_URL}/users/me`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    ).json();
+    const { id: userId, role, email } = user.data;
     req.user = {
-      userId: user.id,
-      role: user.role,
-      email: user.email,
+      userId,
+      role,
+      email,
     } as UserAuth;
     next();
   } catch (error) {
