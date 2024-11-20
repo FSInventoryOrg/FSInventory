@@ -106,7 +106,7 @@ const tokenStatus = async (token: string) => {
   return status;
 };
 
-const currentUser = async (token: string) => {
+const tokenUser = async (token: string) => {
   const status = await fetch(`${API_URL}/users/me`, {
     method: "GET",
     credentials: "include",
@@ -121,5 +121,8 @@ const currentUser = async (token: string) => {
   return status;
 };
 
+const ADMIN: string = "admin";
+const { IT_MANAGER } = process.env;
+
 export default verifyToken;
-export { verifyRole, tokenStatus, currentUser };
+export { verifyRole, tokenStatus, tokenUser, ADMIN, IT_MANAGER };
