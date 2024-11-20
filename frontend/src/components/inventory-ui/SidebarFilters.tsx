@@ -123,10 +123,11 @@ const SidebarFilters = ({
   };
 
   const handleTypeClick = (type: string) => {
-    onTypeChange(type);
-
     if (type !== selectedType) {
+      onTypeChange(type);
       resetFilterSettings();
+    } else {
+      onTypeChange("");
     }
   };
 
