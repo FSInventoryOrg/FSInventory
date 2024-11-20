@@ -114,7 +114,7 @@ export const extractDocuments = async (fileFormat: string = "json") => {
 router.get(
   "/export",
   verifyToken,
-  verifyRole("ADMIN"),
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       const { fileFormat } = req.query as { fileFormat: string };
@@ -149,7 +149,7 @@ router.get(
 router.post(
   "/validate",
   verifyToken,
-  verifyRole("ADMIN"),
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       const uploadData = await extractUploadData(req, "application/zip");
@@ -300,7 +300,7 @@ router.post(
 router.post(
   "/import",
   verifyToken,
-  verifyRole("ADMIN"),
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       // Get list of collection name
@@ -459,7 +459,7 @@ router.patch("/check", verifyToken, async (req: Request, res: Response) => {
 router.delete(
   "/clear",
   verifyToken,
-  verifyRole("ADMIN"),
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       // Get list of collection name
