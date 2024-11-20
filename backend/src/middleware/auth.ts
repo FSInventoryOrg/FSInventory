@@ -59,7 +59,6 @@ declare global {
 const { ROCKS_DEV_API_URL, ROCKS_PRODUCTION_API_URL, NODE_ENV } = process.env;
 const TOKEN_EXPIRED: string = "Token expired";
 const UNAUTHORIZED_ACCESS: string = "Unauthorized access";
-const ADMIN: string = "admin";
 const ADMIN_ERROR: string =
   "Only users with admin role can perform this action";
 const { IT_MANAGER } = process.env;
@@ -100,8 +99,8 @@ const verifyRole = (req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return res.status(401).json({ message: UNAUTHORIZED_ACCESS });
   }
-  const { role, email } = req.user;
-  if (role !== ADMIN && email !== IT_MANAGER) {
+  const { email } = req.user;
+  if (email !== IT_MANAGER) {
     return res.status(403).json({ message: ADMIN_ERROR });
   }
   next();
