@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from "express";
 export interface UserAuth {
   userId: number;
   role: string;
+  email: string;
 }
 
 type RocksRoles =
@@ -54,6 +55,12 @@ declare global {
 }
 
 const { ROCKS_DEV_API_URL, ROCKS_PRODUCTION_API_URL, NODE_ENV } = process.env;
+const TOKEN_EXPIRED: string = "Token expired";
+const UNAUTHORIZED_ACCESS: string = "Unauthorized access";
+const ADMIN: string = "admin";
+const ADMIN_ERROR: string =
+  "Only users with admin role can perform this action";
+const { IT_MANAGER } = process.env;
 
 const API_URL: string =
   NODE_ENV === "PRODUCTION" ? ROCKS_PRODUCTION_API_URL! : ROCKS_DEV_API_URL!;
@@ -61,35 +68,32 @@ const API_URL: string =
 const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies["auth_token"];
   if (!token) {
-    return res.status(401).json({ message: "Unauthorized access" });
+    return res.status(401).json({ message: UNAUTHORIZED_ACCESS });
   }
   try {
     const user: RocksUser = await (await fetch(`${API_URL}/users/me`)).json();
     req.user = {
       userId: user.id,
       role: user.role,
+      email: user.email,
     } as UserAuth;
     next();
   } catch (error) {
     console.error(error);
-    return res.status(401).json({ message: "Unauthorized access" });
+    return res.status(401).json({ message: UNAUTHORIZED_ACCESS });
   }
 };
 
-const verifyRole =
-  (requiredRole: string) =>
-  (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized access" });
-    }
-    const { role } = req.user;
-    if (role !== requiredRole) {
-      return res
-        .status(403)
-        .json({ message: "Forbidden: Insufficient permissions" });
-    }
-    next();
-  };
+const verifyRole = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    return res.status(401).json({ message: UNAUTHORIZED_ACCESS });
+  }
+  const { role, email } = req.user;
+  if (role !== ADMIN && email !== IT_MANAGER) {
+    return res.status(403).json({ message: ADMIN_ERROR });
+  }
+  next();
+};
 
 const tokenStatus = async (token: string) => {
   const status = await fetch(`${API_URL}/auth/check`, {
@@ -101,7 +105,7 @@ const tokenStatus = async (token: string) => {
     },
   });
 
-  if (!status.ok) throw Error("Token expired");
+  if (!status.ok) throw Error(TOKEN_EXPIRED);
 
   return status;
 };
@@ -116,13 +120,10 @@ const tokenUser = async (token: string) => {
     },
   });
 
-  if (!status.ok) throw Error("Token expired");
+  if (!status.ok) throw Error(TOKEN_EXPIRED);
 
   return status;
 };
-
-const ADMIN: string = "admin";
-const { IT_MANAGER } = process.env;
 
 export default verifyToken;
 export { verifyRole, tokenStatus, tokenUser, ADMIN, IT_MANAGER };
