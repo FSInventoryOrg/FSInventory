@@ -305,7 +305,26 @@ export function InventoryTable<TData, TValue>({
 
       return { ...asset, serviceInYears };
     });
-    await exportToExcel(columns, withServiceInYears, "Inventory_Report");
+
+    const withFormattedDate = withServiceInYears.map((data) => {
+      type DataType<T> = { [K: string]: T };
+      const transformedData: DataType<(typeof data)[keyof typeof data]> =
+        structuredClone(data);
+
+      Object.entries(data).forEach(([key, value]) => {
+        // convert all keys with "date" in the object to a specific format
+        if (key.toLowerCase().includes("date") && typeof value === "string") {
+          const date = new Date(value);
+          if (!isNaN(date.getTime())) {
+            transformedData[key] = date.toLocaleDateString("en-US");
+          }
+        }
+      });
+
+      return transformedData as typeof data;
+    });
+
+    await exportToExcel(columns, withFormattedDate, "Inventory_Report");
     setIsDownloading(false);
   };
 
