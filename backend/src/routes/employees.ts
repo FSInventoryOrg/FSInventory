@@ -8,19 +8,25 @@ import Hardware from "../models/hardware.schema";
 
 const router = express.Router();
 
-router.get("/", verifyToken, async (req: Request, res: Response) => {
-  try {
-    const employees: EmployeeType[] = await Employee.find();
-    res.status(200).json(employees);
-  } catch (error) {
-    console.error("Error fetching employees:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+router.get(
+  "/",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    try {
+      const employees: EmployeeType[] = await Employee.find();
+      res.status(200).json(employees);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
-});
+);
 
 router.get(
   "/includeUnregistered",
   verifyToken,
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       const employees: EmployeeType[] = await Employee.find();
@@ -66,23 +72,29 @@ router.get(
   }
 );
 
-router.get("/:code", verifyToken, async (req: Request, res: Response) => {
-  const { code } = req.params;
-  try {
-    const employee: EmployeeType | null = await Employee.findOne({ code });
-    if (!employee) {
-      return res.status(404).json({ message: "Employee not found" });
+router.get(
+  "/:code",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    const { code } = req.params;
+    try {
+      const employee: EmployeeType | null = await Employee.findOne({ code });
+      if (!employee) {
+        return res.status(404).json({ message: "Employee not found" });
+      }
+      res.status(200).json(employee);
+    } catch (error) {
+      console.error("Error fetching employee:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
-    res.status(200).json(employee);
-  } catch (error) {
-    console.error("Error fetching employee:", error);
-    res.status(500).json({ error: "Internal Server Error" });
   }
-});
+);
 
 router.get(
   "/uniqueValues/:property",
   verifyToken,
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       const { property } = req.params;
@@ -172,6 +184,7 @@ router.post(
 router.put(
   "/history/:code/:index",
   verifyToken,
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       const { code, index } = req.params;

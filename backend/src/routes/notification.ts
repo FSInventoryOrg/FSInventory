@@ -1,60 +1,63 @@
 import express, { Request, Response } from "express";
-import verifyToken, { tokenUser } from "../middleware/auth";
+import verifyToken, { verifyRole } from "../middleware/auth";
 import Notification, { NotificationType } from "../models/notification.schema";
 import mongoose from "mongoose";
 
 const router = express.Router();
 
-router.get("/", verifyToken, async (req: Request, res: Response) => {
-  try {
-    const { auth_token: token } = req.cookies;
-    const { data: user } = await (await tokenUser(token)).json();
+router.get(
+  "/",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    try {
+      const { user } = req.cookies;
 
-    const notifications: any = await Notification.aggregate()
-      .match({
-        $expr: {
-          $and: [{ $in: [user.id, "$target_users"] }],
+      const notifications: any = await Notification.aggregate()
+        .match({
+          $expr: {
+            $and: [{ $in: [user.userId, "$target_users"] }],
+          },
+        })
+        .sort({
+          updated: -1,
+        });
+
+      const newData = notifications.reduce(
+        (accum: NotificationType[], value: NotificationType) => {
+          const singleData: any = {
+            _id: value["_id"].toString(),
+            message: value["message"],
+            message_html: value["message_html"],
+            openTab: value["openTab"],
+            url: value["url"],
+            date: value["updated"],
+            read: value["seen_users"].includes(user.userId),
+          };
+
+          accum.push(singleData);
+          return accum;
         },
-      })
-      .sort({
-        updated: -1,
-      });
+        []
+      );
 
-    const newData = notifications.reduce(
-      (accum: NotificationType[], value: NotificationType) => {
-        const singleData: any = {
-          _id: value["_id"].toString(),
-          message: value["message"],
-          message_html: value["message_html"],
-          openTab: value["openTab"],
-          url: value["url"],
-          date: value["updated"],
-          read: value["seen_users"].includes(user.id),
-        };
+      const notifDetails = {
+        unread: newData.filter((f: any) => !f["read"]).length,
+        count: newData.length,
+        data: newData,
+      };
 
-        accum.push(singleData);
-        return accum;
-      },
-      []
-    );
-
-    const notifDetails = {
-      unread: newData.filter((f: any) => !f["read"]).length,
-      count: newData.length,
-      data: newData,
-    };
-
-    return res.status(200).json(notifDetails);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Something went wrong" });
+      return res.status(200).json(notifDetails);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Something went wrong" });
+    }
   }
-});
+);
 
 router.patch("/", verifyToken, async (req: Request, res: Response) => {
   try {
-    const { auth_token: token } = req.cookies;
-    const { data: user } = await (await tokenUser(token)).json();
+    const { user } = req.cookies;
 
     const requestBody = req.body;
 
@@ -72,14 +75,14 @@ router.patch("/", verifyToken, async (req: Request, res: Response) => {
     const notifications: any = await Notification.aggregate().match({
       $expr: {
         $and: [
-          { $in: [user.id, "$target_users"] },
+          { $in: [user.userId, "$target_users"] },
           { $in: ["$_id", mongoIDs] },
         ],
       },
     });
 
     notifications.forEach(async (notif: any) => {
-      notif["seen_users"].push(user.id);
+      notif["seen_users"].push(user.userId);
       notif["seen_users"] = notif["seen_users"].filter(
         (value: string, index: number, array: any) => {
           return array.indexOf(value) === index;

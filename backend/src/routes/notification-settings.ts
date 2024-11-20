@@ -6,22 +6,27 @@ import User from "../models/user.schema";
 
 const router = express.Router();
 
-router.get("/", verifyToken, async (req: Request, res: Response) => {
-  try {
-    const notificationSettings = await NotificationSettings.findOne();
+router.get(
+  "/",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    try {
+      const notificationSettings = await NotificationSettings.findOne();
 
-    if (!notificationSettings) {
-      return res.json({ daysBeforeLicenseExpiration: 5 });
+      if (!notificationSettings) {
+        return res.json({ daysBeforeLicenseExpiration: 5 });
+      }
+
+      return res.json(notificationSettings);
+    } catch (error) {
+      console.error(error);
+      return res
+        .status(500)
+        .json({ message: "Failed to fetch notification settings" });
     }
-
-    return res.json(notificationSettings);
-  } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ message: "Failed to fetch notification settings" });
   }
-});
+);
 
 router.post(
   "/",

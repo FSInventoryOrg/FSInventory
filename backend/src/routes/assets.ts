@@ -248,11 +248,9 @@ router.post(
 
       data["code"] = await getCodeAndIncrement(data["category"], data["type"]);
       if (!data["code"])
-        return res
-          .status(422)
-          .json({
-            message: `Need to configure the index of ${data["type"]} - ${data["category"]}`,
-          });
+        return res.status(422).json({
+          message: `Need to configure the index of ${data["type"]} - ${data["category"]}`,
+        });
 
       const newAsset =
         data.type === "Hardware" ? new Hardware(data) : new Software(data);
@@ -718,38 +716,44 @@ router.put(
   }
 );
 
-router.get("/", verifyToken, async (req: Request, res: Response) => {
-  try {
-    const { type, status, category, processor, memory, storage } = req.query;
-    const allowedFilter = {
-      type,
-      status,
-      category,
-      processor,
-      memory,
-      storage,
-    };
+router.get(
+  "/",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    try {
+      const { type, status, category, processor, memory, storage } = req.query;
+      const allowedFilter = {
+        type,
+        status,
+        category,
+        processor,
+        memory,
+        storage,
+      };
 
-    const query = Object.fromEntries(
-      Object.entries(allowedFilter).filter(
-        ([, v]) => v !== undefined && v !== null && v !== ""
-      )
-    );
+      const query = Object.fromEntries(
+        Object.entries(allowedFilter).filter(
+          ([, v]) => v !== undefined && v !== null && v !== ""
+        )
+      );
 
-    const assets: any[] = await emplyeeSnapper(
-      await Asset.aggregate().match(query)
-    );
+      const assets: any[] = await emplyeeSnapper(
+        await Asset.aggregate().match(query)
+      );
 
-    res.status(200).json(assets);
-  } catch (error) {
-    console.error("Error fetching assets:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+      res.status(200).json(assets);
+    } catch (error) {
+      console.error("Error fetching assets:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
-});
+);
 
 router.get(
   "/count/:property?/:value?",
   verifyToken,
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       const { property, value } = req.params;
@@ -773,6 +777,7 @@ router.get(
 router.get(
   "/uniqueValues/:property",
   verifyToken,
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       const { property } = req.params;
@@ -824,6 +829,7 @@ router.get(
 router.get(
   "/:property/:value",
   verifyToken,
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       const { property, value } = req.params;
@@ -936,11 +942,9 @@ router.put(
           .json({ message: "Request body cannot be empty" });
       }
       if (property !== updateDataKeys[0]) {
-        return res
-          .status(400)
-          .json({
-            message: `Property '${property}' in URL must match property in request body`,
-          });
+        return res.status(400).json({
+          message: `Property '${property}' in URL must match property in request body`,
+        });
       }
 
       const existingAssets = await Asset.find({ [property]: value });
@@ -963,22 +967,27 @@ router.put(
   }
 );
 
-router.get("/:code", verifyToken, async (req: Request, res: Response) => {
-  try {
-    const code: string = req.params.code;
+router.get(
+  "/:code",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    try {
+      const code: string = req.params.code;
 
-    const asset = await Asset.findOne({ code });
+      const asset = await Asset.findOne({ code });
 
-    if (!asset) {
-      return res.status(404).json({ message: "Asset not found" });
+      if (!asset) {
+        return res.status(404).json({ message: "Asset not found" });
+      }
+
+      res.status(200).json(asset);
+    } catch (error) {
+      console.error("Error fetching asset:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
-
-    res.status(200).json(asset);
-  } catch (error) {
-    console.error("Error fetching asset:", error);
-    res.status(500).json({ error: "Internal Server Error" });
   }
-});
+);
 
 router.delete(
   "/:property/:value",
@@ -1037,11 +1046,9 @@ router.patch(
       const codesToDelete = req.body;
 
       if (!Array.isArray(codesToDelete))
-        return res
-          .status(422)
-          .json({
-            message: "Request body should be an array of Asset Item Codes",
-          });
+        return res.status(422).json({
+          message: "Request body should be an array of Asset Item Codes",
+        });
       if (codesToDelete.length === 0)
         return res
           .status(422)

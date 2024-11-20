@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import verifyToken from "../middleware/auth";
+import verifyToken, { verifyRole } from "../middleware/auth";
 import mongoose from "mongoose";
 import { saveFile } from "../utils/common";
 import Attachment from "../models/attachments";
@@ -15,12 +15,10 @@ const processUpload = async (req: Request, res: Response, folder: string) => {
     const srcFormat = { data: "", base64: "" };
 
     if (!src)
-      return res
-        .status(400)
-        .json({
-          message:
-            "Source file is needed and must be in base64 format i.e data:text/plain;base64,abcdef123456789",
-        });
+      return res.status(400).json({
+        message:
+          "Source file is needed and must be in base64 format i.e data:text/plain;base64,abcdef123456789",
+      });
     if (!filename)
       return res.status(400).json({ message: "Original filename is needed" });
 
@@ -30,12 +28,10 @@ const processUpload = async (req: Request, res: Response, folder: string) => {
       srcFormat["base64"] = tmp[1].replace("base64,", "");
     } catch (errorProcess) {
       console.log(errorProcess);
-      return res
-        .status(500)
-        .json({
-          message:
-            "Source file must be in base64 format i.e data:text/plain;base64,abcdef123456789",
-        });
+      return res.status(500).json({
+        message:
+          "Source file must be in base64 format i.e data:text/plain;base64,abcdef123456789",
+      });
     }
 
     const newId = new mongoose.Types.ObjectId();
@@ -72,14 +68,29 @@ const processUpload = async (req: Request, res: Response, folder: string) => {
   }
 };
 
-router.post("/user", verifyToken, async (req: Request, res: Response) => {
-  await processUpload(req, res, "user");
-});
-router.post("/request", verifyToken, async (req: Request, res: Response) => {
-  await processUpload(req, res, "request");
-});
-router.post("/asset", verifyToken, async (req: Request, res: Response) => {
-  await processUpload(req, res, "asset");
-});
+router.post(
+  "/user",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    await processUpload(req, res, "user");
+  }
+);
+router.post(
+  "/request",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    await processUpload(req, res, "request");
+  }
+);
+router.post(
+  "/asset",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    await processUpload(req, res, "asset");
+  }
+);
 
 export default router;

@@ -80,12 +80,10 @@ router.post(
       });
 
       if (existingCounter.length > 0)
-        return res
-          .status(400)
-          .json({
-            message:
-              "Prefix Code already exists or Asset Type and Category already have a prefix Code",
-          });
+        return res.status(400).json({
+          message:
+            "Prefix Code already exists or Asset Type and Category already have a prefix Code",
+        });
 
       const newAssetCounter = new AssetCounter(data);
       await newAssetCounter.save();
@@ -165,11 +163,9 @@ router.put(
         );
       });
       if (findSameCatType)
-        return res
-          .status(400)
-          .json({
-            message: "Asset Type and Category already have a prefix Code",
-          });
+        return res.status(400).json({
+          message: "Asset Type and Category already have a prefix Code",
+        });
 
       const findCounter = existingAssetCounter.find((f) => {
         return f["_id"].toString() === data["_id"];
@@ -204,43 +200,53 @@ router.put(
   }
 );
 
-router.get("/", verifyToken, async (req: Request, res: Response) => {
-  try {
-    const { type, prefixCode, category } = req.query;
-    const query: any = {};
+router.get(
+  "/",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    try {
+      const { type, prefixCode, category } = req.query;
+      const query: any = {};
 
-    if (type) query.type = type;
+      if (type) query.type = type;
 
-    if (category) query.status = category;
+      if (category) query.status = category;
 
-    if (prefixCode) query.category = prefixCode;
+      if (prefixCode) query.category = prefixCode;
 
-    let assetcounter;
+      let assetcounter;
 
-    if (!Object.keys(query).length) assetcounter = await getAssetIndexes();
-    else assetcounter = await AssetCounter.find(query);
+      if (!Object.keys(query).length) assetcounter = await getAssetIndexes();
+      else assetcounter = await AssetCounter.find(query);
 
-    res.status(200).json(assetcounter);
-  } catch (error) {
-    console.error("Error fetching asset counter:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+      res.status(200).json(assetcounter);
+    } catch (error) {
+      console.error("Error fetching asset counter:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
-});
+);
 
-router.get("/:prefixCode", verifyToken, async (req: Request, res: Response) => {
-  try {
-    const prefixCode: string = req.params.prefixCode;
+router.get(
+  "/:prefixCode",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    try {
+      const prefixCode: string = req.params.prefixCode;
 
-    const assetcounter = await AssetCounter.findOne({ prefixCode });
-    if (!assetcounter)
-      return res.status(404).json({ message: "Asset Counter not found" });
+      const assetcounter = await AssetCounter.findOne({ prefixCode });
+      if (!assetcounter)
+        return res.status(404).json({ message: "Asset Counter not found" });
 
-    res.status(200).json(assetcounter);
-  } catch (error) {
-    console.error("Error fetching asset counter:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+      res.status(200).json(assetcounter);
+    } catch (error) {
+      console.error("Error fetching asset counter:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
-});
+);
 
 router.delete(
   "/:prefixCode",
