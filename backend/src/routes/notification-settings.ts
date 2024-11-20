@@ -1,16 +1,12 @@
-import express, { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import verifyToken, { verifyRole } from '../middleware/auth';
-import Notification, { NotificationType } from '../models/notification.schema';
-import mongoose from 'mongoose';
-import { check, validationResult } from 'express-validator';
-import { softwareExpirationMonitoring } from '../system/jobs';
-import NotificationSettings from '../models/notification-settings.schema';
-import User from '../models/user.schema';
+import express, { Request, Response } from "express";
+import verifyToken, { verifyRole } from "../middleware/auth";
+import { check, validationResult } from "express-validator";
+import NotificationSettings from "../models/notification-settings.schema";
+import User from "../models/user.schema";
 
 const router = express.Router();
 
-router.get('/', verifyToken, async (req: Request, res: Response) => {
+router.get("/", verifyToken, async (req: Request, res: Response) => {
   try {
     const notificationSettings = await NotificationSettings.findOne();
 
@@ -23,19 +19,19 @@ router.get('/', verifyToken, async (req: Request, res: Response) => {
     console.error(error);
     return res
       .status(500)
-      .json({ message: 'Failed to fetch notification settings' });
+      .json({ message: "Failed to fetch notification settings" });
   }
 });
 
 router.post(
-  '/',
-  check('daysBeforeLicenseExpiration')
+  "/",
+  check("daysBeforeLicenseExpiration")
     .isInt({ min: 1, max: 365 })
     .withMessage(
-      'daysBeforeLicenseExpiration must be a number between 1 and 365'
+      "daysBeforeLicenseExpiration must be a number between 1 and 365"
     ),
   verifyToken,
-  verifyRole('ADMIN'),
+  verifyRole,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
 
@@ -45,7 +41,7 @@ router.post(
     try {
       const { daysBeforeLicenseExpiration } = req.body;
 
-      let notificationSettings = await NotificationSettings.findOne();
+      const notificationSettings = await NotificationSettings.findOne();
       const currentUser = await User.findOne({ _id: req.user.userId });
       const currentDate = new Date();
 
@@ -76,10 +72,10 @@ router.post(
       );
       return res
         .status(200)
-        .json({ message: 'Successfully updated notification setting.' });
+        .json({ message: "Successfully updated notification setting." });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ message: 'Something went wrong' });
+      return res.status(500).json({ message: "Something went wrong" });
     }
   }
 );
