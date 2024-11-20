@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:18-alpine AS build
 
 WORKDIR /usr/src/app
 
@@ -13,10 +13,12 @@ RUN \
     mkdir -p public/backup/json && \
     mkdir -p public/import/archive && \
     mkdir -p public/import/collections && \
-    chmod -R 777 public
+    chmod -R 775 public
 
 COPY . .
 
+RUN npm run build || tail -n 20 /root/.npm/_logs/*
+
 EXPOSE 8080
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]

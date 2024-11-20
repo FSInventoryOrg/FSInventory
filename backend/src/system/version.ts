@@ -3,14 +3,26 @@ import verifyToken, { verifyRole } from "../middleware/auth";
 import { getAppRootDir, getFile } from "../utils/common";
 
 const router = express.Router();
+const NODE_ENV = process.env.NODE_ENV || "development";
 
+// TODO: implement azure mount storage for file sharing
 export const getVersion = async () => {
+  if (NODE_ENV !== "development") {
+    return {
+      backend: {
+        name: process.env.BACKEND_NAME,
+        version: process.env.BACKEND_VERSION,
+      },
+      frontend: {
+        name: process.env.FRONTEND_NAME,
+        version: process.env.FRONTEND_VERSION,
+      },
+    };
+  }
+
   const rootDir = getAppRootDir();
   const backend: any = await getFile(`${rootDir}/package.json`, true);
-  const frontend: any = await getFile(
-    `${rootDir}/../frontend/package.json`,
-    true
-  );
+  const frontend = await getFile(`${rootDir}/frontend/package.json`, true);
 
   if (backend && frontend) {
     try {
@@ -33,6 +45,7 @@ export const getVersion = async () => {
     }
   } else return null;
 };
+
 router.get(
   "/",
   verifyToken,
