@@ -2,6 +2,10 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.25.2](https://connect.zoho.com/portal/intranet/task/623367000000992150) 2024-11-20
+### Fixed
+- Fixed Total Assets Count whenever the Type is changed which carried over the previous status, category, processor, memory and storage filters causing the bug
+
 ## [2.25.1](https://connect.zoho.com/portal/intranet/task/623367000000940439) 2024-11-11
 ### Fixed
 - Formatted all keys containing the word "date" in the assets to MM/DD/YYYY format before exporting
