@@ -122,15 +122,13 @@ const EditOption = ({
   }, [propertyIsCategory, assetCounter, oldPrefixCode, newPrefixCode]);
 
   useEffect(() => {
-    if (
-      (newPrefixCode === "" || newPrefixCode === undefined) &&
-      isCategoryType
-    ) {
-      setPrefixCodeError("Prefix code can not be empty");
+    if (isCategoryType) {
+      if (newPrefixCode === "" || newPrefixCode === undefined)
+        setPrefixCodeError("Prefix code can not be empty");
     } else {
       setPrefixCodeError("");
     }
-  }, [newPrefixCode]);
+  }, [isCategoryType, newPrefixCode]);
 
   useEffect(() => {
     if (getOptionValue(editedOption.value) === "") {
