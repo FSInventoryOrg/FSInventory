@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
-import verifyToken from "../middleware/auth";
+import verifyToken, { tokenUser } from "../middleware/auth";
 import Notification, { NotificationType } from "../models/notification.schema";
-import { tokenStatus, tokenUser } from "../middleware/auth";
 import mongoose from "mongoose";
 
 const router = express.Router();
@@ -10,7 +9,6 @@ router.get("/", verifyToken, async (req: Request, res: Response) => {
   try {
     const { auth_token: token } = req.cookies;
     const { data: user } = await (await tokenUser(token)).json();
-    await tokenStatus(token);
 
     const notifications: any = await Notification.aggregate()
       .match({
@@ -57,7 +55,6 @@ router.patch("/", verifyToken, async (req: Request, res: Response) => {
   try {
     const { auth_token: token } = req.cookies;
     const { data: user } = await (await tokenUser(token)).json();
-    await tokenStatus(token);
 
     const requestBody = req.body;
 
