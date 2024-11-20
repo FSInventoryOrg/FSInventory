@@ -176,7 +176,7 @@ export const readJSONDataFromCSVFile = async (
  * @description deletes all the files from specific directory
  */
 export const deleteAllFilesInDir = (folder: string): Promise<void> => {
-  const folderDir = `${directory}${directory.includes("\\backend") ? "\\.." : ""}${folder}`;
+  const folderDir = path.join(directory, folder);
   if (!existsSync(folderDir)) {
     return Promise.reject("Folder does not exist");
   }
