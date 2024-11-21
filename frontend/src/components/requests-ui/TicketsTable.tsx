@@ -27,6 +27,7 @@ import { useState } from "react";
 import { SearchIcon } from "lucide-react";
 import { Input } from "../ui/input";
 import { DataTablePagination } from "../DataTablePagination";
+import { ScrollArea } from "../ui/scroll-area";
 
 interface TicketsTableProps {
   id?: string;
@@ -65,7 +66,7 @@ const TicketsTable = ({
   );
   const [pagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 5,
   });
   const table = useReactTable({
     data,
@@ -93,66 +94,74 @@ const TicketsTable = ({
   });
 
   return (
-    <div className="flex flex-col  border">
-      <div className="flex gap-2 w-full">
-        {title && <h1 className="text-2xl font-semibold">{title}</h1>}
-        <div className="flex items-center w-full">
+    <div className="flex flex-col h-full gap-4">
+      <div className="flex justify-between w-full">
+        {title && <h1 className="text-2xl font-semibold min-w-fit">{title}</h1>}
+        <div className="flex items-center w-1/3">
           <SearchIcon className="absolute translate-x-3 h-4 w-4" />
           <Input
             placeholder="Search asset..."
             value={globalFilter ?? ""}
             onChange={(event) => table.setGlobalFilter(event.target.value)}
-            className="pl-10 h-8 font-light rounded-md text-sm"
+            className="pl-10 h-8 font-light rounded-md text-sm "
           />
         </div>
       </div>
-      <Table id={id} className="text-xs relative w-full  ">
-        <TableHeader className="sticky top-0 bg-accent z-10 border-b">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {!header.isPlaceholder &&
-                      flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+      <div>
+        <ScrollArea className=" w-full rounded-md border ">
+          <Table id={id} className="text-xs relative h-full">
+            <TableHeader className="sticky top-0 bg-accent z-10 border-b">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {!header.isPlaceholder &&
+                          flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="h-fit"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="p-3">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow className="hover:bg-background">
+                  <TableCell colSpan={SupportTicketColumns.length}>
+                    <div className="h-max flex flex-col items-center justify-center">
+                      <Empty height={200} width={300} />
+                      <span className="text-muted-foreground">
+                        No results found
+                      </span>
+                    </div>
                   </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow className="hover:bg-background">
-              <TableCell colSpan={SupportTicketColumns.length}>
-                <div className="h-max flex flex-col items-center justify-center">
-                  <Empty height={200} width={300} />
-                  <span className="text-muted-foreground">
-                    No results found
-                  </span>
-                </div>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <DataTablePagination table={table} />
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </ScrollArea>
+        <DataTablePagination table={table} />
+      </div>
     </div>
   );
 };

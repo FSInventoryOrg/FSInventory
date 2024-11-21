@@ -14,7 +14,7 @@ interface TicketIDProps {
 
 const TicketID = ({ ticket }: TicketIDProps) => {
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1 h-fit">
       <div className="text-xs font-normal px-2 py-0 w-fit overflow-hidden text-ellipsis whitespace-nowrap hover:underline">
         {ticket.ticketId}
       </div>
@@ -23,7 +23,7 @@ const TicketID = ({ ticket }: TicketIDProps) => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" className="px-2 py-0">
+              <Button variant="ghost" size="sm" className="px-2 py-0 h-fit">
                 <span>
                   <span className="sr-only">View Remarks</span>
                   <NotebookPenIcon size={16} className="cursor-pointer" />

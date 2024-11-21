@@ -127,13 +127,13 @@ const Tickets = () => {
 
       {supportTickets?.length > 0 ? (
         <div className="flex flex-col space-y-2 gap-8 lg:flex-row lg:space-y-0">
-          <aside className="h-100 mx-5 md:w-1/4">
+          <aside className="h-100 mx-0 w-[200px]">
             <SidebarNav items={settingsNavItems} />
           </aside>
 
           <div
             id="tickets-content"
-            className="flex flex-col justify-center py-3"
+            className="flex flex-col flex-1 justify-center py-3 gap-12"
           >
             <OpenTicketsTable data={supportTickets} />
             <ClosedTicketsTable data={supportTickets} />
