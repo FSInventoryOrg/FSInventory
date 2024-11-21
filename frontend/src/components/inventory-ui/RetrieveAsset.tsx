@@ -113,6 +113,7 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
             message: 'Asset recovered successfully!',
             type: 'SUCCESS',
           });
+          queryClient.invalidateQueries(['fetchAssetsByProperty', 'assignee', assignee]);
           queryClient.invalidateQueries({
             queryKey: ['fetchAllAssets', 'Hardware'],
           });
