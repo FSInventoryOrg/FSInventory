@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import { EmployeeColumns } from '@/components/tracker-ui/EmployeeColumns';
-import { EmployeeTable } from '@/components/tracker-ui/EmployeeTable';
-import * as imsService from '@/ims-service';
-import { useQuery } from '@tanstack/react-query';
-import { EmployeeType } from '@/types/employee';
-import { EmployeeTableSuspense } from '@/components/tracker-ui/EmployeeTableSuspense';
-import DeploymentInfo from '@/components/tracker-ui/DeploymentInfo';
-import Filter from '@/components/graphics/Filter';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { EmployeeColumns } from "@/components/tracker-ui/EmployeeColumns";
+import { EmployeeTable } from "@/components/tracker-ui/EmployeeTable";
+import * as imsService from "@/ims-service";
+import { useQuery } from "@tanstack/react-query";
+import { EmployeeType } from "@/types/employee";
+import { EmployeeTableSuspense } from "@/components/tracker-ui/EmployeeTableSuspense";
+import DeploymentInfo from "@/components/tracker-ui/DeploymentInfo";
+import Filter from "@/components/graphics/Filter";
+import { useParams } from "react-router-dom";
 import {
   Sheet,
   SheetContent,
@@ -15,8 +15,8 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
 const Tracker = () => {
   const { employeeCode } = useParams();
@@ -24,26 +24,26 @@ const Tracker = () => {
   const [open, setOpen] = useState(false);
   const [employees, setEmployees] = useState<EmployeeType[]>();
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeType>();
-  const [height, setHeight] = useState('calc(100vh - 91px)');
+  const [height, setHeight] = useState("calc(100vh - 91px)");
 
   const { data: employeeByUrl } = useQuery({
-    queryKey: ['fetchEmployeeByCode', employeeCode],
-    queryFn: () => imsService.fetchEmployeeByCode(employeeCode || ''),
+    queryKey: ["fetchEmployeeByCode", employeeCode],
+    queryFn: () => imsService.fetchEmployeeByCode(employeeCode || ""),
     enabled: !!employeeCode,
   });
 
   const { data: registeredEmployees } = useQuery({
-    queryKey: ['fetchEmployees'],
+    queryKey: ["fetchEmployees"],
     queryFn: () => imsService.fetchAllEmployees(),
   });
   const { data: assignees } = useQuery<string[]>({
-    queryKey: ['fetch', 'assignee'],
-    queryFn: () => imsService.fetchAssetUniqueValuesByProperty('assignee'),
+    queryKey: ["fetch", "assignee"],
+    queryFn: () => imsService.fetchAssetUniqueValuesByProperty("assignee"),
   });
 
   const { data: employeePositions } = useQuery<string[]>({
-    queryKey: ['fetch', 'position'],
-    queryFn: () => imsService.fetchEmployeeUniqueValuesByProperty('position'),
+    queryKey: ["fetch", "position"],
+    queryFn: () => imsService.fetchEmployeeUniqueValuesByProperty("position"),
   });
 
   const handleEmployeeSelect = (employee: EmployeeType) => {
@@ -74,18 +74,18 @@ const Tracker = () => {
         // Skip employee codes
         if (name && employeeCodes.has(name)) return;
         // Unregistered employees are added to allEmployees
-        const nameParts = name.split(' ');
+        const nameParts = name.split(" ");
         const lastName = nameParts.pop()!;
-        const firstName = nameParts.join(' ');
+        const firstName = nameParts.join(" ");
         if (!employeesAdded.has(name)) {
           allEmployees.push({
-            _id: '', // Assign a unique ID or leave it empty if it's not available
-            code: '', // You can assign a code or leave it empty
+            _id: "", // Assign a unique ID or leave it empty if it's not available
+            code: "", // You can assign a code or leave it empty
             firstName: firstName,
-            middleName: '',
+            middleName: "",
             lastName: lastName,
             name: name,
-            position: '',
+            position: "",
             startDate: new Date(),
             isActive: true,
             isRegistered: false, // Set isActive to true for unregistered employees
@@ -111,27 +111,45 @@ const Tracker = () => {
   const handleFilters = (filters: string[]) => {
     const allEmployees = mergeEmployees();
     if (!allEmployees) return; // Ensure employees data is available
-
+    const statuses = ["Active", "Inactive", "Registered", "Unregistered"];
+    const positionFilters = filters.filter(
+      (posFilter) => !statuses.includes(posFilter)
+    );
     const filteredEmployees = allEmployees.filter((employee) => {
-      const statuses = ['Active', 'Inactive', 'Registered', 'Unregistered'];
+      if (filters.length === 0) return true;
+      if (filters.every((filter) => !statuses.includes(filter))) return true;
+
       return filters.some((filter) => {
         if (statuses.includes(filter)) {
-          if (filter === 'Active' && !employee.isActive) return false;
-          if (filter === 'Inactive' && employee.isActive) return false;
-          if (filter === 'Registered' && !employee.isRegistered) return false;
-          if (filter === 'Unregistered' && employee.isRegistered) return false;
-          return true;
-        } else if (employeePositions?.includes(filter)) {
-          // filter for position
-          return employee.position?.toLowerCase() === filter.toLowerCase();
+          if (filter === "Active" && employee.isActive) {
+            return true;
+          }
+          if (filter === "Inactive" && !employee.isActive) {
+            return true;
+          }
+          if (filter === "Registered" && employee.isRegistered) {
+            return true;
+          }
+          if (filter === "Unregistered" && !employee.isRegistered) {
+            return true;
+          }
+          return false;
         }
-        return Object.values(employee).some((value) => {
-          return value?.toString().toLowerCase() === filter.toLowerCase();
-        });
+
+        return false;
       });
     });
 
-    setEmployees(filteredEmployees);
+    const newEmployees = filteredEmployees.filter((employee) => {
+      if (positionFilters.length === 0) return true;
+      return filters.some((filter) => {
+        if (employeePositions?.includes(filter)) {
+          return employee.position?.toLowerCase() === filter.toLowerCase();
+        }
+        return false;
+      });
+    });
+    setEmployees(newEmployees);
   };
 
   useEffect(() => {
@@ -152,14 +170,14 @@ const Tracker = () => {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1280) {
-        setHeight('calc(100vh - 91px)');
+        setHeight("calc(100vh - 91px)");
       } else {
-        setHeight('');
+        setHeight("");
       }
     };
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -170,10 +188,10 @@ const Tracker = () => {
     };
 
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
 
     return () => {
-      window.removeEventListener('resize', checkScreenSize);
+      window.removeEventListener("resize", checkScreenSize);
     };
   }, []);
 
