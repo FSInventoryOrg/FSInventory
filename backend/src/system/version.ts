@@ -22,7 +22,7 @@ export const getVersion = async () => {
 
   const rootDir = getAppRootDir();
   const backend: any = await getFile(`${rootDir}/package.json`, true);
-  const frontend = await getFile(`${rootDir}/frontend/package.json`, true);
+  const frontend = await getFile(`${rootDir}/../frontend/package.json`, true);
 
   if (backend && frontend) {
     try {
