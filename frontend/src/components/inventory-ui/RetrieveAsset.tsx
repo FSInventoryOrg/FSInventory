@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -7,7 +7,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
+} from "@/components/ui/sheet";
 import {
   FormControl,
   FormField,
@@ -15,28 +15,28 @@ import {
   FormLabel,
   FormMessage,
   Form,
-} from '@/components/ui/form';
-import { AssetUnionType } from '@/types/asset';
-import { useForm } from 'react-hook-form';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import * as imsService from '@/ims-service';
-import { useAppContext } from '@/hooks/useAppContext';
-import { Spinner } from '../Spinner';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import React, { useState } from 'react';
-import { ArrowFatLinesDown } from '@phosphor-icons/react';
-import { EmployeeType } from '@/types/employee';
+} from "@/components/ui/form";
+import { AssetUnionType } from "@/types/asset";
+import { useForm } from "react-hook-form";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as imsService from "@/ims-service";
+import { useAppContext } from "@/hooks/useAppContext";
+import { Spinner } from "../Spinner";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import React, { useState } from "react";
+import { ArrowFatLinesDown } from "@phosphor-icons/react";
+import { EmployeeType } from "@/types/employee";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select';
-import { Defaults } from '@/types/options';
-import { RetrieveAssetSchema } from '@/schemas/RetrieveAssetSchema';
-import LackingDeploymentDetailsDialog from './LackingDeploymentDetailsDialog';
+} from "../ui/select";
+import { Defaults } from "@/types/options";
+import { RetrieveAssetSchema } from "@/schemas/RetrieveAssetSchema";
+import LackingDeploymentDetailsDialog from "./LackingDeploymentDetailsDialog";
 
 interface RetrieveAssetProps {
   assetData: AssetUnionType;
@@ -56,38 +56,41 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
     defaultValues: {
       code: assetData.code,
       recoveredFrom: assetData.assignee,
-      status: 'IT Storage',
+      status: "IT Storage",
     },
   });
 
   const { data: defaults } = useQuery<Defaults>({
-    queryKey: ['fetchOptionValues', 'defaults'],
-    queryFn: () => imsService.fetchOptionValues('defaults'),
+    queryKey: ["fetchOptionValues", "defaults"],
+    queryFn: () => imsService.fetchOptionValues("defaults"),
   });
 
   const { data: employees } = useQuery<EmployeeType[]>({
-    queryKey: ['fetchAllEmployees'],
+    queryKey: ["fetchAllEmployees"],
     queryFn: () => imsService.fetchAllEmployees(),
   });
 
   const { mutate: updateEmployee, isPending: updatingEmployee } = useMutation({
     mutationFn: imsService.updateEmployeeAssetHistory,
     onSuccess: async () => {
-      showToast({ message: 'Asset recovered successfully!', type: 'SUCCESS' });
-      queryClient.invalidateQueries({ queryKey: ['fetchAllAssets'] });
-      queryClient.invalidateQueries({ queryKey: ['fetchAssetsByProperty'] });
-      queryClient.invalidateQueries({
-        queryKey: ['fetchAllAssetsByStatusAndCategory'],
+      showToast({
+        message: "Asset recovered successfullyas!",
+        type: "SUCCESS",
       });
-      queryClient.invalidateQueries({ queryKey: ['fetchEmployees'] });
-      queryClient.invalidateQueries({ queryKey: ['fetchEmployeeByCode'] });
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] });
+      queryClient.invalidateQueries({ queryKey: ["fetchAssetsByProperty"] });
+      queryClient.invalidateQueries({
+        queryKey: ["fetchAllAssetsByStatusAndCategory"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] });
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
       setTimeout(() => {
         setOpen(false);
       }, 100);
     },
     onError: (error: Error) => {
-      showToast({ message: error.message, type: 'ERROR' });
+      showToast({ message: error.message, type: "ERROR" });
     },
   });
 
@@ -110,17 +113,19 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
           });
         } else {
           showToast({
-            message: 'Asset recovered successfully!',
-            type: 'SUCCESS',
-          });
-          queryClient.invalidateQueries(['fetchAssetsByProperty', 'assignee', assignee]);
-          queryClient.invalidateQueries({
-            queryKey: ['fetchAllAssets', 'Hardware'],
+            message: "Asset recovered successfully!",
+            type: "SUCCESS",
           });
           queryClient.invalidateQueries({
-            queryKey: ['fetchAllAssetsByStatusAndCategory'],
+            queryKey: ["fetchAssetsByProperty", "assignee", assignee.trim()],
           });
-          queryClient.invalidateQueries({ queryKey: ['notifications'] });
+          queryClient.invalidateQueries({
+            queryKey: ["fetchAllAssets", "Hardware"],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["fetchAllAssetsByStatusAndCategory"],
+          });
+          queryClient.invalidateQueries({ queryKey: ["notifications"] });
           onRetrieve?.();
           setTimeout(() => {
             setOpen(false);
@@ -129,7 +134,7 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
       }
     },
     onError: (error: Error) => {
-      showToast({ message: error.message, type: 'ERROR' });
+      showToast({ message: error.message, type: "ERROR" });
     },
   });
 
@@ -141,7 +146,7 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
   };
 
   const handleRecoverAsset = () => {
-    const [code, status] = form.getValues(['code', 'status']);
+    const [code, status] = form.getValues(["code", "status"]);
     const retrievedAsset = {
       _id: assetData._id,
       code,
@@ -162,37 +167,37 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button
-          className='w-[90px] justify-between h-8 px-2 gap-2 text-xs font-semibold'
-          variant='secondary'
+          className="w-[90px] justify-between h-8 px-2 gap-2 text-xs font-semibold"
+          variant="secondary"
         >
           Recover
-          <ArrowFatLinesDown weight='fill' size={16} />
+          <ArrowFatLinesDown weight="fill" size={16} />
         </Button>
       </SheetTrigger>
-      <SheetContent className='h-full overflow-y-scroll w-full'>
+      <SheetContent className="h-full overflow-y-scroll w-full">
         <SheetHeader>
           <SheetTitle>Recover asset {assetData.code}</SheetTitle>
           <SheetDescription>
-            Recovering this asset {assignee ? `from ${assignee}` : ''} will
+            Recovering this asset {assignee ? `from ${assignee}` : ""} will
             remove it from their deployed assets list and set the status of this
-            asset to '{form.getValues('status')}'.
+            asset to &apos;{form.getValues("status")}&apos;.
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
           <form
-            className='flex flex-col gap-4 py-4 w-full'
+            className="flex flex-col gap-4 py-4 w-full"
             onSubmit={form.handleSubmit(onSubmit)}
           >
-            <div className='flex flex-col gap-2 w-full'>
+            <div className="flex flex-col gap-2 w-full">
               <FormField
                 control={form.control}
-                name='status'
+                name="status"
                 render={({ field }) => (
-                  <FormItem className='pb-2 '>
-                    <FormLabel className='font-medium'>
+                  <FormItem className="pb-2 ">
+                    <FormLabel className="font-medium">
                       Status for recovered asset
                     </FormLabel>
-                    <div className='flex w-full gap-1'>
+                    <div className="flex w-full gap-1">
                       <Select
                         //   disabled={isStatusDataLoading}
                         onValueChange={field.onChange}
@@ -200,7 +205,7 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder='Select status for recovered asset' />
+                            <SelectValue placeholder="Select status for recovered asset" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -209,7 +214,7 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
                               <SelectItem
                                 key={status}
                                 value={status}
-                                className='w-full'
+                                className="w-full"
                               >
                                 {status}
                               </SelectItem>
@@ -224,9 +229,9 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
             </div>
             <SheetFooter>
               <Button
-                type='submit'
+                type="submit"
                 disabled={retrievalPending || updatingEmployee}
-                className='gap-2 font-semibold'
+                className="gap-2 font-semibold"
               >
                 {retrievalPending || updatingEmployee ? (
                   <Spinner size={18} />
