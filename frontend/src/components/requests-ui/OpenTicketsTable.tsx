@@ -6,7 +6,14 @@ interface TicketsTableProps {
 }
 const HIDDEN_COLUMNS = ["status"];
 const OpenTicketsTable = ({ data }: TicketsTableProps) => {
-  return <TicketsTable data={data} defaultHiddenColumns={HIDDEN_COLUMNS} />;
+  return (
+    <TicketsTable
+      id="open-tickets-table"
+      title="Open Tickets"
+      data={data}
+      defaultHiddenColumns={HIDDEN_COLUMNS}
+    />
+  );
 };
 
 export default OpenTicketsTable;

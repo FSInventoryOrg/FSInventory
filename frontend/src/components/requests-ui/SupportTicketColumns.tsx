@@ -37,6 +37,7 @@ export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
   },
   {
     accessorKey: "created",
+    enableGlobalFilter: false,
     header: ({ column }) => {
       return (
         <Button
@@ -70,6 +71,7 @@ export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
   },
   {
     header: "Priority",
+    enableGlobalFilter: false,
     accessorKey: "priority",
     cell: ({ row }) => {
       return <TicketPriority ticket={row.original} />;
@@ -98,6 +100,7 @@ export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
   },
   {
     id: "actions",
+    enableGlobalFilter: false,
     header: "Actions",
     enableHiding: false,
     cell: () => {
