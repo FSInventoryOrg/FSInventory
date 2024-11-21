@@ -74,7 +74,7 @@ const RetrieveAsset = ({ assetData, onRetrieve }: RetrieveAssetProps) => {
     mutationFn: imsService.updateEmployeeAssetHistory,
     onSuccess: async () => {
       showToast({
-        message: "Asset recovered successfullyas!",
+        message: "Asset recovered successfully!",
         type: "SUCCESS",
       });
       queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] });
