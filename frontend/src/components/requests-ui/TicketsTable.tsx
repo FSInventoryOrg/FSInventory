@@ -24,7 +24,7 @@ import { SupportTicketColumns } from "./SupportTicketColumns";
 import { SupportTicketType } from "@/types/ticket";
 import Empty from "../graphics/Empty";
 import { useState } from "react";
-import { SearchIcon } from "lucide-react";
+import { ChevronFirstIcon, ChevronLastIcon, SearchIcon } from "lucide-react";
 import { Input } from "../ui/input";
 import { DataTablePagination } from "../DataTablePagination";
 import { ScrollArea } from "../ui/scroll-area";
@@ -107,8 +107,8 @@ const TicketsTable = ({
           />
         </div>
       </div>
-      <div>
-        <ScrollArea className=" w-full rounded-md border ">
+      <div className="rounded-md border">
+        <ScrollArea className=" w-full">
           <Table id={id} className="text-xs relative h-full">
             <TableHeader className="sticky top-0 bg-accent z-10 border-b">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -160,7 +160,13 @@ const TicketsTable = ({
             </TableBody>
           </Table>
         </ScrollArea>
-        <DataTablePagination table={table} />
+        <DataTablePagination
+          table={table}
+          className="bg-accent p-2"
+          variant="light"
+          FirstPageIcon={<ChevronFirstIcon className="h-4 w-4" />}
+          LastPageIcon={<ChevronLastIcon className="h-4 w-4" />}
+        />
       </div>
     </div>
   );
