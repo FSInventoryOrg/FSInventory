@@ -14,17 +14,19 @@ permissions:
   contents: read
 
 jobs:
-  build-and-push-images:
-    name: Build and Push Docker Images
+  authentication:
+    name: Authentication Setup
     runs-on: ubuntu-latest
     environment: develop
 
-    env:
-      ACR_LOGIN_SERVER: ${{ secrets.ACR_USERNAME }}.azurecr.io
-
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Log in to ACR
         uses: azure/docker-login@v2
@@ -32,6 +34,16 @@ jobs:
           login-server: ${{ secrets.ACR_USERNAME }}.azurecr.io
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
+
+  build-and-push-images:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    needs: authentication
+    environment: develop
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       - name: Build and Push Frontend
         working-directory: ./frontend
@@ -52,14 +64,6 @@ jobs:
     environment: develop
 
     steps:
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
       - name: Deploy Backend to Azure App Service
         uses: azure/webapps-deploy@v2
         with:
