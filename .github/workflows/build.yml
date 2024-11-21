@@ -61,10 +61,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           allow-no-subscriptions: true
 
-      - name: Set Azure Subscription
-        run: |
-          az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
       - name: Deploy Backend to Azure App Service
         uses: azure/webapps-deploy@v2
         with:
