@@ -13,7 +13,7 @@ RUN \
     mkdir -p public/backup/json && \
     mkdir -p public/import/archive && \
     mkdir -p public/import/collections && \
-    chmod -R 775 public
+    chmod -R 777 public
 
 COPY . .
 
