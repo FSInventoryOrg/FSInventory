@@ -24,6 +24,7 @@ module.exports = {
           DEFAULT: "hsl(var(--border))",
           brandgreen: "hsla(var(--brand-green))",
         },
+        brandgreen: "hsla(var(--brand-green))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         tab: "hsl(var(--tab))",
