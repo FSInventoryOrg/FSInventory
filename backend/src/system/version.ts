@@ -20,9 +20,13 @@ export const getVersion = async () => {
     };
   }
 
+  const jsonPath =
+    process.cwd() === "/usr/src/app"
+      ? "/frontend/package.json"
+      : "/../frontend/package.json";
   const rootDir = getAppRootDir();
   const backend: any = await getFile(`${rootDir}/package.json`, true);
-  const frontend = await getFile(`${rootDir}/frontend/package.json`, true);
+  const frontend = await getFile(`${rootDir}${jsonPath}`, true);
 
   if (backend && frontend) {
     try {

@@ -1,26 +1,78 @@
-name: Build Frontend
+name: Pull Request CI/CD
 
 on:
   pull_request:
     branches:
-      - 'staging'
-      - 'develop'
-      - 'main'
+      - develop
+      - feature/*
+      - bugfix/*
+      - fix/*
+      - improvement/*
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  build:
+  build-and-push-images:
+    name: Build and Push Docker Images
     runs-on: ubuntu-latest
+    environment: develop
+
+    env:
+      ACR_LOGIN_SERVER: ${{ secrets.ACR_USERNAME }}.azurecr.io
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to ACR
+        uses: azure/docker-login@v2
         with:
-          node-version: '20.x'
-      - run: npm ci
-        working-directory: './frontend'
-      - run: npm run build
-        working-directory: './frontend'
-      - run: npm ci
-        working-directory: './backend'
-      - run: npm run build
-        working-directory: './backend'
+          login-server: ${{ secrets.ACR_USERNAME }}.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and Push Frontend
+        working-directory: ./frontend
+        run: |
+          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/app:pr-${{ github.event.number }} .
+          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/app:pr-${{ github.event.number }}
+
+      - name: Build and Push Backend
+        working-directory: ./backend
+        run: |
+          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/api:pr-${{ github.event.number }} .
+          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/api:pr-${{ github.event.number }}
+
+  deploy:
+    name: Deploy to Azure App Services
+    needs: build-and-push-images
+    runs-on: ubuntu-latest
+    environment: develop
+
+    steps:
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          auth-type: ${{ vars.AUTH_TYPE }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set Azure Subscription
+        run: |
+          az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Backend to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: pr-${{ github.event.number }}-api
+          images: ${{ secrets.ACR_USERNAME }}.azurecr.io/api:pr-${{ github.event.number }}
+
+      - name: Deploy Frontend to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: pr-${{ github.event.number }}
+          images: ${{ secrets.ACR_USERNAME }}.azurecr.io/frontend:pr-${{ github.event.number }}
