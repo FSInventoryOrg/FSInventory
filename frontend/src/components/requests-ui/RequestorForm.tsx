@@ -23,7 +23,7 @@ const RequestorForm = () => {
       {/* Autopopulate if logged in */}
       <FormField
         control={control}
-        name="fullName"
+        name="employeeName"
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-secondary-foreground font-normal text-base">
@@ -38,7 +38,7 @@ const RequestorForm = () => {
       />
       <FormField
         control={control}
-        name="manager"
+        name="managerName"
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-secondary-foreground font-normal text-base">
@@ -72,7 +72,7 @@ const RequestorForm = () => {
       />
       <FormField
         control={control}
-        name="contactInfo"
+        name="employeeEmail"
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-secondary-foreground font-normal text-base">
