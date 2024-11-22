@@ -90,11 +90,9 @@ router.post("/addAdmins", verifyToken, async (req: Request, res: Response) => {
     );
 
     if (decodedToken.role !== "ADMIN") {
-      return res
-        .status(403)
-        .json({
-          message: "Only users with admin role can perform this action",
-        });
+      return res.status(403).json({
+        message: "Only users with admin role can perform this action",
+      });
     }
     const data: any = req.body;
 
@@ -128,11 +126,9 @@ router.post(
       );
 
       if (decodedToken.role !== "ADMIN") {
-        return res
-          .status(403)
-          .json({
-            message: "Only users with admin role can perform this action",
-          });
+        return res.status(403).json({
+          message: "Only users with admin role can perform this action",
+        });
       }
 
       const currentUser = await User.findOne({ _id: decodedToken.userId });
