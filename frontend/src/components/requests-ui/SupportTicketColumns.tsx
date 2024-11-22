@@ -6,6 +6,7 @@ import { SupportTicketType } from "@/types/ticket";
 import TicketPriority from "./TicketPriority";
 import NameWithAvatar from "./NameWithAvatar";
 import TicketID from "./TicketID";
+import StatusBadge from "./StatusBadge";
 
 export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
   {
@@ -84,7 +85,7 @@ export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
     header: "Status",
     accessorKey: "status",
     cell: ({ row }) => {
-      return row.getValue("status");
+      return <StatusBadge status={row.getValue("status")} />;
     },
   },
   {
