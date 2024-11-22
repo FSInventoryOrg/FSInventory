@@ -13,6 +13,8 @@ import {
 import { ClockCountdown } from "@phosphor-icons/react";
 import { Flag } from "lucide-react";
 import { useMemo, useState } from "react";
+import * as imsService from "@/ims-service";
+import { useQuery } from "@tanstack/react-query";
 
 const TABS = ["All", "Open", "Closed"];
 const CLOSED_STATUSES: TicketStatusType[] = [
@@ -20,104 +22,113 @@ const CLOSED_STATUSES: TicketStatusType[] = [
   TicketStatus.Resolved,
 ];
 
-const supportTickets: SupportTicketType[] = [
-  {
-    ticketId: "AR-123",
-    employeeEmail: "apacada@fullscale.ph",
-    employeeName: "Alpha Marie Pacada",
-    managerName: "John Doe",
-    createdBy: "apacada@fullscale.ph",
-    created: new Date(),
-    priority: "Low",
-    type: "Asset Request",
-    assetSpecsModel: "Headphones",
-    justification: "worn out",
-    assetType: "Hardware",
-  },
-  {
-    ticketId: "AR-001",
-    employeeEmail: "apacada@fullscale.ph",
-    employeeName: "Alpha Marie Pacada",
-    managerName: "John Doe",
-    createdBy: "apacada@fullscale.ph",
-    created: new Date(),
-    priority: "Low",
-    type: "Asset Request",
-    assetSpecsModel:
-      "Dell PowerEdge R940 Server with Intel Xeon Platinum 8280 Processors, 1.5TB DDR4 RAM",
-    justification: "worn out",
-    assetType: "Hardware",
-  },
-  {
-    ticketId: "IR-001",
-    employeeEmail: "apacada@fullscale.ph",
-    employeeName: "Alpha Marie Pacada",
-    managerName: "John Doe",
-    createdBy: "apacada@fullscale.ph",
-    created: new Date(),
-    priority: "Medium",
-    type: "Issue Report",
-    assetAffected: "Monitor",
-    issueCategory: "Hardware",
-    issueDescription: "",
-  },
-  {
-    ticketId: "IR-002",
-    employeeEmail: "apacada@fullscale.ph",
-    employeeName: "Xerxes Ondong",
-    managerName: "Michael Paradela II",
-    createdBy: "apacada@fullscale.ph",
-    created: new Date(),
-    priority: "Low",
-    type: "Issue Report",
-    issueCategory: "Hardware",
-    issueDescription: "",
-    status: "Rejected",
-  },
-  {
-    ticketId: "IR-003",
-    employeeEmail: "apacada@fullscale.ph",
-    employeeName: "John Doe",
-    managerName: "John Doe",
-    createdBy: "apacada@fullscale.ph",
-    created: new Date(),
-    priority: "Low",
-    type: "Issue Report",
-    issueCategory: "Hardware",
-    issueDescription: "",
-    status: "Resolved",
-  },
-  {
-    ticketId: "IR-004",
-    employeeEmail: "rolazo@fullscale.ph",
-    employeeName: "Richard Olazo",
-    managerName: "Michael Paradela II",
-    createdBy: "rolazo@fullscale.ph",
-    created: new Date(),
-    priority: "High",
-    type: "Issue Report",
-    issueCategory: "Hardware",
-    issueDescription: "",
-    status: "Resolved",
-  },
-  {
-    ticketId: "IR-005",
-    employeeEmail: "dmontecillo@fullscale.ph",
-    employeeName: "David Montecillo",
-    managerName: "Retchel Tapayan",
-    createdBy: "dmontecillo@fullscale.ph",
-    created: new Date(),
-    priority: "High",
-    type: "Issue Report",
-    issueCategory: "Hardware",
-    issueDescription: "",
-    status: "Rejected",
-  },
-];
+// const supportTickets: SupportTicketType[] = [
+//   {
+//     ticketId: "AR-123",
+//     employeeEmail: "apacada@fullscale.ph",
+//     employeeName: "Alpha Marie Pacada",
+//     managerName: "John Doe",
+//     createdBy: "apacada@fullscale.ph",
+//     created: new Date(),
+//     priority: "Low",
+//     type: "Asset Request",
+//     assetSpecsModel: "Headphones",
+//     justification: "worn out",
+//     assetType: "Hardware",
+//   },
+//   {
+//     ticketId: "AR-001",
+//     employeeEmail: "apacada@fullscale.ph",
+//     employeeName: "Alpha Marie Pacada",
+//     managerName: "John Doe",
+//     createdBy: "apacada@fullscale.ph",
+//     created: new Date(),
+//     priority: "Low",
+//     type: "Asset Request",
+//     assetSpecsModel:
+//       "Dell PowerEdge R940 Server with Intel Xeon Platinum 8280 Processors, 1.5TB DDR4 RAM",
+//     justification: "worn out",
+//     assetType: "Hardware",
+//   },
+//   {
+//     ticketId: "IR-001",
+//     employeeEmail: "apacada@fullscale.ph",
+//     employeeName: "Alpha Marie Pacada",
+//     managerName: "John Doe",
+//     createdBy: "apacada@fullscale.ph",
+//     created: new Date(),
+//     priority: "Medium",
+//     type: "Issue Report",
+//     assetAffected: "Monitor",
+//     issueCategory: "Hardware",
+//     issueDescription: "",
+//   },
+//   {
+//     ticketId: "IR-002",
+//     employeeEmail: "apacada@fullscale.ph",
+//     employeeName: "Xerxes Ondong",
+//     managerName: "Michael Paradela II",
+//     createdBy: "apacada@fullscale.ph",
+//     created: new Date(),
+//     priority: "Low",
+//     type: "Issue Report",
+//     issueCategory: "Hardware",
+//     issueDescription: "",
+//     status: "Rejected",
+//   },
+//   {
+//     ticketId: "IR-003",
+//     employeeEmail: "apacada@fullscale.ph",
+//     employeeName: "John Doe",
+//     managerName: "John Doe",
+//     createdBy: "apacada@fullscale.ph",
+//     created: new Date(),
+//     priority: "Low",
+//     type: "Issue Report",
+//     issueCategory: "Hardware",
+//     issueDescription: "",
+//     status: "Resolved",
+//   },
+//   {
+//     ticketId: "IR-004",
+//     employeeEmail: "rolazo@fullscale.ph",
+//     employeeName: "Richard Olazo",
+//     managerName: "Michael Paradela II",
+//     createdBy: "rolazo@fullscale.ph",
+//     created: new Date(),
+//     priority: "High",
+//     type: "Issue Report",
+//     issueCategory: "Hardware",
+//     issueDescription: "",
+//     status: "Resolved",
+//   },
+//   {
+//     ticketId: "IR-005",
+//     employeeEmail: "dmontecillo@fullscale.ph",
+//     employeeName: "David Montecillo",
+//     managerName: "Retchel Tapayan",
+//     createdBy: "dmontecillo@fullscale.ph",
+//     created: new Date(),
+//     priority: "High",
+//     type: "Issue Report",
+//     issueCategory: "Hardware",
+//     issueDescription: "",
+//     status: "Rejected",
+//   },
+// ];
 
 const Tickets = () => {
   const { data: user } = useUserData();
+  const { data } = useQuery({
+    queryKey: ["getTickets"],
+    queryFn: () => imsService.getTickets(),
+  });
+
+  const supportTickets: SupportTicketType[] = data?.data;
+
   const [selectedTab, setSelectedTab] = useState("All");
+
+  const hasExistingTickets = !!supportTickets?.length;
 
   const userData = {
     employeeName: user ? `${user.firstName} ${user.lastName}` : "",
@@ -140,7 +151,7 @@ const Tickets = () => {
           return acc;
         },
         { openTickets: [], closedTickets: [] }
-      ) || {}
+      ) || { openTickets: [], closedTickets: [] }
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supportTickets]);
@@ -158,26 +169,29 @@ const Tickets = () => {
             a new one.
           </p>
         </div>
-        <div className="flex justify-between items-center w-80 border rounded-md bg-accent p-4">
-          <div className="flex flex-row gap-2">
-            <div className="flex items-center justify-center rounded-md bg-[#795E06] size-12 ">
-              <ClockCountdown className="text-[#EBB505]" size={32} />
+        {hasExistingTickets && (
+          <div className="flex justify-between items-center w-80 border rounded-md bg-accent p-4">
+            <div className="flex flex-row gap-2">
+              <div className="flex items-center justify-center rounded-md bg-[#795E06] size-12 ">
+                <ClockCountdown className="text-[#EBB505]" size={32} />
+              </div>
+              <div>
+                <h3 className="text-accent-foreground font-semibold text-sm">
+                  Open Tickets
+                </h3>
+                <h2 className="text-foreground font-bold text-2xl">
+                  {openTickets.length}
+                </h2>
+              </div>
             </div>
-            <div>
-              <h3 className="text-accent-foreground font-semibold text-sm">
-                Open Tickets
-              </h3>
-              <h2 className="text-foreground font-bold text-2xl">
-                {openTickets.length}
-              </h2>
-            </div>
+
+            <RequestForm userData={userData} />
           </div>
-          <RequestForm userData={userData} />
-        </div>
+        )}
       </div>
       <Separator className="my-5" />
 
-      {supportTickets?.length > 0 ? (
+      {hasExistingTickets ? (
         <div className="flex flex-col gap-12 lg:flex-row lg:space-y-0">
           <aside className="h-100 mx-0 w-[200px]">
             <div className="flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1 gap-2">
