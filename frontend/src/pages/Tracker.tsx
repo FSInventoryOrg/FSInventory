@@ -115,7 +115,9 @@ const Tracker = () => {
     const positionFilters = filters.filter(
       (posFilter) => !statuses.includes(posFilter)
     );
-    const filteredEmployees = allEmployees.filter((employee) => {
+
+    // Filter employees based on their status
+    const filteredStatusEmployees = allEmployees.filter((employee) => {
       if (filters.length === 0) return true;
       if (filters.every((filter) => !statuses.includes(filter))) return true;
 
@@ -140,7 +142,8 @@ const Tracker = () => {
       });
     });
 
-    const newEmployees = filteredEmployees.filter((employee) => {
+    // Filter Employees based position
+    const filteredEmployees = filteredStatusEmployees.filter((employee) => {
       if (positionFilters.length === 0) return true;
       return filters.some((filter) => {
         if (employeePositions?.includes(filter)) {
@@ -149,7 +152,7 @@ const Tracker = () => {
         return false;
       });
     });
-    setEmployees(newEmployees);
+    setEmployees(filteredEmployees);
   };
 
   useEffect(() => {
