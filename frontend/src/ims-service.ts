@@ -943,7 +943,6 @@ export const fetchAppVersions = async () => {
 };
 
 export const submitTicket = async (data: RequestFormData) => {
-  return data;
   const response = await fetch(`${API_BASE_URL}/api/support_ticket`, {
     method: "POST",
     credentials: "include",
