@@ -2,6 +2,10 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.26.1](https://connect.zoho.com/portal/intranet/task/623367000000968011) 2024-11-21
+### Fixed
+- Fixed Assets list of Unregistered Employee not refreshing / up to date when an asset is recovered.
+
 ## [2.26.0](https://connect.zoho.com/portal/intranet/task/623367000000853258) 2024-11-22
 ### Changed
 - Updated functionality of filter logic on tracker page, also updated view all text and onClickOutside filter functionality
