@@ -10,6 +10,7 @@ import TicketID from "./TicketID";
 export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
   {
     id: "select",
+    size: 10,
     header: ({ table }) => (
       <Checkbox
         checked={
@@ -33,6 +34,7 @@ export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
   {
     accessorKey: "ticketId",
     header: "Ticket ID",
+    size: 200,
     cell: ({ row }) => <TicketID ticket={row.original} />,
   },
   {
@@ -62,6 +64,7 @@ export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
   },
   {
     header: "Description",
+    size: 400,
     accessorFn: (row) => {
       if (row.type === "Asset Request") {
         return row.assetSpecsModel;
@@ -87,6 +90,7 @@ export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
   {
     header: "Submitted By",
     accessorKey: "employeeName",
+    minSize: 250,
     cell: ({ row }) => {
       return <NameWithAvatar fullName={row.getValue("employeeName")} />;
     },
@@ -94,6 +98,7 @@ export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
   {
     header: "Manager",
     accessorKey: "managerName",
+    minSize: 250,
     cell: ({ row }) => {
       return <NameWithAvatar fullName={row.getValue("managerName")} />;
     },
@@ -103,6 +108,7 @@ export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
     enableGlobalFilter: false,
     header: "Actions",
     enableHiding: false,
+    maxSize: 100,
     cell: () => {
       return (
         <Button variant="ghost" className="h-8 w-8 p-0 rounded-lg">

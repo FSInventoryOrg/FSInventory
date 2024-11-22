@@ -136,7 +136,11 @@ const TicketsTable = ({
                     className="h-fit"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="p-3">
+                      <TableCell
+                        key={cell.id}
+                        className="p-3"
+                        style={{ width: cell.column.getSize() }}
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
