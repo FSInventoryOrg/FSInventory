@@ -33,6 +33,7 @@ import {
 import autoMailRoutess from "./system/automail";
 import backupRoutes, { listCollection } from "./system/backup";
 import versionRoutes from "./system/version";
+import path from "path";
 
 const DEFAULT_PORT = 3000;
 const port = Number(process.env.PORT) || DEFAULT_PORT;
@@ -102,6 +103,15 @@ const onStartupJobs = async () => {
 };
 
 onStartupJobs();
+
+if (process.env.NODE_ENV === "development") {
+  app.use(express.static(path.join(__dirname, "..", "..", "frontend", "dist")));
+  app.get("*", (req, res) => {
+    res.sendFile(
+      path.join(__dirname, "..", "..", "frontend", "dist", "index.html")
+    );
+  });
+}
 
 app.listen(port, HOST, () => {
   logger.info(`Server running on http://${HOST}:${port}`);
