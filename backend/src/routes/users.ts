@@ -119,12 +119,10 @@ router.post("/forgotPassword", async (req: Request, res: Response) => {
     const { email } = req.body;
 
     if (!email)
-      return res
-        .status(422)
-        .json({
-          message:
-            "User email is required to proceed with resetting the password",
-        });
+      return res.status(422).json({
+        message:
+          "User email is required to proceed with resetting the password",
+      });
 
     const user: any = await User.findOne({ email: email });
 
@@ -143,11 +141,9 @@ router.post("/forgotPassword", async (req: Request, res: Response) => {
       recipient: [email],
     });
 
-    return res
-      .status(200)
-      .json({
-        message: `OTP has been sent to your email and will expire on ${expiration.toLocaleString()}`,
-      });
+    return res.status(200).json({
+      message: `OTP has been sent to your email and will expire on ${expiration.toLocaleString()}`,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Something went wrong" });
@@ -160,18 +156,14 @@ router.patch("/resetPassword", async (req: Request, res: Response) => {
     const dateNow = new Date();
 
     if (!token)
-      return res
-        .status(422)
-        .json({
-          message: "Token is required to proceed with resetting the password",
-        });
+      return res.status(422).json({
+        message: "Token is required to proceed with resetting the password",
+      });
     if (!newPassword)
-      return res
-        .status(422)
-        .json({
-          message:
-            "New Password is required to proceed with resetting the password",
-        });
+      return res.status(422).json({
+        message:
+          "New Password is required to proceed with resetting the password",
+      });
 
     const arrayOTPT: any = await OTPTransaction.aggregate().match({
       $expr: {
@@ -248,19 +240,15 @@ router.patch(
       const { currentPassword, newPassword } = req.body;
 
       if (!currentPassword)
-        return res
-          .status(422)
-          .json({
-            message:
-              "Current Password is required to proceed with resetting the password",
-          });
+        return res.status(422).json({
+          message:
+            "Current Password is required to proceed with resetting the password",
+        });
       if (!newPassword)
-        return res
-          .status(422)
-          .json({
-            message:
-              "New Password is required to proceed with resetting the password",
-          });
+        return res.status(422).json({
+          message:
+            "New Password is required to proceed with resetting the password",
+        });
 
       const user: any = await User.findOne({ _id: userId }).select("+password");
 
@@ -270,11 +258,9 @@ router.patch(
       const isMatchNew = await compareHash(user.password, newPassword);
 
       if (!isMatchCurrent)
-        return res
-          .status(404)
-          .json({
-            message: "Current password does not match the original password",
-          });
+        return res.status(404).json({
+          message: "Current password does not match the original password",
+        });
       if (isMatchNew)
         return res
           .status(404)
