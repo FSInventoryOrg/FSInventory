@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Updated functionality of filter logic on tracker page, also updated view all text and onClickOutside filter functionality
 
+## [2.25.4](https://connect.zoho.com/portal/intranet/task/623367000000942387) 2024-11-20
+### Fixed
+- Fixed delete issue on options, added reset state when changes are detected on edit
+
 ## [2.25.3](https://connect.zoho.com/portal/intranet/task/623367000000943123) 2024-11-13
 ### Fixed
 - Fix the edit issue on Status and Equipment Type for Inventory Page
