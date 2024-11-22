@@ -160,8 +160,8 @@ const Tickets = () => {
         </div>
         <div className="flex justify-between items-center w-80 border rounded-md bg-accent p-4">
           <div className="flex flex-row gap-2">
-            <div className="flex items-center justify-center rounded-md bg-yellow-600 size-12 ">
-              <ClockCountdown className="text-background" size={32} />
+            <div className="flex items-center justify-center rounded-md bg-[#795E06] size-12 ">
+              <ClockCountdown className="text-[#EBB505]" size={32} />
             </div>
             <div>
               <h3 className="text-accent-foreground font-semibold text-sm">
