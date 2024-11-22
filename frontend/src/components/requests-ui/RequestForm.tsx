@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAppContext } from "@/hooks/useAppContext";
 import * as imsService from "@/ims-service";
 import RequestAssetForm from "./RequestAssetForm";
@@ -52,6 +52,7 @@ interface RequestFormProps {
 }
 
 const RequestForm = ({ userData }: RequestFormProps) => {
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const { showToast } = useAppContext();
 
@@ -64,6 +65,7 @@ const RequestForm = ({ userData }: RequestFormProps) => {
         type: "SUCCESS",
       });
       setOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["getTickets"] });
     },
   });
 
@@ -165,9 +167,7 @@ const RequestForm = ({ userData }: RequestFormProps) => {
               {requestType === "Issue Report" && (
                 <>
                   <h2 className="text-lg font-semibold">Report an Issue</h2>
-                  {/* <div className="sm:w-1/2 pr-2"> */}
                   <ReportIssueForm />
-                  {/* </div> */}
                 </>
               )}
               {requestType === "Asset Request" && (
