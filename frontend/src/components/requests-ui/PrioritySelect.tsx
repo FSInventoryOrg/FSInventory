@@ -36,8 +36,9 @@ const PriorityDropdown = ({
             priority={priority}
             icon={
               <ChevronDown
+                strokeWidth={2}
                 className={cn(
-                  "ml-2 h-4 w-4 transition-transform duration-200",
+                  "ml-2 transition-transform duration-200 size-3 rounded-full bg-inherit brightness-150",
                   isOpen && "rotate-180"
                 )}
               />

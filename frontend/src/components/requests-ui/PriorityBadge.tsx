@@ -2,34 +2,22 @@ import { PriorityLevel } from "@/types/ticket";
 import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
 
-const colors: Record<PriorityLevel, Record<string, string>> = {
-  Low: {
-    default: "bg-neutrals-20 text-[#565F5C]",
-    active: "bg-neutrals-70 text-neutrals-20",
-  },
-  Medium: {
-    default: "bg-yellow-20 text-[#675211]",
-    active: "bg-yellow-80 text-yellow/20",
-  },
-  High: {
-    default: "bg-red-20 text-destructive",
-    active: "bg-red-80 text-red-20",
-  },
+export const colors: Record<PriorityLevel, string> = {
+  Low: "bg-badge-neutral border-none text-badge-neutral-foreground",
+  Medium: "bg-badge-yellow border-none text-badge-yellow-foreground",
+  High: "bg-badge-destructive border-none text-badge-destructive-foreground",
 };
 
 interface PriorityBadgeProps {
   priority: PriorityLevel;
-  icon?: React.ReactNode; // Optional icon
-  active?: boolean;
+  icon?: React.ReactNode;
 }
-const PriorityBadge = ({ priority, icon, active }: PriorityBadgeProps) => {
+
+const PriorityBadge = ({ priority, icon }: PriorityBadgeProps) => {
   return (
     <Badge
       variant="outline"
-      className={cn(
-        "px-3 font-normal",
-        colors[priority][active ? "active" : "default"]
-      )}
+      className={cn("px-3 text-sm font-semibold", colors[priority])}
     >
       {priority}
       {icon}
