@@ -113,7 +113,7 @@ const RequestForm = ({ userData }: RequestFormProps) => {
   }, [userData]);
 
   const onSubmit = (data: RequestFormData) => {
-    mutate(data);
+    mutate({ ...data, createdBy: userData.employeeEmail });
   };
 
   return (

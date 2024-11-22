@@ -16,8 +16,14 @@ import {
 } from "../ui/select";
 
 const RequestorForm = () => {
-  const { control } = useFormContext();
-  const managers = ["Rodney Fernandez", "John Doe"]; // NOTE: to be replaced with actual data
+  const { control, setValue } = useFormContext();
+  const managers = [
+    { name: "Rodney Fernandez", email: "rfernandez@fullscale.ph" },
+    { name: "John Doe", email: "jdoe@fullscale.ph" },
+  ]; // NOTE: to be replaced with actual data
+
+  const getManagerName = (email: string) =>
+    managers.find((manager) => manager.email === email);
   return (
     <div className="flex flex-col gap-2">
       {/* Autopopulate if logged in */}
@@ -38,14 +44,25 @@ const RequestorForm = () => {
       />
       <FormField
         control={control}
-        name="managerName"
+        name="managerEmail"
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-secondary-foreground font-normal text-base">
               Manager
             </FormLabel>
             <FormControl>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={(email: string) => {
+                  field.onChange(email);
+                  const selectedManager = getManagerName(email);
+                  if (selectedManager) {
+                    setValue("managerName", selectedManager.name);
+                  } else {
+                    setValue("managerName", null);
+                  }
+                }}
+                defaultValue={field.value}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue
                     placeholder={
@@ -54,13 +71,13 @@ const RequestorForm = () => {
                       </p>
                     }
                   >
-                    {field.value}
+                    {field.value ? getManagerName(field.value)?.name : null}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {managers.map((manager) => (
-                    <SelectItem key={manager} value={manager}>
-                      {manager}
+                    <SelectItem key={manager.email} value={manager.email}>
+                      {manager.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

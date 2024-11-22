@@ -3,6 +3,7 @@ import { z } from "zod";
 export const RequestorFormSchema = z.object({
   employeeName: z.string().trim().min(1, "Full name is required"),
   managerName: z.string().trim().min(1, "Manager is required"),
+  managerEmail: z.string().email("Manager is required"),
   employeeEmail: z.string().min(1, "Contact information is required"),
 });
 
@@ -38,6 +39,7 @@ export const RequestFormSchema = z
     type: z.enum(REQUEST_TYPES, {
       required_error: "Request Type is required",
     }),
+    createdBy: z.string().optional(),
   })
   .and(RequestorFormSchema)
   .and(
