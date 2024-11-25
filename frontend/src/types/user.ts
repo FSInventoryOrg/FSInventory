@@ -7,7 +7,7 @@ export interface UserType {
   lastName: string;
   joinDate: Date;
   role: "USER" | "ADMIN";
-  avatar: string
+  avatar: string;
 }
 
 export interface UploadImage {

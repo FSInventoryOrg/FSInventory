@@ -24,6 +24,7 @@ module.exports = {
           DEFAULT: "hsl(var(--border))",
           brandgreen: "hsla(var(--brand-green))",
         },
+        brandgreen: "hsla(var(--brand-green))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         tab: "hsl(var(--tab))",
@@ -66,6 +67,22 @@ module.exports = {
         tracker: {
           from: "var(--tracker-gradient-from)",
           to: "var(--tracker-gradient-to)",
+        },
+        "badge-neutral": {
+          DEFAULT: "var(--badge-neutral)",
+          foreground: "var(--badge-neutral-foreground)",
+        },
+        "badge-destructive": {
+          DEFAULT: "var(--badge-destructive)",
+          foreground: "var(--badge-destructive-foreground)",
+        },
+        "badge-yellow": {
+          DEFAULT: "var(--badge-yellow)",
+          foreground: "var(--badge-yellow-foreground)",
+        },
+        "badge-green": {
+          DEFAULT: "var(--badge-green)",
+          foreground: "var(--badge-green-foreground)",
         },
       },
       borderRadius: {

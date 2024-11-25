@@ -14,7 +14,7 @@ import Tracker from "./pages/Tracker";
 import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import Requests from "./pages/Requests";
+import Tickets from "./pages/Tickets";
 
 const App = () => {
   const { isLoggedIn, isLoading } = useAppContext();
@@ -82,7 +82,7 @@ const App = () => {
                     path="/requests"
                     element={
                       <Layout>
-                        <Requests />
+                        <Tickets />
                       </Layout>
                     }
                   />

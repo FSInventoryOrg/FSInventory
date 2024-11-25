@@ -1,6 +1,7 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
-import * as XLSX from 'xlsx';
+import { UserType } from "@/types/user";
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+import * as XLSX from "xlsx";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -32,7 +33,7 @@ const isValidUrl = (url: string, base?: string) => {
 };
 
 export function prependHostIfMissing(path?: string) {
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
   if (!API_BASE_URL) return path;
   if (!path) return;
@@ -58,13 +59,13 @@ export function exportToExcel(columns: string[], data: any, fileName: string) {
 
   const workbook = XLSX.utils.book_new();
   const worksheet = XLSX.utils.json_to_sheet(filteredData);
-  const currentDate = new Intl.DateTimeFormat('en-PH', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
+  const currentDate = new Intl.DateTimeFormat("en-PH", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   }).format(new Date());
 
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
   return new Promise<void>((resolve, reject) => {
     try {
@@ -79,9 +80,21 @@ export function exportToExcel(columns: string[], data: any, fileName: string) {
 }
 
 export function format(str: string): string {
-  return str.split(/(?=[A-Z])/).map(part => part.toLowerCase()).join(' ');
+  return str
+    .split(/(?=[A-Z])/)
+    .map((part) => part.toLowerCase())
+    .join(" ");
 }
 
 export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export const mapUserToRequesForm = (user: UserType) => {
+  return {
+    employeeName: `${user.firstName} ${user.lastName}`, // Combine first and last names
+    managerName: "",
+    managerEmail: "", // TODO: replace with actual data from Rocks
+    employeeEmail: user.email, // Use user's email
+  };
+};

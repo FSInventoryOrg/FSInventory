@@ -10,11 +10,9 @@ import { AutoMailType } from "@/types/automail";
 import { AssetCounterFormData } from "./schemas/AssetCounterSchema";
 import { MongoResult } from "./types/backup";
 import { NotificationSettingType } from "./types/notification-setting";
-import {
-  ReportIssueFormData,
-  RequestAssetFormData,
-} from "./schemas/RequestFormSchema";
+import { RequestFormData } from "./schemas/RequestFormSchema";
 import { capitalize, format } from "./lib/utils";
+import { SupportTicketType } from "./types/ticket";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
@@ -944,9 +942,159 @@ export const fetchAppVersions = async () => {
   return response.json();
 };
 
-export const submitRequestForm = async (
-  data: ReportIssueFormData | RequestAssetFormData
+export const submitTicket = async (data: RequestFormData) => {
+  const response = await fetch(`${API_BASE_URL}/api/support_ticket`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  const responseBody = await response.json();
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+  return responseBody;
+};
+
+export const updateTicket = async ({
+  ticketId,
+  updatedTicket,
+}: {
+  ticketId: string;
+  updatedTicket: RequestFormData;
+}) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/support_ticket/${ticketId}`,
+    {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedTicket),
+    }
+  );
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || "Failed to update asset");
+  }
+
+  return true;
+};
+
+export const getTickets = async (type?: string) => {
+  let url = `${API_BASE_URL}/api/support_ticket?limit=1000`; //#NOTE: temporary-frontend pagination
+  if (type) {
+    url += `?type=${type}`;
+  }
+
+  const response = await fetch(url, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("Error fetching tickets");
+  }
+
+  return response.json();
+};
+
+export const getTicketById = async (ticketId: string) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/support_ticket/${ticketId}`,
+    {
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Error fetching ticket by Id");
+  }
+
+  return response.json();
+};
+
+export const fetchTicketsByFilter = async (filter: {
+  [key: string]: string;
+}) => {
+  const queryString = new URLSearchParams(filter).toString();
+  const response = await fetch(
+    `${API_BASE_URL}/api/support_ticket?${queryString}`,
+    {
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Error fetching tickets");
+  }
+
+  return response.json();
+};
+
+export const deleteTicketById = async (ticketId: string) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/support_ticket/${ticketId}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || "Failed to delete ticket");
+  }
+
+  return true;
+};
+
+export const bulkDeleteTickets = async (ticketIds: string) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/support_ticket/bulkDelete`,
+    {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(ticketIds),
+    }
+  );
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(responseBody.message || "Failed to delete ticket");
+  }
+
+  return true;
+};
+
+export const updateTicketPriority = async (
+  data: Partial<SupportTicketType>
 ) => {
-  if (data) return true;
-  return false;
+  const { ticketId, ...reqBody } = data;
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/support_ticket/${ticketId}`,
+    {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(reqBody),
+    }
+  );
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(
+      responseBody.message || "Failed to update the ticket priority"
+    );
+  }
+
+  return true;
 };
