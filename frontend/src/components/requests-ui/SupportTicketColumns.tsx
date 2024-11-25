@@ -1,5 +1,5 @@
 import { Checkbox } from "@radix-ui/react-checkbox";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SupportTicketType } from "@/types/ticket";
@@ -7,6 +7,18 @@ import TicketPriority from "./TicketPriority";
 import NameWithAvatar from "./NameWithAvatar";
 import TicketID from "./TicketID";
 import StatusBadge from "./StatusBadge";
+
+const prioritySort = (
+  rowA: Row<SupportTicketType>,
+  rowB: Row<SupportTicketType>
+): number => {
+  const priorityOrder: Record<string, number> = { Low: 1, Medium: 2, High: 3 };
+
+  const priorityA = rowA.original.priority ?? "Low";
+  const priorityB = rowB.original.priority ?? "Low";
+
+  return priorityOrder[priorityA] - priorityOrder[priorityB];
+};
 
 export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
   {
@@ -39,7 +51,7 @@ export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
     cell: ({ row }) => <TicketID ticket={row.original} />,
   },
   {
-    accessorKey: "created",
+    accessorKey: "createdAt",
     enableGlobalFilter: false,
     header: ({ column }) => {
       return (
@@ -54,9 +66,9 @@ export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
       );
     },
     cell: ({ row }) => {
-      if (row.original.created) {
+      if (row.original.createdAt) {
         const formattedDate = new Date(
-          row.getValue("created")
+          row.getValue("createdAt")
         ).toLocaleDateString("en-US");
         return <div className="translate-x-4 w-fit">{formattedDate}</div>;
       }
@@ -74,9 +86,22 @@ export const SupportTicketColumns: ColumnDef<SupportTicketType>[] = [
     },
   },
   {
-    header: "Priority",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          {" "}
+          Header
+          <ArrowUpDown className="h-4 w-4" />
+        </Button>
+      );
+    },
     enableGlobalFilter: false,
+    enableSorting: true,
     accessorKey: "priority",
+    sortingFn: prioritySort, // Sort from High > Medium > Low
     cell: ({ row }) => {
       return <TicketPriority ticket={row.original} />;
     },

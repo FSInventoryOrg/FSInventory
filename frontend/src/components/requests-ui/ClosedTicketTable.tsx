@@ -1,8 +1,7 @@
 import { SupportTicketType } from "@/types/ticket";
 import TicketsTable from "./TicketsTable";
-
 interface TicketsTableProps {
-  data: SupportTicketType[];
+  data?: SupportTicketType[] | undefined;
 }
 const HIDDEN_COLUMNS = ["priority", "actions"];
 const ClosedTicketsTable = ({ data }: TicketsTableProps) => {

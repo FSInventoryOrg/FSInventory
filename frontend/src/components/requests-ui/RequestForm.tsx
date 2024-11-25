@@ -7,7 +7,6 @@ import ReportIssueForm from "./ReportIssueForm";
 import {
   RequestFormData,
   RequestFormSchema,
-  RequestorFormData,
   RequestType,
 } from "@/schemas/RequestFormSchema";
 import {
@@ -32,6 +31,8 @@ import {
 } from "../ui/form";
 import RequestTypeOptions from "./RequestTypeOptions";
 import { Separator } from "../ui/separator";
+import { UserType } from "@/types/user";
+import { mapUserToRequesForm } from "@/lib/utils";
 
 const defaultReportIssueValues = {
   issueCategory: "",
@@ -48,10 +49,11 @@ const defaultRequestAssetValues = {
 };
 
 interface RequestFormProps {
-  userData: RequestorFormData;
+  user?: UserType;
 }
 
-const RequestForm = ({ userData }: RequestFormProps) => {
+const RequestForm = ({ user }: RequestFormProps) => {
+  const userData = user ? mapUserToRequesForm(user) : {};
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const { showToast } = useAppContext();
@@ -115,7 +117,7 @@ const RequestForm = ({ userData }: RequestFormProps) => {
   }, [userData]);
 
   const onSubmit = (data: RequestFormData) => {
-    mutate({ ...data, createdBy: userData.employeeEmail });
+    mutate({ ...data, createdBy: requestForm.getValues("employeeEmail") });
   };
 
   return (

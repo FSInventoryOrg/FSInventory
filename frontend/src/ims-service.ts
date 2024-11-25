@@ -985,7 +985,7 @@ export const updateTicket = async ({
 };
 
 export const getTickets = async (type?: string) => {
-  let url = `${API_BASE_URL}/api/support_ticket`;
+  let url = `${API_BASE_URL}/api/support_ticket?limit=1000`; //#NOTE: temporary-frontend pagination
   if (type) {
     url += `?type=${type}`;
   }

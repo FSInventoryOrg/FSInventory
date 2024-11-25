@@ -28,11 +28,12 @@ import { ChevronFirstIcon, ChevronLastIcon, SearchIcon } from "lucide-react";
 import { Input } from "../ui/input";
 import { DataTablePagination } from "../DataTablePagination";
 import { ScrollArea } from "../ui/scroll-area";
+import { TableSuspense } from "../tracker-ui/TableSuspense";
 
 interface TicketsTableProps {
   id?: string;
   title?: string;
-  data: SupportTicketType[];
+  data: SupportTicketType[] | undefined;
   defaultHiddenColumns: string[];
 }
 
@@ -57,7 +58,9 @@ const TicketsTable = ({
   defaultHiddenColumns,
 }: TicketsTableProps) => {
   const [globalFilter, setGlobalFilter] = useState([]);
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "priority", desc: true },
+  ]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     defaultHiddenColumns.reduce((acc, column) => {
       acc[column] = false;
@@ -69,7 +72,7 @@ const TicketsTable = ({
     pageSize: 5,
   });
   const table = useReactTable({
-    data,
+    data: data || [],
     columns: SupportTicketColumns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
@@ -90,6 +93,7 @@ const TicketsTable = ({
     },
     initialState: {
       pagination,
+      sorting,
     },
   });
 
@@ -108,69 +112,75 @@ const TicketsTable = ({
         </div>
       </div>
       <div className="rounded-md border">
-        <ScrollArea className=" w-full">
-          <Table id={id} className="text-xs relative h-full">
-            <TableHeader className="sticky top-0 bg-accent z-10 border-b">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {!header.isPlaceholder &&
-                          flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="h-fit"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className="p-3"
-                        style={{ width: cell.column.getSize() }}
+        {!data ? (
+          <TableSuspense length={5} />
+        ) : (
+          <>
+            <ScrollArea className=" w-full">
+              <Table id={id} className="text-xs relative h-full">
+                <TableHeader className="sticky top-0 bg-accent z-10 border-b">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => {
+                        return (
+                          <TableHead key={header.id}>
+                            {!header.isPlaceholder &&
+                              flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                          </TableHead>
+                        );
+                      })}
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && "selected"}
+                        className="h-fit"
                       >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell
+                            key={cell.id}
+                            className="p-3"
+                            style={{ width: cell.column.getSize() }}
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow className="hover:bg-background">
+                      <TableCell colSpan={SupportTicketColumns.length}>
+                        <div className="h-max flex flex-col items-center justify-center">
+                          <Empty height={200} width={300} />
+                          <span className="text-muted-foreground">
+                            No results found
+                          </span>
+                        </div>
                       </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow className="hover:bg-background">
-                  <TableCell colSpan={SupportTicketColumns.length}>
-                    <div className="h-max flex flex-col items-center justify-center">
-                      <Empty height={200} width={300} />
-                      <span className="text-muted-foreground">
-                        No results found
-                      </span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </ScrollArea>
-        <DataTablePagination
-          table={table}
-          className="bg-accent p-2"
-          variant="light"
-          FirstPageIcon={<ChevronFirstIcon className="h-4 w-4" />}
-          LastPageIcon={<ChevronLastIcon className="h-4 w-4" />}
-        />
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </ScrollArea>
+            <DataTablePagination
+              table={table}
+              className="bg-accent p-2"
+              variant="light"
+              FirstPageIcon={<ChevronFirstIcon className="h-4 w-4" />}
+              LastPageIcon={<ChevronLastIcon className="h-4 w-4" />}
+            />
+          </>
+        )}
       </div>
     </div>
   );

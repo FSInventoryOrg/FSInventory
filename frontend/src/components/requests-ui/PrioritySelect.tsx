@@ -50,7 +50,7 @@ const PriorityDropdown = ({
         {PRIORITY_LEVELS.map((level) => (
           <DropdownMenuItem
             key={level}
-            onChange={() => handlePriorityChange(level)}
+            onClick={() => handlePriorityChange(level)}
           >
             <PriorityBadge priority={level} />
           </DropdownMenuItem>
