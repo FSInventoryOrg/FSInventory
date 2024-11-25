@@ -8,9 +8,9 @@ export type TicketStatusType = `${TicketStatus}`;
 
 export interface SupportTicket {
   ticketId: string;
-  created: Date;
+  createdAt: Date;
   createdBy: string;
-  updated?: Date;
+  updatedAt?: Date;
   updatedBy?: string;
   type: "Asset Request" | "Issue Report";
   employeeName: string;
