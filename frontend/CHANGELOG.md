@@ -2,13 +2,53 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.26.1](https://connect.zoho.com/portal/intranet/task/623367000000968011) 2024-11-21
+### Fixed
+- Fixed Assets list of Unregistered Employee not refreshing / up to date when an asset is recovered.
+
+## [2.26.0](https://connect.zoho.com/portal/intranet/task/623367000000853258) 2024-11-22
+### Changed
+- Updated functionality of filter logic on tracker page, also updated view all text and onClickOutside filter functionality
+
+## [2.25.4](https://connect.zoho.com/portal/intranet/task/623367000000942387) 2024-11-20
+### Fixed
+- Fixed delete issue on options, added reset state when changes are detected on edit
+
+## [2.25.3](https://connect.zoho.com/portal/intranet/task/623367000000943123) 2024-11-13
+### Fixed
+- Fix the edit issue on Status and Equipment Type for Inventory Page
+
+## [2.25.2](https://connect.zoho.com/portal/intranet/task/623367000000992150) 2024-11-20
+### Fixed
+- Fixed Total Assets Count whenever the Type is changed which carried over the previous status, category, processor, memory and storage filters causing the bug
+
+## [2.25.1](https://connect.zoho.com/portal/intranet/task/623367000000940439) 2024-11-11
+### Fixed
+- Formatted all keys containing the word "date" in the assets to MM/DD/YYYY format before exporting
+
+## [2.25.0](https://connect.zoho.com/portal/intranet/task/623367000000878039) 2024-11-12
+### Added
+- Reimplemented UI on Asset Counts on tracker page, adjusted layout of As of date information
+
+## [2.24.1](https://connect.zoho.com/portal/intranet/task/623367000000878021) 2024-11-04
+### Removed
+-  Logic in asset counter setting to call delete asset counter endpoint since this is already done in the backend 
+
+### Fixed
+-  Previously deleted category may be re-added
+
+## [2.24.0](https://connect.zoho.com/portal/intranet/task/623367000000860085) 2024-11-11
+### Added
+- Added a tooltip for the remarks indicator
+
 ## [2.23.7](https://connect.zoho.com/portal/intranet/task/623367000000878039) 2024-10-29
 ### Fixed
 - Display error message from response if request to add option fails
 
 ## [2.23.6](https://connect.zoho.com/portal/intranet/task/623367000000853258) 2024-11-7 
-### Fixed
+### Added
 -  Reimplemented UI on Employee Filters on tracker page, used checkboxes, added search box, added clear filters
+
 ## [2.23.5](https://connect.zoho.com/portal/intranet/task/623367000000888079) 2024-11-5 
 ### Fixed
 -  Redesigned Tracker UI for active / inactive / unregistered employees

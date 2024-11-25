@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added the models for the support ticket feature
 - Added the validation for the support ticket feature
 
+## [2.19.2](https://connect.zoho.com/portal/intranet/task/623367000000878021) 2024-11-04
+### Changed
+-  Delete category option logic to also delete associated asset counter
+
 ## [2.19.1](https://connect.zoho.com/portal/intranet/task/623367000000878039) 2024-10-29
 ### Fixed
 - Case insensitve checking for existing option value
