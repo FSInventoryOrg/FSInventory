@@ -86,8 +86,8 @@ jobs:
       - name: Extract frontend and backend versions
         id: extract-versions
         run: |
-          FRONTEND_VERSION=$(jq -r '.version' frontend/package.json)
-          BACKEND_VERSION=$(jq -r '.version' backend/package.json)
+          FRONTEND_VERSION=$(jq -r '.version' ./frontend/package.json)
+          BACKEND_VERSION=$(jq -r '.version' ./backend/package.json)
           echo "FRONTEND_VERSION=$FRONTEND_VERSION" >> $GITHUB_ENV
           echo "BACKEND_VERSION=$BACKEND_VERSION" >> $GITHUB_ENV
 
