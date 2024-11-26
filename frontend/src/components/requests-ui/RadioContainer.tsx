@@ -10,15 +10,17 @@ interface RadioContainerProps {
   children: React.ReactNode;
 }
 
-const RadioContainer: React.FC<RadioContainerProps> = ({
+const RadioContainer = ({
   id,
   value,
   selectedValue,
   className,
   children,
-}) => {
+}: RadioContainerProps) => {
+  const isChecked = selectedValue === value;
   return (
-    <div
+    <label
+      htmlFor={id}
       className={cn(
         `flex flex-1 flex-row items-center p-4 pl-2 border rounded-lg cursor-pointer ${
           selectedValue === value
@@ -29,14 +31,10 @@ const RadioContainer: React.FC<RadioContainerProps> = ({
       )}
     >
       <span className="flex w-[48px] h-[48px] justify-center items-center">
-        <RadioGroupItem
-          id={id}
-          value={value}
-          checked={selectedValue === value}
-        />
+        <RadioGroupItem value={value} id={id} checked={isChecked} />
       </span>
       <div className="gap-1 pl-2 items-center">{children}</div>
-    </div>
+    </label>
   );
 };
 
