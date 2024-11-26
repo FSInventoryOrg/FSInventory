@@ -38,7 +38,7 @@ jobs:
 
       # Build backend if using TypeScript
       - name: Build backend (TypeScript)
-      run: |
+        run: |
           cd backend
           npm run build
 
