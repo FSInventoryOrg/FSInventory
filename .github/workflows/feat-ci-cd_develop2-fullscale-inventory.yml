@@ -17,30 +17,41 @@ jobs:
       # Checkout the code from the repository
       - uses: actions/checkout@v4
 
-      # Set up Node.js environment for the React app
+      # Set up Node.js
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
 
-      # Navigate to the frontend directory and install dependencies
-      - name: Install dependencies and build React app
+      # Install and build the React frontend
+      - name: Install and build frontend
         run: |
           cd frontend
           npm install
           npm run build
 
-      # Zip the build folder for deployment
+      # Install backend dependencies
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm install
+
+      # # Zip the build folder for deployment
+      # - name: Zip artifact for deployment
+      #   run: |
+      #     cd frontend/dist
+      #     zip -r ../../release.zip ./*
+
+      # Zip backend and reference the React 'dist' directory
       - name: Zip artifact for deployment
         run: |
-          cd frontend/dist
-          zip -r ../../release.zip ./*
+          zip -r release.zip ./backend ./frontend/dist
 
       # Upload the artifact for the deploy job
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
-          name: react-app
+          name: fullstack-app
           path: release.zip
 
   deploy:
@@ -51,17 +62,17 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      # Download the build artifact
+      # Download the artifact from the build job
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
-          name: react-app
+          name: fullstack-app
 
-      # Unzip the artifact to prepare for deployment
+      # Unzip the artifact
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      # Deploy the React app to Azure Web App
+      # Deploy the backend and React build directory to Azure
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
