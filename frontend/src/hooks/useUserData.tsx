@@ -1,14 +1,11 @@
-import { useQuery } from "@tanstack/react-query"
-import { UserType } from "@/types/user"
-import * as imsService from '@/ims-service'
+import { useContext } from "react";
+import { UserContext } from "@/contexts/UserContext";
 
-const useUserData = () => {
-    const { data, isLoading } = useQuery<UserType>({
-        queryKey: ["fetchUserData"],
-        queryFn: () => imsService.fetchUserData(),
-      });
-    return {data, isLoading}
-}
+export const useUserContext = () => {
+  const context = useContext(UserContext);
 
+  if (!context)
+    throw new Error("useUser must be used within a UserContextProvider");
 
-export default useUserData;
+  return context;
+};
