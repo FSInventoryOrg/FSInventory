@@ -1,4 +1,6 @@
 {
+  "main": "./backend/src/index.ts",
+  "type": "module",
   "devDependencies": {
     "@commitlint/config-conventional": "^16.0.0",
     "@typescript-eslint/eslint-plugin": "^8.11.0",
@@ -11,9 +13,13 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "nodemon": "^3.1.0"
   },
   "scripts": {
+    "dev": "NODE_ENV=development npm run dev --prefix backend",
+    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "cd backend && npm run start",
     "lint": "npm run lint:backend && npm run lint:frontend",
     "lint:backend": "cd backend && npx lint-staged",
     "lint:frontend": "cd frontend && npx lint-staged",
