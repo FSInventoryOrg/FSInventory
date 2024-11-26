@@ -36,6 +36,12 @@ jobs:
           cd backend
           npm install
 
+      # Build backend if using TypeScript
+      - name: Build backend (TypeScript)
+      run: |
+          cd backend
+          npm run build
+
       # # Zip the build folder for deployment
       # - name: Zip artifact for deployment
       #   run: |
