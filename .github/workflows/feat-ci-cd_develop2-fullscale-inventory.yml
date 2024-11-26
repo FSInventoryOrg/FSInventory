@@ -23,6 +23,15 @@ jobs:
         with:
           node-version: '20.x'
 
+      # Extract frontend and backend versions
+      - name: Extract frontend and backend versions
+        id: extract-versions
+        run: |
+          FRONTEND_VERSION=$(jq -r '.version' ./frontend/package.json)
+          BACKEND_VERSION=$(jq -r '.version' ./backend/package.json)
+          echo "FRONTEND_VERSION=$FRONTEND_VERSION" >> $GITHUB_ENV
+          echo "BACKEND_VERSION=$BACKEND_VERSION" >> $GITHUB_ENV
+
       # Install and build the React frontend
       - name: Install and build frontend
         run: |
@@ -82,21 +91,12 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BFD4ED23FA1B4B2097AF8547035BD622 }}
           package: .
 
-      # Extract frontend and backend versions
-      - name: Extract frontend and backend versions
-        id: extract-versions
-        run: |
-          FRONTEND_VERSION=$(jq -r '.version' ./frontend/package.json)
-          BACKEND_VERSION=$(jq -r '.version' ./backend/package.json)
-          echo "FRONTEND_VERSION=$FRONTEND_VERSION" >> $GITHUB_ENV
-          echo "BACKEND_VERSION=$BACKEND_VERSION" >> $GITHUB_ENV
-
       # Update environment variables in Azure
       - name: Update Azure App Service environment variables
         run: |
             az webapp config appsettings set \
               --name develop2-fullscale-inventory \
               --resource-group rg-inventory-eastus-staging-001 \
-              --settings BACKEND_VERSION=$BACKEND_VERSION FRONTEND_VERSION=$FRONTEND_VERSION
+              --settings BACKEND_VERSION=${{ env.BACKEND_VERSION }} FRONTEND_VERSION=${{ env.FRONTEND_VERSION }}
         # env:
         #   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
