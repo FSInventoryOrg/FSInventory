@@ -84,8 +84,18 @@ const EmployeeFilter: React.FC<EmployeeFilterProps> = ({
     isUnregisteredFilter,
   ]);
 
+  const isClearFiltersDisabled =
+    !isActiveFilter &&
+    !isInactiveFilter &&
+    !isRegisteredFilter &&
+    !isUnregisteredFilter &&
+    selectedPositions.length === 0 &&
+    searchPositionText === "";
+
   const viewText = () => {
-    return dataCount > 0 ? `View ${dataCount}` : "No Results";
+    return dataCount > 0
+      ? `View ${isClearFiltersDisabled ? "All" : dataCount}`
+      : "No Results";
   };
 
   const handleClearFilters = () => {
@@ -96,14 +106,6 @@ const EmployeeFilter: React.FC<EmployeeFilterProps> = ({
     setIsUnregisteredFilter(false);
     setSearchPosiitonText("");
   };
-
-  const isClearFiltersDisabled =
-    !isActiveFilter &&
-    !isInactiveFilter &&
-    !isRegisteredFilter &&
-    !isUnregisteredFilter &&
-    selectedPositions.length === 0 &&
-    searchPositionText === "";
 
   const filteredEmployeePositions = React.useMemo(() => {
     if (employeePositions)
@@ -145,7 +147,14 @@ const EmployeeFilter: React.FC<EmployeeFilterProps> = ({
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <PopoverContent className="p-0 w-[310px]">
+      <PopoverContent
+        className="p-0 w-[310px]"
+        onInteractOutside={(e) => {
+          e.preventDefault();
+          setOpen(false);
+          handleClearFilters();
+        }}
+      >
         <Accordion
           type="multiple"
           defaultValue={["item-1", "item-2", "item-3"]}

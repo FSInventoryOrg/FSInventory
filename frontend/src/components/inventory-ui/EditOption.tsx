@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ChevronLeftIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { capitalize, format } from "@/lib/utils";
@@ -48,6 +48,8 @@ const EditOption = ({
   const [optionError, setOptionError] = useState("");
   const { showToast } = useAppContext();
 
+  const isCategoryType = useMemo(() => property === "category", [property]);
+
   const {
     newOption: editedOption,
     setNewOption: setEditedOption,
@@ -63,6 +65,20 @@ const EditOption = ({
   const assetCounter = getAssetCounterFromCategory() ?? undefined;
   const { prefixCode: oldPrefixCode } = assetCounter ?? { prefixCode: "" };
 
+  const [originalValue] = useState(editedOption.value);
+
+  const isValueSame = useMemo(
+    () => getOptionValue(editedOption.value) === getOptionValue(originalValue),
+    [editedOption.value, getOptionValue, originalValue]
+  );
+
+  const handleInputChange = (value: string) => {
+    setEditedOption({
+      property: property,
+      value: isObject ? { ...(option.value as object), value: value } : value,
+    });
+  };
+
   const handleCancel = () => {
     onCancel();
     setEditedOption({ property, value: "" });
@@ -72,7 +88,7 @@ const EditOption = ({
     const isPrefixCodeChanged: boolean =
       !!newPrefixCode && oldPrefixCode !== newPrefixCode;
 
-    if (newPrefixCode === "") {
+    if (newPrefixCode === "" && isCategoryType) {
       setPrefixCodeError("Prefix code can not be empty");
       throw new Error("Prefix code can not be empty");
     }
@@ -86,7 +102,7 @@ const EditOption = ({
         (assetCounter: AssetCounterType) =>
           assetCounter.prefixCode === newPrefixCode
       );
-      if (prefixCodeExists && isPrefixCodeChanged) {
+      if (prefixCodeExists && isPrefixCodeChanged && isCategoryType) {
         setPrefixCodeError("Prefix code already exists");
         throw new Error(`Prefix code ${newPrefixCode} already exists`);
       }
@@ -120,12 +136,13 @@ const EditOption = ({
   }, [propertyIsCategory, assetCounter, oldPrefixCode, newPrefixCode]);
 
   useEffect(() => {
-    if (newPrefixCode === "" || newPrefixCode === undefined) {
-      setPrefixCodeError("Prefix code can not be empty");
+    if (isCategoryType) {
+      if (newPrefixCode === "" || newPrefixCode === undefined)
+        setPrefixCodeError("Prefix code can not be empty");
     } else {
       setPrefixCodeError("");
     }
-  }, [newPrefixCode]);
+  }, [isCategoryType, newPrefixCode]);
 
   useEffect(() => {
     if (getOptionValue(editedOption.value) === "") {
@@ -158,12 +175,7 @@ const EditOption = ({
         type="input"
         className="focus-visible:ring-0 focus-visible:ring-popover"
         onChange={(e) => {
-          setEditedOption({
-            property: property,
-            value: isObject
-              ? { ...(option.value as object), value: e.target.value }
-              : e.target.value,
-          });
+          handleInputChange(e.target.value);
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
@@ -233,10 +245,12 @@ const EditOption = ({
     disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
           onClick={(event) => {
             event.preventDefault();
-            setOpenDeleteOptionDialog(true);
+            isValueSame
+              ? setOpenDeleteOptionDialog(true)
+              : handleInputChange(getOptionValue(originalValue));
           }}
         >
-          Delete
+          {isValueSame ? "Delete" : "Reset"}
         </Button>
         <DeletePropertyDialog
           open={openDeleteOptionDialog}
