@@ -109,6 +109,7 @@ jobs:
             az webapp config appsettings set \
               --name develop2-fullscale-inventory \
               --resource-group rg-inventory-eastus-staging-001 \
-              --settings BACKEND_VERSION=${{ env.BACKEND_VERSION }} FRONTEND_VERSION=${{ env.FRONTEND_VERSION }}
+              --settings BACKEND_VERSION=${{ env.BACKEND_VERSION }} FRONTEND_VERSION=${{ env.FRONTEND_VERSION }} \
+              --subscription ${{ secrets.DEVELOP2_AZURE_SUBSCRIPTION_ID }}
         # env:
         #   AZURE_CREDENTIALS: ${{ secrets.DEVELOP2_AZURE_CREDENTIALS }}
