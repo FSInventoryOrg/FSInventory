@@ -7,18 +7,28 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const RequestorForm = () => {
   const { control } = useFormContext();
+  const managers = ["Rodney Fernandez", "John Doe"]; // NOTE: to be replaced with actual data
   return (
-    <div className="pb-4">
+    <div className="flex flex-col gap-2">
       {/* Autopopulate if logged in */}
       <FormField
         control={control}
-        name="fullName"
+        name="employeeName"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Full Name</FormLabel>
+            <FormLabel className="text-secondary-foreground font-normal text-base">
+              Full Name
+            </FormLabel>
             <FormControl>
               <Input {...field} placeholder="John Doe" />
             </FormControl>
@@ -28,12 +38,33 @@ const RequestorForm = () => {
       />
       <FormField
         control={control}
-        name="manager"
+        name="managerName"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Manager</FormLabel>
+            <FormLabel className="text-secondary-foreground font-normal text-base">
+              Manager
+            </FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <SelectTrigger className="w-full">
+                  <SelectValue
+                    placeholder={
+                      <p className="font-normal text-muted-foreground">
+                        Select manager
+                      </p>
+                    }
+                  >
+                    {field.value}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {managers.map((manager) => (
+                    <SelectItem key={manager} value={manager}>
+                      {manager}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -41,15 +72,14 @@ const RequestorForm = () => {
       />
       <FormField
         control={control}
-        name="contactInfo"
+        name="employeeEmail"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Contact Information</FormLabel>
+            <FormLabel className="text-secondary-foreground font-normal text-base">
+              Contact Information
+            </FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                placeholder="johndoe@fullscale.ph or +63 912 345 6789"
-              />
+              <Input {...field} placeholder="johndoe@fullscale.ph" />
             </FormControl>
             <FormMessage />
           </FormItem>
