@@ -43,7 +43,7 @@ const EditOption = ({
   const [openDeleteOptionDialog, setOpenDeleteOptionDialog] = useState(false);
   const isObject: boolean = typeof option.value === "object";
   const propertyIsCategory: boolean = property === "category";
-  const [newPrefixCode, setNewPrefixCode] = useState("");
+  const [newPrefixCode, setNewPrefixCode] = useState<string | undefined>();
   const [prefixCodeError, setPrefixCodeError] = useState("");
   const [optionError, setOptionError] = useState("");
   const { showToast } = useAppContext();
@@ -94,7 +94,7 @@ const EditOption = ({
         onUpdate(editedOption, {
           ...assetCounter,
           category,
-          prefixCode: newPrefixCode,
+          prefixCode: newPrefixCode!,
           oldPrefixCode,
         });
         // CHECK IF ONLY THE CATEGORY NAME IS CHANGED
@@ -108,7 +108,7 @@ const EditOption = ({
       } else if (isPrefixCodeChanged) {
         onUpdate(editedOption, {
           ...assetCounter,
-          prefixCode: newPrefixCode,
+          prefixCode: newPrefixCode!,
           oldPrefixCode,
         });
       }
@@ -133,7 +133,7 @@ const EditOption = ({
   const optionToEdit = getOptionValue(editedOption.value);
 
   useEffect(() => {
-    if (propertyIsCategory && newPrefixCode === "") {
+    if (propertyIsCategory && newPrefixCode === undefined) {
       setNewPrefixCode(oldPrefixCode);
     }
   }, [propertyIsCategory, assetCounter, oldPrefixCode, newPrefixCode]);
