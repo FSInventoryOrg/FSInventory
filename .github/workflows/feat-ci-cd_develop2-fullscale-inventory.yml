@@ -84,15 +84,15 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      # Deploy the backend and React build directory to Azure
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'develop2-fullscale-inventory'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BFD4ED23FA1B4B2097AF8547035BD622 }}
-          package: .
+      # # Deploy the backend and React build directory to Azure
+      # - name: 'Deploy to Azure Web App'
+      #   id: deploy-to-webapp
+      #   uses: azure/webapps-deploy@v2
+      #   with:
+      #     app-name: 'develop2-fullscale-inventory'
+      #     slot-name: 'Production'
+      #     publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BFD4ED23FA1B4B2097AF8547035BD622 }}
+      #     package: .
 
       # Azure CLI Login
       - name: Azure CLI Login
@@ -100,8 +100,7 @@ jobs:
         with:
           client-id: ${{ secrets.DEVELOP2_AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.DEVELOP2_AZURE_TENANT_ID }}
-          # subscription-id: ${{ secrets.DEVELOP2_AZURE_SUBSCRIPTION_ID }}
-          allow-no-subscriptions: true
+          subscription-id: ${{ secrets.DEVELOP2_AZURE_SUBSCRIPTION_ID }}
 
       # Update environment variables in Azure
       - name: Update Azure App Service environment variables
