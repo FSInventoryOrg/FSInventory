@@ -91,14 +91,11 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BFD4ED23FA1B4B2097AF8547035BD622 }}
           package: .
 
-      # # Azure CLI Login
-      # - name: Azure CLI Login
-      #   run: |
-      #     az login --service-principal \
-      #       --username ${{ secrets.DEVELOP2_AZURE_CLIENT_ID }} \
-      #       --password ${{ secrets.DEVELOP2_AZURE_CLIENT_SECRET }} \
-      #       --tenant ${{ secrets.DEVELOP2_AZURE_TENANT_ID }}
-      #     az account set --subscription ${{ secrets.DEVELOP2_AZURE_SUBSCRIPTION_ID }}
+      # Azure CLI Login
+      - name: Azure CLI Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.DEVELOP2_AZURE_CREDENTIALS }}
 
       # Update environment variables in Azure
       - name: Update Azure App Service environment variables
@@ -107,5 +104,5 @@ jobs:
               --name develop2-fullscale-inventory \
               --resource-group rg-inventory-eastus-staging-001 \
               --settings BACKEND_VERSION=${{ env.BACKEND_VERSION }} FRONTEND_VERSION=${{ env.FRONTEND_VERSION }}
-        env:
-          AZURE_CREDENTIALS: ${{ secrets.DEVELOP2_AZURE_CREDENTIALS }}
+        # env:
+        #   AZURE_CREDENTIALS: ${{ secrets.DEVELOP2_AZURE_CREDENTIALS }}
