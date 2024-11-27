@@ -104,11 +104,11 @@ jobs:
 
       # Azure 
       - name: Log in to Azure
-      uses: azure/login@v1
-      with:
-        client-id: ${{ secrets.DEVELOP2_AZURE_CLIENT_ID }}
-        client-secret: ${{ secrets.DEVELOP2_AZURE_CLIENT_SECRET }}
-        tenant-id: ${{ secrets.DEDVELOP2_AZURE_TENANT_ID }}
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.DEVELOP2_AZURE_CLIENT_ID }}
+          client-secret: ${{ secrets.DEVELOP2_AZURE_CLIENT_SECRET }}
+          tenant-id: ${{ secrets.DEDVELOP2_AZURE_TENANT_ID }}
 
       # Update environment variables in Azure
       - name: Update Azure App Service environment variables
