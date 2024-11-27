@@ -139,7 +139,7 @@ const Options = ({
     useMutation({
       mutationFn: imsService.updateAssetCounter,
       onSuccess: async (status) => {
-        if (status !== 200) {
+        if (status === 201) {
           // assetcounter is created
           queryClient.invalidateQueries({ queryKey: ["fetchAssetCounters"] });
         }
