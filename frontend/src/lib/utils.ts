@@ -98,3 +98,30 @@ export const mapUserToRequesForm = (user: UserType) => {
     employeeEmail: user.email, // Use user's email
   };
 };
+
+export const getNameParts = (fullName: string) => {
+  const nameParts = fullName.trim().split(/\s+/);
+  // Case insensitive regex for common suffixes. Optional '.' for Jr and Sr
+  const suffixRegex = /^(Jr\.?|Sr\.?|I|II|III|IV|V)$/i;
+
+  // Remove suffix after the last name
+  if (
+    nameParts.length > 2 &&
+    suffixRegex.test(nameParts[nameParts.length - 1])
+  ) {
+    nameParts.pop();
+  }
+
+  const firstName = nameParts[0];
+  // Check at least 2 words in the name
+  const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
+
+  return { firstName, lastName };
+};
+
+export const getInitials = (fullName: string) => {
+  const { firstName, lastName } = getNameParts(fullName);
+  const firstInitial = firstName?.[0]?.toUpperCase() || "";
+  const lastInitial = lastName?.[0]?.toUpperCase() || "";
+  return `${firstInitial}${lastInitial}`;
+};
