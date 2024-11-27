@@ -62,6 +62,20 @@ const EditOption = ({
 
   const { prefixCode: oldPrefixCode } = assetCounter ?? { prefixCode: "" };
 
+  const [originalValue] = useState(editedOption.value);
+
+  const isValueSame = useMemo(
+    () => getOptionValue(editedOption.value) === getOptionValue(originalValue),
+    [editedOption.value, getOptionValue, originalValue]
+  );
+
+  const handleInputChange = (value: string) => {
+    setEditedOption({
+      property: property,
+      value: isObject ? { ...(option.value as object), value: value } : value,
+    });
+  };
+
   const handleCancel = () => {
     onCancel();
     setEditedOption({ property, value: "" });
@@ -126,7 +140,6 @@ const EditOption = ({
 
   useEffect(() => {
     if (!isCategoryType) return;
-    // if (isAssetCounterLoading) return;
 
     if (newPrefixCode === "" || newPrefixCode === undefined) {
       setPrefixCodeError("Prefix code can not be empty");
@@ -143,13 +156,7 @@ const EditOption = ({
     } else {
       setPrefixCodeError("");
     }
-  }, [
-    newPrefixCode,
-    isCategoryType,
-    assetCounters,
-    assetCounter,
-    // isAssetCounterLoading,
-  ]);
+  }, [newPrefixCode, isCategoryType, assetCounters, assetCounter]);
 
   useEffect(() => {
     if (getOptionValue(editedOption.value) === "") {
@@ -183,12 +190,7 @@ const EditOption = ({
         type="input"
         className="focus-visible:ring-0 focus-visible:ring-popover"
         onChange={(e) => {
-          setEditedOption({
-            property: property,
-            value: isObject
-              ? { ...(option.value as object), value: e.target.value }
-              : e.target.value,
-          });
+          handleInputChange(e.target.value);
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
@@ -258,10 +260,12 @@ const EditOption = ({
     disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
           onClick={(event) => {
             event.preventDefault();
-            setOpenDeleteOptionDialog(true);
+            isValueSame
+              ? setOpenDeleteOptionDialog(true)
+              : handleInputChange(getOptionValue(originalValue));
           }}
         >
-          Delete
+          {isValueSame ? "Delete" : "Reset"}
         </Button>
         <DeletePropertyDialog
           open={openDeleteOptionDialog}
