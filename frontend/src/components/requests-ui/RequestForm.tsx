@@ -127,7 +127,7 @@ const RequestForm = ({ userData }: RequestFormProps) => {
       >
         <div className="sm:max-w-[800px] bg-card h-fit  rounded-lg">
           <DialogHeader className="relative sm:p-5">
-            <DialogClose className="absolute right-2 top-2 p-5 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+            <DialogClose className="absolute right-2 top-2 m-5 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
               <XIcon className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </DialogClose>
@@ -165,9 +165,7 @@ const RequestForm = ({ userData }: RequestFormProps) => {
               {requestType === "Issue Report" && (
                 <>
                   <h2 className="text-lg font-semibold">Report an Issue</h2>
-                  {/* <div className="sm:w-1/2 pr-2"> */}
                   <ReportIssueForm />
-                  {/* </div> */}
                 </>
               )}
               {requestType === "Asset Request" && (
@@ -177,7 +175,18 @@ const RequestForm = ({ userData }: RequestFormProps) => {
                 </>
               )}
               <div className="flex justify-end gap-2">
-                <Button variant="outline">Cancel</Button>
+                <DialogClose asChild>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      requestForm.reset();
+                      setOpen(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+
                 <Button className="bg-primary text-white" type="submit">
                   Submit Ticket
                 </Button>
