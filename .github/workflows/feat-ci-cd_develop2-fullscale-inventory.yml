@@ -9,6 +9,9 @@ on:
       - feat/ci-cd
   workflow_dispatch:
 
+permissions:
+  id-token: write # Require write permission to Fetch an OIDC token.
+
 jobs:
   build:
     runs-on: ubuntu-latest
