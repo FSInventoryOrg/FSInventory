@@ -66,12 +66,22 @@ const getTypeSpecificData = (arg: T) => {
     };
   } else if (arg.type === TicketType.AssetRequest) {
     const data = arg as IAssetRequestTicket;
+    const dateObject = new Date(data.requestedDate ?? "");
+    let requestedDate = undefined;
+    if (!isNaN(dateObject.getTime())) {
+      requestedDate = new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      }).format(requestedDate);
+    }
+
     return {
       type: arg.type,
       assetType: data.assetType,
       assetSpecsModel: data.assetSpecsModel,
       justification: data.justification,
-      requestedDate: data.requestedDate,
+      requestedDate: requestedDate,
     };
   } else {
     return {};
