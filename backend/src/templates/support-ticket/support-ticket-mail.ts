@@ -92,7 +92,7 @@ const generateRejectApproveUrl = ({
   ticketId,
   managerEmail,
 }: ApprovalQueryParams) => {
-  const baseUrl = process.env.BACKEND_URL || "http:localhost:8080";
+  const baseUrl = process.env.BACKEND_URL || "http://localhost:8080";
   const token = jwt.sign(
     { ticketId, managerEmail },
     process.env.JWT_SECRET_KEY as string,
