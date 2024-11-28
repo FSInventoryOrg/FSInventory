@@ -76,7 +76,7 @@ const getTypeSpecificData = (arg: T) => {
         month: "short",
         day: "2-digit",
         year: "numeric",
-      }).format(requestedDate);
+      }).format(dateObject);
     }
 
     return {
