@@ -22,7 +22,10 @@ export const generateSupportTicketHTML = async (data: T) => {
     return imageExtensions.some((ext) => fileUrl.toLowerCase().endsWith(ext));
   });
   Handlebars.registerHelper("getInitial", (text: string) => {
-    const splittedText = text.split(" ");
+    const suffixes = ["Jr", "Sr", "Jr.", "Sr.", "II", "III", "IV"];
+    const splittedText = text
+      .split(" ")
+      .filter((word) => !suffixes.includes(word));
     if (splittedText.length <= 1) {
       return splittedText[0].charAt(0).toUpperCase();
     }
