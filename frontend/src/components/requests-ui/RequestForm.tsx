@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAppContext } from "@/hooks/useAppContext";
 import * as imsService from "@/ims-service";
@@ -53,7 +53,9 @@ interface RequestFormProps {
 }
 
 const RequestForm = ({ user }: RequestFormProps) => {
-  const userData = user ? mapUserToRequesForm(user) : {};
+  const userData = useMemo(() => {
+    return user ? mapUserToRequesForm(user) : {};
+  }, [user]);
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const { showToast } = useAppContext();
