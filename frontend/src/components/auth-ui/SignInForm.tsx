@@ -17,8 +17,10 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as authService from "@/auth-service";
 import { useAppContext } from "@/hooks/useAppContext";
+import { useUserContext } from "@/hooks/useUserData";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "../Spinner";
+import { LoginReturn } from "@/types/auth";
 
 export type SignInFormData = {
   email: string;
@@ -34,6 +36,7 @@ const SignInForm = ({ onError, onSubmit }: SignInFormProps) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { showToast } = useAppContext();
+  const { setUser } = useUserContext();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [serverError, setServerError] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -56,7 +59,26 @@ const SignInForm = ({ onError, onSubmit }: SignInFormProps) => {
 
   const mutation = useMutation({
     mutationFn: authService.login,
-    onSuccess: async () => {
+    onSuccess: async (data: LoginReturn) => {
+      const {
+        employee_id: id,
+        role_name: role,
+        first_name,
+        last_name,
+        is_admin,
+        email,
+        avatar,
+      } = data.user;
+
+      setUser({
+        _id: String(id),
+        role,
+        first_name,
+        last_name,
+        is_admin,
+        email,
+        avatar,
+      });
       setServerError(false);
       showToast({
         message: "You have logged in to the session.",

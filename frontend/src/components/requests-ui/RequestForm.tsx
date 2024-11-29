@@ -4,7 +4,7 @@ import { useAppContext } from "@/hooks/useAppContext";
 import * as imsService from "@/ims-service";
 import RequestAssetForm from "./RequestAssetForm";
 import ReportIssueForm from "./ReportIssueForm";
-import useUserData from "@/hooks/useUserData";
+import { useUserContext } from "@/hooks/useUserData";
 import {
   ReportIssueFormData,
   RequestAssetFormData,
@@ -12,7 +12,7 @@ import {
 
 const RequestForm = () => {
   const { showToast } = useAppContext();
-  const { data: user } = useUserData();
+  const { user } = useUserContext();
   const [requestType, setRequestType] = useState("Report an Issue");
   const [userData, setUserData] = useState<Record<string, string>>({});
 
@@ -20,7 +20,7 @@ const RequestForm = () => {
     if (user) {
       setUserData({
         ...userData,
-        fullName: user.firstName + " " + user.lastName,
+        fullName: user.first_name + " " + user.last_name,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

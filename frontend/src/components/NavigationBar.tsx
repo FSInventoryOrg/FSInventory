@@ -16,11 +16,11 @@ import {
 } from "lucide-react";
 import { Gear } from "@phosphor-icons/react";
 import { FullScaleIcon } from "./icons/FullScaleIcon";
-import useUserData from "@/hooks/useUserData";
+import { useUserContext } from "@/hooks/useUserData";
 import VersionBadge from "./VersionBadge";
 
 const NavigationBar = () => {
-  const { data: userData } = useUserData();
+  const { user: userData } = useUserContext();
   const isDevMode = import.meta.env.DEV;
 
   return (

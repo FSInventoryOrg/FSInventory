@@ -14,7 +14,7 @@ import AppearanceMode from "./AppearanceMode";
 import { UserIcon } from "./icons/UserIcon";
 import { prependHostIfMissing } from "@/lib/utils";
 import { UserType } from "@/types/user";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
   height?: number;
@@ -22,10 +22,15 @@ type Props = {
   userInfo: UserType | undefined;
 };
 const UserAvatar = ({ height = 40, width = 40, userInfo }: Props) => {
-  const name = useMemo(() => {
-    if (!userInfo) return "";
-    return `${userInfo?.lastName}, ${userInfo?.firstName}`;
-  }, [userInfo]);
+  const [name, setName] = useState<string>(
+    `${userInfo?.last_name}, ${userInfo?.first_name}`
+  );
+
+  useEffect(() => {
+    if (userInfo && userInfo.last_name) {
+      setName(`${userInfo.last_name}, ${userInfo.first_name}`);
+    }
+  }, [name, userInfo]);
 
   return (
     <DropdownMenu modal={false}>

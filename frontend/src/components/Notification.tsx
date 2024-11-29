@@ -115,7 +115,7 @@ const Notification = () => {
           <DropdownMenuLabel>Notifications</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <div className="max-w-[400px] min-w-80 max-h-96 overflow-y-auto overflow-x-hidden">
-            {notifications.length > 0 ? (
+            {notifications?.length > 0 ? (
               notifications.map((notification: NotificationType) => (
                 <DropdownMenuItem
                   key={notification._id}

@@ -1,6 +1,12 @@
 import LoginForm from "./LoginForm";
+import { useUserContext } from "@/hooks/useUserData";
+import { useEffect } from "react";
 
 export const LoginScreen = () => {
+  const { setUser } = useUserContext();
+  useEffect(() => {
+    setUser(undefined);
+  });
   return (
     <div className="flex w-screen h-screen tablet:bg-login-bg tablet:bg-cover">
       <div
