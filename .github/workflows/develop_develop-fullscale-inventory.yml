@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Development'
+      name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
       id-token: write #This is required for requesting the JWT
@@ -90,16 +90,16 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9AC086B8BD3F4F54A5077717DAE15E75 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_38981A3EE96049129C2C16F8AF2D31BA }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_576758DD6DA04359906F1DD010CD5115 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_5E3AACBC9E9B41C5A94FA561FEE921A6 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4186406312F44CEFB408211C1C0C9FBD }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B43C270FF26549108CE70DF38CF7345B }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'develop-fullscale-inventory'
-          slot-name: 'Development'
+          slot-name: 'Production'
           package: .
         
       # Display values for BACKEND_VERSION and FRONTEND_VERSION from the extract-version step
