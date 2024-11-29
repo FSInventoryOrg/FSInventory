@@ -1,12 +1,7 @@
-import { createContext, useState } from "react";
-
-type User = {
-  id?: number;
-  role: string;
-  first_name: string;
-  last_name: string;
-  is_admin: boolean;
-};
+import { createContext, useState, useEffect } from "react";
+import { UserType as User } from "@/types/user";
+import { useMutation } from "@tanstack/react-query";
+import * as imsService from "@/ims-service";
 
 type UserContextType = {
   user?: User;
@@ -26,6 +21,32 @@ export const UserContextProvider = ({
   children: React.ReactNode;
 }) => {
   const [user, setUser] = useState<User | undefined>(undefined);
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
+
+  const { mutate: getCookieUser } = useMutation({
+    mutationFn: imsService.getCookieUser,
+    onSuccess: async (data: { user: User; isLoggedIn: boolean }) => {
+      const { user, isLoggedIn } = data;
+      setLoggedIn(isLoggedIn);
+      setUser(user);
+    },
+  });
+
+  const { mutate: validateToken } = useMutation({
+    mutationFn: imsService.validateToken,
+    onSuccess: async (data: boolean) => {
+      setLoggedIn(data);
+    },
+  });
+
+  useEffect(() => {
+    if (!loggedIn) {
+      validateToken();
+    }
+    if (loggedIn && !user) {
+      getCookieUser();
+    }
+  }, [user, getCookieUser, validateToken, loggedIn]);
 
   const value: UserContextType = {
     setUser: (user: User | undefined) => {

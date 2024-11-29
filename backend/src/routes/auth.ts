@@ -15,6 +15,7 @@ const {
 
 const API_URL: string =
   NODE_ENV === "PRODUCTION" ? ROCKS_PRODUCTION_API_URL! : ROCKS_DEV_API_URL!;
+const { IT_MANAGER } = process.env;
 
 router.post(
   "/login",
@@ -61,19 +62,57 @@ router.post(
       }
 
       const { access_token: token, user_details } = responseBody;
-      const { first_name: firstName, last_name: lastName } = user_details;
+      const {
+        first_name,
+        last_name,
+        employee_no,
+        role_name: role,
+      } = user_details;
+      const is_admin: boolean = username === IT_MANAGER;
+
+      const rocks_user = await fetch(
+        `${API_URL}/employees?employeeNo=${employee_no}`,
+        {
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!rocks_user.ok) {
+        throw new Error(responseBody.message);
+      }
+
+      const userBody = await rocks_user.json();
+
+      const { avatar } = userBody.data[0];
 
       res.cookie("auth_token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         maxAge: 86400000,
       });
-      res.cookie("user", JSON.stringify({ firstName, lastName }), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 86400000,
-      });
-      res.status(200).json({ userId: user_details.user_id });
+      res.cookie(
+        "user",
+        JSON.stringify({
+          first_name,
+          last_name,
+          is_admin,
+          email: username,
+          avatar,
+          role,
+        }),
+        {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          maxAge: 86400000,
+        }
+      );
+      res
+        .status(200)
+        .json({ user: { ...user_details, is_admin, email: username, avatar } });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -92,6 +131,16 @@ router.post("/logout", (req: Request, res: Response) => {
     expires: new Date(0),
   });
   res.send();
+});
+
+router.get("/cookie-user", (req: Request, res: Response) => {
+  const { user, auth_token } = req.cookies;
+
+  if (!auth_token) res.status(401).json({ message: "Unauthorized" });
+
+  if (!user) res.status(401).json({ message: "Unauthorized" });
+
+  res.status(200).json({ user: JSON.parse(user), isLoggedIn: !!auth_token });
 });
 
 export default router;
