@@ -203,6 +203,7 @@ export const sendMail = async (config: any) => {
     return true;
   } catch (err) {
     console.log("Error while sending the mail", err);
+    throw err;
   }
 };
 
