@@ -731,7 +731,8 @@ export const updateAssetCounter = async ({
     const responseBody = await response.json();
     throw new Error(responseBody.message || "Failed to update asset counter");
   }
-  return true;
+
+  return response.status;
 };
 
 export const deleteAssetCounter = async (prefixCode: string) => {
