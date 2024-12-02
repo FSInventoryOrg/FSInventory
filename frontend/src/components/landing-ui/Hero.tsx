@@ -73,7 +73,7 @@ const Hero = () => {
           ) : (
             <FullScaleIcon size={100} className='fill-current text-primary' />
           )}
-          <span className="hidden md:block text-7xl font-bold tracking-tighter">stockpilot</span>
+          <span className="hidden md:block text-7xl font-bold tracking-tighter">stockpilot :)</span>
         </div>
       </div>
       <div className='w-full flex flex-col justify-center p-3'>

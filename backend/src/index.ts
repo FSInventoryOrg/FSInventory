@@ -34,11 +34,13 @@ import {
 import autoMailRoutess from "./system/automail";
 import backupRoutes, { listCollection } from "./system/backup";
 import versionRoutes from "./system/version";
+import path from "path";
 
 const DEFAULT_PORT = 3000;
 const port = Number(process.env.PORT) || DEFAULT_PORT;
 
 const HOST = (process.env.HOST as string) || "localhost";
+const FRONTEND_BUILD_LOCATION = "../../frontend/dist";
 
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string);
 const db = mongoose.connection;
@@ -55,6 +57,7 @@ startChangeStream();
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, FRONTEND_BUILD_LOCATION)));
 app.use(cookieParser());
 app.use(express.json({ limit: "200mb" }));
 app.use(express.urlencoded({ limit: "200mb", extended: true }));
@@ -84,6 +87,20 @@ app.use("/version", versionRoutes);
 app.use("/healthcheck", (_, res) =>
   res.send("Inventory backend is running...")
 );
+
+// Catch-all route for unmatched URLs
+if (process.env.NODE_ENV !== "development") {
+  app.get("/*", function (req, res) {
+    res.sendFile(
+      path.join(__dirname, `${FRONTEND_BUILD_LOCATION}/index.html`),
+      function (err) {
+        if (err) {
+          res.status(500).send(err);
+        }
+      }
+    );
+  });
+}
 
 const isAtlasDB = () => {
   return process.env.MONGODB_CONNECTION_STRING?.startsWith("mongodb+srv://");
