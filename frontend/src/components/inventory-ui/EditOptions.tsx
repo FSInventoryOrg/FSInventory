@@ -519,7 +519,7 @@ const EditOptions = ({
           <span className="sr-only">Close</span>
         </div>
         <div
-          id="main panel"
+          id={`main-${property}-panel`}
           className={`flex flex-col gap-2 ${isCreating || isEditing ? "hidden" : ""}`}
         >
           <h1 className="w-full text-center font-semibold text-sm">
@@ -593,7 +593,7 @@ const EditOptions = ({
           </Button>
         </div>
         <div
-          id="create panel"
+          id={`create-${property}-panel`}
           className={`flex flex-col gap-3 ${isCreating ? "" : "hidden"}`}
         >
           <div className="items-center flex flex-row">
@@ -690,7 +690,7 @@ const EditOptions = ({
           </Button>
         </div>
         <div
-          id="edit panel"
+          id={`edit-${property}-panel`}
           className={`flex flex-col gap-3 ${isEditing ? "" : "hidden"}`}
         >
           <div className="items-center flex flex-row">
