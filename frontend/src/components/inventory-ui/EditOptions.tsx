@@ -99,7 +99,7 @@ const EditOptions = ({
     getAssetCounterFromCategory,
     updateAssetCounterInCache,
     getAssetCounters,
-  } = useAssetCounter(propertyIsCategory, newOption);
+  } = useAssetCounter(propertyIsCategory, { property, value: optionToEdit });
 
   const [filterValue, setFilterValue] = React.useState("");
   const [filteredData, setFilteredData] = React.useState<ColorOption[]>([]);
