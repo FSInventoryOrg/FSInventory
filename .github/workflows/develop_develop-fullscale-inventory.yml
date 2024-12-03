@@ -1,0 +1,117 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Develop Branch Deployment to Azure Web App - develop-fullscale-inventory
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # expose outputs for the extract-version step
+    outputs:
+      backend_version: ${{ steps.extract-versions.outputs.backend_version }}
+      frontend_version: ${{ steps.extract-versions.outputs.frontend_version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+
+       # Extract frontend and backend versions and set them as outputs
+      - name: Extract frontend and backend versions
+        id: extract-versions
+        run: |
+          FRONTEND_VERSION=$(jq -r '.version' ./frontend/package.json)
+          BACKEND_VERSION=$(jq -r '.version' ./backend/package.json)
+          echo "FRONTEND_VERSION=$FRONTEND_VERSION"
+          echo "BACKEND_VERSION=$BACKEND_VERSION"
+          echo "frontend_version=$FRONTEND_VERSION" >> $GITHUB_OUTPUT
+          echo "backend_version=$BACKEND_VERSION" >> $GITHUB_OUTPUT
+
+      # Install and build the React frontend
+      - name: Install and build frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+       # Install backend dependencies
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm install
+
+      # Build backend if using TypeScript
+      - name: Build backend (TypeScript)
+        run: |
+          cd backend
+          npm run build
+
+      # Zip backend and reference the React 'dist' directory
+      - name: Zip artifact for deployment
+        run: |
+          zip -r release.zip ./backend ./frontend/dist
+
+      # Upload the artifact for the deploy job
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: fullstack-app
+          path: release.zip
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    permissions:
+      id-token: write #This is required for requesting the JWT
+
+    steps:
+      # Download the artifact from the build job
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: fullstack-app
+
+      # Unzip the artifact
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_5E3AACBC9E9B41C5A94FA561FEE921A6 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4186406312F44CEFB408211C1C0C9FBD }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B43C270FF26549108CE70DF38CF7345B }}
+
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'develop-fullscale-inventory'
+          slot-name: 'Production'
+          package: .
+        
+      # Display values for BACKEND_VERSION and FRONTEND_VERSION from the extract-version step
+      - name: Debug Azure CLI environment variables
+        run: |
+          echo "BACKEND_VERSION=${{ needs.build.outputs.backend_version }}"
+          echo "FRONTEND_VERSION=${{ needs.build.outputs.frontend_version }}"
+
+      # Update environment variables in Azure
+      - name: Update Azure App Service environment variables
+        run: |
+          az webapp config appsettings set \
+            --name develop-fullscale-inventory \
+            --resource-group rg-inventory-eastus-staging-002 \
+            --settings "BACKEND_VERSION=${{ needs.build.outputs.backend_version }}" "FRONTEND_VERSION=${{ needs.build.outputs.frontend_version }}"
