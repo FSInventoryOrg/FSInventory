@@ -5,6 +5,9 @@ export interface UserAuth {
   userId: number;
   role: string;
   email: string;
+  full_name: string;
+  first_name: string;
+  last_name: string;
 }
 
 type RocksRoles =
@@ -100,11 +103,25 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
         },
       })
     ).json();
-    const { id: userId, role, email } = user.data;
+    const { id: userId, employee_id, role, email } = user.data;
+    const FS_EMPLOYEE = await (
+      await fetch(`${API_URL}/employees/${employee_id}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    ).json();
+    const { first_name, last_name } = FS_EMPLOYEE.data;
     req.user = {
       userId,
       role,
       email,
+      first_name,
+      last_name,
+      full_name: `${first_name} ${last_name}`,
     } as UserAuth;
     next();
   } catch (error) {
