@@ -12,6 +12,7 @@ import { MongoResult } from "./types/backup";
 import { NotificationSettingType } from "./types/notification-setting";
 import { RequestFormData } from "./schemas/RequestFormSchema";
 import { capitalize, format } from "./lib/utils";
+import { SupportTicketType } from "./types/ticket";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
@@ -942,7 +943,6 @@ export const fetchAppVersions = async () => {
 };
 
 export const submitTicket = async (data: RequestFormData) => {
-  return data;
   const response = await fetch(`${API_BASE_URL}/api/support_ticket`, {
     method: "POST",
     credentials: "include",
@@ -985,7 +985,7 @@ export const updateTicket = async ({
 };
 
 export const getTickets = async (type?: string) => {
-  let url = `${API_BASE_URL}/api/support_ticket`;
+  let url = `${API_BASE_URL}/api/support_ticket?limit=1000`; //#NOTE: temporary-frontend pagination
   if (type) {
     url += `?type=${type}`;
   }
@@ -1067,6 +1067,33 @@ export const bulkDeleteTickets = async (ticketIds: string) => {
   if (!response.ok) {
     const responseBody = await response.json();
     throw new Error(responseBody.message || "Failed to delete ticket");
+  }
+
+  return true;
+};
+
+export const updateTicketPriority = async (
+  data: Partial<SupportTicketType>
+) => {
+  const { ticketId, ...reqBody } = data;
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/support_ticket/${ticketId}`,
+    {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(reqBody),
+    }
+  );
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(
+      responseBody.message || "Failed to update the ticket priority"
+    );
   }
 
   return true;

@@ -25,23 +25,23 @@ const ReportIssueForm = () => {
 
   const issueCategories = [
     {
-      value: "hardware",
+      value: "Hardware",
       label: "Hardware Issue",
       caption: "Laptop, Printer, Monitor, etc.",
     },
     {
-      value: "software",
+      value: "Software",
       label: "Software Issue",
       caption: "Microsoft Office, Internal App, etc.",
     },
-    { value: "network", label: "Network Issue", caption: "Wi-Fi, VPN, etc." },
+    { value: "Network", label: "Network Issue", caption: "Wi-Fi, VPN, etc." },
     {
-      value: "emailOrComm",
+      value: "Communication",
       label: "Email or Communication Issue",
       caption: "Email, Cliq, etc.",
     },
     {
-      value: "security",
+      value: "Security",
       label: "Security Issue",
       caption: "Unauthorized access, etc.",
     },

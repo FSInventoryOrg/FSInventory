@@ -48,6 +48,16 @@
     
     --tracker-gradient-from:#CAEADA -46.58%;
     --tracker-gradient-to:#F7FCFA 61.77%;
+
+    --badge-neutral: #EEEEEF;
+    --badge-neutral-foregound: #565F5C;
+    --badge-destructive: #FAEAEA;
+    --badge-destructive-foreground: #D44444;
+    --badge-yellow: #FDF8E6;
+    --badge-yellow-foreground: #675211;
+    --badge-green: #E6F5ED;
+    --badge-green-foreground: #019C4E;
+
   }
  
   .dark {
@@ -77,7 +87,7 @@
  
     --accent: 180 20% 15%;
     --accent-foreground: 190 20% 60%;
- 
+    
     --destructive: 0 62.8% 50%;
     --destructive-foreground: 60 9.1% 97.8%;
 
@@ -92,6 +102,16 @@
 
     --tracker-gradient-from: #212533 17.84%;
     --tracker-gradient-to: #347355 128.66%;
+    
+    --badge-neutral: #3D3F41;
+    --badge-neutral-foreground: #EEEEEF;
+    --badge-destructive: #6B1B1B;
+    --badge-yellow: #795E06;
+    --badge-green: #019C4E;
+    --badge-neutral-foreground: #FFFFFF;
+    --badge-destructive-foreground: #FAEAEA;
+    --badge-yellow-foreground: #FDF8E6;
+    --badge-green-foreground: #FFFFFF;
   }
 }
  
