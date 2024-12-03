@@ -24,7 +24,7 @@ interface EditOptionProps {
   onDelete: (optionToDelete: string) => void;
   onUpdate: (
     updatedOption: OptionType,
-    updatedAssetCounter?: AssetCounterType & { oldPrefixCode: string }
+    updatedAssetCounter?: AssetCounterType & { oldPrefixCode?: string }
   ) => void;
   isUpdatePending: boolean;
   onEnterPressed?: () => void;
@@ -60,7 +60,9 @@ const EditOption = ({
   const { updateAssetCounterInCache, assetCounters, assetCounter } =
     useAssetCounter(propertyIsCategory, option);
 
-  const { prefixCode: oldPrefixCode } = assetCounter ?? { prefixCode: "" };
+  const { prefixCode: oldPrefixCode } = assetCounter ?? {
+    prefixCode: undefined,
+  };
 
   const [originalValue] = useState(editedOption.value);
 

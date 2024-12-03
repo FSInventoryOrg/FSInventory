@@ -163,7 +163,7 @@ const Options = ({
   };
   const handleUpdateOption = (
     updatedOption: OptionType,
-    updatedAssetCounter?: AssetCounterType & { oldPrefixCode: string }
+    updatedAssetCounter?: AssetCounterType & { oldPrefixCode?: string }
   ) => {
     const indexOfValueToEdit = findIndexInOptions(optionToEdit);
     updateOptionValue({
