@@ -508,7 +508,7 @@ const EditOptions = ({
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className="">
+      <PopoverContent side="top">
         <div
           className="cursor-pointer absolute right-3 top-3 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
           onClick={() => {
@@ -522,300 +522,299 @@ const EditOptions = ({
           <XIcon className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </div>
-        <div
-          id={`main-${property}-panel`}
-          className={`flex flex-col gap-2 ${isCreating || isEditing ? "hidden" : ""}`}
-        >
-          <h1 className="w-full text-center font-semibold text-sm">
-            {capitalize(format(property))}
-          </h1>
-          <div className="flex items-center">
-            <Input
-              defaultValue=""
-              type="input"
-              className="focus-visible:ring-0 focus-visible:ring-popover"
-              onChange={(e) => {
-                setFilterValue(e.target.value);
-              }}
-              placeholder="Search..."
-            />
-          </div>
-          <ScrollArea className="h-[225px] justify-center flex align-middle">
-            {filteredData && filteredData.length > 0 ? (
-              filteredData.map((value, index) => (
-                <div key={index} className="flex items-center gap-1 my-1.5">
-                  <div
-                    className={
-                      "w-full text-sm justify-start focus-visible:ring-0 focus-visible:ring-popover focus-visible:bg-accent h-8 rounded-sm ml-1"
-                    }
-                  >
-                    <span className="max-w-28 overflow-hidden text-ellipsis">
-                      {typeof value === "object" ? value.value : value}
-                    </span>
-                  </div>
-                  {colorSelect && (
+        {!isCreating && !isEditing && (
+          <div id={`main-${property}-panel`} className={"flex flex-col gap-2"}>
+            <h1 className="w-full text-center font-semibold text-sm">
+              {capitalize(format(property))}
+            </h1>
+            <div className="flex items-center">
+              <Input
+                defaultValue=""
+                type="input"
+                className="focus-visible:ring-0 focus-visible:ring-popover"
+                onChange={(e) => {
+                  setFilterValue(e.target.value);
+                }}
+                placeholder="Search..."
+              />
+            </div>
+            <ScrollArea className="h-[225px] justify-center flex align-middle">
+              {filteredData && filteredData.length > 0 ? (
+                filteredData.map((value, index) => (
+                  <div key={index} className="flex items-center gap-1 my-1.5">
                     <div
-                      className="h-3 w-3 min-w-3 rounded-full"
-                      style={{
-                        backgroundColor: value.color ? value.color : "#8d8d8d",
+                      className={
+                        "w-full text-sm justify-start focus-visible:ring-0 focus-visible:ring-popover focus-visible:bg-accent h-8 rounded-sm ml-1"
+                      }
+                    >
+                      <span className="max-w-28 overflow-hidden text-ellipsis">
+                        {typeof value === "object" ? value.value : value}
+                      </span>
+                    </div>
+                    {colorSelect && (
+                      <div
+                        className="h-3 w-3 min-w-3 rounded-full"
+                        style={{
+                          backgroundColor: value.color
+                            ? value.color
+                            : "#8d8d8d",
+                        }}
+                      />
+                    )}
+                    <Button
+                      className="mr-3 w-10 h-8"
+                      variant="ghost"
+                      type="button"
+                      size="icon"
+                      onClick={() => {
+                        setNewOption({ property: property, value: value });
+                        setOptionToEdit(
+                          typeof value === "object" ? value.value : value
+                        );
+                        setIsEditing(!isEditing);
                       }}
-                    />
-                  )}
-                  <Button
-                    className="mr-3 w-10 h-8"
-                    variant="ghost"
-                    type="button"
-                    size="icon"
-                    onClick={() => {
-                      setIsEditing(!isEditing);
-                      setNewOption({ property: property, value: value });
-                      setOptionToEdit(
-                        typeof value === "object" ? value.value : value
-                      );
-                    }}
-                  >
-                    <PencilIcon size={16} />
-                  </Button>
+                    >
+                      <PencilIcon size={16} />
+                    </Button>
+                  </div>
+                ))
+              ) : (
+                <div className="flex text-sm text-muted-foreground items-center justify-center gap-1 my-1.5">
+                  No results.
                 </div>
-              ))
-            ) : (
-              <div className="flex text-sm text-muted-foreground items-center justify-center gap-1 my-1.5">
-                No results.
-              </div>
-            )}
-          </ScrollArea>
-          <Button
-            className="h-8"
-            variant="secondary"
-            type="button"
-            onClick={() => {
-              setIsCreating(!isCreating);
-              setNewOption({ property: property, value: "" });
-            }}
-          >
-            Create a new {format(property)}
-          </Button>
-        </div>
-        <div
-          id={`create-${property}-panel`}
-          className={`flex flex-col gap-3 ${isCreating ? "" : "hidden"}`}
-        >
-          <div className="items-center flex flex-row">
+              )}
+            </ScrollArea>
             <Button
+              className="h-8"
+              variant="secondary"
               type="button"
-              size="icon"
-              variant="ghost"
-              className="absolute h-10 w-10"
               onClick={() => {
                 setIsCreating(!isCreating);
                 setNewOption({ property: property, value: "" });
-                setPrefixCode("");
               }}
             >
-              <ChevronLeftIcon />
+              Create a new {format(property)}
             </Button>
-            <h1 className="w-full flex justify-center items-center font-semibold text-sm h-10">
-              Create {format(property)}
-            </h1>
           </div>
-          <Label>{capitalize(property)}</Label>
-          <Input
-            value={
-              typeof newOption.value === "object"
-                ? newOption.value.value
-                : newOption.value
-            }
-            type="input"
-            className="focus-visible:ring-0 focus-visible:ring-popover"
-            onChange={(e) => {
-              const newValue = e.target.value;
-              if (typeof newOption === "object") {
-                setNewOption((prevOption) => {
-                  const updatedValue =
-                    typeof prevOption.value === "object"
-                      ? { ...prevOption.value, value: newValue }
-                      : newValue;
-                  return { ...prevOption, value: updatedValue };
-                });
-              } else {
-                setNewOption({ property: property, value: newValue });
-              }
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                setOpen(!open);
-              }
-            }}
-          />
-          {property === "category" && (
-            <>
-              <Label>Prefix Code</Label>
-              <Input
-                value={prefixCode}
-                type="input"
-                className="focus-visible:ring-0 focus-visible:ring-popover"
-                onChange={(e) => {
-                  const newValue = e.target.value;
-                  setPrefixCode(newValue.toUpperCase().trim());
+        )}
+        {isCreating && (
+          <div id={`create-${property}-panel`} className="flex flex-col gap-3">
+            <div className="items-center flex flex-row">
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="absolute h-10 w-10"
+                onClick={() => {
+                  setIsCreating(!isCreating);
+                  setNewOption({ property: property, value: "" });
+                  setPrefixCode("");
                 }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    setOpen(!open);
-                  }
-                }}
-              />
-            </>
-          )}
-          {colorSelect && (
-            <ColorSelect
-              onColorSelect={handleColorSelect}
-              reset={isEditing || isCreating}
-            />
-          )}
-          <Separator className="my-1" />
-          <Button
-            className="gap-2"
-            disabled={isAddPending}
-            type="button"
-            onClick={() => {
-              if (newOption) {
-                if (property === "category") {
-                  addOptionValue({ ...newOption, prefixCode, type });
+              >
+                <ChevronLeftIcon />
+              </Button>
+              <h1 className="w-full flex justify-center items-center font-semibold text-sm h-10">
+                Create {format(property)}
+              </h1>
+            </div>
+            <Label>{capitalize(property)}</Label>
+            <Input
+              value={
+                typeof newOption.value === "object"
+                  ? newOption.value.value
+                  : newOption.value
+              }
+              type="input"
+              className="focus-visible:ring-0 focus-visible:ring-popover"
+              onChange={(e) => {
+                const newValue = e.target.value;
+                if (typeof newOption === "object") {
+                  setNewOption((prevOption) => {
+                    const updatedValue =
+                      typeof prevOption.value === "object"
+                        ? { ...prevOption.value, value: newValue }
+                        : newValue;
+                    return { ...prevOption, value: updatedValue };
+                  });
                 } else {
-                  addOptionValue(newOption);
+                  setNewOption({ property: property, value: newValue });
                 }
-              }
-            }}
-          >
-            {isAddPending ? <Spinner size={18} /> : null}
-            Create
-          </Button>
-        </div>
-        <div
-          id={`edit-${property}-panel`}
-          className={`flex flex-col gap-3 ${isEditing ? "" : "hidden"}`}
-        >
-          <div className="items-center flex flex-row">
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  setOpen(!open);
+                }
+              }}
+            />
+            {property === "category" && (
+              <>
+                <Label>Prefix Code</Label>
+                <Input
+                  value={prefixCode}
+                  type="input"
+                  className="focus-visible:ring-0 focus-visible:ring-popover"
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setPrefixCode(newValue.toUpperCase().trim());
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      setOpen(!open);
+                    }
+                  }}
+                />
+              </>
+            )}
+            {colorSelect && (
+              <ColorSelect
+                onColorSelect={handleColorSelect}
+                reset={isEditing || isCreating}
+              />
+            )}
+            <Separator className="my-1" />
             <Button
+              className="gap-2"
+              disabled={isAddPending}
               type="button"
-              size="icon"
-              variant="ghost"
-              className="absolute h-10 w-10"
               onClick={() => {
-                setIsEditing(!isEditing);
-                setNewOption({ property: property, value: "" });
-                setPrefixCode("");
+                if (newOption) {
+                  if (property === "category") {
+                    addOptionValue({ ...newOption, prefixCode, type });
+                  } else {
+                    addOptionValue(newOption);
+                  }
+                }
               }}
             >
-              <ChevronLeftIcon />
+              {isAddPending ? <Spinner size={18} /> : null}
+              Create
             </Button>
-            <h1 className="w-full flex justify-center items-center font-semibold text-sm h-10">
-              Edit {format(property)}
-            </h1>
           </div>
-          <Label>{capitalize(property)}</Label>
-          <Input
-            value={
-              typeof newOption.value === "object"
-                ? newOption.value.value
-                : newOption.value
-            }
-            type="input"
-            className="focus-visible:ring-0 focus-visible:ring-popover"
-            onChange={(e) => {
-              const newValue = e.target.value;
-              if (typeof newOption === "object") {
-                setNewOption((prevOption) => {
-                  const updatedValue =
-                    typeof prevOption.value === "object"
-                      ? { ...prevOption.value, value: newValue }
-                      : newValue;
-                  return { ...prevOption, value: updatedValue };
-                });
-              } else {
-                setNewOption({ property: property, value: newValue });
+        )}
+        {isEditing && (
+          <div id={`edit-${property}-panel`} className="flex flex-col gap-3">
+            <div className="items-center flex flex-row">
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="absolute h-10 w-10"
+                onClick={() => {
+                  setIsEditing(!isEditing);
+                  setNewOption({ property: property, value: "" });
+                  setPrefixCode("");
+                }}
+              >
+                <ChevronLeftIcon />
+              </Button>
+              <h1 className="w-full flex justify-center items-center font-semibold text-sm h-10">
+                Edit {format(property)}
+              </h1>
+            </div>
+            <Label>{capitalize(property)}</Label>
+            <Input
+              value={
+                typeof newOption.value === "object"
+                  ? newOption.value.value
+                  : newOption.value
               }
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                setOpen(!open);
-              }
-            }}
-          />
-          <>
-            {optionError && (
-              <div className="text-xs text-destructive font-semibold">
-                {optionError}
-              </div>
-            )}
-          </>
-          {propertyIsCategory && newPrefixCode !== null && (
+              type="input"
+              className="focus-visible:ring-0 focus-visible:ring-popover"
+              onChange={(e) => {
+                const newValue = e.target.value;
+                if (typeof newOption === "object") {
+                  setNewOption((prevOption) => {
+                    const updatedValue =
+                      typeof prevOption.value === "object"
+                        ? { ...prevOption.value, value: newValue }
+                        : newValue;
+                    return { ...prevOption, value: updatedValue };
+                  });
+                } else {
+                  setNewOption({ property: property, value: newValue });
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  setOpen(!open);
+                }
+              }}
+            />
             <>
-              <Label>Prefix Code</Label>
-              <Input
-                value={newPrefixCode}
-                type="input"
-                className="focus-visible:ring-0 focus-visible:ring-popover"
-                onChange={(e) => {
-                  const newValue = e.target.value;
-                  setNewPrefixCode(newValue.toUpperCase().trim());
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                  }
-                }}
-              />
-              {prefixCodeError && (
+              {optionError && (
                 <div className="text-xs text-destructive font-semibold">
-                  {prefixCodeError}
+                  {optionError}
                 </div>
               )}
             </>
-          )}
-          {colorSelect && (
-            <ColorSelect
-              onColorSelect={handleColorSelect}
-              property={property}
-              option={optionToEdit}
-            />
-          )}
-          <Separator className="my-1" />
-          <div className="flex justify-between">
-            <Button
-              className="gap-2"
-              disabled={
-                isOptionEditPending ||
-                isAssetEditPending ||
-                (newPrefixCode === prefixCode &&
-                  typeof newOption.value !== "string" &&
-                  newOption.value.value === optionToEdit) ||
-                !!optionError ||
-                !!prefixCodeError ||
-                isUpdateAssetCounterPending ||
-                isAssetPrefixEditPending
-              }
-              type="button"
-              onClick={handleUpdate}
-            >
-              {(isOptionEditPending ||
-                isAssetEditPending ||
-                isUpdateAssetCounterPending ||
-                isAssetPrefixEditPending) && <Spinner size={18} />}
-              {
-                <>
-                  {isAssetEditPending && !isOptionEditPending
-                    ? " Updating assets"
-                    : "Save"}
-                </>
-              }
-            </Button>
-            <DeleteOption />
+            {propertyIsCategory && newPrefixCode !== null && (
+              <>
+                <Label>Prefix Code</Label>
+                <Input
+                  value={newPrefixCode}
+                  type="input"
+                  className="focus-visible:ring-0 focus-visible:ring-popover"
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setNewPrefixCode(newValue.toUpperCase().trim());
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+                {prefixCodeError && (
+                  <div className="text-xs text-destructive font-semibold">
+                    {prefixCodeError}
+                  </div>
+                )}
+              </>
+            )}
+            {colorSelect && (
+              <ColorSelect
+                onColorSelect={handleColorSelect}
+                property={property}
+                option={optionToEdit}
+              />
+            )}
+            <Separator className="my-1" />
+            <div className="flex justify-between">
+              <Button
+                className="gap-2"
+                disabled={
+                  isOptionEditPending ||
+                  isAssetEditPending ||
+                  (newPrefixCode === prefixCode &&
+                    typeof newOption.value !== "string" &&
+                    newOption.value.value === optionToEdit) ||
+                  !!optionError ||
+                  !!prefixCodeError ||
+                  isUpdateAssetCounterPending ||
+                  isAssetPrefixEditPending
+                }
+                type="button"
+                onClick={handleUpdate}
+              >
+                {(isOptionEditPending ||
+                  isAssetEditPending ||
+                  isUpdateAssetCounterPending ||
+                  isAssetPrefixEditPending) && <Spinner size={18} />}
+                {
+                  <>
+                    {isAssetEditPending && !isOptionEditPending
+                      ? " Updating assets"
+                      : "Save"}
+                  </>
+                }
+              </Button>
+              <DeleteOption />
+            </div>
           </div>
-        </div>
+        )}
       </PopoverContent>
     </Popover>
   );
