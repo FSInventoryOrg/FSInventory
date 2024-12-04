@@ -9,6 +9,7 @@ import ActionCell from "./InventoryAction";
 import StatusBadge from "./StatusBadge";
 import AssetCode from "./AssetCode";
 import DeployRetrieveAsset from "./DeployRetrieveAsset";
+import { dateNormalizer, sortDatesDesc } from "@/lib/utils";
 
 export const InventoryColumns: ColumnDef<HardwareType | SoftwareType>[] = [
   {
@@ -134,6 +135,12 @@ export const InventoryColumns: ColumnDef<HardwareType | SoftwareType>[] = [
         return <></>;
       }
     },
+    sortingFn: (rowA, rowB, columnId) => {
+      const dateA = dateNormalizer(rowA.getValue(columnId));
+      const dateB = dateNormalizer(rowB.getValue(columnId));
+
+      return sortDatesDesc(dateA, dateB);
+    },
   },
   {
     accessorKey: "serviceInYears",
@@ -211,6 +218,12 @@ export const InventoryColumns: ColumnDef<HardwareType | SoftwareType>[] = [
         return <></>;
       }
     },
+    sortingFn: (rowA, rowB, columnId) => {
+      const dateA = dateNormalizer(rowA.getValue(columnId));
+      const dateB = dateNormalizer(rowB.getValue(columnId));
+
+      return sortDatesDesc(dateA, dateB);
+    },
   },
   {
     accessorKey: "recoveredFrom",
@@ -240,6 +253,12 @@ export const InventoryColumns: ColumnDef<HardwareType | SoftwareType>[] = [
       } else {
         return <></>;
       }
+    },
+    sortingFn: (rowA, rowB, columnId) => {
+      const dateA = dateNormalizer(rowA.getValue(columnId));
+      const dateB = dateNormalizer(rowB.getValue(columnId));
+
+      return sortDatesDesc(dateA, dateB);
     },
   },
   {
