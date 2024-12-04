@@ -60,7 +60,6 @@ declare global {
 }
 
 const { ROCKS_DEV_API_URL, ROCKS_PRODUCTION_API_URL, NODE_ENV } = process.env;
-const TOKEN_EXPIRED: string = "Token expired";
 const UNAUTHORIZED_ACCESS: string = "Unauthorized access";
 const ADMIN_ERROR: string =
   "Only users with admin role can perform this action";
@@ -141,20 +140,5 @@ const verifyRole = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-const tokenUser = async (token: string) => {
-  const status = await fetch(`${API_URL}/users/me`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!status.ok) throw Error(TOKEN_EXPIRED);
-
-  return status;
-};
-
 export default verifyToken;
-export { verifyRole, tokenUser, IT_MANAGER };
+export { verifyRole, IT_MANAGER };
