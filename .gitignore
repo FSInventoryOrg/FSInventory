@@ -35,7 +35,6 @@ node_modules/
 
 # Compiled output
 /frontend/dist/
-/backend/public/
 /build/
 /public/**
 
