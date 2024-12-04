@@ -2,9 +2,13 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## [2.26.2](https://connect.zoho.com/portal/intranet/task/623367000001000135) 2024-12-4
+## [2.27.1](https://connect.zoho.com/portal/intranet/task/623367000001000135) 2024-12-4
 ### Fixed
 - Fixed Sorting issues on Inventory Table with date columns (Purchase Date, Deployment Date, Recovery Date).
+
+## [2.27.0](https://connect.zoho.com/portal/intranet/task/623367000000892241) 2024-11-21
+### Added
+- UI design to IT services request form and no tickets page
 
 ## [2.26.1](https://connect.zoho.com/portal/intranet/task/623367000000968011) 2024-11-21
 ### Fixed
