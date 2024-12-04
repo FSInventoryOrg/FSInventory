@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+import { parse } from "date-fns";
 import { twMerge } from "tailwind-merge";
 import * as XLSX from "xlsx";
 
@@ -88,3 +89,65 @@ export function format(str: string): string {
 export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+/**
+ * Given a string, returns a Date object. If the string is not parseable or
+ * empty, returns a Date object with a value of 0.
+ *
+ * If the string matches the format MM/dd/yyyy, MM/dd/yy or MM/dd/yyyy, the
+ * date is parsed directly from the string. Otherwise, the date is parsed
+ * using the `parse` function from the `date-fns` library.
+ *
+ * @param {string} dateStr - The string to be parsed.
+ * @returns {Date} The parsed date.
+ */
+export const dateNormalizer = (dateStr: string) => {
+  if (!dateStr) return new Date(0);
+  if (dateStr.trim() === "") return new Date(0);
+  const dateFormatRegex =
+    /^([1-9]|0[1-9]|1[0-2])\/([1-9]|0[1-9]|[12][0-9]|3[01])\/(\d{2}|\d{4})$/;
+  if (dateFormatRegex.test(dateStr)) {
+    const [month, day, year] = dateStr.split("/");
+
+    const fullYear = year.length === 2 ? `20${year}` : year;
+    const newDate = parse(
+      `${month}/${day}/${fullYear}`,
+      "MM/dd/yyyy",
+      new Date()
+    );
+    return newDate;
+  }
+
+  const date = new Date(dateStr);
+  if (date instanceof Date && !isNaN(date.getTime())) {
+    return date;
+  }
+  return parse(dateStr, "MM/dd/yyyy", new Date());
+};
+
+/**
+ * Sorts two dates in descending order.
+ *
+ * If either date is invalid (i.e. NaN), it is considered "later" than the other.
+ *
+ * @param {Date} dateA - The first date to compare.
+ * @param {Date} dateB - The second date to compare.
+ * @returns {number} A negative value if dateA is earlier than dateB, a positive value if dateA is later than dateB, or 0 if both dates are equal or invalid.
+ */
+export const sortDatesDesc = (dateA: Date, dateB: Date): number => {
+  // Handle invalid dates
+  const isDateAValid = !isNaN(dateA.getTime());
+  const isDateBValid = !isNaN(dateB.getTime());
+
+  if (!isDateAValid && !isDateBValid) {
+    return 0;
+  }
+  if (!isDateAValid) {
+    return 1;
+  }
+  if (!isDateBValid) {
+    return -1;
+  }
+
+  return dateB.getTime() - dateA.getTime();
+};
