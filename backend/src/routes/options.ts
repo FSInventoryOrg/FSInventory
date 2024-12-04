@@ -3,7 +3,8 @@ import Option, { StatusOptions } from "../models/options.schema"; // Import your
 import { check, validationResult } from "express-validator";
 import verifyToken from "../middleware/auth";
 import jwt from "jsonwebtoken";
-import { auditAssets } from "../utils/common";
+import { auditAssets, deleteNotif } from "../utils/common";
+import AssetCounter from "../models/asset-counter.schema";
 import { format } from "../utils/string-utils";
 
 const router = express.Router();
@@ -171,7 +172,7 @@ router.put(
     check("softwareCategory").optional().isString(),
     check("hardwareCategory").optional().isString(),
     check("equipmentType").optional().isString(),
-    check("deployableStatus").isArray(),
+    check("deployableStatus").optional().isArray(),
     check("retrievableStatus").optional().isString(),
     check("inventoryColumns").optional().isArray(),
   ],
@@ -341,10 +342,28 @@ router.put(
 
       const propertyValues = option.get(property) || [];
       // Check if the value already exists in the array for the specified property
-      if (propertyValues.includes(value)) {
-        return res
-          .status(400)
-          .json({ error: "Value already exists for the specified property" });
+      if (typeof value === "object") {
+        const existingValue = propertyValues.find(
+          (val: any, index: number) =>
+            val.value.toLowerCase() === value.value.toLowerCase() &&
+            index !== updateIndex
+        );
+        if (existingValue) {
+          return res.status(400).json({
+            message: "Value already exists for the specified property",
+          });
+        }
+      } else {
+        const existingValue = propertyValues.find(
+          (propertyVal: string, index: number) =>
+            propertyVal.toLowerCase() === value?.toLowerCase() &&
+            index !== updateIndex
+        );
+        if (existingValue) {
+          return res.status(400).json({
+            message: "Value already exists for the specified property",
+          });
+        }
       }
 
       // Update element at the specified index
@@ -427,7 +446,7 @@ router.delete(
       const { property } = req.params;
       const { value } = req.body;
 
-      let isStatusIncluded = false;
+      let shouldAuditAssets = false;
 
       // Check if the options document exists
       const option = await Option.findOne();
@@ -452,12 +471,18 @@ router.delete(
             message: `Value '${value}' does not exist in option '${property}'`,
           });
         }
+        // Check if the value exists in the array
+        if (!propertyValue.some((option) => option.value === value)) {
+          return res.status(400).json({
+            message: `Value '${value}' does not exist in option '${property}'`,
+          });
+        }
 
         const updatedProperty = propertyValue.filter(
           (option) => option.value !== value
         );
         option.set(property, updatedProperty);
-        if (property === "status") isStatusIncluded = true;
+        shouldAuditAssets = true;
       } else {
         const propertyValue: string[] = option.get(property);
         if (!propertyValue.includes(value)) {
@@ -471,7 +496,18 @@ router.delete(
 
       await option.save();
 
-      if (isStatusIncluded) await auditAssets();
+      if (shouldAuditAssets) await auditAssets();
+
+      if (property === "category") {
+        // Delete associated asset index/counter for category
+        const assetCounter = await AssetCounter.findOneAndDelete({
+          category: value,
+        });
+        if (assetCounter) {
+          // Update tracking and remove notifications for deleted category
+          await deleteNotif(`AssetCounter-${assetCounter["_id"]}`);
+        }
+      }
 
       res.status(200).json({
         message: `Value '${value}' removed from option '${property}' successfully`,

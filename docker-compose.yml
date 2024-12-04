@@ -35,6 +35,9 @@ services:
       - ./backend:/usr/src/app
       - /usr/src/app/public
       - /usr/src/app/node_modules
+      - ./frontend/package.json:/usr/src/app/frontend/package.json
+      - ./frontend/dist:/usr/src/app/frontend/dist
+      - ./backend/public:/usr/src/app/public
     ports:
       - 8080:8080
     env_file:

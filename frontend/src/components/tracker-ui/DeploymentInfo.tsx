@@ -81,7 +81,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
   });
 
   const { data: currentAssets } = useQuery({
-    queryKey: ["fetchAssetsByProperty", "assignee", assignee],
+    queryKey: ["fetchAssetsByProperty", "assignee", assignee.trim()],
     queryFn: () => imsService.fetchAssetsByProperty("assignee", assignee),
     enabled: !!employee,
   });
@@ -239,11 +239,6 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <div className="flex">
-              <span className="text-muted-foreground font-medium text-xs sm:text-sm self-end text-ellipsis overflow-hidden whitespace-nowrap">
-                As of {currentDate.toLocaleString()}
-              </span>
-            </div>
           </div>
         </div>
         <div id="statistics" className="relative flex-grow ">
@@ -256,38 +251,48 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
           )}
         </div>
       </div>
-      <div className="flex items-center gap-2 pb-2">
-        <Select
-          value={selectedFilter}
-          onValueChange={(value) => setSelectedFilter(value)}
-        >
-          <SelectTrigger className="w-[250px]">
-            <SelectValue defaultValue="current" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Filter by</SelectLabel>
-              <SelectItem value="current">Current deployed assets</SelectItem>
-              <SelectItem value="history" disabled={!employee.code}>
-                History of deployed assets
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-        <TooltipProvider delayDuration={100}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Info size={20} className="text-border cursor-pointer" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="max-w-[200px]">
-                Assets history for{" "}
-                <span className="text-destructive">unregistered</span> users is
-                not available.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-2 px-1">
+        <div className="flex">
+          <span className="dark:text-[#D9F2F2] font-medium text-xs sm:text-sm self-end text-ellipsis overflow-hidden whitespace-nowrap">
+            As of {currentDate.toLocaleString()}
+          </span>
+        </div>
+        <div className="flex justify-center items-center gap-4">
+          <Select
+            value={selectedFilter}
+            onValueChange={(value) => setSelectedFilter(value)}
+          >
+            <SelectTrigger className="w-[250px]">
+              <SelectValue defaultValue="current" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Filter by</SelectLabel>
+                <SelectItem value="current">Current deployed assets</SelectItem>
+                <SelectItem value="history" disabled={!employee.code}>
+                  History of deployed assets
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info
+                  size={24}
+                  className="dark:text-[#D9F2F2] cursor-pointer"
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-[200px]">
+                  Assets history for{" "}
+                  <span className="text-destructive">unregistered</span> users
+                  is not available.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
       {selectedFilter === "current" ? (
         assetsCurrent !== null ? (
