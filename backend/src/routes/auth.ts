@@ -122,7 +122,16 @@ router.get("/validate-token", verifyToken, (req: Request, res: Response) => {
   res.status(200).send({ userId: req.user.userId });
 });
 
-router.post("/logout", (req: Request, res: Response) => {
+router.post("/logout", async (req: Request, res: Response) => {
+  const token = req.cookies["auth_token"];
+  await fetch(`${API_URL}/auth/token`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
   res.cookie("auth_token", "", {
     expires: new Date(0),
   });
