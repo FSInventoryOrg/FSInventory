@@ -141,21 +141,6 @@ const verifyRole = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-const tokenStatus = async (token: string) => {
-  const status = await fetch(`${API_URL}/auth/check`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!status.ok) throw Error(TOKEN_EXPIRED);
-
-  return status;
-};
-
 const tokenUser = async (token: string) => {
   const status = await fetch(`${API_URL}/users/me`, {
     method: "GET",
@@ -172,4 +157,4 @@ const tokenUser = async (token: string) => {
 };
 
 export default verifyToken;
-export { verifyRole, tokenStatus, tokenUser, IT_MANAGER };
+export { verifyRole, tokenUser, IT_MANAGER };
