@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { check, validationResult } from "express-validator";
-import verifyToken from "../middleware/auth";
+import verifyToken, { IT_MANAGER } from "../middleware/auth";
 
 const router = express.Router();
 
@@ -15,7 +15,6 @@ const {
 
 const API_URL: string =
   NODE_ENV === "PRODUCTION" ? ROCKS_PRODUCTION_API_URL! : ROCKS_DEV_API_URL!;
-const { IT_MANAGER } = process.env;
 
 router.post(
   "/login",
