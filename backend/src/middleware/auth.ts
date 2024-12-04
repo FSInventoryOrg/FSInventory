@@ -50,6 +50,13 @@ export interface RocksUser {
   };
 }
 
+type TokenStatus = {
+  status_code: 200 | 401;
+  login_session_id?: string;
+  message: "Authenticated" | "Unauthenticated";
+  authenticated: boolean;
+};
+
 /* Extend Request type and add userId */
 declare global {
   namespace Express {
@@ -92,6 +99,21 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     return res.status(401).json({ message: UNAUTHORIZED_ACCESS });
   }
   try {
+    const token_status: TokenStatus = await (
+      await fetch(`${API_URL}/auth/check`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    ).json();
+
+    if (!token_status.authenticated) {
+      return res.status(401).json({ message: UNAUTHORIZED_ACCESS });
+    }
+
     const user: RocksUser = await (
       await fetch(`${API_URL}/users/me`, {
         method: "GET",
