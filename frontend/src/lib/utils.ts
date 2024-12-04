@@ -102,8 +102,7 @@ export function capitalize(str: string): string {
  * @returns {Date} The parsed date.
  */
 export const dateNormalizer = (dateStr: string) => {
-  if (!dateStr) return new Date(0);
-  if (dateStr.trim() === "") return new Date(0);
+  if (dateStr.trim() === "" || !dateStr) return new Date(0);
   const dateFormatRegex =
     /^([1-9]|0[1-9]|1[0-2])\/([1-9]|0[1-9]|[12][0-9]|3[01])\/(\d{2}|\d{4})$/;
   if (dateFormatRegex.test(dateStr)) {
