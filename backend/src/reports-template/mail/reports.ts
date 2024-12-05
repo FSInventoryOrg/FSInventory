@@ -8,7 +8,13 @@ import path from "path";
 
 export const inventoryReportHtml = async (mailMeta?: any) => {
   const rootDir = getAppRootDir();
-  const templatePath = path.join(rootDir, "src", "reports-template", "mail", "report.hbs" );
+  const templatePath = path.join(
+    rootDir,
+    "src",
+    "reports-template",
+    "mail",
+    "report.hbs"
+  );
   const templateContent = await getFile(templatePath, true);
   const template = Handlebars.compile(templateContent?.toString());
 
