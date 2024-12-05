@@ -35,7 +35,6 @@ node_modules/
 
 # Compiled output
 /frontend/dist/
-/backend/public/
 /build/
 /public/**
 
@@ -63,3 +62,18 @@ yarn-error.log*
 /backend/frontend
 !/public/**/
 !/public/**/.gitkeep
+
+# Ignore contents of specific directories under backend/public
+/backend/public/attachments/*
+/backend/public/backup/archive/*
+/backend/public/backup/excel/*
+/backend/public/backup/json/*
+/backend/public/import/archive/*
+/backend/public/import/collections/*
+/backend/public/import/collections/archive/*
+/backend/public/import/collections/csv/*
+/backend/public/import/collections/json/*
+
+!/backend/public/import/collections/archive/
+!/backend/public/import/collections/csv/
+!/backend/public/import/collections/json/

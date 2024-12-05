@@ -1,28 +1,26 @@
-
-import React from 'react';
-import { FullScaleIcon } from '../icons/FullScaleIcon';
-import Login from './Login';
+import React from "react";
+import { FullScaleIcon } from "../icons/FullScaleIcon";
+import Login from "./Login";
 
 const Hero = () => {
-
   const [isMD, setIsMD] = React.useState(false);
   React.useEffect(() => {
     const checkScreenSize = () => {
-      setIsMD(window.innerWidth >= 768); 
+      setIsMD(window.innerWidth >= 768);
     };
 
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
 
     return () => {
-      window.removeEventListener('resize', checkScreenSize);
+      window.removeEventListener("resize", checkScreenSize);
     };
   }, []);
 
   return (
-    <section className='flex flex-col md:flex-row w-full justify-center'>
-      <div className='w-full md:w-full flex justify-center items-center'>
-        <div className='flex flex-col items-center w-20 md:w-full p-0 md:p-16 lg-24 xl:p-48'>
+    <section className="flex flex-col md:flex-row w-full justify-center">
+      <div className="w-full md:w-full flex justify-center items-center">
+        <div className="flex flex-col items-center w-20 md:w-full p-0 md:p-16 lg-24 xl:p-48">
           {/* <svg fill="currentColor" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" className='' viewBox="0 0 425.178 425.178" xmlSpace="preserve">
             <g>
               <g>
@@ -69,18 +67,20 @@ const Hero = () => {
             </g>
           </svg> */}
           {isMD ? (
-            <FullScaleIcon size={400} className='fill-current text-primary' />  
+            <FullScaleIcon size={400} className="fill-current text-primary" />
           ) : (
-            <FullScaleIcon size={100} className='fill-current text-primary' />
+            <FullScaleIcon size={100} className="fill-current text-primary" />
           )}
-          <span className="hidden md:block text-7xl font-bold tracking-tighter">stockpilot :)</span>
+          <span className="hidden md:block text-7xl font-bold tracking-tighter">
+            stockpilot :)
+          </span>
         </div>
       </div>
-      <div className='w-full flex flex-col justify-center p-3'>
+      <div className="w-full flex flex-col justify-center p-3">
         <Login />
       </div>
     </section>
-  )
-}
+  );
+};
 
 export default Hero;

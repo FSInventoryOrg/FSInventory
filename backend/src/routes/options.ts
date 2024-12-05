@@ -350,7 +350,7 @@ router.put(
         );
         if (existingValue) {
           return res.status(400).json({
-            message: "Value already exists for the specified property",
+            message: `The ${format(property)} '${existingValue.value}' already exists.`,
           });
         }
       } else {
@@ -361,7 +361,7 @@ router.put(
         );
         if (existingValue) {
           return res.status(400).json({
-            message: "Value already exists for the specified property",
+            message: `The ${format(property)} '${existingValue}' already exists.`,
           });
         }
       }

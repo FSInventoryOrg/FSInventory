@@ -4,10 +4,17 @@ import AssetCounter from "../../models/asset-counter.schema";
 import Option from "../../models/options.schema";
 import AutoMail from "../../models/automail.schema";
 import { getFile, getAppRootDir } from "../../utils/common";
+import path from "path";
 
 export const inventoryReportHtml = async (mailMeta?: any) => {
   const rootDir = getAppRootDir();
-  const templatePath = `${rootDir}\\/src/reports-template/mail/report.hbs`;
+  const templatePath = path.join(
+    rootDir,
+    "src",
+    "reports-template",
+    "mail",
+    "report.hbs"
+  );
   const templateContent = await getFile(templatePath, true);
   const template = Handlebars.compile(templateContent?.toString());
 
