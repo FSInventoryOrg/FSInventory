@@ -705,13 +705,14 @@ export const updateAssetCounter = async ({
   prefixCode,
   updatedAssetCounter,
 }: {
-  prefixCode: string;
+  prefixCode?: string;
   updatedAssetCounter: AssetCounterFormData & { _id?: string };
 }) => {
   if (!updatedAssetCounter._id) {
     return postAssetCounter({ ...updatedAssetCounter, threshold: 1 });
   }
-
+  // Validate if existing category is not assigned a prefix code
+  if (!prefixCode) throw new Error("Prefix code is required.");
   const response = await fetch(
     `${API_BASE_URL}/api/assetcounter/${prefixCode}`,
     {
@@ -728,7 +729,8 @@ export const updateAssetCounter = async ({
     const responseBody = await response.json();
     throw new Error(responseBody.message || "Failed to update asset counter");
   }
-  return true;
+
+  return response.status;
 };
 
 export const deleteAssetCounter = async (prefixCode: string) => {

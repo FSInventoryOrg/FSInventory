@@ -98,14 +98,12 @@ const EditOptions = ({
   const {
     getAssetCounterFromCategory,
     updateAssetCounterInCache,
-    getAssetCounters,
+    refetch: refetchAssetCounters,
+    assetCounters,
   } = useAssetCounter(propertyIsCategory, { property, value: optionToEdit });
 
   const [filterValue, setFilterValue] = React.useState("");
   const [filteredData, setFilteredData] = React.useState<ColorOption[]>([]);
-
-  const { data: assetCounters, refetch: refetchAssetCounters } =
-    getAssetCounters();
 
   const getOptionValue = (option: ColorOption | TagOption | string) => {
     if (typeof option === "string") {
