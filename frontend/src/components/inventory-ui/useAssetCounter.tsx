@@ -11,7 +11,11 @@ const useAssetCounter = (isCategory: boolean, option: OptionType) => {
       ? option.value.value
       : (option.value as string);
 
-  const { data: assetCounters, refetch } = useQuery<AssetCounterType[]>({
+  const {
+    data: assetCounters,
+    refetch,
+    isLoading,
+  } = useQuery<AssetCounterType[]>({
     queryKey: ["fetchAssetCounters"],
     queryFn: async () => await imsService.fetchAssetCounters(),
   });
@@ -62,6 +66,7 @@ const useAssetCounter = (isCategory: boolean, option: OptionType) => {
     assetCounters,
     assetCounter,
     refetch,
+    isLoading,
   };
 };
 

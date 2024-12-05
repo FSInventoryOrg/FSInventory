@@ -44,6 +44,7 @@ const EditOption = ({
   const isObject: boolean = typeof option.value === "object";
   const propertyIsCategory: boolean = property === "category";
   const [newPrefixCode, setNewPrefixCode] = useState<string | undefined>();
+  const [oldPrefixCode, setOldPrefixCode] = useState<string | undefined>();
   const [prefixCodeError, setPrefixCodeError] = useState("");
   const [optionError, setOptionError] = useState("");
   const { showToast } = useAppContext();
@@ -60,16 +61,14 @@ const EditOption = ({
   const { updateAssetCounterInCache, assetCounters, assetCounter } =
     useAssetCounter(propertyIsCategory, option);
 
-  const { prefixCode: oldPrefixCode } = assetCounter ?? {
-    prefixCode: undefined,
-  };
-
   const [originalValue] = useState(editedOption.value);
 
   const isValueSame = useMemo(
     () => getOptionValue(editedOption.value) === getOptionValue(originalValue),
     [editedOption.value, getOptionValue, originalValue]
   );
+
+  const isPrefixCodeSame = !!newPrefixCode && oldPrefixCode === newPrefixCode;
 
   const handleInputChange = (value: string) => {
     setEditedOption({
@@ -89,8 +88,7 @@ const EditOption = ({
 
     if (assetCounter && category) {
       const isCategoryNameChanged = category !== assetCounter.category;
-      const isPrefixCodeChanged: boolean =
-        !!newPrefixCode && oldPrefixCode !== newPrefixCode;
+      const isPrefixCodeChanged = !isPrefixCodeSame;
 
       if (isPrefixCodeChanged && isCategoryNameChanged) {
         onUpdate(editedOption, {
@@ -135,10 +133,14 @@ const EditOption = ({
   const optionToEdit = getOptionValue(editedOption.value);
 
   useEffect(() => {
-    if (propertyIsCategory && newPrefixCode === undefined) {
-      setNewPrefixCode(oldPrefixCode);
+    if (propertyIsCategory && option) {
+      const { prefixCode } = assetCounter ?? { prefixCode: "" };
+      setOldPrefixCode(prefixCode);
+      if (prefixCode && newPrefixCode === undefined) {
+        setNewPrefixCode(prefixCode);
+      }
     }
-  }, [propertyIsCategory, assetCounter, oldPrefixCode, newPrefixCode]);
+  }, [option, propertyIsCategory, newPrefixCode, assetCounter]);
 
   useEffect(() => {
     if (!isCategoryType) return;
@@ -242,7 +244,12 @@ const EditOption = ({
       <div className="flex justify-between">
         <Button
           className="gap-2"
-          disabled={!!prefixCodeError || !!optionError || isUpdatePending}
+          disabled={
+            !!prefixCodeError ||
+            !!optionError ||
+            isUpdatePending ||
+            (isValueSame && isPrefixCodeSame)
+          }
           type="button"
           onClick={() => {
             try {

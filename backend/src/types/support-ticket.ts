@@ -67,3 +67,8 @@ export interface TicketQueryParams {
   status?: string;
   query?: string;
 }
+
+export type ApprovalQueryParams = {
+  ticketId: string;
+  managerEmail: string;
+};
