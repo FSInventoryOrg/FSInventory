@@ -29,7 +29,7 @@ const activateAutoMailing = async (data: any, now?: boolean) => {
 
       if (findEmployee)
         value["assignee"] =
-          `${findEmployee["firstName"]} ${findEmployee["lastName"]}`;
+          `${findEmployee["first_name"]} ${findEmployee["last_name"]}`;
     }
     if (value.recoveredFrom) {
       const findEmployee = allEmployees.find(
@@ -38,7 +38,7 @@ const activateAutoMailing = async (data: any, now?: boolean) => {
 
       if (findEmployee)
         value["recoveredFrom"] =
-          `${findEmployee["firstName"]} ${findEmployee["lastName"]}`;
+          `${findEmployee["first_name"]} ${findEmployee["last_name"]}`;
     }
 
     value["purchaseDate"] =
@@ -243,11 +243,11 @@ router.post(
       if (!newData.created) {
         newData["created"] = new Date();
         newData["createdby"] =
-          `${currentUser["firstName"]} ${currentUser["lastName"]}`;
+          `${currentUser["first_name"]} ${currentUser["last_name"]}`;
       }
       newData["updated"] = new Date();
       newData["updatedby"] =
-        `${currentUser["firstName"]} ${currentUser["lastName"]}`;
+        `${currentUser["first_name"]} ${currentUser["last_name"]}`;
 
       await AutoMail.updateOne({ _id: idToUsed }, newData, { upsert: true });
 

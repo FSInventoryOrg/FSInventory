@@ -49,8 +49,8 @@ router.post(
       data.updated = currentDate;
 
       if (currentUser) {
-        data.createdBy = `${currentUser.firstName} ${currentUser.lastName}`;
-        data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+        data.createdBy = `${currentUser.first_name} ${currentUser.last_name}`;
+        data.updatedBy = `${currentUser.first_name} ${currentUser.last_name}`;
       }
 
       if (!data.counter) data["counter"] = 0;
@@ -183,7 +183,7 @@ router.put(
       const currentUser = JSON.parse(user);
       data.updated = new Date();
       if (currentUser)
-        data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+        data.updatedBy = `${currentUser.first_name} ${currentUser.last_name}`;
 
       const updatedAsset = await AssetCounter.findOneAndUpdate(
         { _id: ID },

@@ -48,13 +48,13 @@ const processUpload = async (req: Request, res: Response, folder: string) => {
       _id: newId,
       created: new Date(),
       updated: new Date(),
-      createdBy: `${currentUser["firstName"]} ${currentUser["lastName"]}`,
-      updatedBy: `${currentUser["firstName"]} ${currentUser["lastName"]}`,
+      createdBy: `${currentUser["first_name"]} ${currentUser["last_name"]}`,
+      updatedBy: `${currentUser["first_name"]} ${currentUser["last_name"]}`,
       downloadLink: downlink,
       infoLink: infolink,
       path: path,
       size: srcFormat["base64"].length,
-      originalName: filename,
+      original_name: filename,
       filetype: srcFormat["data"],
     };
 

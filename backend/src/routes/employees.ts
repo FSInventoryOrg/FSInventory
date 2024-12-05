@@ -43,9 +43,9 @@ router.get(
             const findIndex = accum.findIndex((f) => f["code"] === value);
             if (findIndex === -1) {
               const findEmployeeIndex = employees.findIndex((f) => {
-                let name = `${f["firstName"]}`;
-                if (f["middleName"]) name += ` ${f["middleName"]}`;
-                name += ` ${f["lastName"]}`;
+                let name = `${f["first_name"]}`;
+                if (f["middle_name"]) name += ` ${f["middle_name"]}`;
+                name += ` ${f["last_name"]}`;
 
                 return f["code"] === value || name === value;
               });
@@ -54,8 +54,8 @@ router.get(
                 accum.push({
                   code: value,
                   state: "UNREGISTERED",
-                  firstName: "",
-                  lastName: "",
+                  first_name: "",
+                  last_name: "",
                 });
             }
           }
@@ -147,10 +147,10 @@ router.post(
   "/",
   [
     check("code").isString().withMessage("Employee code must be a string"),
-    check("firstName").isString().withMessage("First name must be a string"),
-    check("lastName").isString().withMessage("Last name must be a string"),
+    check("first_name").isString().withMessage("First name must be a string"),
+    check("last_name").isString().withMessage("Last name must be a string"),
     check("position").isString().withMessage("Position must be a string"),
-    check("firstName").isString().withMessage("First name must be a string"),
+    check("first_name").isString().withMessage("First name must be a string"),
     check("startDate").isISO8601().toDate().withMessage("Invalid start date"),
   ],
   verifyToken,
@@ -266,10 +266,10 @@ router.put(
   "/:code",
   [
     check("code").isString().withMessage("Employee code must be a string"),
-    check("firstName").isString().withMessage("First name must be a string"),
-    check("lastName").isString().withMessage("Last name must be a string"),
+    check("first_name").isString().withMessage("First name must be a string"),
+    check("last_name").isString().withMessage("Last name must be a string"),
     check("position").isString().withMessage("Position must be a string"),
-    check("firstName").isString().withMessage("First name must be a string"),
+    check("first_name").isString().withMessage("First name must be a string"),
     check("startDate").isISO8601().toDate().withMessage("Invalid start date"),
   ],
   verifyToken,

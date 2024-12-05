@@ -54,7 +54,7 @@ router.post(
         daysBeforeLicenseExpiration,
         updated: currentDate,
         updatedBy: currentUser
-          ? `${currentUser.firstName} ${currentUser.lastName}`
+          ? `${currentUser.first_name} ${currentUser.last_name}`
           : undefined,
       };
 
@@ -69,7 +69,7 @@ router.post(
           $setOnInsert: {
             created: currentDate,
             createdBy: currentUser
-              ? `${currentUser.firstName} ${currentUser.lastName}`
+              ? `${currentUser.first_name} ${currentUser.last_name}`
               : undefined,
           },
         },

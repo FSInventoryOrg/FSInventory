@@ -29,7 +29,7 @@ const emplyeeSnapper = async (assets: any) => {
     .match({ $expr: {} })
     .project({
       idNum: "$code",
-      name: { $concat: ["$firstName", " ", "$lastName"] },
+      name: { $concat: ["$first_name", " ", "$last_name"] },
     });
 
   assets = assets.reduce((accum: any[], value: any) => {
@@ -201,8 +201,8 @@ router.post(
       data.updated = currentDate;
 
       if (currentUser) {
-        data.createdBy = `${currentUser.firstName} ${currentUser.lastName}`;
-        data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+        data.createdBy = `${currentUser.first_name} ${currentUser.last_name}`;
+        data.updatedBy = `${currentUser.first_name} ${currentUser.last_name}`;
       }
 
       const existingAsset = await Asset.findOne({ code: data.code });
@@ -305,7 +305,7 @@ router.put(
       const currentUser = JSON.parse(user);
       data.updated = new Date();
       if (currentUser) {
-        data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+        data.updatedBy = `${currentUser.first_name} ${currentUser.last_name}`;
       }
 
       const deploymentRecord = {
@@ -368,7 +368,7 @@ router.put(
       const currentUser = JSON.parse(user);
       data.updated = new Date();
       if (currentUser) {
-        data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+        data.updatedBy = `${currentUser.first_name} ${currentUser.last_name}`;
       }
 
       data.assignee = "";
@@ -600,7 +600,7 @@ router.put(
       const currentUser = JSON.parse(user);
       data.updated = new Date();
       if (currentUser) {
-        data.updatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+        data.updatedBy = `${currentUser.first_name} ${currentUser.last_name}`;
       }
 
       delete data["code"];
