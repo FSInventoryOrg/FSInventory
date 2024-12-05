@@ -6,6 +6,7 @@ import {
 import { ApprovalQueryParams, TicketType } from "../../types/support-ticket";
 import { getAppRootDir, getFile } from "../../utils/common";
 import Handlebars from "handlebars";
+import path from "path";
 
 type T = (IAssetRequestTicket | IIssueReportTicket) & {
   employeeRole?: string;
@@ -14,7 +15,13 @@ type T = (IAssetRequestTicket | IIssueReportTicket) & {
 
 export const generateSupportTicketHTML = async (data: T) => {
   const rootDir = getAppRootDir();
-  const templatePath = `${rootDir}\\/src/templates/support-ticket/support-ticket.hbs`;
+  const templatePath = path.join(
+    rootDir,
+    "src",
+    "templates",
+    "support-ticket",
+    "support-ticket.hbs"
+  );
   const templateContent = await getFile(templatePath, true);
 
   Handlebars.registerHelper("isImage", (fileUrl) => {
