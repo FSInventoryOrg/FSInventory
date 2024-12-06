@@ -1,4 +1,4 @@
-import { RocksRole } from "./auth";
+import { RocksRole, BasicUserInfo } from "./auth";
 
 export interface UserType {
   _id: string;
@@ -8,6 +8,7 @@ export interface UserType {
   is_admin: boolean;
   email: string;
   avatar: string;
+  manager: BasicUserInfo;
 }
 
 export interface UploadImage {

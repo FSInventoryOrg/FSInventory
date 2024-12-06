@@ -9,7 +9,7 @@ export type RocksRole =
   | "sales"
   | "contentwriter";
 
-type BasicUserInfo = {
+export type BasicUserInfo = {
   employee_id: number;
   user_id: number;
   role_name: RocksRole;

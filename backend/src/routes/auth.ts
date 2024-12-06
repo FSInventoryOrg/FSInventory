@@ -66,6 +66,7 @@ router.post(
         last_name,
         employee_no,
         role_name: role,
+        managers,
       } = user_details;
       const is_admin: boolean = username === IT_MANAGER;
 
@@ -102,6 +103,7 @@ router.post(
           email: username,
           avatar,
           role,
+          manager: managers[0],
         }),
         {
           httpOnly: true,

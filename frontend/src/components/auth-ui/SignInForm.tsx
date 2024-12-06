@@ -68,6 +68,7 @@ const SignInForm = ({ onError, onSubmit }: SignInFormProps) => {
         is_admin,
         email,
         avatar,
+        managers,
       } = data.user;
 
       setUser({
@@ -78,6 +79,7 @@ const SignInForm = ({ onError, onSubmit }: SignInFormProps) => {
         is_admin,
         email,
         avatar,
+        manager: managers[0],
       });
       setServerError(false);
       showToast({
