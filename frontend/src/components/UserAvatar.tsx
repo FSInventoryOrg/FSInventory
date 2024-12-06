@@ -74,11 +74,13 @@ const UserAvatar = ({ height = 40, width = 40, userInfo }: Props) => {
           <div className="text-md relative gap-2 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 w-full">
             <AppearanceMode /> Dark Mode
           </div>
-          <Link to="/settings">
-            <DropdownMenuItem className="gap-2 text-md">
-              <Settings /> Settings
-            </DropdownMenuItem>
-          </Link>
+          {userInfo?.is_admin && (
+            <Link to="/settings">
+              <DropdownMenuItem className="gap-2 text-md">
+                <Settings /> Settings
+              </DropdownMenuItem>
+            </Link>
+          )}
           <DropdownMenuItem className="gap-2 text-md" disabled>
             <Wrench /> Support
           </DropdownMenuItem>
