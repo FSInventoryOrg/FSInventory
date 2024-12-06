@@ -36,6 +36,12 @@ router.get(
     res: Response
   ) => {
     const { page = 1, limit = 10, type, status, query } = req.query;
+    // TODO: No need to do type assertion. This will be handled by Yul.
+    const user = req.user as unknown as {
+      role: string;
+      email: string;
+      name: string;
+    };
 
     const pageNumber = Number(page);
     const limitNumber = Number(limit);
@@ -53,6 +59,25 @@ router.get(
       ].map((field) => ({
         [field]: { $regex: query, $options: "i" },
       }));
+    }
+
+    // TODO: Use constant for the IT manager's email.
+    // Non-IT managers have restricted access to support tickets
+    if (user.email !== "itmanager@gmail.com") {
+      filters.$or = filters.$or || [];
+
+      // All employees can see the support tickets they created, OR
+      // were created on their behalf
+      filters.$or.push(
+        { createdBy: user.name },
+        { employeeEmail: user.email },
+        { employeeName: user.name }
+      );
+
+      // floor managers can see tickets of employees under their floor
+      if (user.role === "floormanager") {
+        filters.$or.push({ managerEmail: user.email });
+      }
     }
 
     try {
