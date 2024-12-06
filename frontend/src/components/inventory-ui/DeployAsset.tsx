@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -7,7 +7,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
+} from "@/components/ui/sheet";
 import {
   FormControl,
   FormField,
@@ -15,105 +15,117 @@ import {
   FormLabel,
   FormMessage,
   Form,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Input, InputProps } from '../ui/input';
-import { AssetType } from "@/types/asset"
-import { CalendarIcon } from "lucide-react"
+} from "@/components/ui/popover";
+import { Input, InputProps } from "../ui/input";
+import { AssetType } from "@/types/asset";
+import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import * as imsService from '@/ims-service'
-import { useAppContext } from '@/hooks/useAppContext'
-import { Spinner } from '../Spinner'
-import { AssetFormData, AssetSchema} from "@/schemas/DeployAssetSchema";
+import * as imsService from "@/ims-service";
+import { useAppContext } from "@/hooks/useAppContext";
+import { Spinner } from "../Spinner";
+import { AssetFormData, AssetSchema } from "@/schemas/DeployAssetSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { format } from "date-fns"
-import { cn } from "@/lib/utils"
-import { Calendar } from "../ui/calendar"
-import React from "react"
-import { RocketLaunch } from "@phosphor-icons/react"
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Calendar } from "../ui/calendar";
+import React from "react";
+import { RocketLaunch } from "@phosphor-icons/react";
 import { EmployeeType } from "@/types/employee";
 
 interface DeployAssetProps {
-  assetData: AssetType
+  assetData: AssetType;
 }
 
 const DeployAsset = ({ assetData }: DeployAssetProps) => {
-  const queryClient = useQueryClient()
-  const [open, setOpen] = React.useState(false)
-  const [openDeploymentDate, setOpenDeploymentDate] = React.useState(false)
+  const queryClient = useQueryClient();
+  const [open, setOpen] = React.useState(false);
+  const [openDeploymentDate, setOpenDeploymentDate] = React.useState(false);
   const { showToast } = useAppContext();
 
   const form = useForm<z.infer<typeof AssetSchema>>({
     resolver: zodResolver(AssetSchema),
     defaultValues: {
       code: assetData.code,
-      assignee: '',
+      assignee: "",
       deploymentDate: undefined,
-    }
+    },
   });
 
   const { mutate, isPending } = useMutation({
-    mutationKey: ['deployAsset'],
+    mutationKey: ["deployAsset"],
     mutationFn: imsService.deployAsset,
     onSuccess: async () => {
-      showToast({ message: 'Asset deployed successfully!', type: 'SUCCESS' });
-      queryClient.invalidateQueries({ queryKey: ['fetchAllAssets'] });
-      queryClient.invalidateQueries({ queryKey: ['fetchAssetsByProperty'] });
+      showToast({ message: "Asset deployed successfully!", type: "SUCCESS" });
+      queryClient.invalidateQueries({ queryKey: ["fetchAllAssets"] });
+      queryClient.invalidateQueries({ queryKey: ["fetchAssetsByProperty"] });
       queryClient.invalidateQueries({
-        queryKey: ['fetchAllAssetsByStatusAndCategory'],
+        queryKey: ["fetchAllAssetsByStatusAndCategory"],
       });
-      queryClient.invalidateQueries({ queryKey: ['fetchEmployees'] });
-      queryClient.invalidateQueries({ queryKey: ['fetchEmployeeByCode'] });
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployees"] });
+      queryClient.invalidateQueries({ queryKey: ["fetchEmployeeByCode"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
       setTimeout(() => {
         setOpen(false);
       }, 100);
     },
     onError: (error: Error) => {
-      showToast({ message: error.message, type: 'ERROR' });
+      showToast({ message: error.message, type: "ERROR" });
     },
   });
 
   const onSubmit = (data: z.infer<typeof AssetSchema>) => {
     const currentTime = new Date();
-    data.deploymentDate.setHours(currentTime.getHours(), currentTime.getMinutes(), currentTime.getSeconds(), currentTime.getMilliseconds());
+    data.deploymentDate.setHours(
+      currentTime.getHours(),
+      currentTime.getMinutes(),
+      currentTime.getSeconds(),
+      currentTime.getMilliseconds()
+    );
     const deployedAsset: AssetFormData & { _id: string } = {
       ...data,
       code: assetData.code,
       _id: assetData._id,
-    }
+    };
     mutate({ code: assetData.code, deployedAsset: deployedAsset });
-  }
+  };
 
   React.useEffect(() => {
     if (open) {
-      form.reset()
+      form.reset();
     }
-  }, [open, form])
+  }, [open, form]);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button className="w-[90px] justify-between h-8 px-2 gap-2 text-xs font-semibold" variant='secondary'>
+        <Button
+          className="w-[90px] justify-between h-8 px-2 gap-2 text-xs font-semibold"
+          variant="secondary"
+        >
           Deploy
           <RocketLaunch weight="fill" size={16} />
         </Button>
       </SheetTrigger>
-      <SheetContent className='h-full overflow-y-scroll w-full'>
+      <SheetContent className="h-full overflow-y-scroll w-full">
         <SheetHeader>
           <SheetTitle>Deploy asset {assetData.code}</SheetTitle>
           <SheetDescription>
-            Fill-up the deployment details below. All fields are required for deployment.
+            Fill-up the deployment details below. All fields are required for
+            deployment.
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
-          <form className="flex flex-col gap-4 py-4 w-full" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            className="flex flex-col gap-4 py-4 w-full"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
             <div className="flex flex-col gap-2 w-full">
               <FormLabel htmlFor="assignee" className="">
                 Assignee
@@ -122,12 +134,12 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
                 control={form.control}
                 name="assignee"
                 render={({ field }) => (
-                  <FormItem className='w-full'>
+                  <FormItem className="w-full">
                     <FormControl>
-                      <EmployeeSuggestiveInput 
-                        placeholder='e.g. Juan De La Cruz, Joe Smith' 
-                        autoComplete='off' 
-                        type='input' 
+                      <EmployeeSuggestiveInput
+                        placeholder="e.g. Juan De La Cruz, Joe Smith"
+                        autoComplete="off"
+                        type="input"
                         field={field}
                         className="w-full"
                       />
@@ -146,7 +158,10 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
                 name="deploymentDate"
                 render={({ field }) => (
                   <FormItem className="flex flex-col w-full">
-                    <Popover open={openDeploymentDate} onOpenChange={setOpenDeploymentDate} >
+                    <Popover
+                      open={openDeploymentDate}
+                      onOpenChange={setOpenDeploymentDate}
+                    >
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
@@ -170,9 +185,7 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
                           mode="single"
                           onSelect={field.onChange}
                           onDayClick={() => setOpenDeploymentDate(false)}
-                          disabled={(date) =>
-                            date < new Date("1900-01-01")
-                          }
+                          disabled={(date) => date < new Date("1900-01-01")}
                         />
                       </PopoverContent>
                     </Popover>
@@ -182,8 +195,12 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
               />
             </div>
             <SheetFooter>
-              <Button type="submit" disabled={isPending} className="gap-2 font-semibold">
-                {isPending ? <Spinner size={18}/> : null }
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="gap-2 font-semibold"
+              >
+                {isPending ? <Spinner size={18} /> : null}
                 Deploy {assetData.code}
               </Button>
             </SheetFooter>
@@ -191,8 +208,8 @@ const DeployAsset = ({ assetData }: DeployAssetProps) => {
         </Form>
       </SheetContent>
     </Sheet>
-  )
-}
+  );
+};
 
 export default DeployAsset;
 
@@ -200,45 +217,63 @@ interface SuggestiveInputProps extends InputProps {
   placeholder?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   field?: any;
-  includeUnregistered?: string
+  includeUnregistered?: string;
 }
 
-export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, SuggestiveInputProps>(
-  ({ placeholder, field, className, autoComplete, type, includeUnregistered }, ref) => {
-    const { data: employees } = useQuery<EmployeeType[]>({ 
-      queryKey: [includeUnregistered ? 'fetchAllEmployeesIncludeUnregistered' : 'fetchAllEmployees'], 
+export const EmployeeSuggestiveInput = React.forwardRef<
+  HTMLInputElement,
+  SuggestiveInputProps
+>(
+  (
+    { placeholder, field, className, autoComplete, type, includeUnregistered },
+    ref
+  ) => {
+    const { data: employees } = useQuery<EmployeeType[]>({
+      queryKey: [
+        includeUnregistered
+          ? "fetchAllEmployeesIncludeUnregistered"
+          : "fetchAllEmployees",
+      ],
       queryFn: () => imsService.fetchAllEmployees(includeUnregistered),
     });
 
-    const [filteredOptions, setFilteredOptions] = React.useState<EmployeeType[]>([]);
-    const [showSuggestions, setShowSuggestions] = React.useState<boolean>(false);
+    const [filteredOptions, setFilteredOptions] = React.useState<
+      EmployeeType[]
+    >([]);
+    const [showSuggestions, setShowSuggestions] =
+      React.useState<boolean>(false);
     const [selectedIndex, setSelectedIndex] = React.useState<number>(-1);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const searchTerm = event.target.value.toLowerCase().trim();
-      const filtered = employees?.filter(employee =>
-        `${employee.firstName} ${employee.lastName}`.toLowerCase().includes(searchTerm) || `${employee.code}`.toLowerCase().includes(searchTerm)
-      ) || [];
+      const filtered =
+        employees?.filter(
+          (employee) =>
+            `${employee.first_name} ${employee.last_name}`
+              .toLowerCase()
+              .includes(searchTerm) ||
+            `${employee.code}`.toLowerCase().includes(searchTerm)
+        ) || [];
       setFilteredOptions(filtered);
       setShowSuggestions(filtered.length > 0);
       setSelectedIndex(-1);
       field.onChange(event.target.value);
     };
-    
+
     const handleSuggestionClick = (option: EmployeeType) => {
       setFilteredOptions([]);
       setSelectedIndex(-1);
       // Set the form value to the employee code
       field.onChange(option.code);
       setTimeout(() => {
-        if(showSuggestions) {
+        if (showSuggestions) {
           setShowSuggestions(false);
         }
-      }, 500)
+      }, 500);
     };
-    
+
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === 'Enter') {
+      if (event.key === "Enter") {
         event.preventDefault();
         if (selectedIndex >= 0 && selectedIndex < filteredOptions.length) {
           field.onChange(filteredOptions[selectedIndex].code);
@@ -251,20 +286,30 @@ export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, Sugges
           setShowSuggestions(false); // Hide suggestions when Enter is pressed
           setSelectedIndex(-1); // Reset selected index
         }
-      } else if (event.key === 'ArrowDown') {
+      } else if (event.key === "ArrowDown") {
         event.preventDefault();
-        setSelectedIndex((prevIndex) => (prevIndex + 1) % filteredOptions.length);
-      } else if (event.key === 'ArrowUp') {
+        setSelectedIndex(
+          (prevIndex) => (prevIndex + 1) % filteredOptions.length
+        );
+      } else if (event.key === "ArrowUp") {
         event.preventDefault();
-        setSelectedIndex((prevIndex) => (prevIndex - 1 + filteredOptions.length) % filteredOptions.length);
-      } else if (event.key === 'Tab' && showSuggestions) {
-        event.preventDefault(); 
+        setSelectedIndex(
+          (prevIndex) =>
+            (prevIndex - 1 + filteredOptions.length) % filteredOptions.length
+        );
+      } else if (event.key === "Tab" && showSuggestions) {
+        event.preventDefault();
         if (!event.shiftKey) {
-          setSelectedIndex((prevIndex) => (prevIndex + 1) % filteredOptions.length);
+          setSelectedIndex(
+            (prevIndex) => (prevIndex + 1) % filteredOptions.length
+          );
         } else {
-          setSelectedIndex((prevIndex) => (prevIndex - 1 + filteredOptions.length) % filteredOptions.length);
+          setSelectedIndex(
+            (prevIndex) =>
+              (prevIndex - 1 + filteredOptions.length) % filteredOptions.length
+          );
         }
-      } else if (event.key === 'Escape' && showSuggestions) {
+      } else if (event.key === "Escape" && showSuggestions) {
         event.preventDefault();
         setShowSuggestions(false);
       }
@@ -272,16 +317,21 @@ export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, Sugges
 
     React.useEffect(() => {
       if (showSuggestions && selectedIndex !== -1) {
-        const suggestionElement = document.getElementById(`suggestion_${selectedIndex}`);
+        const suggestionElement = document.getElementById(
+          `suggestion_${selectedIndex}`
+        );
         if (suggestionElement) {
-          suggestionElement.scrollIntoView({ behavior: "auto", block: "nearest" });
+          suggestionElement.scrollIntoView({
+            behavior: "auto",
+            block: "nearest",
+          });
         }
       }
     }, [showSuggestions, selectedIndex]);
 
     const handleInputBlur = () => {
       setTimeout(() => {
-        if(showSuggestions) {
+        if (showSuggestions) {
           setShowSuggestions(false);
         }
       }, 750);
@@ -289,13 +339,17 @@ export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, Sugges
 
     const inputLabel = () => {
       try {
-        const findName = employees?.find(f => f?.code === field?.value)
-        return findName ? `${findName?.firstName} ${findName?.lastName}` : field?.value
-      } catch (errLabel) { return field?.value || '' }
-    }
+        const findName = employees?.find((f) => f?.code === field?.value);
+        return findName
+          ? `${findName?.first_name} ${findName?.last_name}`
+          : field?.value;
+      } catch (errLabel) {
+        return field?.value || "";
+      }
+    };
 
     return (
-      <div className='relative w-full'>
+      <div className="relative w-full">
         <Input
           ref={ref}
           type={type}
@@ -310,24 +364,38 @@ export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, Sugges
         <Input
           ref={ref}
           type="hidden"
-          value={filteredOptions.length > 0 ? `${filteredOptions[0].firstName} ${filteredOptions[0].lastName}` : field.value}
+          value={
+            filteredOptions.length > 0
+              ? `${filteredOptions[0].first_name} ${filteredOptions[0].last_name}`
+              : field.value
+          }
           {...field}
         />
         {showSuggestions && filteredOptions.length > 0 && (
-          <div className='max-h-[200px] overflow-y-scroll absolute top-full left-0 bg-popover border border-border w-full z-50 rounded-lg my-1 p-1'>
+          <div className="max-h-[200px] overflow-y-scroll absolute top-full left-0 bg-popover border border-border w-full z-50 rounded-lg my-1 p-1">
             {filteredOptions.map((option, index) => (
-              <div 
-                key={index} 
-                className={cn('p-1 w-full justify-start gap-2 grid-cols-3 grid', {
-                  'bg-accent': index === selectedIndex,
-                })}
+              <div
+                key={index}
+                className={cn(
+                  "p-1 w-full justify-start gap-2 grid-cols-3 grid cursor-pointer",
+                  {
+                    "bg-accent": index === selectedIndex,
+                  }
+                )}
                 onClick={() => handleSuggestionClick(option)}
-                cursor-pointer
               >
-                {option?.state === 'UNREGISTERED' ? (
-                  <><span className="px-3 py-1.5 rounded-md text-start bg-muted font-semibold text-muted-foreground cursor-pointer text-destructive text-xs tracking-tight">UNREGISTERED</span><span className="text-start col-span-2 cursor-pointer">{`${option.code}`}</span></>
+                {option?.state === "UNREGISTERED" ? (
+                  <>
+                    <span className="px-3 py-1.5 rounded-md text-start bg-muted font-semibold text-muted-foreground cursor-pointer text-destructive text-xs tracking-tight">
+                      UNREGISTERED
+                    </span>
+                    <span className="text-start col-span-2 cursor-pointer">{`${option.code}`}</span>
+                  </>
                 ) : (
-                  <><span className="px-3 py-1.5 rounded-md text-start bg-muted font-semibold text-sm text-muted-foreground cursor-pointer">{`${option.code}`}</span><span className="text-start col-span-2 cursor-pointer">{`${option.firstName} ${option.lastName}`}</span></>
+                  <>
+                    <span className="px-3 py-1.5 rounded-md text-start bg-muted font-semibold text-sm text-muted-foreground cursor-pointer">{`${option.code}`}</span>
+                    <span className="text-start col-span-2 cursor-pointer">{`${option.first_name} ${option.last_name}`}</span>
+                  </>
                 )}
               </div>
             ))}
@@ -337,3 +405,5 @@ export const EmployeeSuggestiveInput = React.forwardRef<HTMLInputElement, Sugges
     );
   }
 );
+
+EmployeeSuggestiveInput.displayName = "EmployeeSuggestiveInput";

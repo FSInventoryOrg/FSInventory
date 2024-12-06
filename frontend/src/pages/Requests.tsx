@@ -7,7 +7,7 @@ const Requests = () => {
   const { data: user } = useUserData();
 
   const userData = {
-    employeeName: user ? `${user.firstName} ${user.lastName}` : "",
+    employeeName: user ? `${user.first_name} ${user.last_name}` : "",
     managerName: "John Doe", // TODO: replace with actual data from Rocks
     employeeEmail: user?.email || "",
   };

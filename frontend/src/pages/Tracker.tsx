@@ -61,7 +61,7 @@ const Tracker = () => {
     // Add registered employees
     if (registeredEmployees) {
       registeredEmployees.forEach((employee: EmployeeType) => {
-        const name = `${employee.firstName} ${employee.lastName}`;
+        const name = `${employee.first_name} ${employee.last_name}`;
         allEmployees.push({
           ...employee,
           name: name,
@@ -77,15 +77,15 @@ const Tracker = () => {
         if (name && employeeCodes.has(name)) return;
         // Unregistered employees are added to allEmployees
         const nameParts = name.split(" ");
-        const lastName = nameParts.pop()!;
-        const firstName = nameParts.join(" ");
+        const last_name = nameParts.pop()!;
+        const first_name = nameParts.join(" ");
         if (!employeesAdded.has(name)) {
           allEmployees.push({
             _id: "", // Assign a unique ID or leave it empty if it's not available
             code: "", // You can assign a code or leave it empty
-            firstName: firstName,
-            middleName: "",
-            lastName: lastName,
+            first_name: first_name,
+            middle_name: "",
+            last_name: last_name,
             name: name,
             position: "",
             startDate: new Date(),
@@ -257,7 +257,7 @@ const Tracker = () => {
                 assignee={
                   selectedEmployee.code
                     ? selectedEmployee.code
-                    : `${selectedEmployee.firstName} ${selectedEmployee.lastName}`
+                    : `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
                 }
               />
             ) : (
