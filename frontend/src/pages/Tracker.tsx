@@ -113,26 +113,47 @@ const Tracker = () => {
   const handleFilters = (filters: string[]) => {
     const allEmployees = mergeEmployees();
     if (!allEmployees) return; // Ensure employees data is available
+    const statuses = ["Active", "Inactive", "Registered", "Unregistered"];
+    const positionFilters = filters.filter(
+      (posFilter) => !statuses.includes(posFilter)
+    );
 
-    const filteredEmployees = allEmployees.filter((employee) => {
-      const statuses = ["Active", "Inactive", "Registered", "Unregistered"];
+    // Filter employees based on their status
+    const filteredStatusEmployees = allEmployees.filter((employee) => {
+      if (filters.length === 0) return true;
+      if (filters.every((filter) => !statuses.includes(filter))) return true;
+
       return filters.some((filter) => {
         if (statuses.includes(filter)) {
-          if (filter === "Active" && !employee.isActive) return false;
-          if (filter === "Inactive" && employee.isActive) return false;
-          if (filter === "Registered" && !employee.isRegistered) return false;
-          if (filter === "Unregistered" && employee.isRegistered) return false;
-          return true;
-        } else if (employeePositions?.includes(filter)) {
-          // filter for position
-          return employee.position?.toLowerCase() === filter.toLowerCase();
+          if (filter === "Active" && employee.isActive) {
+            return true;
+          }
+          if (filter === "Inactive" && !employee.isActive) {
+            return true;
+          }
+          if (filter === "Registered" && employee.isRegistered) {
+            return true;
+          }
+          if (filter === "Unregistered" && !employee.isRegistered) {
+            return true;
+          }
+          return false;
         }
-        return Object.values(employee).some((value) => {
-          return value?.toString().toLowerCase() === filter.toLowerCase();
-        });
+
+        return false;
       });
     });
 
+    // Filter Employees based position
+    const filteredEmployees = filteredStatusEmployees.filter((employee) => {
+      if (positionFilters.length === 0) return true;
+      return filters.some((filter) => {
+        if (employeePositions?.includes(filter)) {
+          return employee.position?.toLowerCase() === filter.toLowerCase();
+        }
+        return false;
+      });
+    });
     setEmployees(filteredEmployees);
   };
 

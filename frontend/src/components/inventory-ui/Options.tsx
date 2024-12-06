@@ -1,5 +1,5 @@
 import React from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as imsService from "@/ims-service";
 import { useAppContext } from "@/hooks/useAppContext";
 import { FormControl } from "@/components/ui/form";
@@ -65,6 +65,7 @@ const Options = ({
     property: property,
     value: "",
   });
+  const queryClient = useQueryClient();
   const [optionToEdit, setOptionToEdit] = React.useState<string>("");
   const [isCreating, setIsCreating] = React.useState<boolean>(false);
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
@@ -137,6 +138,12 @@ const Options = ({
   const { mutate: updateAssetCounter, isPending: isUpdateAssetCounterPending } =
     useMutation({
       mutationFn: imsService.updateAssetCounter,
+      onSuccess: async (status) => {
+        if (status === 201) {
+          // assetcounter is created
+          queryClient.invalidateQueries({ queryKey: ["fetchAssetCounters"] });
+        }
+      },
     });
 
   const findIndexInOptions = (optionVal: string) => {
@@ -156,7 +163,7 @@ const Options = ({
   };
   const handleUpdateOption = (
     updatedOption: OptionType,
-    updatedAssetCounter?: AssetCounterType & { oldPrefixCode: string }
+    updatedAssetCounter?: AssetCounterType & { oldPrefixCode?: string }
   ) => {
     const indexOfValueToEdit = findIndexInOptions(optionToEdit);
     updateOptionValue({
@@ -178,11 +185,13 @@ const Options = ({
         prefixCode,
         updatedAssetCounter: rest,
       });
-      updateAssetPrefixCodes({
-        property: "code",
-        value: prefixCode,
-        newValue: rest.prefixCode,
-      });
+      if (rest.prefixCode && prefixCode) {
+        updateAssetPrefixCodes({
+          property: "code",
+          value: prefixCode,
+          newValue: rest.prefixCode,
+        });
+      }
     }
     if (indexOfValueToEdit === findIndexInOptions(field.value)) {
       field.onChange(

@@ -81,7 +81,7 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
   });
 
   const { data: currentAssets } = useQuery({
-    queryKey: ["fetchAssetsByProperty", "assignee", assignee],
+    queryKey: ["fetchAssetsByProperty", "assignee", assignee.trim()],
     queryFn: () => imsService.fetchAssetsByProperty("assignee", assignee),
     enabled: !!employee,
   });

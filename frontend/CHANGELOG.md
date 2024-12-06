@@ -2,6 +2,41 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.28.2](https://connect.zoho.com/portal/intranet/task/623367000001000135) 2024-12-4
+### Fixed
+- Fixed Sorting issues on Inventory Table with date columns (Purchase Date, Deployment Date, Recovery Date).
+
+## [2.28.1](https://connect.zoho.com/portal/intranet/task/623367000000943123) 2024-11-13
+### Fixed
+- Fix the edit issue on Status and Equipment Type
+
+## [2.28.0](https://workplace.zoho.com/#connect_app/portal/intranet/task/623367000000860293) 2024-11-12
+## Added
+- Prefix Code is now editable when editing a category in the Settings/Inventory page
+## [2.27.0](https://connect.zoho.com/portal/intranet/task/623367000000892241) 2024-11-21
+### Added
+- UI design to IT services request form and no tickets page
+
+## [2.26.1](https://connect.zoho.com/portal/intranet/task/623367000000968011) 2024-11-21
+### Fixed
+- Fixed Assets list of Unregistered Employee not refreshing / up to date when an asset is recovered.
+
+## [2.26.0](https://connect.zoho.com/portal/intranet/task/623367000000853258) 2024-11-22
+### Changed
+- Updated functionality of filter logic on tracker page, also updated view all text and onClickOutside filter functionality
+
+## [2.25.4](https://connect.zoho.com/portal/intranet/task/623367000000942387) 2024-11-20
+### Fixed
+- Fixed delete issue on options, added reset state when changes are detected on edit
+
+## [2.25.3](https://connect.zoho.com/portal/intranet/task/623367000000943123) 2024-11-13
+### Fixed
+- Fix the edit issue on Status and Equipment Type for Inventory Page
+
+## [2.25.2](https://connect.zoho.com/portal/intranet/task/623367000000992150) 2024-11-20
+### Fixed
+- Fixed Total Assets Count whenever the Type is changed which carried over the previous status, category, processor, memory and storage filters causing the bug
+
 ## [2.25.1](https://connect.zoho.com/portal/intranet/task/623367000000940439) 2024-11-11
 ### Fixed
 - Formatted all keys containing the word "date" in the assets to MM/DD/YYYY format before exporting

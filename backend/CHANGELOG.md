@@ -2,6 +2,21 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.21.1](https://connect.zoho.com/portal/intranet/task/623367000001068001) 2024-12-04
+### Fixed
+- Fix public folder referencing by tracking backend/public directories and include error as response for automail endpoints
+- Fix error when triggering manual send now in automated report
+
+## [2.21.0](https://connect.zoho.com/portal/intranet/task/623367000000992438) 2024-11-15
+### Added
+- Added an email notification to managers when an employee files a support ticket
+
+## [2.20.0](https://connect.zoho.com/portal/intranet/task/623367000000992200) 2024-11-15
+### Added
+- Added the endpoints for the support ticket feature
+- Added the models for the support ticket feature
+- Added the validation for the support ticket feature
+
 ## [2.19.2](https://connect.zoho.com/portal/intranet/task/623367000000878021) 2024-11-04
 ### Changed
 -  Delete category option logic to also delete associated asset counter

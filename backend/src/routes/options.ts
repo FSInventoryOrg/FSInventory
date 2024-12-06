@@ -160,7 +160,7 @@ router.put(
     check("softwareCategory").optional().isString(),
     check("hardwareCategory").optional().isString(),
     check("equipmentType").optional().isString(),
-    check("deployableStatus").isArray(),
+    check("deployableStatus").optional().isArray(),
     check("retrievableStatus").optional().isString(),
     check("inventoryColumns").optional().isArray(),
   ],
@@ -328,7 +328,7 @@ router.put(
         );
         if (existingValue) {
           return res.status(400).json({
-            message: "Value already exists for the specified property",
+            message: `The ${format(property)} '${existingValue.value}' already exists.`,
           });
         }
       } else {
@@ -339,7 +339,7 @@ router.put(
         );
         if (existingValue) {
           return res.status(400).json({
-            message: "Value already exists for the specified property",
+            message: `The ${format(property)} '${existingValue}' already exists.`,
           });
         }
       }

@@ -114,6 +114,23 @@ const SidebarFilters = ({
     setPrevTotalAssets(totalAssets);
   };
 
+  const resetFilterSettings = () => {
+    handleStatusClick("all");
+    onCategoryChange("all");
+    onProcessorChange("all");
+    onMemoryChange("all");
+    onStorageChange("all");
+  };
+
+  const handleTypeClick = (type: string) => {
+    if (type !== selectedType) {
+      onTypeChange(type);
+      resetFilterSettings();
+    } else {
+      onTypeChange("");
+    }
+  };
+
   return (
     <section className="w-full flex flex-col">
       <div className="flex items-end justify-between mr-8 pb-3 xl:pb-4">
@@ -173,7 +190,7 @@ const SidebarFilters = ({
               <Button
                 variant="outline"
                 className={`bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2  ${selectedType === "Hardware" ? "border-primary" : ""}`}
-                onClick={() => onTypeChange("Hardware")}
+                onClick={() => handleTypeClick("Hardware")}
               >
                 Hardware
                 <MonitorSmartphoneIcon size={18} />
@@ -181,7 +198,7 @@ const SidebarFilters = ({
               <Button
                 variant="outline"
                 className={`bg-muted rounded-xl border-2 flex w-full justify-between h-fit py-1.5 px-2 text-xs gap-2  ${selectedType === "Software" ? "border-primary" : ""}`}
-                onClick={() => onTypeChange("Software")}
+                onClick={() => handleTypeClick("Software")}
               >
                 Software
                 <CodeIcon size={18} />

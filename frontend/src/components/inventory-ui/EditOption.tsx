@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ChevronLeftIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { capitalize, format } from "@/lib/utils";
@@ -24,7 +24,7 @@ interface EditOptionProps {
   onDelete: (optionToDelete: string) => void;
   onUpdate: (
     updatedOption: OptionType,
-    updatedAssetCounter?: AssetCounterType & { oldPrefixCode: string }
+    updatedAssetCounter?: AssetCounterType & { oldPrefixCode?: string }
   ) => void;
   isUpdatePending: boolean;
   onEnterPressed?: () => void;
@@ -43,10 +43,13 @@ const EditOption = ({
   const [openDeleteOptionDialog, setOpenDeleteOptionDialog] = useState(false);
   const isObject: boolean = typeof option.value === "object";
   const propertyIsCategory: boolean = property === "category";
-  const [newPrefixCode, setNewPrefixCode] = useState("");
+  const [newPrefixCode, setNewPrefixCode] = useState<string | undefined>();
+  const [oldPrefixCode, setOldPrefixCode] = useState<string | undefined>();
   const [prefixCodeError, setPrefixCodeError] = useState("");
   const [optionError, setOptionError] = useState("");
   const { showToast } = useAppContext();
+
+  const isCategoryType = useMemo(() => property === "category", [property]);
 
   const {
     newOption: editedOption,
@@ -55,57 +58,73 @@ const EditOption = ({
     getOptionValue,
   } = useOption(option);
 
-  const {
-    getAssetCounterFromCategory,
-    updateAssetCounterInCache,
-    assetCounters,
-  } = useAssetCounter(propertyIsCategory, option);
-  const assetCounter = getAssetCounterFromCategory() ?? undefined;
-  const { prefixCode: oldPrefixCode } = assetCounter ?? { prefixCode: "" };
+  const { updateAssetCounterInCache, assetCounters, assetCounter } =
+    useAssetCounter(propertyIsCategory, option);
+
+  const [originalValue] = useState(editedOption.value);
+
+  const isValueSame = useMemo(
+    () => getOptionValue(editedOption.value) === getOptionValue(originalValue),
+    [editedOption.value, getOptionValue, originalValue]
+  );
+
+  const isPrefixCodeSame = !!newPrefixCode && oldPrefixCode === newPrefixCode;
+
+  const handleInputChange = (value: string) => {
+    setEditedOption({
+      property: property,
+      value: isObject ? { ...(option.value as object), value: value } : value,
+    });
+  };
 
   const handleCancel = () => {
     onCancel();
     setEditedOption({ property, value: "" });
   };
 
-  const handleUpdate = () => {
-    const isPrefixCodeChanged: boolean =
-      !!newPrefixCode && oldPrefixCode !== newPrefixCode;
-
-    if (newPrefixCode === "") {
-      setPrefixCodeError("Prefix code can not be empty");
-      throw new Error("Prefix code can not be empty");
-    }
-
-    if (optionError) {
-      throw new Error(`${capitalize(property)} name can not be empty`);
-    }
-
-    if (assetCounters) {
-      const prefixCodeExists: boolean = !!assetCounters.find(
-        (assetCounter: AssetCounterType) =>
-          assetCounter.prefixCode === newPrefixCode
-      );
-      if (prefixCodeExists && isPrefixCodeChanged) {
-        setPrefixCodeError("Prefix code already exists");
-        throw new Error(`Prefix code ${newPrefixCode} already exists`);
-      }
-    }
-
+  const handleCategoryUpdate = () => {
     const category: string =
       typeof editedOption.value === "object" ? editedOption.value.value : "";
 
-    if (isPrefixCodeChanged && !!assetCounter && !!newPrefixCode) {
-      onUpdate(editedOption, {
-        ...assetCounter,
-        category,
-        prefixCode: newPrefixCode,
-        oldPrefixCode,
-      });
+    if (assetCounter && category) {
+      const isCategoryNameChanged = category !== assetCounter.category;
+      const isPrefixCodeChanged = !isPrefixCodeSame;
+
+      if (isPrefixCodeChanged && isCategoryNameChanged) {
+        onUpdate(editedOption, {
+          ...assetCounter,
+          category,
+          prefixCode: newPrefixCode!,
+          oldPrefixCode,
+        });
+        // CHECK IF ONLY THE CATEGORY NAME IS CHANGED
+      } else if (isCategoryNameChanged) {
+        onUpdate(editedOption, {
+          ...assetCounter,
+          category,
+          oldPrefixCode,
+        });
+        // CHECK IF ONLY THE PREFIX CODE IS CHANGED
+      } else if (isPrefixCodeChanged) {
+        onUpdate(editedOption, {
+          ...assetCounter,
+          prefixCode: newPrefixCode!,
+          oldPrefixCode,
+        });
+      }
       updateAssetCounterInCache(assetCounter._id!, {
         prefixCode: newPrefixCode,
         category,
       });
+    }
+  };
+
+  const handleUpdate = () => {
+    if (optionError) {
+      throw new Error(`${capitalize(property)} name can not be empty`);
+    }
+    if (isCategoryType) {
+      handleCategoryUpdate();
     } else {
       onUpdate(editedOption);
     }
@@ -114,18 +133,34 @@ const EditOption = ({
   const optionToEdit = getOptionValue(editedOption.value);
 
   useEffect(() => {
-    if (propertyIsCategory && newPrefixCode === "") {
-      setNewPrefixCode(oldPrefixCode);
+    if (propertyIsCategory && option) {
+      const { prefixCode } = assetCounter ?? { prefixCode: "" };
+      setOldPrefixCode(prefixCode);
+      if (prefixCode && newPrefixCode === undefined) {
+        setNewPrefixCode(prefixCode);
+      }
     }
-  }, [propertyIsCategory, assetCounter, oldPrefixCode, newPrefixCode]);
+  }, [option, propertyIsCategory, newPrefixCode, assetCounter]);
 
   useEffect(() => {
+    if (!isCategoryType) return;
+
     if (newPrefixCode === "" || newPrefixCode === undefined) {
       setPrefixCodeError("Prefix code can not be empty");
+    } else if (assetCounters && assetCounter) {
+      const isDuplicatePrefixCode = assetCounters.find(
+        (ac: AssetCounterType) =>
+          ac.prefixCode === newPrefixCode && ac._id !== assetCounter._id
+      );
+      if (isDuplicatePrefixCode) {
+        setPrefixCodeError(`Prefix code ${newPrefixCode} is already assigned`);
+      } else {
+        setPrefixCodeError("");
+      }
     } else {
       setPrefixCodeError("");
     }
-  }, [newPrefixCode]);
+  }, [newPrefixCode, isCategoryType, assetCounters, assetCounter]);
 
   useEffect(() => {
     if (getOptionValue(editedOption.value) === "") {
@@ -133,7 +168,8 @@ const EditOption = ({
     } else {
       setOptionError("");
     }
-  }, [editedOption.value, property, getOptionValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editedOption.value, property]);
 
   return (
     <>
@@ -158,12 +194,7 @@ const EditOption = ({
         type="input"
         className="focus-visible:ring-0 focus-visible:ring-popover"
         onChange={(e) => {
-          setEditedOption({
-            property: property,
-            value: isObject
-              ? { ...(option.value as object), value: e.target.value }
-              : e.target.value,
-          });
+          handleInputChange(e.target.value);
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
@@ -213,7 +244,12 @@ const EditOption = ({
       <div className="flex justify-between">
         <Button
           className="gap-2"
-          disabled={!!prefixCodeError || !!optionError || isUpdatePending}
+          disabled={
+            !!prefixCodeError ||
+            !!optionError ||
+            isUpdatePending ||
+            (isValueSame && isPrefixCodeSame)
+          }
           type="button"
           onClick={() => {
             try {
@@ -233,10 +269,12 @@ const EditOption = ({
     disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
           onClick={(event) => {
             event.preventDefault();
-            setOpenDeleteOptionDialog(true);
+            isValueSame
+              ? setOpenDeleteOptionDialog(true)
+              : handleInputChange(getOptionValue(originalValue));
           }}
         >
-          Delete
+          {isValueSame ? "Delete" : "Reset"}
         </Button>
         <DeletePropertyDialog
           open={openDeleteOptionDialog}
