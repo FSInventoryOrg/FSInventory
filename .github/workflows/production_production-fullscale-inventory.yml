@@ -22,11 +22,13 @@ jobs:
           node-version: '20.x'
 
       # Install and build the React frontend
+      # using npm run start, since the existing package.json 
+      # uses npm run start to build a NODE_ENV for production
       - name: Install and build frontend
         run: |
           cd frontend
           npm install
-          npm run build
+          npm run start
 
       # Install backend dependencies
       - name: Install backend dependencies
