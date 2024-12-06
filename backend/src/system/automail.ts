@@ -1,9 +1,7 @@
 import express, { Request, Response } from "express";
-import jwt from "jsonwebtoken";
-import verifyToken from "../middleware/auth";
+import verifyToken, { verifyRole } from "../middleware/auth";
 import AutoMail, { AutoMailType } from "../models/automail.schema";
 import mongoose from "mongoose";
-import User from "../models/user.schema";
 import { createExcelTable, saveFile } from "../utils/common";
 import { AutoMailReportTemplate } from "../reports-template/mail/auto-mail-report";
 import Employee from "../models/employee.schema";
@@ -31,7 +29,7 @@ const activateAutoMailing = async (data: any, now?: boolean) => {
 
       if (findEmployee)
         value["assignee"] =
-          `${findEmployee["firstName"]} ${findEmployee["lastName"]}`;
+          `${findEmployee["first_name"]} ${findEmployee["last_name"]}`;
     }
     if (value.recoveredFrom) {
       const findEmployee = allEmployees.find(
@@ -40,7 +38,7 @@ const activateAutoMailing = async (data: any, now?: boolean) => {
 
       if (findEmployee)
         value["recoveredFrom"] =
-          `${findEmployee["firstName"]} ${findEmployee["lastName"]}`;
+          `${findEmployee["first_name"]} ${findEmployee["last_name"]}`;
     }
 
     value["purchaseDate"] =
@@ -206,113 +204,90 @@ export const renewAutoMailingActivation = async () => {
   }
 };
 
-router.post("/", verifyToken, async (req: Request, res: Response) => {
-  try {
-    const token = req.cookies.auth_token;
-    const decodedToken: any = jwt.verify(
-      token,
-      process.env.JWT_SECRET_KEY as string
-    );
+router.post(
+  "/",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    try {
+      const { user } = req.cookies;
 
-    if (decodedToken.role !== "ADMIN") {
-      return res.status(403).json({
-        message: "Only users with admin role can perform this action",
+      const currentUser: any = JSON.parse(user);
+
+      const doc: any = req.body;
+
+      if (!doc)
+        return res.status(422).json({ message: "Cannot process the payload" });
+
+      let newData: any = {
+        frequency: doc["frequency"],
+        day: doc["day"],
+        weekday: doc["weekday"],
+        time: doc["time"],
+        recipient: doc["recipient"],
+        contact: doc["contact"],
+      };
+
+      let existingSettings: any = await AutoMail.aggregate().match({});
+
+      existingSettings = existingSettings ? existingSettings[0] : null;
+
+      const idToUsed = existingSettings
+        ? existingSettings._id
+        : new mongoose.Types.ObjectId();
+
+      if (existingSettings) delete existingSettings._id;
+
+      newData = nextRollComputatuion({ ...existingSettings, ...newData });
+
+      if (!newData.created) {
+        newData["created"] = new Date();
+        newData["createdby"] =
+          `${currentUser["first_name"]} ${currentUser["last_name"]}`;
+      }
+      newData["updated"] = new Date();
+      newData["updatedby"] =
+        `${currentUser["first_name"]} ${currentUser["last_name"]}`;
+
+      await AutoMail.updateOne({ _id: idToUsed }, newData, { upsert: true });
+
+      await renewAutoMailingActivation();
+
+      return res.status(200).json({
+        message: "Auto generated mail reports configurations has been set",
+        data: newData,
       });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Something went wrong", error });
     }
-
-    const currentUser: any = await User.findOne({ _id: decodedToken.userId });
-
-    const doc: any = req.body;
-
-    if (!doc)
-      return res.status(422).json({ message: "Cannot process the payload" });
-
-    let newData: any = {
-      frequency: doc["frequency"],
-      day: doc["day"],
-      weekday: doc["weekday"],
-      time: doc["time"],
-      recipient: doc["recipient"],
-      contact: doc["contact"],
-    };
-
-    let existingSettings: any = await AutoMail.aggregate().match({});
-
-    existingSettings = existingSettings ? existingSettings[0] : null;
-
-    const idToUsed = existingSettings
-      ? existingSettings._id
-      : new mongoose.Types.ObjectId();
-
-    if (existingSettings) delete existingSettings._id;
-
-    newData = nextRollComputatuion({ ...existingSettings, ...newData });
-
-    if (!newData.created) {
-      newData["created"] = new Date();
-      newData["createdby"] =
-        `${currentUser["firstName"]} ${currentUser["lastName"]}`;
-    }
-    newData["updated"] = new Date();
-    newData["updatedby"] =
-      `${currentUser["firstName"]} ${currentUser["lastName"]}`;
-
-    await AutoMail.updateOne({ _id: idToUsed }, newData, { upsert: true });
-
-    await renewAutoMailingActivation();
-
-    return res.status(200).json({
-      message: "Auto generated mail reports configurations has been set",
-      data: newData,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Something went wrong", error });
   }
-});
+);
 
-router.get("/", verifyToken, async (req: Request, res: Response) => {
-  try {
-    const token = req.cookies.auth_token;
-    const decodedToken: any = jwt.verify(
-      token,
-      process.env.JWT_SECRET_KEY as string
-    );
+router.get(
+  "/",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    try {
+      const existingSettings: any = await AutoMail.findOne({});
 
-    if (decodedToken.role !== "ADMIN") {
-      return res.status(403).json({
-        message: "Only users with admin role can perform this action",
-      });
+      if (!existingSettings)
+        return res.status(404).json({ message: "Auto mail is not yet set" });
+      return res.status(200).json(existingSettings);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Something went wrong", error });
     }
-
-    const existingSettings: any = await AutoMail.findOne({});
-
-    if (!existingSettings)
-      return res.status(404).json({ message: "Auto mail is not yet set" });
-    return res.status(200).json(existingSettings);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Something went wrong", error });
   }
-});
+);
 
 router.post(
   "/activateNow",
   verifyToken,
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = jwt.verify(
-        token,
-        process.env.JWT_SECRET_KEY as string
-      );
-
-      if (decodedToken.role !== "ADMIN") {
-        return res.status(403).json({
-          message: "Only users with admin role can perform this action",
-        });
-      }
-
       const autoMailData = await AutoMail.findOne({});
       await activateAutoMailing(autoMailData, true);
 

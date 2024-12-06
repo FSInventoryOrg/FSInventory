@@ -16,12 +16,14 @@ import {
 } from "lucide-react";
 import { Gear } from "@phosphor-icons/react";
 import { FullScaleIcon } from "./icons/FullScaleIcon";
-import useUserData from "@/hooks/useUserData";
+import { useUserContext } from "@/hooks/useUserData";
 import VersionBadge from "./VersionBadge";
 
 const NavigationBar = () => {
-  const { data: userData } = useUserData();
+  const { user: userData } = useUserContext();
   const isDevMode = import.meta.env.DEV;
+
+  console.log(userData?.is_admin);
 
   return (
     <section className="flex w-full justify-between py-6 px-6 z-0">
@@ -174,23 +176,25 @@ const NavigationBar = () => {
       </div>
       <div className="flex items-center justify-center">
         <NavigationMenu>
-          <NavigationMenuList className="gap-1 hidden md:flex">
-            <NavigationMenuItem className="justify-center flex">
-              <Button
-                asChild
-                size="icon"
-                className="rounded-xl"
-                variant="secondary"
-              >
-                <Link to="/settings">
-                  <Gear weight="fill" size={28} />
-                </Link>
-              </Button>
-            </NavigationMenuItem>
-            <NavigationMenuItem className="justify-center flex">
-              <Notification />
-            </NavigationMenuItem>
-          </NavigationMenuList>
+          {userData?.is_admin && (
+            <NavigationMenuList className="gap-1 hidden md:flex">
+              <NavigationMenuItem className="justify-center flex">
+                <Button
+                  asChild
+                  size="icon"
+                  className="rounded-xl"
+                  variant="secondary"
+                >
+                  <Link to="/settings">
+                    <Gear weight="fill" size={28} />
+                  </Link>
+                </Button>
+              </NavigationMenuItem>
+              <NavigationMenuItem className="justify-center flex">
+                <Notification />
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          )}
           <NavigationMenuList className="ml-4">
             <NavigationMenuItem>
               <UserAvatar userInfo={userData} />

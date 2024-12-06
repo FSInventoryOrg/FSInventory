@@ -1,13 +1,14 @@
+import { RocksRole, BasicUserInfo } from "./auth";
+
 export interface UserType {
   _id: string;
-  username: string;
+  first_name: string;
+  last_name: string;
+  role: RocksRole;
+  is_admin: boolean;
   email: string;
-  password?: string;
-  firstName: string;
-  lastName: string;
-  joinDate: Date;
-  role: "USER" | "ADMIN";
-  avatar: string
+  avatar: string;
+  manager: BasicUserInfo;
 }
 
 export interface UploadImage {

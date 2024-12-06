@@ -156,11 +156,11 @@ const DeploymentInfo = ({ employee, assignee }: DeploymentInfoProps) => {
                   <Tooltip>
                     <TooltipTrigger className="w-fit text-ellipsis">
                       <span className="whitespace-nowrap text-primary-foreground text-4xl">
-                        {employee.firstName + " " + employee.lastName}
+                        {employee.first_name + " " + employee.last_name}
                       </span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      {employee.firstName + " " + employee.lastName}
+                      {employee.first_name + " " + employee.last_name}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -382,7 +382,7 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <Button onClick={handleDeleteEmployee} variant="destructive">
                 Yes, I want to remove{" "}
-                {employee.firstName + " " + employee.lastName}
+                {employee.first_name + " " + employee.last_name}
               </Button>
             </AlertDialogFooter>
           </>
@@ -392,7 +392,7 @@ const DeleteEmployee = ({ employee }: { employee: EmployeeType }) => {
               <AlertDialogTitle>Cannot remove this employee</AlertDialogTitle>
               <AlertDialogDescription>
                 There are {employeeAssets?.length || 0} assets deployed to{" "}
-                {employee.firstName + " " + employee.lastName}. Recover these
+                {employee.first_name + " " + employee.last_name}. Recover these
                 assets and try again.
               </AlertDialogDescription>
             </AlertDialogHeader>

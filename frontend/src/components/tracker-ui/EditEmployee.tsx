@@ -55,9 +55,9 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
     resolver: zodResolver(EmployeeSchema),
     defaultValues: {
       code: employeeData.code,
-      firstName: employeeData.firstName,
-      middleName: employeeData.middleName,
-      lastName: employeeData.lastName,
+      first_name: employeeData.first_name,
+      middle_name: employeeData.middle_name,
+      last_name: employeeData.last_name,
       position: employeeData.position,
       startDate: employeeData.startDate
         ? new Date(employeeData.startDate)
@@ -239,7 +239,7 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
                   <div className="flex w-full gap-2 justify-center items-center">
                     <FormField
                       control={form.control}
-                      name="firstName"
+                      name="first_name"
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <FormControl>
@@ -257,7 +257,7 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
                     />
                     <FormField
                       control={form.control}
-                      name="middleName"
+                      name="middle_name"
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <FormControl>
@@ -275,7 +275,7 @@ const EditEmployee = ({ employeeData, buttonText }: EditEmployeeProps) => {
                     />
                     <FormField
                       control={form.control}
-                      name="lastName"
+                      name="last_name"
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <FormControl>

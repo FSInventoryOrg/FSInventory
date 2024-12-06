@@ -4,7 +4,6 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 
-import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
 import assetRoutes from "./routes/assets";
 import assetCounterRoutes from "./routes/asset-counter";
@@ -69,7 +68,6 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
 app.use("/api/assets", assetRoutes);
 app.use("/api/options", optionRoutes);
 app.use("/api/employees", employeeRoutes);

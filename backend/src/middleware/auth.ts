@@ -1,47 +1,166 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import { Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload } from 'jsonwebtoken'
 
 export interface UserAuth {
-	userId: string;
-	role: string;
+  userId: number;
+  role: string;
+  email: string;
+  full_name: string;
+  first_name: string;
+  last_name: string;
 }
+
+type RocksRoles =
+  | "superadmin"
+  | "admin"
+  | "standarduser"
+  | "client"
+  | "hr"
+  | "floormanager"
+  | "finance"
+  | "sales"
+  | "contentwriter";
+
+export interface RocksUser {
+  data: {
+    id: number;
+    employee_id: number;
+    name: string;
+    email: string;
+    user_name: string;
+    role: RocksRoles;
+    role_is_active: number;
+    can_login: number;
+    is_verified: number;
+    created_at: string;
+    updated_at: string;
+    updated_by: string | null;
+    clients: null;
+    deleted_at: string | null;
+    roles: {
+      data: [
+        {
+          id: number;
+          is_enabled: number;
+          role_id: number;
+          user_id: number;
+        },
+      ];
+    };
+  };
+}
+
+type TokenStatus = {
+  status_code: 200 | 401;
+  login_session_id?: string;
+  message: "Authenticated" | "Unauthenticated";
+  authenticated: boolean;
+};
 
 /* Extend Request type and add userId */
 declare global {
-	namespace Express {
-		interface Request {
-			user: UserAuth;
-		}
-	}
+  namespace Express {
+    interface Request {
+      user: UserAuth;
+    }
+  }
 }
 
-const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-	const token = req.cookies["auth_token"];
-	if (!token) {
-		return res.status(401).json({ message: "Unauthorized access" })
-	}
-	try {
-		const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
-		req.user = {
-			userId: (decoded as JwtPayload).userId,
-			role: (decoded as JwtPayload).role,
-		} as UserAuth;
-		next();
-	} catch (error) {
-		return res.status(401).json({ message: "Unauthorized access" })
-	}
-}
+const { ROCKS_DEV_API_URL, ROCKS_PRODUCTION_API_URL, NODE_ENV } = process.env;
+const UNAUTHORIZED_ACCESS: string = "Unauthorized access";
+const ADMIN_ERROR: string =
+  "Only users with admin role can perform this action";
+const { IT_MANAGER } = process.env;
 
-const verifyRole = (requiredRole: string) => (req: Request, res: Response, next: NextFunction) => {
-	if (!req.user) {
-		return res.status(401).json({ message: "Unauthorized access" });
-	}
-	const { role } = req.user;
-	if (role !== requiredRole) {
-		return res.status(403).json({ message: "Forbidden: Insufficient permissions" });
-	}
-	next();
-}
+/*
+  Note for future devs:
+  In case the IT team grows to more than just the IT manager, you can add a
+  collection to the database which contains the emails of the IT team's members.
+  For which you should also need endpoints to add/delete entries to the collection.
+
+  The email of the current IT Manager should, understandably, always be in the list of
+  members in the IT team. It is also possible to check the job position of the currently
+  logged in user if it equals "IT Manager". This is done by accessing the endpoint through
+  ${API_URL}/employees/:employee_id (API_URL, of course, being the Rocks Dev/Prod API URL).
+
+  The data for the job position should be accessible in the data.projects.data.emplyee.job_position
+  property (super nested, I know). For the first implementation, the IT Manager is recognized
+  by their email, which is stored in the environment file in order to keep it secret and safe.
+  Feel free to modify this implementation should the need arise.
+*/
+const IT_TEAM: string[] = [IT_MANAGER!];
+
+const API_URL: string =
+  NODE_ENV === "PRODUCTION" ? ROCKS_PRODUCTION_API_URL! : ROCKS_DEV_API_URL!;
+
+const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies["auth_token"];
+  if (!token) {
+    return res.status(401).json({ message: UNAUTHORIZED_ACCESS });
+  }
+  try {
+    const token_status: TokenStatus = await (
+      await fetch(`${API_URL}/auth/check`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    ).json();
+
+    if (!token_status.authenticated) {
+      return res.status(401).json({ message: UNAUTHORIZED_ACCESS });
+    }
+
+    const user: RocksUser = await (
+      await fetch(`${API_URL}/users/me`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    ).json();
+    const { id: userId, employee_id, role, email } = user.data;
+    const FS_EMPLOYEE = await (
+      await fetch(`${API_URL}/employees/${employee_id}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    ).json();
+    const { first_name, last_name } = FS_EMPLOYEE.data;
+    req.user = {
+      userId,
+      role,
+      email,
+      first_name,
+      last_name,
+      full_name: `${first_name} ${last_name}`,
+    } as UserAuth;
+    next();
+  } catch (error) {
+    console.error(error);
+    return res.status(401).json({ message: UNAUTHORIZED_ACCESS });
+  }
+};
+
+const verifyRole = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    return res.status(401).json({ message: UNAUTHORIZED_ACCESS });
+  }
+  const { email } = req.user;
+  if (!IT_TEAM.includes(email)) {
+    return res.status(403).json({ message: ADMIN_ERROR });
+  }
+  next();
+};
 
 export default verifyToken;
-export { verifyRole };
+export { verifyRole, IT_MANAGER };

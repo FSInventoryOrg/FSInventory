@@ -17,6 +17,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { useUserContext } from "@/hooks/useUserData";
 
 const Tracker = () => {
   const { employeeCode } = useParams();
@@ -25,6 +26,7 @@ const Tracker = () => {
   const [employees, setEmployees] = useState<EmployeeType[]>();
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeType>();
   const [height, setHeight] = useState("calc(100vh - 91px)");
+  const { user } = useUserContext();
 
   const { data: employeeByUrl } = useQuery({
     queryKey: ["fetchEmployeeByCode", employeeCode],
@@ -59,7 +61,7 @@ const Tracker = () => {
     // Add registered employees
     if (registeredEmployees) {
       registeredEmployees.forEach((employee: EmployeeType) => {
-        const name = `${employee.firstName} ${employee.lastName}`;
+        const name = `${employee.first_name} ${employee.last_name}`;
         allEmployees.push({
           ...employee,
           name: name,
@@ -75,15 +77,15 @@ const Tracker = () => {
         if (name && employeeCodes.has(name)) return;
         // Unregistered employees are added to allEmployees
         const nameParts = name.split(" ");
-        const lastName = nameParts.pop()!;
-        const firstName = nameParts.join(" ");
+        const last_name = nameParts.pop()!;
+        const first_name = nameParts.join(" ");
         if (!employeesAdded.has(name)) {
           allEmployees.push({
             _id: "", // Assign a unique ID or leave it empty if it's not available
             code: "", // You can assign a code or leave it empty
-            firstName: firstName,
-            middleName: "",
-            lastName: lastName,
+            first_name: first_name,
+            middle_name: "",
+            last_name: last_name,
             name: name,
             position: "",
             startDate: new Date(),
@@ -199,38 +201,14 @@ const Tracker = () => {
   }, []);
 
   return (
-    <section
-      id="tracker"
-      className="flex gap-3 sm:gap-6 w-full px-3 pb-3 sm:px-6 sm:pb-6 pt-3"
-      style={{ height }}
-    >
-      <aside className="order-first hidden xl:flex xl:w-80 z-50">
-        {employees ? (
-          <EmployeeTable
-            columns={EmployeeColumns}
-            data={employees}
-            onEmployeeSelect={handleEmployeeSelect}
-            onFilter={handleFilters}
-          />
-        ) : (
-          <EmployeeTableSuspense />
-        )}
-      </aside>
-      <main className="flex-1 flex flex-col gap-3 w-full">
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild>
-            <Button className="xl:hidden bg-accent" variant="outline">
-              View Employees
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="h-full overflow-y-scroll w-full">
-            <SheetHeader className="pb-4">
-              <SheetTitle>Employees</SheetTitle>
-              <SheetDescription className="hidden sm:flex">
-                Select an employee below to view their currently deployed and
-                past assets.
-              </SheetDescription>
-            </SheetHeader>
+    <>
+      {user!.is_admin && (
+        <section
+          id="tracker"
+          className="flex gap-3 sm:gap-6 w-full px-3 pb-3 sm:px-6 sm:pb-6 pt-3"
+          style={{ height }}
+        >
+          <aside className="order-first hidden xl:flex xl:w-80 z-50">
             {employees ? (
               <EmployeeTable
                 columns={EmployeeColumns}
@@ -241,28 +219,59 @@ const Tracker = () => {
             ) : (
               <EmployeeTableSuspense />
             )}
-          </SheetContent>
-        </Sheet>
-        {selectedEmployee ? (
-          <DeploymentInfo
-            key={key}
-            employee={selectedEmployee}
-            assignee={
-              selectedEmployee.code
-                ? selectedEmployee.code
-                : `${selectedEmployee.firstName} ${selectedEmployee.lastName}`
-            }
-          />
-        ) : (
-          <div className="w-full h-full flex flex-col justify-center items-center">
-            <Filter height={300} width={300} />
-            <span className="text-sm text-muted-foreground">
-              Select an employee to view their deployed assets
-            </span>
-          </div>
-        )}
-      </main>
-    </section>
+          </aside>
+          <main className="flex-1 flex flex-col gap-3 w-full">
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild>
+                <Button className="xl:hidden bg-accent" variant="outline">
+                  View Employees
+                </Button>
+              </SheetTrigger>
+              <SheetContent
+                side="left"
+                className="h-full overflow-y-scroll w-full"
+              >
+                <SheetHeader className="pb-4">
+                  <SheetTitle>Employees</SheetTitle>
+                  <SheetDescription className="hidden sm:flex">
+                    Select an employee below to view their currently deployed
+                    and past assets.
+                  </SheetDescription>
+                </SheetHeader>
+                {employees ? (
+                  <EmployeeTable
+                    columns={EmployeeColumns}
+                    data={employees}
+                    onEmployeeSelect={handleEmployeeSelect}
+                    onFilter={handleFilters}
+                  />
+                ) : (
+                  <EmployeeTableSuspense />
+                )}
+              </SheetContent>
+            </Sheet>
+            {selectedEmployee ? (
+              <DeploymentInfo
+                key={key}
+                employee={selectedEmployee}
+                assignee={
+                  selectedEmployee.code
+                    ? selectedEmployee.code
+                    : `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
+                }
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col justify-center items-center">
+                <Filter height={300} width={300} />
+                <span className="text-sm text-muted-foreground">
+                  Select an employee to view their deployed assets
+                </span>
+              </div>
+            )}
+          </main>
+        </section>
+      )}
+    </>
   );
 };
 

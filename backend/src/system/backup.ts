@@ -114,7 +114,7 @@ export const extractDocuments = async (fileFormat: string = "json") => {
 router.get(
   "/export",
   verifyToken,
-  verifyRole("ADMIN"),
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       const { fileFormat } = req.query as { fileFormat: string };
@@ -149,7 +149,7 @@ router.get(
 router.post(
   "/validate",
   verifyToken,
-  verifyRole("ADMIN"),
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       const uploadData = await extractUploadData(req, "application/zip");
@@ -300,7 +300,7 @@ router.post(
 router.post(
   "/import",
   verifyToken,
-  verifyRole("ADMIN"),
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       // Get list of collection name
@@ -375,83 +375,88 @@ router.post(
 /**
  * IGNORE THIS PART
  */
-router.patch("/check", verifyToken, async (req: Request, res: Response) => {
-  try {
-    // Get import filepath
-    const verifiedUploadedDir = getDirPath("/public/backup/collections");
+router.patch(
+  "/check",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    try {
+      // Get import filepath
+      const verifiedUploadedDir = getDirPath("/public/backup/collections");
 
-    const collectionList = await listCollection();
-    const noIDs: any[] = [];
-    const noRecord: any[] = [];
-    const errorParsing: any[] = [];
-    let currentMoreUpdated: boolean = false;
+      const collectionList = await listCollection();
+      const noIDs: any[] = [];
+      const noRecord: any[] = [];
+      const errorParsing: any[] = [];
+      let currentMoreUpdated: boolean = false;
 
-    collectionList?.forEach(async (collection) => {
-      let backupDocuments: any;
-      try {
-        const bkFile: any = await getFileFromDir(
-          `${verifiedUploadedDir}/${collection}.json`,
-          true
-        );
-        backupDocuments = JSON.parse(bkFile.toString());
-
-        const fileLength = backupDocuments.length;
-        backupDocuments = backupDocuments.reduce((accum: any, value: any) => {
-          if (value?._id) {
-            value._id = {
-              $oid: value._id,
-            };
-
-            accum.push(value);
-          }
-          return accum;
-        }, []);
-
-        if (fileLength !== backupDocuments.length) noIDs.push(collection);
-
-        if (backupDocuments.length === 0) noRecord.push(collection);
-      } catch (errorFile) {
-        console.error(errorFile);
-        errorParsing.push(collection);
-      }
-
-      if (Array.isArray(backupDocuments) && collection === "assets") {
-        if (backupDocuments.length > 0) {
-          backupDocuments = backupDocuments.sort((a, b) =>
-            b.updated.toString().localCompare(a.updated)
+      collectionList?.forEach(async (collection) => {
+        let backupDocuments: any;
+        try {
+          const bkFile: any = await getFileFromDir(
+            `${verifiedUploadedDir}/${collection}.json`,
+            true
           );
+          backupDocuments = JSON.parse(bkFile.toString());
 
-          const _tmpCollection = db.collection(collection);
-          let lastupdate: any = await _tmpCollection
-            .aggregate()
-            .match({})
-            .sort({ updated: -1 })
-            .limit(1)
-            .toArray();
+          const fileLength = backupDocuments.length;
+          backupDocuments = backupDocuments.reduce((accum: any, value: any) => {
+            if (value?._id) {
+              value._id = {
+                $oid: value._id,
+              };
 
-          if (lastupdate.length > 0) {
-            lastupdate = lastupdate[0];
+              accum.push(value);
+            }
+            return accum;
+          }, []);
 
-            const backupLastEntry = new Date(backupDocuments[0].updated);
-            const currentLastEntry = new Date(lastupdate.updated);
+          if (fileLength !== backupDocuments.length) noIDs.push(collection);
 
-            if (currentLastEntry > backupLastEntry) currentMoreUpdated = true;
+          if (backupDocuments.length === 0) noRecord.push(collection);
+        } catch (errorFile) {
+          console.error(errorFile);
+          errorParsing.push(collection);
+        }
+
+        if (Array.isArray(backupDocuments) && collection === "assets") {
+          if (backupDocuments.length > 0) {
+            backupDocuments = backupDocuments.sort((a, b) =>
+              b.updated.toString().localCompare(a.updated)
+            );
+
+            const _tmpCollection = db.collection(collection);
+            let lastupdate: any = await _tmpCollection
+              .aggregate()
+              .match({})
+              .sort({ updated: -1 })
+              .limit(1)
+              .toArray();
+
+            if (lastupdate.length > 0) {
+              lastupdate = lastupdate[0];
+
+              const backupLastEntry = new Date(backupDocuments[0].updated);
+              const currentLastEntry = new Date(lastupdate.updated);
+
+              if (currentLastEntry > backupLastEntry) currentMoreUpdated = true;
+            }
           }
         }
-      }
-    });
+      });
 
-    return res.status(200).json({
-      no_id_collection: noIDs,
-      no_record_collection: noRecord,
-      error_in_parsing: errorParsing,
-      currentIsUpdated: currentMoreUpdated,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Something went wrong" });
+      return res.status(200).json({
+        no_id_collection: noIDs,
+        no_record_collection: noRecord,
+        error_in_parsing: errorParsing,
+        currentIsUpdated: currentMoreUpdated,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Something went wrong" });
+    }
   }
-});
+);
 
 /**
  * Clear tables
@@ -459,7 +464,7 @@ router.patch("/check", verifyToken, async (req: Request, res: Response) => {
 router.delete(
   "/clear",
   verifyToken,
-  verifyRole("ADMIN"),
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
       // Get list of collection name

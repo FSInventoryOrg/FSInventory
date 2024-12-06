@@ -236,7 +236,7 @@ const SidebarFilters = ({
                     <div
                       className={`rounded-lg px-2 py-0.5 text-xs ${selectedStatus === "" ? "bg-primary/30 text-primary" : "bg-secondary text-secondary-foreground"}`}
                     >
-                      {data.length}
+                      {data?.length}
                     </div>
                   </Button>
                   {Object.entries(statusCounts).map(([status, count]) => (

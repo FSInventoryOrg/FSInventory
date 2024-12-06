@@ -1,14 +1,14 @@
 import RequestForm from "@/components/requests-ui/RequestForm";
 import { Separator } from "@/components/ui/separator";
-import useUserData from "@/hooks/useUserData";
+import { useUserContext } from "@/hooks/useUserData";
 import { Flag } from "lucide-react";
 
 const Requests = () => {
-  const { data: user } = useUserData();
+  const { user } = useUserContext();
 
   const userData = {
-    employeeName: user ? `${user.firstName} ${user.lastName}` : "",
-    managerName: "John Doe", // TODO: replace with actual data from Rocks
+    employeeName: user ? `${user.first_name} ${user.last_name}` : "",
+    managerName: user?.manager.full_name || "",
     employeeEmail: user?.email || "",
   };
 

@@ -1,8 +1,7 @@
 import express, { Request, Response } from "express";
 import Option, { StatusOptions } from "../models/options.schema"; // Import your Mongoose model
 import { check, validationResult } from "express-validator";
-import verifyToken from "../middleware/auth";
-import jwt from "jsonwebtoken";
+import verifyToken, { verifyRole } from "../middleware/auth";
 import { auditAssets, deleteNotif } from "../utils/common";
 import AssetCounter from "../models/asset-counter.schema";
 import { format } from "../utils/string-utils";
@@ -52,24 +51,13 @@ router.post(
   "/:property",
   [check("value").exists().withMessage("Value is required")],
   verifyToken,
+  verifyRole,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = jwt.verify(
-        token,
-        process.env.JWT_SECRET_KEY as string
-      );
-
-      if (decodedToken.role !== "ADMIN") {
-        return res.status(403).json({
-          message: "Only users with admin role can perform this action",
-        });
-      }
-
       const { property } = req.params;
       const { type } = req.query;
       let { value } = req.body;
@@ -177,24 +165,13 @@ router.put(
     check("inventoryColumns").optional().isArray(),
   ],
   verifyToken,
+  verifyRole,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = jwt.verify(
-        token,
-        process.env.JWT_SECRET_KEY as string
-      );
-
-      if (decodedToken.role !== "ADMIN") {
-        return res.status(403).json({
-          message: "Only users with admin role can perform this action",
-        });
-      }
-
       let option = await Option.findOne();
       if (!option) {
         option = new Option({});
@@ -300,6 +277,7 @@ router.put(
   "/:property",
   [check("value").exists().withMessage("Value is required")],
   verifyToken,
+  verifyRole,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -429,20 +407,9 @@ router.put(
 router.delete(
   "/:property",
   verifyToken,
+  verifyRole,
   async (req: Request, res: Response) => {
     try {
-      const token = req.cookies.auth_token;
-      const decodedToken: any = jwt.verify(
-        token,
-        process.env.JWT_SECRET_KEY as string
-      );
-
-      if (decodedToken.role !== "ADMIN") {
-        return res.status(403).json({
-          message: "Only users with admin role can perform this action",
-        });
-      }
-
       const { property } = req.params;
       const { value } = req.body;
 
@@ -519,39 +486,49 @@ router.delete(
   }
 );
 
-router.get("/:property", async (req: Request, res: Response) => {
-  try {
-    const { property } = req.params;
+router.get(
+  "/:property",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    try {
+      const { property } = req.params;
 
-    // Retrieve the options document
-    const option = await Option.findOne();
+      // Retrieve the options document
+      const option = await Option.findOne();
 
-    // Check if the options document exists and if the property exists in it
-    if (!option || !option.get(property)) {
-      return res
-        .status(404)
-        .json({ message: `property '${property}' not found in options` });
+      // Check if the options document exists and if the property exists in it
+      if (!option || !option.get(property)) {
+        return res
+          .status(404)
+          .json({ message: `property '${property}' not found in options` });
+      }
+
+      // Return the value of the specified property
+      res.status(200).json({ value: option.get(property) });
+    } catch (error) {
+      console.error("Error fetching option value:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
-
-    // Return the value of the specified property
-    res.status(200).json({ value: option.get(property) });
-  } catch (error) {
-    console.error("Error fetching option value:", error);
-    res.status(500).json({ error: "Internal Server Error" });
   }
-});
+);
 
-router.get("/", async (req: Request, res: Response) => {
-  try {
-    // Retrieve all options documents
-    const options = await Option.find();
+router.get(
+  "/",
+  verifyToken,
+  verifyRole,
+  async (req: Request, res: Response) => {
+    try {
+      // Retrieve all options documents
+      const options = await Option.find();
 
-    // Return the options array
-    res.status(200).json(options);
-  } catch (error) {
-    console.error("Error fetching options:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+      // Return the options array
+      res.status(200).json(options);
+    } catch (error) {
+      console.error("Error fetching options:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
-});
+);
 
 export default router;

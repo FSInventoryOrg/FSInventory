@@ -13,7 +13,6 @@ import Loading from "./pages/Loading";
 import Tracker from "./pages/Tracker";
 import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
 import Requests from "./pages/Requests";
 
 const App = () => {
@@ -89,7 +88,6 @@ const App = () => {
                 </>
               )}
               <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="*" element={<Navigate to="/" />} />
             </>
           )}

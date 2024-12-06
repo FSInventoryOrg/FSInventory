@@ -10,6 +10,7 @@ import { InventoryTableSuspense } from "@/components/inventory-ui/InventoryTable
 import { Defaults } from "@/types/options";
 import { PROPERTIES } from "@/lib/data";
 import { AssetType } from "@/types/asset";
+import { useUserContext } from "@/hooks/useUserData";
 
 const Inventory = () => {
   const [selectedType, setSelectedType] = React.useState<string>("");
@@ -19,6 +20,7 @@ const Inventory = () => {
     Record<string, string>
   >({ processor: "", memory: "", storage: "" });
   const [isFiltersVisible, setIsFiltersVisible] = React.useState<boolean>(true);
+  const { user } = useUserContext();
 
   const handleTypeChange = (type: string) => {
     setSelectedType(type);
@@ -103,50 +105,54 @@ const Inventory = () => {
   }, []);
 
   return (
-    <section
-      id="inventory"
-      className=" flex flex-col xl:flex-row gap-3 sm:gap-6 px-3 pb-3 sm:px-6 sm:pb-6 pt-3"
-      style={{ height, width: "calc(100vw - 10px)" }}
-    >
-      {isFiltersVisible && (
-        <aside className="order-first flex xl:w-80 z-50">
-          <SidebarFilters
-            onTypeChange={handleTypeChange}
-            onFilterChange={handleFilterChange}
-            onCategoryChange={handleCategoryChange}
-            onProcessorChange={handleProcessorChange}
-            onMemoryChange={handleMemoryChange}
-            onStorageChange={handleStorageChange}
-            onToggleFilters={handleToggleFilters}
-            isFiltersVisible={isFiltersVisible}
-            selectedType={selectedType}
-            selectedStatus={selectedStatus}
-            selectedCategory={selectedCategory}
-            selectedSystemSpecs={selectedSystemSpecs}
-            totalAssets={data?.length ?? 0}
-          />
-        </aside>
+    <>
+      {user!.is_admin && (
+        <section
+          id="inventory"
+          className=" flex flex-col xl:flex-row gap-3 sm:gap-6 px-3 pb-3 sm:px-6 sm:pb-6 pt-3"
+          style={{ height, width: "calc(100vw - 10px)" }}
+        >
+          {isFiltersVisible && (
+            <aside className="order-first flex xl:w-80 z-50">
+              <SidebarFilters
+                onTypeChange={handleTypeChange}
+                onFilterChange={handleFilterChange}
+                onCategoryChange={handleCategoryChange}
+                onProcessorChange={handleProcessorChange}
+                onMemoryChange={handleMemoryChange}
+                onStorageChange={handleStorageChange}
+                onToggleFilters={handleToggleFilters}
+                isFiltersVisible={isFiltersVisible}
+                selectedType={selectedType}
+                selectedStatus={selectedStatus}
+                selectedCategory={selectedCategory}
+                selectedSystemSpecs={selectedSystemSpecs}
+                totalAssets={data?.length ?? 0}
+              />
+            </aside>
+          )}
+          <main className="flex-1 flex gap-4 w-full">
+            {data ? (
+              <InventoryTable
+                columns={InventoryColumns}
+                data={data}
+                defaultOptions={defaultOptions || {}}
+                DEFAULT_HIDDEN_COLUMNS={DEFAULT_HIDDEN_COLUMNS}
+                onToggleFilters={handleToggleFilters}
+                isFiltersVisible={isFiltersVisible}
+                selectedCategory={selectedCategory}
+                selectedType={selectedType as AssetType["type"]}
+              />
+            ) : (
+              <InventoryTableSuspense
+                onToggleFilters={handleToggleFilters}
+                isFiltersVisible={isFiltersVisible}
+              />
+            )}
+          </main>
+        </section>
       )}
-      <main className="flex-1 flex gap-4 w-full">
-        {data ? (
-          <InventoryTable
-            columns={InventoryColumns}
-            data={data}
-            defaultOptions={defaultOptions || {}}
-            DEFAULT_HIDDEN_COLUMNS={DEFAULT_HIDDEN_COLUMNS}
-            onToggleFilters={handleToggleFilters}
-            isFiltersVisible={isFiltersVisible}
-            selectedCategory={selectedCategory}
-            selectedType={selectedType as AssetType["type"]}
-          />
-        ) : (
-          <InventoryTableSuspense
-            onToggleFilters={handleToggleFilters}
-            isFiltersVisible={isFiltersVisible}
-          />
-        )}
-      </main>
-    </section>
+    </>
   );
 };
 

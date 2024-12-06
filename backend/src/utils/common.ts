@@ -292,7 +292,7 @@ export const trackExpiringSoftwareLicenses = async () => {
 
         if (findUser) {
           notifValue["target_users"].push(findUser.email);
-          value.assignee = `${findUser["firstName"]} ${findUser["lastName"]}`;
+          value.assignee = `${findUser["first_name"]} ${findUser["last_name"]}`;
         }
 
         notifValue["message"] = `Software Asset ${value.code} assigned to ${

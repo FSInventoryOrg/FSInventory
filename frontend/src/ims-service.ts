@@ -809,6 +809,24 @@ export const verifyOAuthCode = async (code: string) => {
   return responseBody;
 };
 
+export const getCookieUser = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/cookie-user`, {
+    credentials: "include",
+  });
+
+  const responseBody = await response.json();
+
+  return responseBody;
+};
+
+export const validateToken = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/validate-token`, {
+    credentials: "include",
+  });
+
+  return response.ok;
+};
+
 export const bulkDeleteAssets = async (assetCodes: string[]) => {
   const response = await fetch(`${API_BASE_URL}/api/assets/bulkDelete`, {
     method: "PATCH",

@@ -1,7 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
     
@@ -44,10 +45,19 @@
     --radius: 0.5rem;
     --tab: 0 0% 85%;
 
-    --brand-green: 150, 99%, 31%, 1;
+    --brand-green: #019C4E;
+    --brand-green-hover: #028B46;
     
     --tracker-gradient-from:#CAEADA -46.58%;
     --tracker-gradient-to:#F7FCFA 61.77%;
+
+    --body-new: #565F5C;
+    --primary-new: #1A1A1A;
+    --secondary-new: #333333;
+    --border-new: #D9D9D9;
+    --muted-new: #808080;
+    --error: #F33535;
+    --error-bg: #FCF0F0;
   }
  
   .dark {
@@ -92,6 +102,13 @@
 
     --tracker-gradient-from: #212533 17.84%;
     --tracker-gradient-to: #347355 128.66%;
+
+    --background-new: #141D1E;
+    --body-new: #565F5C;
+    --primary-new: #1A1A1A;
+    --secondary-new: #333333;
+    --border-new: #D9D9D9;
+    --muted-new: #85A7AD;
   }
 }
  

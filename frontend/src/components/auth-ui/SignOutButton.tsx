@@ -29,7 +29,7 @@ const SignOutButton = () => {
         type: "SUCCESS",
       });
       navigate("/");
-      await queryClient.invalidateQueries({ queryKey: ["validateToken"] });
+      queryClient.removeQueries();
     },
     onError: (error: Error) => {
       showToast({ message: error.message, type: "ERROR" });
