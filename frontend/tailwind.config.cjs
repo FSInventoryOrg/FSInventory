@@ -33,7 +33,6 @@ module.exports = {
           DEFAULT: "var(--brand-green)",
           hover: "var(--brand-green-hover)",
         },
-        brandgreen: "hsla(var(--brand-green))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         tab: "hsl(var(--tab))",
