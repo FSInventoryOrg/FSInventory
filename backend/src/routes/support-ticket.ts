@@ -176,7 +176,7 @@ router.post(
 router.put(
   "/:ticketId",
   verifyToken,
-  verifyRole("ADMIN"),
+  verifyRole,
   validateUpdaterFields,
   async (
     req: Request<{ ticketId: string }, object, TicketRequestBody>,
